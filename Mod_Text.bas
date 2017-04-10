@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 2
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2584,7 +2584,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
             GoTo fastexit
         End If
         ' check for iamglobal ??
-        UnFloatGroup bstack, w$, y1, pppp.item(v)
+        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
         
         var(y1).FloatGroupName = ec$
        Dim r As Double, bs As New basetask
@@ -2621,7 +2621,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
             GoTo fastexit
         End If
        ' check for iamglobal ??
-        UnFloatGroup bstack, w$, y1, pppp.item(v)
+        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
         var(y1).FloatGroupName = ec$
         If Left$(b$, 1) = "." Then
             b$ = w$ + b$
@@ -2691,7 +2691,7 @@ RetStackSize = bstack.RetStackTotal
         End If
         On Error Resume Next
                ' check for iamglobal ??
-        UnFloatGroup bstack, w$, y1, pppp.item(v)
+        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
 If Err.Number > 0 Then
 mer123:
 MyEr "This For can't be done", " ¡ıÙﬁ Á √È· ‰ÂÌ ÏÔÒÂﬂ Ì· „ﬂÌÂÈ"
@@ -2720,7 +2720,7 @@ w$ = myUcase(w$)
                                                 Set dd = New Group
                                                  y1 = GlobalVar(w$, dd)
                                                         ' check for iamglobal ??
-                                                UnFloatGroup bstack, w$, y1, pppp.item(v)
+                                                UnFloatGroup bstack, w$, y1, pppp.item(v), , True
                                                 bstack.MoveNameDot myUcase(w$)
                                                 depth = depth + 1
                                                 mm.DataVal CDbl(y1)
@@ -2942,7 +2942,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         Set dd = New Group
          y1 = GlobalVar(w$, dd)
        ' check for iamglobal ??
-        UnFloatGroup bstack, w$, y1, pppp.item(v)
+        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
 
         If Prefix <> "" Then
         If Prefix = "@READ2" Then
@@ -3773,7 +3773,9 @@ ElseIf IsSymbol(b$, ")") Then pppp.SerialItem 0, x1, 9: Exit Do
 End If
 Loop
 p = 0
-Set bstack.lastobj = pppp
+Set bstack.lastobj = New mHandler
+bstack.lastobj.t1 = 3
+Set bstack.lastobj.objref = pppp
 GetArr = True
 End Function
 Function IsExp(basestack As basetask, a$, r As Double, Optional ByVal noand1 As Boolean = True) As Boolean
@@ -5713,7 +5715,7 @@ foundprivate:
                 End If
             Else
                 r = 0
-                CopyGroup var(VR), bstack
+                CopyGroup2 var(VR), bstack
             End If
         ElseIf v$ Like "mE*" Then
             CopyEvent var(VR), bstack
@@ -8742,7 +8744,7 @@ w1 = Abs(IsLabel(bstack, a$, s$))
 If w1 = 1 Then
 If Not GetVar(bstack, s$, w1) Then GoTo jmp1478
 If Not Typename(var(w1)) = "Group" Then GoTo jmp1478
-CopyGroup var(w1), bstack
+CopyGroup2 var(w1), bstack
     r = 0
     IsNumber = FastSymbol(a$, ")", True)
     Exit Function
@@ -14115,7 +14117,7 @@ fstr63: ' "GROUP$(", "œÃ¡ƒ¡$("
         If w1 = 1 Or w1 = 3 Then
         If Not GetVar(bstackstr, s$, w1) Then GoTo jmp1478
         If Not Typename(var(w1)) = "Group" Then GoTo jmp1478
-        CopyGroup var(w1), bstackstr
+        CopyGroup2 var(w1), bstackstr
              r$ = ""
             IsString = FastSymbol(a$, ")", True)
             Exit Function
@@ -15762,7 +15764,7 @@ Case "RETURN", "≈–…”‘—œ÷«"
                     LastErNameGR = ""  ' interpret is like execute without if for repeat while select structures
                     If comhash.Find2(w$, i, v) Then
                         If v <> 0 Then
-                            If v = 1500 Then
+                            If v = 32 Then
                                 If Not Identifier(bstack, w$, b$, True, lang) Then
                                     If NOEXECUTION Then
                                             MyEr "", ""
@@ -20697,7 +20699,11 @@ End If
         bstack.soros.PushVal p
             Execute = SpeedGroup(bstack, pppp, "@READ", w$, b$, v)
         Else
+        If p = 0 Then
+        pppp.item(v) = CLng(0)  ' release pointer
+        Else
      NoNumberAssign
+     End If
         End If
      Else
         pppp.item(v) = p
@@ -23106,7 +23112,7 @@ End Sub
 
 
 Function neoGetArray(bstack As basetask, ByVal nm$, ga As mArray, Optional searchonly As Boolean = False, Optional useglobalname As Boolean = False, Optional useLocalOnly As Boolean = False) As Boolean
-Dim k As Long
+Dim k As Long, myobject As Object
 Dim n$
 nm$ = myUcase(nm$)
 
@@ -23284,8 +23290,19 @@ If k > 0 Then
 If Typename(var(k)) = "Empty" Then
 Set ga = New mArray: neoGetArray = True
 Else
-
-Set ga = var(k)
+If TypeOf var(k) Is mArray Then
+    Set ga = var(k)
+Else
+    Set myobject = var(k)
+    If CheckIsmArray(myobject, var()) Then
+        Set ga = myobject
+    Else
+        NotArray
+        Set myobject = Nothing
+    Exit Function
+    End If
+    Set myobject = Nothing
+End If
 
 End If
   neoGetArray = True
@@ -24681,7 +24698,7 @@ Set scr = bstack.Owner
 prive = GetCode(scr)
 Dim p As Double, i As Long, s$, pn&, x As Double, y As Double, it As Long, f As Long, pa$
 Dim x1 As Long, y1 As Long, frm$, par As Boolean, ohere$, ss$, w$, sx As Double, sy As Double
-Dim pppp As mArray, hlp$, h&, all$
+Dim pppp As mArray, hlp$, h&, all$, myobject As Object
 Dim w1 As Long, w2 As Long, DUM As Boolean, virtualtop As Long
 pn& = 0
 virtualtop = varhash.Count - 1
@@ -24709,7 +24726,10 @@ ElseIf InStr(s$, ChrW(&H1FFF)) > 0 Then '******************
 GoTo LOOPNEXT
 ElseIf Right$(s$, 1) = "(" Then
     If MyIsObject(var(h&)) Then
-        Set pppp = var(h&)
+        Set myobject = var(h&)
+        If Not CheckIsmArray(myobject, var()) Then GoTo LOOPNEXT
+        Set pppp = myobject
+            Set myobject = Nothing
         pppp.SerialItem (0), f, 5
         w1 = 0
         pppp.SerialItem w2, w1, 6
@@ -26503,7 +26523,6 @@ w$ = "&"
 f$ = ChrW(&H1FFF) + f$
 
 GoTo funcoperator
-
 Case "PRIVATE", "…ƒ…Ÿ‘… œ"
 If Not IsOperator(rest$, ":") Then
 ExecuteVarOnly = False
@@ -28262,13 +28281,22 @@ Dim pppp As mArray, myobject As Object
              If neoGetArray(basestack, what$, pppp) Then ''basestack.GroupName &
                     If Not pppp Is Nothing Then
                         If TypeOf myobject Is mHandler Then
-                            If myobject.indirect >= 0 Then
-                                Set myobject = var(myobject.indirect)
+                        If CheckIsmArray(myobject, var()) Then
+                            Set var(varhash.lastNDX) = myobject
+                            var(varhash.lastNDX).common = pppp.common
                             Else
-                                Set myobject = myobject.objref
-                            End If
+                                  NotArray
+                                  Exit Function
+                        
                         End If
+                        ElseIf TypeOf myobject Is mArray Then
                         myobject.CopyArray pppp
+                        Else
+                        NotArray
+                        globalArrByPointer = False
+                        Set myobject = Nothing
+                        Exit Function
+                        End If
                         Set myobject = Nothing
                         globalArrByPointer = True
                     End If
@@ -28278,15 +28306,23 @@ there1:
                 GlobalArr basestack, basestack.GroupName & what$, "", 0, -1
                 If neoGetArray(basestack, what$, pppp) Then  ''basestack.GroupName &
                         If TypeOf myobject Is mHandler Then
-                                 If myobject.indirect >= 0 Then
-                                  Set myobject = var(myobject.indirect)
+                        If CheckIsmArray(myobject, var()) Then
+                            Set var(varhash.lastNDX) = myobject
                                   Else
-                                  Set myobject = myobject.objref
-                                  End If
-                         End If
+                                  NotArray
+                                  Exit Function
+                        
+                        End If
+                        ElseIf TypeOf myobject Is mArray Then
                         myobject.CopyArray pppp
+                        Else
+                        NotArray
+                        globalArrByPointer = False
                         Set myobject = Nothing
-                        globalArrByPointer = True
+                        Exit Function
+                         End If
+                         globalArrByPointer = True
+                        Set myobject = Nothing
                 End If
                 
              End If
@@ -28318,6 +28354,92 @@ Set aa = Nothing
 Set bb = Nothing
 End Sub
 
+Public Sub CopyGroup2(mg As Variant, bstack As basetask)
+Dim mgroup As Group
+Set mgroup = mg
+Dim name$, k As Group, i As Long, j As Long, s$, v As Variant, W3 As Long
+Dim b$(), vvl As Variant, delme As Document, myArray As mArray, mySecondArray As mArray
+Dim c$(), arrIndex As Long, choose$
+Set k = New Group
+Set k.Sorosref = mgroup.soros.Copy
+Dim BI As Long
+BI = 1
+
+i = mgroup.soros.Total
+k.BeginFloat i + 2
+k.PokeItem 0, "Variables-Arrays"
+k.PokeItem 1, i
+For j = 2 To i * 2 + 1 Step 2
+'Debug.Print k.soros.StackItem(BI)
+b$() = Split(k.soros.StackItem(BI), " ")
+If Right$(b$(0), 1) = ")" Then
+b$(0) = Left$(b$(0), Len(b$(0)) - 1)
+
+End If
+If Right$(b$(0), 1) <> "(" Then
+
+k.PokeItem j, b$(0)
+
+If Typename(var(val(b$(1)))) = doc Then 'preserve Documents
+ MakeitObject vvl
+ vvl.EmptyDoc
+ vvl.textDoc = var(val(b$(1))).textDoc
+ k.PokeItem j + 1, vvl
+ElseIf Typename(var(val(b$(1)))) = "Group" Then
+vvl = -1
+CopyGroup2 var(val(b$(1))), bstack
+Set vvl = bstack.lastobj
+Set bstack.lastobj = Nothing
+k.PokeItem j + 1, vvl
+ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
+CopyHandler var(val(b$(1))), bstack
+Set vvl = bstack.lastobj
+Set bstack.lastobj = Nothing
+k.PokeItem j + 1, vvl
+Else
+k.PokeItem j + 1, var(val(b$(1)))
+End If
+Else
+
+
+If val(b$(1)) = 0 Then
+Set vvl = New mArray
+ElseIf Typename$(var(val(b$(1)))) = "Empty" Then
+
+ElseIf Typename$(var(val(b$(1)))) = "mArray" Then
+If Not var(val(b$(1))).common Then
+Set myArray = var(val(b$(1)))
+Set mySecondArray = New mArray
+myArray.CopyArray mySecondArray
+Set myArray = Nothing
+Set vvl = mySecondArray
+Set mySecondArray = Nothing
+Else
+Set vvl = var(val(b$(1)))
+End If
+Else
+Set vvl = var(val(b$(1)))
+
+End If
+k.PokeItem j, b$(0) + ")"
+ k.PokeItem j + 1, vvl
+Set vvl = Nothing
+
+
+End If
+BI = BI + 1
+Next j
+With mgroup
+k.PokeItem j, mgroup.LocalList
+k.PokeItem j + 1, GetFunctionList(.FuncList)
+k.HasStrValue = .HasStrValue
+k.HasValue = .HasValue
+k.HasSet = .HasSet
+k.HasParameters = .HasParameters
+k.HasParametersSet = .HasParametersSet
+End With
+Set bstack.lastobj = k
+End Sub
 Public Sub CopyGroup(mg As Variant, bstack As basetask)
 Dim mgroup As Group
 Set mgroup = mg
@@ -28350,17 +28472,11 @@ If Typename(var(val(b$(1)))) = doc Then 'preserve Documents
  vvl.textDoc = var(val(b$(1))).textDoc
  k.PokeItem j + 1, vvl
 ElseIf Typename(var(val(b$(1)))) = "Group" Then
-' Not used
-'MakeitObject2 vvl
-'vvl.GroupName = var(val(b$(1))).GroupName
-
 vvl = -1
-
 CopyGroup var(val(b$(1))), bstack
 Set vvl = bstack.lastobj
 Set bstack.lastobj = Nothing
 k.PokeItem j + 1, vvl
-
 ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
 CopyHandler var(val(b$(1))), bstack
 Set vvl = bstack.lastobj
@@ -28375,7 +28491,6 @@ Else
 If val(b$(1)) = 0 Then
 Set vvl = New mArray
 ElseIf Typename$(var(val(b$(1)))) = "Empty" Then
-
 Else
 Set vvl = var(val(b$(1)))
 
@@ -28399,8 +28514,8 @@ k.HasParametersSet = .HasParametersSet
 End With
 Set bstack.lastobj = k
 End Sub
-
-Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False)
+Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False, Optional temp As Boolean = False)
+'temp = False
 While Right$(what$, 1) = "."
 what$ = Left$(what$, Len(what$) - 1)
 Wend
@@ -28454,15 +28569,17 @@ With myobject
                                             s$ = Left$(s$, Len(s$) - 1)
                                             ss$ = ""
                                             If Not neoGetArrayLinkOnly(bstack, s$, i) Then  ''
-                                                    Set subgroup = vvl
-                                                    j = -1
+                                                j = -1
+                                            If temp Then
                                                     GlobalArr bstack, s$, ss$, 0, j  ''bstack.GroupName &
+                                                  Set var(j) = vvl 'PRESERVE POINTER
+                                                  Else
+                                                    Set subgroup = vvl
+                                                    GlobalArr bstack, s$, ss$, 0, j
                                                     Set pppp = var(j)
-                                                   '  pppp.IHaveGui = vvl.IHaveGui
-                                                    'Set pppp.GroupRef = vvl.GroupRef
                                                     subgroup.CopyArray pppp
                                                     Set subgroup = Nothing
-                                                    
+                                                  End If
                                             End If
 
                                             ps.DataStr s$ + Str$(j)
@@ -28499,7 +28616,7 @@ With myobject
                                             
                                              v = GlobalVar(bstack.GroupName & Mid$(s$, 2), 0)
                                                    Set spare = vvl
-                                                        UnFloatGroup bstack, Mid$(s$, 2), v, spare, glob
+                                                        UnFloatGroup bstack, Mid$(s$, 2), v, spare, glob, temp
                                                     '    vvl.EndFloat
                                                         Set spare = Nothing
                                              ps.DataStr s$ + Str(v)
@@ -28509,7 +28626,7 @@ With myobject
                                              
                                              v = GlobalVar(bstack.GroupName & s$, 0)
                                                  Set spare = vvl
-                                                        UnFloatGroup bstack, s$, v, spare, glob
+                                                        UnFloatGroup bstack, s$, v, spare, glob, temp
                                                     
                                                         Set spare = Nothing
                                              
@@ -35999,10 +36116,11 @@ arrconthere:
                     If varhash.ExistKey(what$) Then
                       If flag2 And Not f And Not flag Then
                       If i < 0 Then
-                        Set myobject = var(-i).objref
-                        i = AllocVar
-                        Set var(i) = myobject
-                      Set myobject = Nothing
+                     '   Set myobject = var(-i).objref
+                     '   i = AllocVar
+                     '   Set var(i) = myobject
+                     ' Set myobject = Nothing
+                     i = -i
                       End If
                            varhash.ItemCreator what$, i
                            
@@ -36017,10 +36135,11 @@ arrconthere:
                     If varhash.ExistKey(ohere$ & "." & what$) Then
                     If flag2 And Not f And Not flag Then
                        If i < 0 Then
-                        Set myobject = var(-i).objref
-                        i = AllocVar
-                        Set var(i) = myobject
-                      Set myobject = Nothing
+'                        Set myobject = var(-i).objref
+ '                       i = AllocVar
+  '                      Set var(i) = myobject
+   '                   Set myobject = Nothing
+   i = -i
                       End If
                            varhash.ItemCreator ohere$ & "." & what$, i, True
                     Else
@@ -36029,10 +36148,11 @@ arrconthere:
                     End If
                     Else
                      If i < 0 Then
-                        Set myobject = var(-i).objref
-                        i = AllocVar
-                        Set var(i) = myobject
-                      Set myobject = Nothing
+                        'Set myobject = var(-i).objref
+                        'i = AllocVar
+                       ' Set var(i) = myobject
+                      'Set myobject = Nothing
+                      i = -i
                       End If
 
                         varhash.ItemCreator ohere$ & "." & what$, i, True
@@ -43233,10 +43353,12 @@ End Function
 Function MyDim(basestack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, pppp As mArray, it As Long
 Dim p As Double, w$, s$, x As Double, i As Long, f As Long, reverse As Boolean, ss$, uselocalbase As Boolean, usethisbase As Long
-Dim oldbase As Long
+Dim oldbase As Long, common As Boolean
 MyDim = True
 reverse = IsLabelSymbolNew(rest$, "OLE", "OLE", lang)
 par = IsLabelSymbolNew(rest$, "Õ≈œ", "NEW", lang)
+common = IsLabelSymbolNew(rest$, " œ…Õœ”", "COMMON", lang)
+If Not common Then common = IsLabelSymbolNew(rest$, " œ…Õœ…", "COMMON", lang)
 uselocalbase = IsLabelSymbolNew(rest$, "¬¡”«", "BASE", lang)
 If uselocalbase Then
 If FastSymbol(rest$, "1") Then
@@ -43257,6 +43379,7 @@ usethisbase = ArrBase
         If Not pppp.Arr Then Set pppp = Nothing: GoTo ex1
         If pppp.IHaveClass And pppp.GroupRef Is Nothing Then Set pppp = Nothing: GoTo ex1
         pppp.myarrbase = -usethisbase
+        pppp.common = common
    End If
    Loop Until Not FastSymbol(rest$, ",")
    GoTo ex1
@@ -43280,6 +43403,7 @@ ArrBase = usethisbase
     End If
     
     If pppp.IHaveClass And pppp.GroupRef Is Nothing Then Set pppp = Nothing: GoTo ex1
+    pppp.common = common
    ' If reverse Then pppp.RevOrder = True
    If uselocalbase Then pppp.myarrbase = -ArrBase
     Select Case it
@@ -43287,25 +43411,32 @@ ArrBase = usethisbase
    GlobalArrResize pppp, basestack, w$, rest$, i
    p = i
     If i < 0 Then it = 0
+    
     Case Else
     it = 0
     End Select
    Else
     Select Case it
     Case 5, 6, 7
+    f = -1
     GlobalArr basestack, w$, rest$, i, f, , reverse
+    var(f).common = common
+    
     p = i
     If i < 0 Then it = 0
+    
     Case Else
     it = 0
     End Select
     End If
+    
     Select Case it
     Case 5
     x = 0
     If FastSymbol(rest$, "=") Then
         If IsExp(basestack, rest$, x) Then
         If neoGetArray(basestack, w$, pppp) Then
+        pppp.common = common
                      If Not basestack.lastobj Is Nothing Then
                             If Typename(basestack.lastobj) = "Group" Then
                                 Set pppp.GroupRef = basestack.lastobj
@@ -43336,6 +43467,7 @@ ArrBase = usethisbase
                 s$ = Left$(rest$, f - 1)
                 rest$ = Mid$(rest$, f)
                 If neoGetArray(basestack, w$, pppp) Then
+                pppp.common = common
                         For i = 0 To pppp.UpperMonoLimit
                         If IsExp(basestack, (s$), x) Then
                                         If Not basestack.lastobj Is Nothing Then
@@ -43382,6 +43514,7 @@ ArrBase = usethisbase
     If FastSymbol(rest$, "=") Then
     If IsExp(basestack, rest$, x) Then
    If neoGetArray(basestack, w$, pppp) Then ''basestack.GroupName &
+   pppp.common = common
     If Typename(basestack.lastobj) = "lambda" Then
                                 pppp.FillLambda basestack
                              
@@ -43399,6 +43532,7 @@ ArrBase = usethisbase
                 s$ = Left$(rest$, f - 1)
                 rest$ = Mid$(rest$, f)
                 If neoGetArray(basestack, w$, pppp) Then
+                pppp.common = common
                         For i = 0 To pppp.UpperMonoLimit
                         If IsExp(basestack, (s$), x) Then
                             If Typename(basestack.lastobj) = "lambda" Then
@@ -43430,6 +43564,7 @@ ArrBase = usethisbase
     If FastSymbol(rest$, "=") Then
     If IsStrExp(basestack, rest$, s$) Then
    If neoGetArray(basestack, w$, pppp) Then '' basestack.GroupName &
+   pppp.common = common
    If Typename(basestack.lastobj) = "lambda" Then
                                 pppp.FillLambda basestack
     ElseIf Typename(basestack.lastobj) = "Group" Then
@@ -43452,6 +43587,7 @@ ArrBase = usethisbase
                 s$ = Left$(rest$, f - 1)
                 rest$ = Mid$(rest$, f)
                 If neoGetArray(basestack, w$, pppp) Then
+                pppp.common = common
                         For i = 0 To pppp.UpperMonoLimit
                         If IsStrExp(basestack, (s$), ss$) Then
                             If Typename(basestack.lastobj) = "Group" Then

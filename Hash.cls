@@ -27,7 +27,7 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-Private index As Long
+Private Index As Long
 Private Hash() As Long
 Private Sub Class_Initialize()
     MaxSpace = 10
@@ -40,8 +40,11 @@ Friend Sub ReadVar(where, name$, num As Long)
     name$ = PriveSpace(where).Key
     num = PriveSpace(where).NDX
 End Sub
+Public Property Get lastNDX() As String
+lastNDX = PriveSpace(Index).NDX
+End Property
 Public Property Get lastkey() As String
-lastkey = PriveSpace(index).Key
+lastkey = PriveSpace(Index).Key
 End Property
 
 Private Sub ExpandHash()
@@ -137,7 +140,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).NDX: Find = True: index = k: Exit Function
+    num = PriveSpace(k).NDX: Find = True: Index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0

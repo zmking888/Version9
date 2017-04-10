@@ -520,7 +520,7 @@ Flush
 End Sub
 Sub CopyGroup(myobject As Object, myobject2 As Object)
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
-Dim subgroup As Object, sub2 As Object
+Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
              With myobject
                 If .IamFloatGroup Then
@@ -535,6 +535,15 @@ Dim subgroup As Object, sub2 As Object
                     Set subgroup = Nothing
                     Set vvl = sub2
                     Set sub2 = Nothing
+                    ElseIf Typename(vvl) = "mArray" Then
+                    If Not vvl.common Then
+                        Set myArray = vvl
+                        Set mySecondArray = New mArray
+                        myArray.CopyArray mySecondArray
+                        Set myArray = Nothing
+                        Set vvl = mySecondArray
+                        Set mySecondArray = Nothing
+                    End If
                     End If
                     myobject2.PokeItem x1, vvl
      

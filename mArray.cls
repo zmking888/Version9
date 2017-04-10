@@ -20,6 +20,7 @@ Dim actualdata() As Variant
 Dim maxitems As Long
 Dim maxitems1 As Long
 Public myarrbase As Long
+Public common As Boolean
 Public IHaveClass As Boolean
 Public IHaveGui As Boolean
 Public GroupRef As Object   ' get a floating Group, maybe with groups inside....as floating group
@@ -535,7 +536,6 @@ If dnum = 0 Then Exit Function
 If cursor < 0 Or cursor >= maxitems Then Exit Function
 item = actualdata(cursor)
 ElseIf command = 3 Then
-
     Fill item
 ElseIf command = 4 Then
     cursor = maxitems
@@ -737,7 +737,7 @@ End Sub
 Sub CopyGroup(myobject As Object, myobject2 As Object)
 'Special Copy
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
-Dim subgroup As Object, sub2 As Object
+Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
  
              With myobject
@@ -753,6 +753,15 @@ Dim subgroup As Object, sub2 As Object
                     Set subgroup = Nothing
                     Set vvl = sub2
                     Set sub2 = Nothing
+                    ElseIf Typename(vvl) = "mArray" Then
+                    If Not vvl.common Then
+                        Set myArray = vvl
+                        Set mySecondArray = New mArray
+                        myArray.CopyArray mySecondArray
+                        Set myArray = Nothing
+                        Set vvl = mySecondArray
+                        Set mySecondArray = Nothing
+                    End If
                     End If
                     myobject2.PokeItem x1, vvl
      
