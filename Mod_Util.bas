@@ -1182,8 +1182,10 @@ With mybasket
         ddd.CurrentX = PX * .Xt
         ddd.CurrentY = PY * .Yt + .uMineLineSpace
      r1 = .mx - PX - 1 + r
-     If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
-        Do
+        If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
+            Do
+           '  If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
+
             If ONELINE And nocr And PX > .mx Then what = "": Exit Do
             c$ = Mid$(WHAT1$, r + 1, 1)
       
@@ -1283,6 +1285,8 @@ realR& = 0
        ddd.CurrentX = PX * .Xt
     
     ddd.CurrentY = PY * .Yt + .uMineLineSpace
+        If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
+
 r1 = Len(what$) - 1
     For r = r To r1
         c$ = Mid$(WHAT1$, r + 1, 1)
