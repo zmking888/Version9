@@ -1270,7 +1270,7 @@ BreakMe = False
 End If
 KeyCode = 0
 Case vbKeyLeft
-INK$ = INK$ & Chr(0) + Chr(75)
+INK$ = INK$ & Chr(0) + Chr(75)   ' GWBASIC Codes
 Case vbKeyRight
 INK$ = INK$ & Chr(0) + Chr(77)
 Case vbKeyUp
@@ -1281,6 +1281,14 @@ Case vbKeyInsert
 INK$ = INK$ & Chr(0) + Chr(82)
 Case vbKeyDelete
 INK$ = INK$ & Chr(0) + Chr(83)
+Case vbKeyPageUp
+INK$ = INK$ & Chr(0) + Chr(73)
+Case vbKeyPageDown
+INK$ = INK$ & Chr(0) + Chr(81)
+Case vbKeyHome
+INK$ = INK$ & Chr(0) + Chr(71)
+Case vbKeyEnd
+INK$ = INK$ & Chr(0) + Chr(79)
 Case vbKeyEscape
 If List1.LeaveonChoose Then Exit Sub
 INK$ = INK$ & Chr(27)

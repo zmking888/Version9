@@ -1135,7 +1135,7 @@ End With
 End Sub
 
 
-Public Sub PlainBaSket(ddd As Object, mybasket As basket, ByVal what As String, Optional ONELINE As Boolean = False, Optional nocr As Boolean = False, Optional plusone As Long = 2)
+Public Sub PlainBaSket(ddd As Object, mybasket As basket, ByVal what As String, Optional ONELINE As Boolean = False, Optional nocr As Boolean = False, Optional plusone As Long = 2, Optional clearline As Boolean = False)
 Dim PX As Long, PY As Long, r As Long, p$, c$, LEAVEME As Boolean, nr As RECT, nr2 As RECT
 Dim p2 As Long, mUAddPixelsTop As Long
 Dim pixX As Long, pixY As Long
@@ -1157,6 +1157,7 @@ With mybasket
         .top = PY * pixY + mUAddPixelsTop
          .Bottom = .top + pixY - mUAddPixelsTop * 2
     End With
+    
     rTop = PY * pixY
     rBottom = rTop + pixY - plusone
     lenw& = Len(what)
@@ -1181,6 +1182,7 @@ With mybasket
         ddd.CurrentX = PX * .Xt
         ddd.CurrentY = PY * .Yt + .uMineLineSpace
      r1 = .mx - PX - 1 + r
+     If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
         Do
             If ONELINE And nocr And PX > .mx Then what = "": Exit Do
             c$ = Mid$(WHAT1$, r + 1, 1)
@@ -1216,7 +1218,7 @@ With mybasket
         Exit Do
         End If
         If realR > .mx + PX - 1 Then Exit Do
-        
+    
          Loop
         .curpos = PX + realR
  
@@ -1254,6 +1256,8 @@ With mybasket
             End With
             rTop = PY * pixY
             rBottom = rTop + pixY - plusone
+   
+
         End If
         realR& = 0
     Loop
@@ -2400,13 +2404,13 @@ LCTCB dq, mybasket, ins&
 Do
 MyDoEvents1 Form1
 If bstack.IamThread Then If myexit(bstack) Then GoTo contgfhere
-
+If Not TaskMaster Is Nothing Then
 If TaskMaster.QueueCount > 0 Then
 dq.FontTransparent = True
 TaskMaster.RestEnd1
 TaskMasterTick
 End If
-
+End If
  cc$ = INKEY$
  If cc$ <> "" Then
 If Not TaskMaster Is Nothing Then TaskMaster.rest
@@ -2484,6 +2488,18 @@ SetTextBasketBack dq, mybasket
                  Exit Do
         End If
         Select Case Len(cc$)
+        Case 0
+        If FKey > 0 Then
+        If FK$(FKey) <> "" And FKey <> 13 Then
+            cc$ = FK$(FKey)
+            interpret basestack1, cc$
+        
+        End If
+        FKey = 0
+        Else
+        
+        End If
+        
         Case 1
         If STAR And cc$ = " " Then cc$ = Chr$(127)
                 Select Case AscW(cc$)
@@ -2593,7 +2609,22 @@ SetTextBasketBack dq, mybasket
                 End Select
         Case 2
                 Select Case AscW(Right$(cc$, 1))
-               
+                Case 81
+                f& = 10 ' exit - pagedown ***************
+                gf$ = b$
+                Exit Do
+                Case 73
+                f& = -10 ' exit - pageup
+                gf$ = b$
+                Exit Do
+                Case 79
+                f& = 20 ' End
+                gf$ = b$
+                Exit Do
+                Case 71
+                f& = -20 ' exit - home
+                gf$ = b$
+                Exit Do
                 Case 75 'LEFT
                         If c& > 1 Then
                                    .currow = y&

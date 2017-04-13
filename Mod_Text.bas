@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1476,7 +1476,7 @@ Dim scr As Object, oldCol As Long, oldFTEXT As Long, oldFTXT As String, oldpen A
 Dim par As Boolean, i As Long, f As Long, p As Double, W4 As Boolean, pn&, s$, dlen As Long
 Dim o As Long, W3 As Long, x1 As Long, y1 As Long, x As Double, ColOffset As Long
 Dim work As Boolean, work2 As Long, skiplast As Boolean, ss$, ls As Long, myobject As Object, counter As Long, Counterend As Long, countDir As Long
-Dim bck$
+Dim bck$, clearline As Boolean
 Set scr = basestack.Owner
 W3 = -1
 Dim basketcode As Long, prive As basket
@@ -1508,6 +1508,9 @@ Else
 Select Case lang
 Case 1
 Select Case UCase(s$)
+        Case "BACK"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 4
         Case "OVER"
         f = 1
         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
@@ -1524,6 +1527,9 @@ Select Case UCase(s$)
         
 Case 0, 2
         Select Case myUcase(s$, True)
+        Case "жомто"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 4
         Case "памы"
         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
         f = 1
@@ -1544,29 +1550,29 @@ Case 0, 2
         If f <> 2 Then If x1& > 0 Or y1& >= .mx Then crNew basestack, prive
         End If
 If f = 1 Then  ''
-work = True
-oldCol = .Column
-scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 2 * DYP), .Paper, BF
-LCTbasket scr, prive, .currow, 0&
-.Column = .mx - 1
-W4 = True
-oldFTEXT = .FTEXT
-oldFTXT = .FTXT
-oldpen = .mypen
-pn& = 2
-.FTEXT = 4
+    work = True
+    oldCol = .Column
+    scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 2 * DYP), .Paper, BF
+    LCTbasket scr, prive, .currow, 0&
+    .Column = .mx - 1
+    W4 = True
+    oldFTEXT = .FTEXT
+    oldFTXT = .FTXT
+    oldpen = .mypen
+    pn& = 2
+    .FTEXT = 4
 ElseIf f = 2 Then
-work = True
-oldCol = .Column
-scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .mypen, BF
-crNew basestack, prive
-LCTbasketCur scr, prive
-W4 = True
-oldFTEXT = .FTEXT
-oldFTXT = .FTXT
-oldpen = .mypen
-.FTEXT = 4
-pn& = 2
+    work = True
+    oldCol = .Column
+    scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .mypen, BF
+    crNew basestack, prive
+    LCTbasketCur scr, prive
+    W4 = True
+    oldFTEXT = .FTEXT
+    oldFTXT = .FTXT
+    oldpen = .mypen
+    .FTEXT = 4
+    pn& = 2
 ElseIf f = 3 Then
 ' we print in a line with lost chars, so controling the start of printing
 ' we can render text, like from a view port Some columns are hidden because they went out of screen;
@@ -1578,7 +1584,20 @@ oldFTEXT = .FTEXT
 oldFTXT = .FTXT
 .FTEXT = 4
 oldpen = .mypen
+ElseIf f = 4 Then
+    work = True
+    clearline = True
+    ' LCTbasketCur scr, prive
+    If .curpos > 0 Then
+    crNew basestack, prive
+    LCTbasketCur scr, prive
+    End If
+    scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
+   ' scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .mypen, BF
+    LCTbasketCur scr, prive
+    pn& = 2
 End If
+
 f = 0
 End If
 
@@ -1665,6 +1684,7 @@ Do
                          pn& = 99
     End If
     ElseIf FastSymbol(rest$, "@(", , 2) Then
+    clearline = False
     W3 = -1
                If Not par Then RevisionPrint = False: Set scr = Nothing: Exit Function
                 If IsExp(basestack, rest$, p) Then
@@ -1944,7 +1964,9 @@ crNew basestack, prive: skiplast = True
 ElseIf pn& = 2 Then
 
 If Abs(W3) = 1 And .curpos = 0 And Not (.FTEXT = 9 Or .FTEXT = 5 Or .FTEXT = 6) Then
-
+If .FTEXT = 7 Then
+crNew basestack, prive: skiplast = True
+End If
 Else
 crNew basestack, prive: skiplast = True
 End If
@@ -2061,19 +2083,20 @@ End If
             If .curpos >= .mx Then
     '' ???
                     Else
+            If clearline And .curpos = 0 Then scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
             Select Case .FTEXT
             Case 0
             
                           
-                       PlainBaSket scr, prive, Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + s$, W4, W4
+                       PlainBaSket scr, prive, Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + s$, W4, W4, , clearline
                        
             Case 3
-                        PlainBaSket scr, prive, Right$(Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + Left$(s$, .Column + 1), .Column + 1), W4, W4
+                        PlainBaSket scr, prive, Right$(Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + Left$(s$, .Column + 1), .Column + 1), W4, W4, , clearline
             Case 2
                         If RealLen(s$) > .Column + 1 Then s$ = "????"
-                        PlainBaSket scr, prive, Left$(Space$((.Column + 1 - RealLen(s$)) \ 2) + Left$(s$, .Column + 1) & Space$(.Column), .Column + 1), W4, W4
+                        PlainBaSket scr, prive, Left$(Space$((.Column + 1 - RealLen(s$)) \ 2) + Left$(s$, .Column + 1) & Space$(.Column), .Column + 1), W4, W4, , clearline
             Case 1
-                        PlainBaSket scr, prive, Left$(s$ & Space$(.Column), .Column + 1), W4, W4
+                        PlainBaSket scr, prive, Left$(s$ & Space$(.Column), .Column + 1), W4, W4, , clearline
             Case 5
                         x1 = .curpos
                         y1 = .currow
@@ -2105,16 +2128,24 @@ End If
          
                    End If
             Case 4, 7, 8
-            
-                        wwPlain basestack, prive, s$ & vbCrLf, .Column * .Xt + .Xt - (.Xt - TextWidth(scr, Right$(s$, 1))) \ 2, 0, , , 1, , , pn& < 5, , True
+                         wwPlain basestack, prive, s$ & vbCrLf, .Column * .Xt + .Xt - (.Xt - TextWidth(scr, Right$(s$, 1))) \ 2, 0, , , 1, , , pn& < 5, , True
                         .curpos = .curpos + .Column + 1
                         If .curpos >= .mx And Not W4 Then
                                 .curpos = 0
                                 .currow = .currow + 1
+
                         End If
                         If .lastprint Then
                             If .curpos = 0 Then
-                                If .currow >= .My Then crNew basestack, prive Else LCTbasketCur scr, prive
+                                If .currow >= .My Then
+                                crNew basestack, prive
+                                
+                             
+                              
+                                Else
+                                LCTbasketCur scr, prive
+
+                                End If
                             End If
                             If .curpos > 0 Then scr.CurrentX = .curpos * .Xt - (.Xt - TextWidth(scr, Right$(s$, 1))) \ 2 Else scr.CurrentX = .curpos * .Xt
                             scr.CurrentY = .currow * .Yt + .uMineLineSpace
@@ -2208,24 +2239,26 @@ End If
                  If .curpos >= .mx Then
                  y1 = 1
                     Else
+                               If clearline And .curpos = 0 Then scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
+
             Select Case .FTEXT
                 Case 1
                            '' GetXY scr, X1, y1
                           ''  If s$ = "" Then s$ = " "
                           dlen = RealLen(s$)
-                          PlainBaSket scr, prive, Left$(s$ & Space$(Len(s$) - dlen + .Column - (dlen - 1) Mod (.Column + 1)), .Column + 1 + Len(s$) - dlen), W4, W4
+                          PlainBaSket scr, prive, Left$(s$ & Space$(Len(s$) - dlen + .Column - (dlen - 1) Mod (.Column + 1)), .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
                 Case 2
                             dlen = RealLen(s$)
                             If dlen > (.Column + 1 + Len(s$) - dlen) Then s$ = Left$(s$, .Column + 1 + Len(s$) - dlen):  dlen = RealLen(s$)
                             
-                            PlainBaSket scr, prive, Left$(Space$((.Column + 1 + Len(s$) - dlen - dlen) \ 2) + s$ & Space$(.Column), .Column + 1 + Len(s$) - dlen), W4, W4
+                            PlainBaSket scr, prive, Left$(Space$((.Column + 1 + Len(s$) - dlen - dlen) \ 2) + s$ & Space$(.Column), .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
                 Case 3
                             dlen = RealLen(s$)
-                            PlainBaSket scr, prive, Right$(Space$(.Column + Len(s$) - dlen - (dlen - 1) Mod (.Column + 1)) & s$, .Column + 1 + Len(s$) - dlen), W4, W4
+                            PlainBaSket scr, prive, Right$(Space$(.Column + Len(s$) - dlen - (dlen - 1) Mod (.Column + 1)) & s$, .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
                 Case 0
                            '' If s$ = "" Then s$ = " "
                         
-                            PlainBaSket scr, prive, s$ + Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)), W4, W4
+                            PlainBaSket scr, prive, s$ + Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)), W4, W4, , clearline
                        
                 Case 4
                             
@@ -2259,7 +2292,7 @@ End If
                             If .curpos >= .mx And Not W4 Then
                                 .curpos = 0
                                 .currow = .currow + 1
-                            End If
+                             End If
                 Case 7
                             
                             LCTbasketCur scr, prive
@@ -2410,9 +2443,9 @@ End If
                        scr.CurrentX = W3
             Else
                 If .FTXT <> "" Then
-                PlainBaSket scr, prive, Format$(s$, .FTXT)
+                PlainBaSket scr, prive, Format$(s$, .FTXT), , , , clearline
                 Else
-                PlainBaSket scr, prive, s$
+                PlainBaSket scr, prive, s$, , , , clearline
                 End If
                 
             End If
@@ -2524,6 +2557,7 @@ If par Then If myexit(basestack) Then RevisionPrint = True: Exit Function
 
 End With
 End Function
+
 
 Private Sub ProcessOper(bstack As basetask, first As Object, oper$, r As Double, lang As Long)
 Dim where As Long, w$, ok As Boolean
@@ -42897,7 +42931,11 @@ rest$ = Mid$(rest$, i)
 If Not FastSymbol(rest$, ",") Then Exit Do
 ss$ = ss$ + ", "
 Loop
+If Trim$(s$) = "" Then
+ProcDef = MyFunction(0, basestack, Left$(what$, Len(what$) - 1) + " { =" + ss$ + "}", 1)
+Else
 ProcDef = MyFunction(0, basestack, Left$(what$, Len(what$) - 1) + " {  @read " + s$ + vbCrLf + "=" + ss$ + "}", 1)
+End If
 Exit Function
 End If
 End If

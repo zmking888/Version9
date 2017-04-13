@@ -1650,6 +1650,7 @@ col(1) = 1
 End Sub
 Private Sub addone(col() As Variant, ByVal thispos As Long, ByVal thiscolor As Long)
 Dim k As Long
+
 k = UBound(col())
 If VarType(col(0)) = 0 Then
 makebase col(), 14
@@ -1672,28 +1673,29 @@ End Sub
 Private Sub ColorizeExpressions(ByVal a$, col(), k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
+Dim n$
 again:
 If a$ = "" Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then
-If IsSymbol(a$, "@") Then
-
-If pos2 > 0 Then
-addone col(), pos2, 14
-Else
-addone col(), 1, 14
+    If IsSymbol(a$, "@") Then
+        If pos2 > 0 Then
+            addone col(), pos2, 14
+        Else
+            addone col(), 1, 14
+        End If
+        pos2 = k - Len(a$) + 1
+    
+    End If
+    n$ = a$
+    kind = IsLabelOnly(n$, drop$)
+    If kind = 0 And n$ <> a$ Then
+    feedthis = 10
+    a$ = n$: Exit Sub
+    End If
+    a$ = n$
+    
 End If
- pos2 = k - Len(a$) + 1
-End If
-Dim n$
-n$ = a$
-kind = IsLabelOnly(n$, drop$)
-If kind = 0 And n$ <> a$ Then
-feedthis = 10
-a$ = n$: Exit Sub
-End If
-End If
-a$ = n$
 
 If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1791,6 +1793,7 @@ pos2 = k - Len(a$) + 1
 Else
 addone col(), pos2, 14
 a$ = Mid$(a$, 2)
+
     pos2 = k - Len(a$) + 1
     GoTo again
 
