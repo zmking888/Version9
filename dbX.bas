@@ -438,11 +438,11 @@ End If
         Set TBL = CreateObject("ADOX.TABLE")
            Set cat = CreateObject("ADOX.Catalog")
            Set cat.activeconnection = myBase
-           If cat.activeconnection.errors.count > 0 Then
+           If cat.activeconnection.errors.Count > 0 Then
            MyEr "Can't connect to Base", "Δεν μπορώ να συνδεθώ με τη βάση"
            Exit Sub
            End If
-        If cat.TABLES.count > 0 Then
+        If cat.TABLES.Count > 0 Then
         For Each TBL In cat.TABLES
         
         If TBL.Type = "TABLE" Then
@@ -452,8 +452,8 @@ End If
         
         cnt = cnt + 1
                             stac1.DataStr TBL.name
-                       If TBL.indexes.count > 0 Then
-                                         For j = 0 To TBL.indexes.count - 1
+                       If TBL.indexes.Count > 0 Then
+                                         For j = 0 To TBL.indexes.Count - 1
                                                    With TBL.indexes(j)
                                                    If (.Unique = False) And (.indexnulls = 0) Then
                                                         KB = True
@@ -478,9 +478,9 @@ End If
          cnt = 1
                      rs.Open "Select * From [" & TBL.name & "] ;", myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
                                          stac1.Flush
-                                        stac1.DataVal CDbl(rs.FIELDS.count)
-                                        If TBL.indexes.count > 0 Then
-                                         For j = 0 To TBL.indexes.count - 1
+                                        stac1.DataVal CDbl(rs.FIELDS.Count)
+                                        If TBL.indexes.Count > 0 Then
+                                         For j = 0 To TBL.indexes.Count - 1
                                                    With TBL.indexes(j)
                                                    If (.Unique = False) And (.indexnulls = 0) Then
                                                    vindx = True
@@ -497,7 +497,7 @@ End If
                                             Else
                                             stac1.DataVal CDbl(0)
                                         End If
-                     For i = 0 To rs.FIELDS.count - 1
+                     For i = 0 To rs.FIELDS.Count - 1
                      With rs.FIELDS(i)
                              stac1.DataStr .name
                              If .Type = 203 And .DEFINEDSIZE >= 536870910# Then
@@ -533,12 +533,12 @@ End If
                      Next i
                      rs.Close
                      If vindx Then
-                    If TBL.indexes.count > 0 Then
-                             For j = 0 To TBL.indexes.count - 1
+                    If TBL.indexes.Count > 0 Then
+                             For j = 0 To TBL.indexes.Count - 1
                           With TBL.indexes(j)
                           If (.Unique = False) And (.indexnulls = 0) Then
-                          stac1.DataVal CDbl(.Columns.count)
-                          For k = 0 To .Columns.count - 1
+                          stac1.DataVal CDbl(.Columns.Count)
+                          For k = 0 To .Columns.Count - 1
                             stac1.DataStr .Columns(k).name
                              stac1.DataStr inames(.Columns(k).sortorder, lang)
                           Next k
@@ -874,10 +874,10 @@ If from >= 0 Then
   rec.Move from - 1
   End If
 End If
-    For i& = rec.FIELDS.count - 1 To 0 Step -1
+    For i& = rec.FIELDS.Count - 1 To 0 Step -1
 
    Select Case rec.FIELDS(i&).Type
-Case 1, 2, 3, 4, 5, 6, 7
+Case 1, 2, 3, 4, 5, 6
 
  If IsNull(rec.FIELDS(i&)) Then
         bstackstr.soros.PushUndefine          '.PushStr "0"
@@ -885,6 +885,14 @@ Case 1, 2, 3, 4, 5, 6, 7
         bstackstr.soros.PushVal CDbl(rec.FIELDS(i&))
     
 End If
+Case 7
+If IsNull(rec.FIELDS(i&)) Then
+    
+     bstackstr.soros.PushStr ""
+ Else
+  
+   bstackstr.soros.PushStr CStr(CDate(rec.FIELDS(i&)))
+  End If
 
 
 Case 130, 8, 203, 202
@@ -1124,7 +1132,7 @@ Dim myBase
            If Err.Number > 0 Then Err.Clear: myBase.errors.Clear
             myBase.Execute com2execute
 
-If myBase.errors.count <> 0 Then
+If myBase.errors.Count <> 0 Then
 MyEr "Can't execute command", "Δεν μπορώ εκτελέσω εντολή"
  myBase.errors.Clear
 End If
@@ -1208,14 +1216,14 @@ MyEr Err.Description & " " & tablename, Err.Description & " " & tablename
 Exit Sub
 End If
 End If
-error.Clear
+Err.Clear
 mcat.TABLES(tablename).indexes("ndx").Remove
+Err.Clear
 mcat.TABLES(tablename).indexes.Refresh
 
-   If mcat.TABLES.count > 0 Then
+   If mcat.TABLES.Count > 0 Then
    okntable = True
         For Each mtable In mcat.TABLES
-        
         If mtable.Type = "TABLE" Then
         If mtable.name = tablename Then
         okntable = False
@@ -1223,7 +1231,7 @@ mcat.TABLES(tablename).indexes.Refresh
         End If
         End If
         Next mtable
-        Set mtable = Nothing
+'        Set mtable = Nothing
         If okntable Then GoTo t111
 Else
 t111:
@@ -1231,10 +1239,12 @@ MyEr "No tables in Database " + ExtractNameOnly(base), "Δεν υπάρχουν αρχεία στη 
 Exit Sub
 End If
 ' now we have mtable from mybase
-
+If mtable Is Nothing Then
+Else
  mtable.indexes("ndx").Remove  ' remove the old index/
+ End If
  Err.Clear
- If mcat.activeconnection.errors.count > 0 Then
+ If mcat.activeconnection.errors.Count > 0 Then
  mcat.activeconnection.errors.Clear
  End If
  Err.Clear
@@ -1258,13 +1268,15 @@ End If
                  
         End If
         Wend
-        If pIndex.Columns.count > 0 Then
+        If pIndex.Columns.Count > 0 Then
         mtable.indexes.Append pIndex
              If Err.Number Then
+          '   mtable.Append pIndex
          MyEr Err.Description, Err.Description
          Exit Sub
         End If
 mcat.TABLES.Append mtable
+Err.Clear
 mcat.TABLES.Refresh
 End If
     
@@ -1343,7 +1355,7 @@ End If
          
 ' check if table exist
 
-           If cat.TABLES.count > 0 Then
+           If cat.TABLES.Count > 0 Then
         For Each mtable In cat.TABLES
           If mtable.Type = "TABLE" Then
         If mtable.name = tablename Then
@@ -1369,6 +1381,7 @@ End If
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
+                                                If n = 8 Then n = 7: l = 0
                                                 If n = 10 Then n = 202
                                                 If n = 12 Then n = 203: l = 0
                                                     If l <> 0 Then
@@ -1391,10 +1404,16 @@ End If
                
 End With
         If okntable Then
+        
         cat.TABLES.Append mtable
         If Err.Number Then
+        If Err.Number = -2147217859 Then
+        Err.Clear
+        Else
          MyEr Err.Description, Err.Description
          Exit Sub
+        End If
+        
         End If
         cat.TABLES.Refresh
         ElseIf Not one_ok Then
@@ -1619,7 +1638,7 @@ Dim rec
    Else
    myBase.errors.Clear
    myBase.Execute "DELETE * FROM [" & table$ & "] WHERE " & first$ & " = " & Second$
-   If myBase.errors.count > 0 Then
+   If myBase.errors.Count > 0 Then
    MyEr "Can't delete " & table$, "Δεν μπορώ να διαγράψω"
    Else
     DELfields = True
@@ -1660,12 +1679,12 @@ Sub CloseAllConnections()
 Dim v As Variant, bb As Boolean
 On Error Resume Next
 If Not Init Then Exit Sub
-If conCollection.count > 0 Then
+If conCollection.Count > 0 Then
 Dim i As Long
 Err.Clear
-For i = conCollection.count - 1 To 0 Step -1
+For i = conCollection.Count - 1 To 0 Step -1
 On Error Resume Next
-conCollection.index = i
+conCollection.Index = i
 If conCollection.IsObj Then
 With conCollection.ValueObj
 bb = .connectionstring <> ""
@@ -1695,6 +1714,7 @@ End Sub
 Public Sub RemoveOneConn(conname)
 On Error Resume Next
 Dim vv
+If conCollection Is Nothing Then Exit Sub
 If Not conCollection.ExistKey(conname) Then Exit Sub
 
 Set vv = conCollection.ValueObj
@@ -1740,10 +1760,10 @@ If Init Then Exit Sub
 Set conCollection = New FastCollection
 Init = True
 End Sub
-Function ftype(ByVal A As Long, lang As Long) As String
+Function ftype(ByVal a As Long, lang As Long) As String
 Select Case lang
 Case 0
-Select Case A
+Select Case a
     Case 0
 ftype = "ΑΔΕΙΟ"
     Case 2
@@ -1831,7 +1851,7 @@ ftype = "????"
 End Select
 
 Case Else  ' this is for 1
-Select Case A
+Select Case a
     Case 0
 ftype = "EMPTY"
     Case 2

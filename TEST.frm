@@ -195,15 +195,15 @@ Attribute VB_Exposed = False
 Option Explicit
 Public WithEvents testpad As TextViewer
 Attribute testpad.VB_VarHelpID = -1
-Public WithEvents compute As myTextBox
-Attribute compute.VB_VarHelpID = -1
+Public WithEvents Compute As myTextBox
+Attribute Compute.VB_VarHelpID = -1
 Private Label(0 To 2) As New myTextBox
 
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
-Dim A$
+Dim a$
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
 Dim height1 As Long, width1 As Long
@@ -311,18 +311,18 @@ testpad.NoColor = False
 testpad.EditDoc = False
 testpad.nowrap = False
 testpad.enabled = True
-Set compute = New myTextBox
-Set compute.Container = gList0
-compute.MaxCharLength = 500 ' as a limit
-compute.Locked = False
-compute.enabled = True
-compute.Retired
+Set Compute = New myTextBox
+Set Compute.Container = gList0
+Compute.MaxCharLength = 500 ' as a limit
+Compute.locked = False
+Compute.enabled = True
+Compute.Retired
 Set Label(0).Container = gList3(0)
 Set Label(1).Container = gList3(1)
 Set Label(2).Container = gList3(2)
 If pagio$ = "GREEK" Then
 gList2.HeadLine = "Έλεγχος"
-compute.Prompt = "Τυπωσε "
+Compute.Prompt = "Τυπωσε "
 Label(0).Prompt = "Τμήμα: "
 Label(1).Prompt = "Εντολή: "
 Label(2).Prompt = "Επόμενο: "
@@ -335,7 +335,7 @@ gList4.additemFast "Αργή Ροή"
 gList4.additemFast "Διακοπή"
 Else
 gList2.HeadLine = "Control"
-compute.Prompt = "Print "
+Compute.Prompt = "Print "
 Label(0).Prompt = "Module: "
 Label(1).Prompt = "Id: "
 Label(2).Prompt = "Next: "
@@ -358,7 +358,7 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 testpad.Dereference
-compute.Dereference
+Compute.Dereference
 Set MyBaseTask = Nothing
 trace = False
 STq = True
@@ -389,42 +389,42 @@ End If
 End Sub
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
-                      
+            Me.Visible = False
             Unload Me
 End If
 End Sub
 
 
-Public Property Get Label1(ByVal index As Long) As String
-Label1 = Label(index)
+Public Property Get Label1(ByVal Index As Long) As String
+Label1 = Label(Index)
 End Property
 
-Public Property Let Label1(ByVal index As Long, ByVal RHS As String)
-Label(index) = RHS
+Public Property Let Label1(ByVal Index As Long, ByVal RHS As String)
+Label(Index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), 0
 b = 5
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
 
 End Sub
 
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 ' create brush
@@ -438,19 +438,19 @@ Private Sub gList2_LostFocus()
 doubleclick = 0
 End Sub
 
-Private Sub glist3_CheckGotFocus(index As Integer)
+Private Sub glist3_CheckGotFocus(Index As Integer)
 Dim s$
 gList4.SetFocus
-If index < 2 Then
+If Index < 2 Then
 abt = False
 
 vH_title$ = ""
-s$ = Label(index)
+s$ = Label(Index)
 Select Case Left$(LTrim(Label(2)) + " ", 1)
 Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
 End Select
-ElseIf index = 2 Then
+ElseIf Index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
 gList3(2).BackColor = &H606060
@@ -464,11 +464,11 @@ End If
 End Sub
 
 Private Sub gList4_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
-Dim A As RECT, b As RECT
-CopyFromLParamToRect A, thisrect
+Dim a As RECT, b As RECT
+CopyFromLParamToRect a, thisrect
 CopyFromLParamToRect b, thisrect
-A.Left = A.Left + 1 * lastfactor
-A.Right = gList4.WidthPixels
+a.Left = a.Left + 1 * lastfactor
+a.Right = gList4.WidthPixels
 b.Right = gList4.WidthPixels
  If item = gList4.ListIndex Then
    If EXECUTED Then
@@ -491,12 +491,12 @@ b.Right = gList4.WidthPixels
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
-  A.Left = A.Left + 1 * lastfactor + gList4.PanPosPixels
+  a.Left = a.Left + 1 * lastfactor + gList4.PanPosPixels
   gList4.ForeColor = rgb(128, 0, 128)
   End If
    
    
-   PrintItem thisHDC, gList4.list(item), A
+   PrintItem thisHDC, gList4.List(item), a
     skip = True
 End Sub
  
@@ -572,7 +572,7 @@ If Button = 1 Then
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addx As Long, addy As Long, factor As Single, Once As Boolean
+Dim addX As Long, addy As Long, factor As Single, Once As Boolean
 If Once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
@@ -587,16 +587,16 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addx = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addx = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
     
-  If Not ExpandWidth Then addx = 0
+  If Not ExpandWidth Then addX = 0
         If lastfactor = 0 Then lastfactor = 1
         factor = lastfactor
 
@@ -604,25 +604,25 @@ Else
   
         Once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addx = -(Width - ScrX()) + addx
-        If (addy + Height) / height1 > 0.4 And ((Width + addx) / width1) > 0.4 Then
+        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((Width * lastfactor / factor + addx) / Height * lastfactor / factor) < (width1 / height1) Then
-        addx = -Width * lastfactor / factor - 1
+        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -Width * lastfactor / factor - 1
       
            End If
 
-        If addx = 0 Then
+        If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (Width + addx) * lastfactor / factor
+         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
         
@@ -685,8 +685,8 @@ gList0.FontSize = gList1.FontSize
 ScaleDialogFix = factor
 End Function
 
-Public Sub hookme(This As gList)
-If Not This Is Nothing Then This.NoWheel = True
+Public Sub hookme(this As gList)
+If Not this Is Nothing Then this.NoWheel = True
 End Sub
 Sub ByeBye()
 Unload Me

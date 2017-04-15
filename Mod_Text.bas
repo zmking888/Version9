@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1693,7 +1693,13 @@ Do
                 End If
                 
                 If FastSymbol(rest$, ",") Then
-                If IsExp(basestack, rest$, p) Then .currow = CLng(p)
+                If IsExp(basestack, rest$, p) Then
+                If CLng(p) >= .My Then
+                .currow = .My - 1
+                Else
+                .currow = CLng(p)
+                End If
+                End If
                 End If
 
                 If FastSymbol(rest$, ",") Then
@@ -8947,9 +8953,13 @@ fun93: 'Case "TEST(", "ΔΟΚΙΜΗ("
  IsNumber = False
  
  If IsExp(bstack, a$, r) Then
-    bypassST = r = 0
-    STbyST = Not bypassST
-    IsNumber = FastSymbol(a$, ")", True)
+    If trace Then
+        bypassST = r = 0
+        STbyST = Not bypassST
+        IsNumber = FastSymbol(a$, ")", True)
+    Else
+        r = 0
+    End If
     ElseIf IsStrExp(bstack, a$, s$) Then
     If trace Then
     If s$ = "" Then s$ = Chr$(1)
@@ -9010,24 +9020,39 @@ subHash.ItemCreator s1$, bstack.OriginalCode, True
 ElseIf s1$ = "LAMBDA()" Then
     If bstack.IamLambda Then
         s1$ = bstack.FuncRec
-        GoTo contAr1
+        
  Else
-        LambdaOnly a$
-    GoTo skiperror
+s1$ = Mid$(here$, rinstr(here$, "].") + 2)
+If Not GetSub(s1$, V1&) Then
+If here$ Like "*." + s1$ Then
+subHash.ItemCreator s1$, bstack.OriginalCode, True
+Else
+GoTo skiperror
+End If
+End If
  End If
+ GoTo contAr1
 ElseIf s1$ = "ΛΑΜΔΑ()" Then
     If bstack.IamLambda Then
         s1$ = bstack.FuncRec
-        GoTo contAr1
+        
  Else
-        LambdaOnly a$
-    GoTo skiperror
+s1$ = Mid$(here$, rinstr(here$, "].") + 2)
+If Not GetSub(s1$, V1&) Then
+If here$ Like "*." + s1$ Then
+subHash.ItemCreator s1$, bstack.OriginalCode, True
+Else
+GoTo skiperror
+End If
+End If
  End If
+ GoTo contAr1
 Else
              If Right$(s1$, 3) <> "$()" Then
         
               If neoGetArray(bstack, Left$(s1$, Len(s1$) - 2) + "$(", pppp) Then GoTo contAr2
                End If
+               
 End If
 End If
 GoTo skiperror
@@ -14458,17 +14483,31 @@ skiperrorStr:
         ElseIf q1$ = "LAMBDA$()" Then
             If bstackstr.IamLambda Then
              q1$ = bstackstr.FuncRec
-             GoTo contStrFun
              Else
-                MyErMacroStr a$, "Only in lambda function", "Μόνο σε λάμδα συνάρτηση"
+                q1$ = Mid$(here$, rinstr(here$, "].") + 2)
+                If Not GetSub(q1$, w1&) Then
+                If here$ Like "*." + q1$ Then
+                subHash.ItemCreator q1$, bstackstr.OriginalCode, True
+                Else
+                GoTo skiperrorStr
+                End If
+                End If
              End If
+             GoTo contStrFun
         ElseIf q1$ = "ΛΑΜΔΑ$()" Then
             If bstackstr.IamLambda Then
              q1$ = bstackstr.FuncRec
-             GoTo contStrFun
              Else
-                MyErMacroStr a$, "Only in lambda function", "Μόνο σε λάμδα συνάρτηση"
+             q1$ = Mid$(here$, rinstr(here$, "].") + 2)
+                    If Not GetSub(q1$, w1&) Then
+                    If here$ Like "*." + q1$ Then
+                    subHash.ItemCreator q1$, bstackstr.OriginalCode, True
+                    Else
+                    GoTo skiperrorStr
+                    End If
+                    End If
              End If
+             GoTo contStrFun
         End If
 End If
 
@@ -15092,7 +15131,7 @@ End If
     Form1.Show , Form5   'OK
     End If
 
-    If STbyST Then
+    If STbyST And bstack.IamChild Then
         STbyST = False
         If Not STEXIT Then
         If Not STq Then
@@ -15100,9 +15139,11 @@ End If
         End If
         End If
         Do
-        MyDoEvents1 Form1
-        BLOCKkey = False
-        MyDoEvents
+        'MyDoEvents1 Form1
+        'BLOCKkey = False
+        'MyDoEvents
+        If di.Visible Then di.Refresh
+        ProcTask2 bstack
         Loop Until STbyST Or STq Or STEXIT Or NOEXECUTION Or myexit(bstack)
             If Not STEXIT Then
         If Not STq Then
@@ -15117,7 +15158,7 @@ End If
         Exit Function
         End If
     End If
-Sleep 5
+'Sleep 5
    '' SleepWaitNO 5
     If STEXIT Then
     
@@ -21602,8 +21643,8 @@ Dim i As Long
 
 Do
 i = i + 1
-If Stack.Total < i Then Exit Do
-If Stack.StackItemType(i) = "N" Then
+If Stack.Total < i Or Len(AL$) > 400 Then Exit Do
+If Stack.StackItemType(i) = "N" Or Stack.StackItemType(i) = "L" Then
 AL$ = AL$ & CStr(Stack.StackItem(i)) & " "
 ElseIf Stack.StackItemType(i) = "S" Then
 r$ = Stack.StackItem(i)
@@ -21612,7 +21653,9 @@ r$ = Stack.StackItem(i)
     Else
     AL$ = AL$ & Chr(34) + r$ & Chr(34)
     End If
-Else
+ElseIf Stack.StackItemType(i) = "*" Then
+AL$ = AL$ & Stack.StackItemTypeObjectType(i) & " "
+Else  '??
 AL$ = AL$ & Stack.StackItemTypeObjectType(i) & " "
 End If
 Loop
@@ -25856,6 +25899,12 @@ Sleep 1
 End Sub
 Sub ProcTask2(bstack As basetask)
 On Error GoTo procbliah2
+If TaskMaster Is Nothing Then
+If SLOW Then
+Sleep 1
+End If
+DoEvents
+Else
 If TaskMaster.Processing Then
           TaskMaster.RestEnd1
  TaskMaster.TimerTickNow
@@ -25868,6 +25917,7 @@ TaskMaster.rest
 
 SleepWaitEdit2 1
 TaskMaster.RestEnd
+End If
 Exit Sub
 procbliah2:
 DoEvents
@@ -29371,6 +29421,11 @@ End Sub
 Function procTestMe(bstack As basetask, rest$, what$) As Boolean
 Dim ss$
 procTestMe = True
+
+If Not Form1.Visible Then
+newshow basestack1
+k1 = 0
+End If
 If FastSymbol(rest$, "!") Then
 untest:
 If trace Then
@@ -29465,8 +29520,8 @@ Else
 stackshow bstack
 MyDoEvents
 Form1.Show , Form5
-
-If IsLabelOnly((rest$), what$) Then
+what$ = ""
+If IsLabelOnly((rest$), what$) = 1 Then
 rest$ = ": " + rest$
 If Not trace Then
 trace = True
@@ -29477,11 +29532,37 @@ Else
 
 
 End If
+ElseIf what$ <> "" Then
+com1020:
+Dim m As Long, s$
+Do
+m = 1
 
+ what$ = aheadstatus(rest$, , m)
+
+ If m > 1 Then
+ If Asc(LTrim(Left$(rest$, m))) < 32 Then Exit Do
+ If s$ <> "" Then
+ s$ = s$ + ", " + LTrim(Left$(rest$, m - 1))
+ Else
+s$ = s$ + LTrim(Left$(rest$, m - 1))
 End If
+Mid$(rest$, 1, m - 1) = Space$(m - 1)
+End If
+If Not FastSymbol(rest$, ",") Then Exit Do
+Loop Until m = 1
+If Not Form2.Visible Then Form2.Show , Form1
+Form2.Compute.vartext = s$
+rest$ = NLtrim(rest$)
 trace = True
+STq = True
+STbyST = False
+TestShowCode = False
+Form2.gList4.ListIndex = 1
+End If
+
 Else
-If IsLabelOnly((rest$), what$) Then
+If IsLabelOnly((rest$), what$) = 1 Then
 TestShowCode = True
 rest$ = ": " + rest$
 trace = True
@@ -29489,6 +29570,8 @@ trace = True
 stackshow bstack
 MyDoEvents
 Form1.Show , Form5
+Else
+GoTo com1020
 End If
 
 End If
@@ -38464,6 +38547,7 @@ If pa$ = "" Then
 JetPrefixUser = JetPrefixHelp
 JetPostfixUser = JetPostfixHelp
 Else
+' DB.PROVIDER "Microsoft.ACE.OLEDB.12.0","Jet OLEDB","100101"
 ' DB.PROVIDER "Microsoft.Jet.OLEDB.4.0", "Jet OLEDB", "100101"
 ' DB.PROVIDER "dns=testme;Uid=admin;Pwd=12alfa45", "ODBC", "100101"
 ' use (name) for database name
