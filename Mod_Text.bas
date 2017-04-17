@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8956,6 +8956,7 @@ fun93: 'Case "TEST(", "дойилг("
     If trace Then
         bypassST = r = 0
         STbyST = Not bypassST
+         STq = False
         IsNumber = FastSymbol(a$, ")", True)
     Else
         r = 0
@@ -29542,12 +29543,14 @@ m = 1
 
  If m > 1 Then
  If Asc(LTrim(Left$(rest$, m))) < 32 Then Exit Do
+ STq = True
  If s$ <> "" Then
  s$ = s$ + ", " + LTrim(Left$(rest$, m - 1))
  Else
 s$ = s$ + LTrim(Left$(rest$, m - 1))
 End If
 Mid$(rest$, 1, m - 1) = Space$(m - 1)
+STbyST = False
 End If
 If Not FastSymbol(rest$, ",") Then Exit Do
 Loop Until m = 1
@@ -29555,8 +29558,8 @@ If Not Form2.Visible Then Form2.Show , Form1
 Form2.Compute.vartext = s$
 rest$ = NLtrim(rest$)
 trace = True
-STq = True
-STbyST = False
+
+
 TestShowCode = False
 Form2.gList4.ListIndex = 1
 End If
