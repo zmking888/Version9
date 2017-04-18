@@ -3848,6 +3848,8 @@ Private Property Let BarVisible(ByVal RHS As Boolean)
 If Not myEnabled Then
 Exit Property
 End If
+If RHS = False And Shape1.Visible = False Then
+Else
 If listcount = 0 Then RHS = False
 Shape1.Visible = RHS Or Spinner
 Shape2.Visible = RHS Or Spinner
@@ -3856,6 +3858,7 @@ Shape Shape1
 Shape Shape2
 Shape Shape3
 If Not NoFire = True Then Timer1.enabled = True
+End If
 End Property
 
 Private Sub showshapes()

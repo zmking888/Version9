@@ -83,7 +83,7 @@ Private GuiControls As New Collection
 Dim onetime As Boolean, PopupOn As Boolean
 Dim alfa As New GuiButton
 Public MyName$
-Public ModuleName$
+Public modulename$
 Public prive As Long
 Private ByPassEvent As Boolean
 Private mIndex As Long
@@ -187,8 +187,8 @@ End Sub
 
 Private Sub Form_Click()
 If gList2.Visible Then gList2.SetFocus
-If Index > -1 Then
-    Callback MyName$ + ".Click(" + CStr(Index) + ")"
+If index > -1 Then
+    Callback MyName$ + ".Click(" + CStr(index) + ")"
 Else
     Callback MyName$ + ".Click()"
 End If
@@ -271,8 +271,8 @@ mEnabled = True
 End Sub
 
 Private Sub Form_LostFocus()
-If Index > -1 Then
-    Callback MyName$ + ".LostFocus(" + CStr(Index) + ")"
+If index > -1 Then
+    Callback MyName$ + ".LostFocus(" + CStr(index) + ")"
 Else
     Callback MyName$ + ".LostFocus()"
 End If
@@ -287,8 +287,8 @@ If Not Relax Then
 
 
 Relax = True
-If Index > -1 Then
-    Callback MyName$ + ".MouseDown(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+If index > -1 Then
+    Callback MyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
     Callback MyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -303,8 +303,8 @@ Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y A
 If Not Relax Then
 Relax = True
 
-If Index > -1 Then
-Callback MyName$ + ".MouseMove(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+If index > -1 Then
+Callback MyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback MyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -318,8 +318,8 @@ If Not Relax Then
 
 Relax = True
 
-If Index > -1 Then
-Callback MyName$ + ".MouseUp(" + CStr(Index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+If index > -1 Then
+Callback MyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback MyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
@@ -354,11 +354,11 @@ ResizeMark.Move Width - ResizeMark.Width, Height - ResizeMark.Height
 End Sub
 
 
-Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, Skip As Boolean)
+Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
 FillThere thisHDC, thisrect, gList2.CapColor
 FillThereMyVersion thisHDC, thisrect, &H999999
-Skip = True
+skip = True
 End If
 End Sub
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
@@ -441,29 +441,29 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
 
-FillBack thathDC, A, thatbgcolor
+FillBack thathDC, a, thatbgcolor
 End Sub
 
 Private Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), 0
 b = 5 * lastfactor
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 End Sub
 
 Public Property Get TITLE() As Variant
@@ -480,14 +480,15 @@ gList2.HeadLine = ""
 If Trim(vNewValue) = "" Then vNewValue = " "
 gList2.HeadLine = vNewValue
 gList2.HeadlineHeight = gList2.HeightPixels
-If oldenable = False Then gList2.ShowMe
+'If oldenable = False Then
+gList2.ShowMe
 gList2.enabled = oldenable
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Sub CloseNow()
@@ -513,9 +514,9 @@ Set w = Nothing
 Unload Me
     End If
 End Sub
-Public Function Control(Index) As Object
+Public Function Control(index) As Object
 On Error Resume Next
-Set Control = Controls(Index)
+Set Control = Controls(index)
 If Err > 0 Then Set Control = Me
 End Function
 Public Sub Opacity(mAlpha, Optional mlColor = 0, Optional mTRMODE = 0)
@@ -648,8 +649,8 @@ PopupOn = True
 that.Show , Me
 
 End Sub
-Public Sub hookme(This As gList)
-Set LastGlist = This
+Public Sub hookme(this As gList)
+Set LastGlist = this
 End Sub
 
 Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -670,7 +671,7 @@ End If
 End Sub
 
 Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addy As Single, addx As Single
+Dim addy As Single, addX As Single
 If Not Relax Then
     x = x + ResizeMark.Left
     y = y + ResizeMark.top
@@ -678,14 +679,14 @@ If Not Relax Then
     Relax = True
     If dr Then
          If y < (Height - 150) Or y >= Height Then addy = (y - ly) Else addy = dv15 * 5
-         If x < (Width - 150) Or x >= Width Then addx = (x - Lx) Else addx = dv15 * 5
-         If Width + addx >= 1800 And Width + addx < ScrX() Then
+         If x < (Width - 150) Or x >= Width Then addX = (x - Lx) Else addX = dv15 * 5
+         If Width + addX >= 1800 And Width + addX < ScrX() Then
              If Height + addy >= 1800 And Height + addy < ScrY() Then
                 Lx = x
                 ly = y
-                Move Left, top, Width + addx, Height + addy
-                If Index > -1 Then
-                    Callback MyName$ + ".Resize(" + CStr(Index) + ")"
+                Move Left, top, Width + addX, Height + addy
+                If index > -1 Then
+                    Callback MyName$ + ".Resize(" + CStr(index) + ")"
                 Else
                     Callback MyName$ + ".Resize()"
                 End If

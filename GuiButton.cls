@@ -18,7 +18,7 @@ Public CtrlName As String
 Private mesCtrlName As String, mlocked As Boolean
 Dim mIndex As Long
 Dim Callback As GuiM2000
-Dim white As Long, dimm1 As Long, dimm2 As Long
+Dim white As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
@@ -98,6 +98,7 @@ With glistN
 .BackColor = rgb(200, 120, 60)
 Set .Font = ff
 .ForeColor = Callback.Controls(1).ForeColor
+shadowcol = -.ForeColor
 .dcolor = Callback.Controls(1).dcolor
 
 .enabled = True
@@ -125,14 +126,30 @@ End Sub
 
 Private Sub glistN_CheckGotFocus()
 If mlocked Then Exit Sub
-glistN.BackColor = dimm1
+If Me.enabled Then
+If glistN.BackStyle = 1 Then
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".GotFocus(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".GotFocus()"
+      End If
+End If
+glistN.BackColor = mycolor(dimm1)
 glistN.ShowMe
+End If
 End Sub
 
 Private Sub glistN_CheckLostFocus()
 
 If Me.enabled Then
-If Not mlocked Then glistN.BackColor = dimm2
+If glistN.BackStyle = 1 Then
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".LostFocus(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".LostFocus()"
+      End If
+End If
+If Not mlocked Then glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 
@@ -195,11 +212,11 @@ Public Property Get Caption() As String
 Caption = mCaptext
 End Property
 
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get enabled() As Long
@@ -210,19 +227,25 @@ Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
 glistN.enabled = RHS
 End Property
+Public Property Get WrapText() As Long
+WrapText = glistN.WrapText
+End Property
+
+Public Property Let WrapText(ByVal RHS As Long)
+glistN.WrapText = RHS <> 0
+End Property
 Sub ColorsReset()
 white = rgb(255, 255, 255)
 glistN.ForeColor = rgb(255, 255, 255)
 dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
-Sub Colors(white1, Optional dimm11, Optional dimm21)
+Sub Colors(white1, Optional dimm21, Optional dimm11)
 
 glistN.ForeColor = mycolor(white1)
-
-If Not IsMissing(dimm11) Then
-dimm1 = dimm11
-If Not IsMissing(dimm21) Then dimm2 = dimm21
+If Not IsMissing(dimm21) Then
+dimm2 = dimm21
+If Not IsMissing(dimm11) Then dimm1 = dimm11
 End If
 'Retired
 End Sub
@@ -265,16 +288,15 @@ On Error Resume Next
 Callback.Controls(CtrlName).SetFocus
 End Sub
 
-
-Public Property Get Locked() As Variant
-Locked = mlocked
+Public Property Get locked() As Variant
+locked = mlocked
 End Property
 
-Public Property Let Locked(ByVal vNewValue As Variant)
+Public Property Let locked(ByVal vNewValue As Variant)
 mlocked = vNewValue
 glistN.dropkey = mlocked
 glistN.TabStop = Not mlocked
-glistN.BackColor = mycolor(dimm1)
+glistN.BackColor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 End Property
@@ -289,4 +311,22 @@ Dim x  As Long, y As Long
 glistN.BackStyle = 1
 glistN.GetLeftTop x, y
 glistN.RepaintFromOut Callback.image, x, y
+glistN.ShowMe
 End Sub
+Sub TransparentOff()
+glistN.BackStyle = 0
+glistN.ShowMe
+End Sub
+Sub Shadow(ByVal vNewValue As Variant)
+shadowcol = -white
+Colors vNewValue
+Me.locked = True
+Show
+End Sub
+Sub ShadowOff()
+
+Colors shadowcol
+Me.locked = False
+Show
+End Sub
+

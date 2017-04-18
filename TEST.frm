@@ -298,7 +298,7 @@ gList2.FloatList = True
 gList2.FloatLimitTop = ScrY() - players(0).Yt * 2
 gList2.FloatLimitLeft = ScrX() - players(0).Xt * 2
 gList2.MoveParent = True
-gList2.enabled = True
+'gList2.enabled = True
 gList1.DragEnabled = False
 gList1.AutoPanPos = True
 Set testpad = New TextViewer
@@ -352,10 +352,6 @@ gList4.enabled = True
 gList4.ListindexPrivateUse = 0
 gList4.ShowMe
 End Sub
-
-
-
-
 Private Sub Form_Unload(Cancel As Integer)
 testpad.Dereference
 Compute.Dereference
@@ -363,9 +359,6 @@ Set MyBaseTask = Nothing
 trace = False
 STq = True
 End Sub
-
-
-
 Private Sub gList1_CheckGotFocus()
 gList1.BackColor = &H606060
 gList1.ShowMe2
@@ -395,12 +388,12 @@ End If
 End Sub
 
 
-Public Property Get Label1(ByVal Index As Long) As String
-Label1 = Label(Index)
+Public Property Get Label1(ByVal index As Long) As String
+Label1 = Label(index)
 End Property
 
-Public Property Let Label1(ByVal Index As Long, ByVal RHS As String)
-Label(Index) = RHS
+Public Property Let Label1(ByVal index As Long, ByVal RHS As String)
+Label(index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
 Dim a As RECT, b As Long
@@ -438,19 +431,19 @@ Private Sub gList2_LostFocus()
 doubleclick = 0
 End Sub
 
-Private Sub glist3_CheckGotFocus(Index As Integer)
+Private Sub glist3_CheckGotFocus(index As Integer)
 Dim s$
 gList4.SetFocus
-If Index < 2 Then
+If index < 2 Then
 abt = False
 
 vH_title$ = ""
-s$ = Label(Index)
+s$ = Label(index)
 Select Case Left$(LTrim(Label(2)) + " ", 1)
 Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
 End Select
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
 gList3(2).BackColor = &H606060
