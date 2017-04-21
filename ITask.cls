@@ -20,7 +20,7 @@ Option Explicit
 ' OBJECTS
 
 
-Public Property Set Owner(ByRef rhs As Object)
+Public Property Set Owner(ByRef RHS As Object)
 End Property
 
 Public Property Get Owner() As Object
@@ -52,6 +52,8 @@ End Property
 Public Property Get Interval() As Double
 End Property
 Public Property Let Interval(ByVal Value As Double)
+End Property
+Public Property Get CodeData() As String
 End Property
 ' METHODS
 

@@ -6240,6 +6240,18 @@ End Sub
 Public Sub MissPar()
 MyEr "missing parameter", "λείπει παράμετρος"
 End Sub
+Public Sub MissModuleName()
+MyEr "Missing module name", "Λείπει όνομα τμήματος"
+End Sub
+Public Sub NoNext()
+MyEr "NEXT without FOR", "ΕΠΟΜΕΝΟ χωρίς ΓΙΑ"
+End Sub
+Public Sub MissNext()
+MyEr "Missing the right NEXT", "Έχασα το σωστό ΕΠΟΜΕΝΟ"
+End Sub
+Public Sub MissVarName()
+MyEr "Missing variable name", "Λείπει όνομα μεταβλητής"
+End Sub
 Public Sub MissParam(ar$)
 MyErMacro ar$, "missing parameter", "λείπει παράμετρος"
 End Sub

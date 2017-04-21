@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -1320,7 +1320,8 @@ STq = False
 STEXIT = False
 STbyST = True
 Form2.Show , Form1
-Form2.Label1(0) = here$
+ PrepareLabel basestack1
+ 
 Form2.Label1(1) = "..."
 Form2.Label1(2) = "..."
     Form2.gList3(2).BackColor = &H3B3B3B
@@ -1708,7 +1709,7 @@ MyDoEvents
  If cLine = "" Then
 
    If trace Then
-    Form2.Label1(0) = here$
+   PrepareLabel basestack1
     Form2.Label1(1) = "..."
     Form2.Label1(2) = "..."
     Form2.gList3(2).BackColor = &H3B3B3B

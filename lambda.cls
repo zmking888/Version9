@@ -21,6 +21,7 @@ Private Type Vars
 End Type
 Private Total As Long, fixed As Long, used As Long
 Private myVar() As Vars, myHash As New Hash
+Public subs As FastCollection
 Sub CopyToVar(bstack As basetask, glb As Boolean, v() As Variant)
 Dim i As Long, nm$, where As Long, dummy As Variant, x1 As Long
 bstack.IamLambda = True
@@ -139,6 +140,7 @@ Next i
 
 End If
 Erase myVar()
+Set subs = Nothing
 End Sub
 Public Sub CopyTo(a As lambda, v() As Variant)
 ' only for new

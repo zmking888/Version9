@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -529,13 +529,13 @@ lastindex = bb.index
 ElseIf bb.Done Then
 If Not bstack.soros.IsEmpty Then
 With bstack.soros
-Select Case .StackItemTypeObjectType(1)
-Case ""
+If .StackItemTypeIsObject(1) Then
+Set bb.ValueObj = .PopObj
+
+Else
 bb.Value = .StackItem(1)
 .drop 1
-Case Else
-Set bb.ValueObj = .PopObj
-End Select
+End If
 End With
 ChangeValues = True
 Else
@@ -5620,7 +5620,7 @@ If bstack.soros.Total = 0 Then
   
         IsNumber = False: Exit Function
 
-    ElseIf bstack.soros.StackItemTypeObjectType(1) = "mArray" Then
+    ElseIf bstack.soros.StackItemTypeObjectType(1, var()) = "*[mArray]" Then
         Set bstack.lastobj = bstack.soros.PopObj
         r = 0
         IsNumber = True
@@ -5638,7 +5638,7 @@ If bstack.soros.Total = 0 Then
   
         IsNumber = False: Exit Function
 
-    ElseIf bstack.soros.StackItemTypeObjectType(1) = "Group" Then
+    ElseIf bstack.soros.StackItemTypeObjectType(1, var()) = "Group" Then
         Set bstack.lastobj = bstack.soros.PopObj
         r = 0
         IsNumber = True
@@ -9733,13 +9733,13 @@ End Select
 ElseIf k < 5 Then
         If GetVar(bstack, n$, pos1, , , True) Then
         If Typename(var(pos1)) = "lambda" Then
-        Dim AAA As lambda
-        var(pos1).CopyTo AAA, var()
-        Set dummy = AAA
+        Dim aaa As lambda
+        var(pos1).CopyTo aaa, var()
+        Set dummy = aaa
             body.FeedNonLocal n$, dummy, var()
             Set dummy = Nothing
             dummy = Empty
-            Set AAA = Nothing
+            Set aaa = Nothing
         ElseIf Typename(var(pos1)) = "Group" Then
         CopyGroup var(pos1), bstack
         Set dummy = bstack.lastobj
@@ -12386,11 +12386,11 @@ itisavar:
                 If GetVar(bstackstr, q$, w) Then
                 If MyIsObject(var(w)) Then
                     If TypeOf var(w) Is lambda Then
-                        Dim AAA As lambda
+                        Dim aaa As lambda
                         r$ = ""
-                        var(w).CopyTo AAA, var()
-                        Set bstackstr.lastobj = AAA
-                        Set AAA = Nothing
+                        var(w).CopyTo aaa, var()
+                        Set bstackstr.lastobj = aaa
+                        Set aaa = Nothing
                     ElseIf TypeOf var(w) Is PropReference Then
                         r$ = var(w).Value
                     ElseIf TypeOf var(w) Is Group Then
@@ -15121,7 +15121,15 @@ Else
 i1 = IsLabelAnew("", b$, w$, lang) '' NO FORM AA@BBB ALLOWED HERE
 End If
   If trace And (bstack.Process Is Nothing) Then
+  If bstack.IamLambda Then
+  If pagio$ = "GREEK" Then
+  Form2.Label1(0) = "À¡Ãƒ¡()"
+  Else
+  Form2.Label1(0) = "LAMBDA()"
+  End If
+  Else
     Form2.Label1(0) = here$
+    End If
     Form2.Label1(1) = w$
     Form2.Label1(2) = GetStrUntil(vbCrLf, b$ & vbCrLf, False)
  TestShowSub = ""
@@ -15363,14 +15371,16 @@ noexpression:
                         If IsExp(bstack, b$, p) Then
                             If bstack.lastobj Is Nothing Then
                                 Expected "lambda", "Î‹Ï‰·"
-                            End If
-                            If TypeOf bstack.lastobj Is lambda Then
+                            ElseIf TypeOf bstack.lastobj Is lambda Then
                                 Set var(v) = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                 GoTo loopcontinue1
                             Else
                                 Expected "lambda", "Î‹Ï‰·"
                             End If
+                            interpret = False
+                            Exit Function
+
                         Else
                             MissNumExpr
                             interpret = False
@@ -16563,13 +16573,13 @@ Do
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
             If CheckIsmArray(bstack.lastobj, var()) Then
-            Dim AAA As New mHandler
-            With AAA
+            Dim aaa As New mHandler
+            With aaa
                 .t1 = 3
                Set .objref = bstack.lastobj
                
             End With
-                bstack.SetVarobJ w$, AAA
+                bstack.SetVarobJ w$, aaa
             Else
                 bstack.SetVar w$, p
             End If
@@ -16942,14 +16952,18 @@ End If
       
  ' trace here...And Not bstack.IamAnEvent And Not bstack.IamThread
  If trace Then
-  If (bstack.Process Is Nothing) Then
-    Form2.Label1(0) = here$
+  If True Then
+    PrepareLabel bstack
     Form2.Label1(1) = w$
     Form2.Label1(2) = GetStrUntil(vbCrLf, b$ & vbCrLf, False)
     If WaitShow = 0 Or Len(b$) < WaitShow Then
 
    WaitShow = 0
+   If bstack.OriginalCode < 0 Then
+   sbb$ = GetNextLine((var(-bstack.OriginalCode).code$))
+   Else
     sbb$ = GetNextLine((sbf(bstack.OriginalCode).sb))
+    End If
     If Left$(sbb$, 10) = "'11001EDIT" Then
     TestShowSub = Mid$(sbf(bstack.OriginalCode).sb, Len(sbb$) + 3)
     If TestShowSub = "" Then
@@ -16960,10 +16974,20 @@ End If
     End If
     Else
     If bstack.OriginalCode <> 0 Then
+    If bstack.OriginalCode < 0 Then
+    TestShowSub = var(-bstack.OriginalCode).code$
+    Else
      TestShowSub = sbf(bstack.OriginalCode).sb
-     
+     End If
+     Else
+     If bstack.IamThread Then
+     If bstack.Process Is Nothing Then
+     Else
+     TestShowSub = bstack.Process.CodeData
+     End If
      Else
      TestShowSub = b$
+     End If
      End If
      End If
 End If
@@ -16994,12 +17018,23 @@ End If
         Form2.gList4.ListIndex = 0
         End If
         End If
+     '   If bstack.IamThread Then
+     '       If Not TaskMaster Is Nothing Then
+      '      TaskMaster.StopProcess
+      '      End If
+      '  End If
+        If Not TaskMaster Is Nothing Then
+       If TaskMaster.QueueCount > 0 And TaskMaster.Processing Then TaskMaster.StopProcess
+        End If
         Do
         BLOCKkey = False
          If di.Visible Then di.Refresh
         ProcTask2 bstack
         
         Loop Until STbyST Or STq Or STEXIT Or bypassST Or NOEXECUTION Or myexit(bstack) Or Not Form2.Visible
+       If Not TaskMaster Is Nothing Then
+       If TaskMaster.QueueCount > 0 And Not TaskMaster.Processing Then TaskMaster.StartProcess
+        End If
         If Not STEXIT Then
         If Not STq Then
         Form2.gList4.ListIndex = 0
@@ -17900,7 +17935,7 @@ contNext:
         ss$ = bstack.RetStack.PopStr
         If ss$ <> w$ Then
          bstack.RetStack.PushStr ss$
-        MyEr "Missing the right NEXT", "∏˜·Û· ÙÔ Û˘ÛÙ¸ ≈–œÃ≈Õœ"
+        MissNext
         Execute = 0
         Exit Function
         Else
@@ -17914,7 +17949,7 @@ contNext:
   
         End If
         Else
-              MyEr "NEXT without FOR", "≈–œÃ≈Õœ ˜˘ÒﬂÚ √…¡"
+              NoNext
         Execute = 0
         Exit Function
         End If
@@ -18381,8 +18416,9 @@ contTask:
         bstack.TaskMain = True
                 Do
                 
-                TaskMaster.TimerTick
-               '' mydoevents1 form1
+             If TaskMaster Is Nothing Then Execute = 0: Exit Function
+             If TaskMaster.Processing Then TaskMaster.TimerTick
+              '''''''''' '' mydoevents1 form1
                MyDoEvents0 di
           ''     MyDoEvents2 di
                 ''TaskMaster.RestEnd1
@@ -19627,14 +19663,16 @@ noexpression:
                         If IsExp(bstack, b$, p) Then
                             If bstack.lastobj Is Nothing Then
                                 Expected "lambda", "Î‹Ï‰·"
-                            End If
-                            If TypeOf bstack.lastobj Is lambda Then
+                            ElseIf TypeOf bstack.lastobj Is lambda Then
                                 Set var(v) = bstack.lastobj
                                 Set bstack.lastobj = Nothing
                                 GoTo loopcontinue
                             Else
                                 Expected "lambda", "Î‹Ï‰·"
                             End If
+                            Execute = 0
+                            Exit Function
+
                         Else
                             MissNumExpr
                             Execute = 0
@@ -21207,10 +21245,10 @@ MyEr Err.Description, Err.Description
 Err.Clear
      Execute = 0: Exit Function
 errstat1:
-MyEr "Missing module name", "ÀÂﬂÂÈ ¸ÌÔÏ· ÙÏﬁÏ·ÙÔÚ"
+MissModuleName
      Execute = 0: Exit Function
 errstat:
-MyEr "Missing variable name", "ÀÂﬂÂÈ ¸ÌÔÏ· ÏÂÙ·‚ÎÁÙﬁÚ"
+MissVarName
      Execute = 0: Exit Function
 LONGERR:
     If Err.Number = 6 Then
@@ -21544,12 +21582,21 @@ With Form2.testpad
 .nowrap = True
 .Text = TestShowSub
 .mdoc.WrapAgainColor
+
 If AscW(Form2.Label1(1)) = 8191 Then
 .SelStartSilent = TestShowStart - 1 ''Len(Mid$(Form2.Label1(1), 7)) - 1
+'If b.IamThread Then
+'.SelLength = 0
+'Else
 .SelLength = Len(Mid$(Form2.Label1(1), 7))
+'End If
 Else
 .SelStartSilent = TestShowStart - Len(Form2.Label1(1)) - 1
+'If b.IamThread Then
+'.SelLength = 0
+'Else
 .SelLength = Len(Form2.Label1(1))
+'End If
 End If
 
 .enabled = False
@@ -21654,9 +21701,10 @@ r$ = Stack.StackItem(i)
     AL$ = AL$ & Chr(34) + r$ & Chr(34)
     End If
 ElseIf Stack.StackItemType(i) = "*" Then
-AL$ = AL$ & Stack.StackItemTypeObjectType(i) & " "
+
+AL$ = AL$ & Stack.StackItemTypeObjectType(i, var()) & " "
 Else  '??
-AL$ = AL$ & Stack.StackItemTypeObjectType(i) & " "
+AL$ = AL$ & Stack.StackItemTypeObjectType(i, var()) & " "
 End If
 Loop
 With Form2
@@ -23107,13 +23155,14 @@ End If
 Dim j As Long, i As Long, p As Double, aa As Boolean
 items = 1
 i = 0
-
 Do
 If IsExp(bstack, rst$, p) Then
 i = i + 1
 items = items * Int(Abs(p))
 afto.PushDim CLng(p)
 aa = True
+Else
+GoTo dummyarray
 End If
 If i > 9 Then Exit Do
 Loop Until Not FastSymbol(rst$, ",")
@@ -23166,10 +23215,13 @@ i = i + 1
 items = items * Int(Abs(p))
 afto.PushDim CLng(p)
 aa = True
+Else
+GoTo fault
 End If
 If i > 9 Then Exit Do
 Loop Until Not FastSymbol(rst$, ",")
 afto.PushEnd
+fault:
 If aa And FastSymbol(rst$, ")") Then
     
 
@@ -25488,6 +25540,7 @@ If j <> 62 Then
              Set anything = st.StackItem(i).objref
                 If CheckDeepAny(anything, var()) Then
                 If Typename$(anything) = "mStiva" Then
+                ElseIf Typename$(anything) = "mArray" Then
                 Else
                 Exit Function
                 End If
@@ -27803,7 +27856,10 @@ If vv.indirect >= 0 Then
     Set vv = var(vv.indirect)
    
 Else
+If vv.UseIterator Then
+Else
     Set vv = vv.objref
+End If
 End If
  indirect = True
 End If
@@ -28207,7 +28263,10 @@ On Error GoTo there
 Set o = var(fromIndex)
 If TypeOf o Is mHandler Then
 propIndex = -propIndex
+If o.UseIterator Then
+Else
 Set o = o.objref
+End If
 End If
 er$ = ""
 ReadProp = ReadOneParameter(o, propIndex, er$, RETVAR)
@@ -28236,7 +28295,10 @@ Dim o As Object, er$
 Set o = var(fromIndex)
 If TypeOf o Is mHandler Then
 propIndex = -propIndex
+If o.UseIterator Then
+Else
 Set o = o.objref
+End If
 End If
 'ChangeOneIndexParameter
 ChangeOneParameter o, propIndex, Anyval, er$
@@ -29133,7 +29195,11 @@ Sub MakeMyTitle(s$, lang As Long)
             End If
 End Sub
 Function SBcode(i As Long) As String
+If i < 0 Then
+SBcode = var(-i).code$
+Else
 SBcode = sbf(i).sb
+End If
 End Function
 Function GlobalHandler(basestack As basetask, rest$, lang As Long, typeHandler As Long) As Boolean
 Dim x1 As Long, ss$, i As Long, s$, what$, par As Boolean
@@ -29471,8 +29537,15 @@ If here$ = "" Then
  End If
 MyDoEvents
 ' gList2.HeadLine
-
+ If bstack.IamLambda Then
+  If pagio$ = "GREEK" Then
+  Form2.Label1(0) = "”’Õ¡—‘«”« À¡Ãƒ¡"
+  Else
+  Form2.Label1(0) = "LAMBDA FUNCTION"
+  End If
+  Else
 Form2.Label1(0) = here$
+End If
 Form2.Label1(1) = what$
 Form2.Label1(2) = GetStrUntil(vbCrLf, rest$ & vbCrLf, False)
 Dim back$
@@ -29495,6 +29568,7 @@ If Len(TestShowSub) >= WaitShow And WaitShow > 0 Then
         TestShowStart = rinstr(TestShowSub, Mid$(rest$, 2)) - 1
 Else
     WaitShow = 0
+    
     ss$ = GetNextLine((sbf(bstack.OriginalCode).sb))
     If Left$(ss$, 10) = "'11001EDIT" Then
     
@@ -31751,35 +31825,62 @@ ww$() = Split(w$)
 If where = 0 Then
 Exit Function
 Else
-With sbf(where) 'varhash.ItemCreator what$, i
-If .subs Is Nothing Then
-    Set .subs = New FastCollection
-Else
-If UBound(ww$()) = 0 Then
-    w$ = ww$(0)
-Else
-    w$ = ww$(1)
+If where < 0 Then
+    With var(-where)
+    If .subs Is Nothing Then
+        Set .subs = New FastCollection
+    Else
+        If UBound(ww$()) = 0 Then
+            w$ = ww$(0)
+        Else
+            w$ = ww$(1)
+        End If
+        If .subs.ExistKey(UCase(w$)) Then
+        ww$ = Split(CStr(.subs.Value))
+        final = val(ww$(0))
+        site = val(ww$(1))
+        If .subs.ExistKey(UCase(w$) + ")") Then w$ = .subs.Value Else w$ = ""
+        WaitShow = 0
+        searchsub = True
+        Exit Function
+        End If
+        w$ = Join(ww$)
     End If
-    If .subs.ExistKey(UCase(w$)) Then
-    ww$ = Split(CStr(.subs.Value))
-    final = val(ww$(0))
-    site = val(ww$(1))
-    If .subs.ExistKey(UCase(w$) + ")") Then w$ = .subs.Value Else w$ = ""
-    WaitShow = 0
-    searchsub = True
-    Exit Function
+    End With
+Else
+    With sbf(where) 'varhash.ItemCreator what$, i
+    If .subs Is Nothing Then
+        Set .subs = New FastCollection
+    Else
+        If UBound(ww$()) = 0 Then
+            w$ = ww$(0)
+        Else
+            w$ = ww$(1)
+        End If
+        If .subs.ExistKey(UCase(w$)) Then
+        ww$ = Split(CStr(.subs.Value))
+        final = val(ww$(0))
+        site = val(ww$(1))
+        If .subs.ExistKey(UCase(w$) + ")") Then w$ = .subs.Value Else w$ = ""
+        WaitShow = 0
+        searchsub = True
+        Exit Function
+        End If
+        w$ = Join(ww$)
     End If
-    w$ = Join(ww$)
+    End With
+    End If
 End If
-End With
-End If
-
 
 Dim Len1 As Long, there1 As Long, a$
 Dim acopy As Document, there As Long, Curs As Long, Curs2 As Long
 Dim a1 As Long, b As Long, c As Long, d As Long
 Dim ss$, DUMP$
+If where > 0 Then
 a$ = sbf(where).sb
+Else
+a$ = var(-where).code$
+End If
 paliedo:
 Len1 = Len(ww$(0))
 If Len1 = 1 Then
@@ -31865,11 +31966,23 @@ IsNumberLabel ss$, DUMP$
 End With
 register:
 If searchsub Then
+If site > 0 Then
+If sbf(site).subs Is Nothing Then Set sbf(site).subs = New FastCollection
+sbf(site).subs.AddKey UCase(ww$(1)), Trim$(Str$(final) + Str$(where))
+If w$ <> "" Then sbf(site).subs.AddKey UCase(ww$(1)) + ")", w$
+ElseIf site < 0 Then
+If var(-site).subs Is Nothing Then Set var(-site).subs = New FastCollection
+var(-site).subs.AddKey UCase(ww$(1)), Trim$(Str$(final) + " " + Str$(where))
+If w$ <> "" Then var(-site).subs.AddKey UCase(ww$(1)) + ")", w$
+ElseIf where > 0 Then
+site = where
 If sbf(site).subs Is Nothing Then Set sbf(site).subs = New FastCollection
 sbf(site).subs.AddKey UCase(ww$(1)), Trim$(Str$(final) + Str$(where))
 If w$ <> "" Then sbf(site).subs.AddKey UCase(ww$(1)) + ")", w$
 End If
 site = where
+End If
+
 
 End Function
 Function search2KIND(a$, w$, final As Long, Optional Anypos As Boolean = False) As Boolean
@@ -32075,34 +32188,51 @@ findelsesub0:
                                                                 If searchsub(W3, bb$, i, W3) Then
                                                                 
                                                                         subspoint = False
-                         
-                                                                        If bb$ <> "" Then
-                                                                                bb$ = "Read NEW " + bb$ + vbCrLf + Mid$(sbf(W3).sb, i)
-                                                                        Else
-                                                                                bb$ = Mid$(sbf(W3).sb, i)
+                                                                    If bb$ <> "" Then
+                                                                               If Not MyRead(4, bstack, bb$, 1) Then
+                                                                                Exec = 0
+                                                                                Exit Function
+                                                                               End If
+                                                                               
                                                                         End If
+                                                                        If W3 > 0 Then
+                                                                        
+                                                                                bb$ = Mid$(sbf(W3).sb, i)
+                                                                        
+                                                                        Else
+                                                                                bb$ = Mid$(var(-W3).code$, i)
+                                                                        End If
+    
                                                                     WaitShow = Len(bb$)
                                                                     bstack.addlen = 0
                                                                         kolpo = False
-                                                                        If trace Then TestShowSub = bb$
+                                                                        If trace Then TestShowStart = 1: TestShowSub = bb$
                                                                         GoTo contSub
                                                                 ElseIf bstack.IamChild Then
-                                                                        If searchsub(FindPrevOriginal(bstack), bb$, i, W3) Then
+                                                                If bstack.IamLambda Then
+                                                                MyEr "Sub  Not Found", "« ÒÔıÙﬂÌ· ‰ÂÌ ‚Ò›ËÁÍÂ"
+                                                                         Exec = 0
+                                                                                            Exit Function
+                                                                        ElseIf searchsub(FindPrevOriginal(bstack), bb$, i, W3) Then
                                                                                 subspoint = True
-                                                                                If bb$ <> "" Then
-                                                                                        bb$ = "Read NEW " + bb$ + vbCrLf + Mid$(sbf(W3).sb, i)
-                                                                                       'bstack.addlen = 5
-                                                                                Else
-                                                                                'bstack.addlen = 0
-                                                                                        bb$ = Mid$(sbf(W3).sb, i)
-                                                                                End If
-                                                                                    
-                                                                              WaitShow = Len(bb$)
+                                                                        If bb$ <> "" Then
+                                                                               If Not MyRead(4, bstack, bb$, 1) Then
+                                                                                Exec = 0
+                                                                                Exit Function
+                                                                               End If
+                                                                               
+                                                                        End If
+                                                                                                                                                        
+
+                                                                        bb$ = Mid$(sbf(W3).sb, i)
+                                                                        
+                                                                        WaitShow = Len(bb$)
                                                                              
                                                                         kolpo = False
                                                                               If trace Then
                                                                  TestShowSub = bb$
-                                                                stackshow bstack
+                                                                TestShowStart = i
+                                                                 stackshow bstack
                                                                 
                                                                 End If
                                                                       
@@ -32294,7 +32424,7 @@ againhere:
                                                             With bs.soros
                                                                      i = 1
                                                                      For v = v To VN
-                                                                              If .StackItemTypeObjectType(i) = "" Then
+                                                                              If .StackItemTypeIsObject(i) = "" Then
                                                                                        pppp.item(v) = .StackItem(i)
                                                                               Else
                                                                                        Set pppp.item(v) = .StackItem(i)
@@ -33392,9 +33522,9 @@ Dim aa As mEvent
 Set aa = a
 '' now put code to copy a to alfa
 alfa.BypassInit CLng(a.CurMaxSpace)
-Dim AAA() As GenItem, bbb() As Long, mytop As Long
-aa.CopySpaceUp AAA(), bbb(), mytop
-alfa.CopySpaceDown AAA(), bbb(), mytop
+Dim aaa() As GenItem, bbb() As Long, mytop As Long
+aa.CopySpaceUp aaa(), bbb(), mytop
+alfa.CopySpaceDown aaa(), bbb(), mytop
 alfa.ParamBlock aa.ParamsRead, aa.params
 alfa.NoHere = aa.NoHere
 Set bstack.lastobj = alfa
@@ -33524,7 +33654,8 @@ here$ = ohere$
 conthere1:
 extreme = extr
 If tr Then
-If STEXIT Then trace = tr
+'If STEXIT Then trace = tr
+trace = tr
 End If
 escok = olescok
 End Function
@@ -33589,7 +33720,8 @@ Set bstack = Nothing
 here$ = ohere$
 conthere0:
 If tr Then
-If STEXIT Then trace = tr
+'If STEXIT Then
+trace = tr
 End If
 extreme = extr
 escok = olescok
@@ -33692,7 +33824,8 @@ Set oldbstack = Nothing
 Set bb = Nothing
 
 If tr Then
-If STEXIT Then trace = tr
+'If STEXIT Then trace = tr
+trace = tr
 End If
 extreme = extr
 escok = olescok
@@ -33714,13 +33847,13 @@ what$ = Left$(what$, Len(what$) - 1)
   Case "GuiM2000"
                              CreateFormObject aVar, 1
                                 Set pppp.item(i) = aVar
-                                Dim AAA As GuiM2000
-                                Set AAA = aVar
+                                Dim aaa As GuiM2000
+                                Set aaa = aVar
                                 With pppp.item(0)
-                                Set AAA.EventObj = .EventObj
+                                Set aaa.EventObj = .EventObj
                                 h$ = .modulename
                                 End With
-                                Set AAA = Nothing
+                                Set aaa = Nothing
                                 With aVar
                                  .MyName = what$
                                  .modulename = h$
@@ -33768,32 +33901,32 @@ Case "GuiEditBox"
                                 Set pppp.item(i) = aVar
                                 Dim aaa4 As GuiEditBox
                                 Set aaa4 = pppp.item(0)
-                                Set AAA = aaa4.GetCallBack
+                                Set aaa = aaa4.GetCallBack
                                 With aVar
-                                .ConstructArray AAA, what$, i
+                                .ConstructArray aaa, what$, i
                                 .Move 0, 2000, 6000, 1200
                               
-                                If AAA.prive <> 0 Then
-                                    .Linespace = players(AAA.prive).uMineLineSpace
+                                If aaa.prive <> 0 Then
+                                    .Linespace = players(aaa.prive).uMineLineSpace
                                 Else
                                     .Linespace = players(0).uMineLineSpace
                                 End If
                                 .SetUp
                                 .Text = what$ + "(" + LTrim(Str$(i)) + ")"
                                  End With
-                                 Set AAA = Nothing
+                                 Set aaa = Nothing
                               
 Case "GuiListBox"
                                 CreateFormObject aVar, 6
                                 Set pppp.item(i) = aVar
                                 Dim aaa5 As GuiListBox
                                 Set aaa5 = pppp.item(0)
-                                Set AAA = aaa5.GetCallBack
+                                Set aaa = aaa5.GetCallBack
                                 With aVar
                                 .ConstructArray aaa5.GetCallBack, what$, i
                                 .Move 0, 2000, 6000, 600
-                                If AAA.prive <> 0 Then
-                                    .Linespace = players(AAA.prive).uMineLineSpace
+                                If aaa.prive <> 0 Then
+                                    .Linespace = players(aaa.prive).uMineLineSpace
                                 Else
                                     .Linespace = players(0).uMineLineSpace
                                 End If
@@ -33805,7 +33938,7 @@ Case "GuiDropDown"
                                 Set pppp.item(i) = aVar
                                 Dim aaa6 As GuiDropDown
                                 Set aaa6 = pppp.item(0)
-                                Set AAA = aaa6.GetCallBack
+                                Set aaa = aaa6.GetCallBack
                                 With aVar
                                 .ConstructArray aaa5.GetCallBack, what$, i
                                 .Move 0, 2000, 6000, 600
@@ -33926,10 +34059,10 @@ contEvArray:
                                 For i = 0 To ar - 1
                                 CreateFormObject aVar, 1
                                 Set pppp.item(i) = aVar
-                                Dim AAA As GuiM2000
-                                Set AAA = aVar
-                                Set AAA.EventObj = mmmm
-                                Set AAA = Nothing
+                                Dim aaa As GuiM2000
+                                Set aaa = aVar
+                                Set aaa.EventObj = mmmm
+                                Set aaa = Nothing
                                 With aVar
                                  .MyName = what$
                                  .modulename = here$
@@ -34400,7 +34533,7 @@ ElseIf Typename(var(i)) = "lambda" Then
             
             var(i).CopyToVar basestack, here$ = "", var()
             'sbf(0).sb = var(i).code$
-            basestack.OriginalCode = 0
+            basestack.OriginalCode = -i
             basestack.FuncRec = subHash.LastKnown
                Call executeblock(it, basestack, var(i).code$, False, flag)
                var(i).CopyFromVar basestack, var()
@@ -35942,7 +36075,7 @@ Dim p As Double, x As Double
 Dim pppp As mArray
 ohere$ = here$
 Dim col As Long
-On jump GoTo read, refer, commit
+On jump GoTo read, refer, commit, readnew, readlocal
 Exit Function
 commit:
 If bstack.UseGroupname <> "" Then
@@ -35957,6 +36090,14 @@ End If
 Exit Function
 refer:
 col = 1
+GoTo read123
+
+readlocal:
+flag = True
+GoTo read123
+
+readnew:
+flag2 = True
 GoTo read123
 
 read:
@@ -39784,7 +39925,7 @@ End If
     Set myobject = .StackItem(i)
     If Not myobject Is Nothing Then
     If TypeOf myobject Is mHandler Then
-    Dim AAA As mHandler
+    Dim aaa As mHandler
     If myobject.indirect > -1 Then
     If MyIsObject(var(myobject.indirect)) Then
     If myobject.indirect <= var2used Then
@@ -41355,7 +41496,7 @@ ProcFlush = True
 End Function
 Function ProcOpenImage(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, scr As Object, x1 As Long
-Dim AAA() As String
+Dim aaa() As String
 If IsSelectorInUse Then
 SelectorInUse
 Exit Function
@@ -41381,15 +41522,15 @@ Else
 End If
 If InStr(w$, "|") > 0 Then
 If InStr(w$, "(*.") > 0 Then
-AAA() = Split(w$, "(*.")
+aaa() = Split(w$, "(*.")
 Else
-AAA() = Split(w$, "|")
+aaa() = Split(w$, "|")
 End If
 w$ = ""
-If UBound(AAA()) > LBound(AAA()) Then
+If UBound(aaa()) > LBound(aaa()) Then
 w$ = "|"
-For x1 = LBound(AAA()) + 1 To UBound(AAA())
-w$ = w$ & UCase(Left$(AAA(x1), InStr(AAA(x1), ")") - 1) & "|")
+For x1 = LBound(aaa()) + 1 To UBound(aaa())
+w$ = w$ & UCase(Left$(aaa(x1), InStr(aaa(x1), ")") - 1) & "|")
 Next x1
 End If
 End If
@@ -41397,14 +41538,14 @@ End If
     ' push to stack
     If multifileselection Then
     If ReturnListOfFiles <> "" Then
-    AAA() = Split(ReturnListOfFiles, "#")
-    If UBound(AAA()) > LBound(AAA()) Then
+    aaa() = Split(ReturnListOfFiles, "#")
+    If UBound(aaa()) > LBound(aaa()) Then
 
-For x1 = UBound(AAA()) To LBound(AAA()) + 1 Step -1
-    basestack.soros.PushStr AAA(x1)
+For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
+    basestack.soros.PushStr aaa(x1)
 Next x1
-basestack.soros.PushVal UBound(AAA()) - LBound(AAA())
-basestack.soros.PushStr AAA(x1)
+basestack.soros.PushVal UBound(aaa()) - LBound(aaa())
+basestack.soros.PushStr aaa(x1)
 End If
 Else
     basestack.soros.PushStr ReturnFile
@@ -41421,7 +41562,7 @@ ProcOpenImage = True
 End Function
 Function ProcOpenFile(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, scr As Object, x1 As Long, p As Double, par As Boolean, f As Boolean
-Dim AAA() As String, DUM As Boolean
+Dim aaa() As String, DUM As Boolean
 If IsSelectorInUse Then
 SelectorInUse
 Exit Function
@@ -41450,21 +41591,21 @@ End If
 End If
 If InStr(w$, "|") > 0 Then
     If InStr(w$, "(*.") > 0 Then
-        AAA() = Split(w$, "(*.")
+        aaa() = Split(w$, "(*.")
         w$ = ""
-        If UBound(AAA()) > LBound(AAA()) Then
+        If UBound(aaa()) > LBound(aaa()) Then
             w$ = "|"
-            For x1 = LBound(AAA()) + 1 To UBound(AAA())
-                w$ = w$ & UCase(Left$(AAA(x1), InStr(AAA(x1), ")") - 1) & "|")
+            For x1 = LBound(aaa()) + 1 To UBound(aaa())
+                w$ = w$ & UCase(Left$(aaa(x1), InStr(aaa(x1), ")") - 1) & "|")
             Next x1
         End If
     Else
-        AAA() = Split(w$, "|")
+        aaa() = Split(w$, "|")
         w$ = ""
-        If UBound(AAA()) > LBound(AAA()) Then
+        If UBound(aaa()) > LBound(aaa()) Then
             w$ = "|"
-            For x1 = LBound(AAA()) To UBound(AAA())
-                w$ = w$ & UCase(AAA(x1)) & "|"
+            For x1 = LBound(aaa()) To UBound(aaa())
+                w$ = w$ & UCase(aaa(x1)) & "|"
             Next x1
         End If
     End If
@@ -41473,14 +41614,14 @@ End If
     If OpenDialog(basestack, scr, frm$, s$, ss$, w$, Not par, DUM) Then
      If multifileselection Then
         If ReturnListOfFiles <> "" Then
-                AAA() = Split(ReturnListOfFiles, "#")
-                If UBound(AAA()) > LBound(AAA()) Then
+                aaa() = Split(ReturnListOfFiles, "#")
+                If UBound(aaa()) > LBound(aaa()) Then
             
-                        For x1 = UBound(AAA()) To LBound(AAA()) + 1 Step -1
-                            basestack.soros.PushStr AAA(x1)
+                        For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
+                            basestack.soros.PushStr aaa(x1)
                         Next x1
-                        basestack.soros.PushVal UBound(AAA()) - LBound(AAA())
-                        basestack.soros.PushStr AAA(x1)
+                        basestack.soros.PushVal UBound(aaa()) - LBound(aaa())
+                        basestack.soros.PushStr aaa(x1)
                  End If
             Else
             
@@ -44710,8 +44851,8 @@ backitem:
     StackItem = FastSymbol(a$, ")", True)
     Exit Function
     ElseIf anything.StackItemType(W3) = "*" Then
-    ''If anything.StackItemTypeObjectType(W3) = "mHandler" Then
     r = 0
+    
     Set bstack.lastobj = anything.StackPickRef(W3).ObjectRef
     
     StackItem = FastSymbol(a$, ")", True)
@@ -44733,3 +44874,60 @@ Set anything = bstack.soros
 GoTo backitem
 End If
 End Function
+Public Function LambdaList(bstack As basetask) As String
+On Error Resume Next
+LambdaList = var(-bstack.OriginalCode).code$
+End Function
+Sub PrepareLabel(bstack As basetask)
+ If bstack.IamThread Then
+  If pagio$ = "GREEK" Then
+  Form2.Label1prompt(0) = "Õ«Ã¡(" + CStr(bstack.Process.Id) + "): "
+  Else
+  Form2.Label1prompt(0) = "THREAD(" + CStr(bstack.Process.Id) + "): "
+  End If
+  
+    Else
+    If pagio$ = "GREEK" Then
+        If bstack.fHere <> "" Then
+            Form2.Label1prompt(0) = "”ıÌ‹Ò.: "
+        Else
+            Form2.Label1prompt(0) = "‘ÏﬁÏ·: "
+        End If
+  Else
+        If bstack.fHere <> "" Then
+        Form2.Label1prompt(0) = "Func.: "
+  Else
+  Form2.Label1prompt(0) = "Module: "
+  End If
+  End If
+ End If
+   If bstack.IamLambda Then
+  If pagio$ = "GREEK" Then
+  If Right$(here$, 3) = "$()" Then
+  Form2.Label1(0) = "À¡Ãƒ¡$()"
+  Else
+  Form2.Label1(0) = "À¡Ãƒ¡()"
+  End If
+  Else
+  If Right$(here$, 3) = "$()" Then
+  Form2.Label1(0) = "LAMBDA$()"
+  Else
+  Form2.Label1(0) = "LAMBDA()"
+  End If
+  End If
+  Else
+  Dim MMM$
+
+MMM$ = here$
+    If InStr(here$, "].") > 0 Then
+        MMM$ = Mid$(here$, InStr(here$, "].") + 2)
+    End If
+   ' If AscW(MMM$) = 8191 Then MMM$ = Mid$(MMM$, 8)
+    If bstack.fHere <> "" Then MMM$ = bstack.fHere + "." + MMM$
+    Form2.Label1(0) = MMM$
+    
+      End If
+    
+    
+  
+End Sub

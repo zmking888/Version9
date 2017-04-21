@@ -43,8 +43,8 @@ Private Property Set TaskInterface_Process(aProcess As basetask)
 Set myProcess = aProcess
 Set myProcess.Process = myBase
 End Property
-Private Property Let TaskInterface_ID(ByVal rhs As Long)
-If rhs = Channel + 1 Then
+Private Property Let TaskInterface_ID(ByVal RHS As Long)
+If RHS = Channel + 1 Then
 myBase.Done = True
 End If
 End Property
@@ -53,8 +53,8 @@ Private Property Get TaskInterface_ID() As Long
 TaskInterface_ID = Channel + 1
 End Property
 
-Private Property Let TaskInterface_interval(ByVal rhs As Double)
-m_duration = CLng(rhs)
+Private Property Let TaskInterface_interval(ByVal RHS As Double)
+m_duration = CLng(RHS)
 End Property
 
 Private Property Get TaskInterface_interval() As Double
@@ -63,12 +63,12 @@ End Property
 
 ' IMPLEMENTED PROPERTIES
 
-Private Property Set TaskInterface_Owner(rhs As Object)
+Private Property Set TaskInterface_Owner(RHS As Object)
 ' Usage: Private Property Set TaskInterface_Owner(RHS As Form)
   
   'Validating type
  ' If TypeOf RHS Is Form Then
-    Set myBase.Owner = rhs
+    Set myBase.Owner = RHS
  ' Else
    ' Error tmTypeMisMatch
   'End If
@@ -153,8 +153,8 @@ End Sub
 
 
 
-Private Property Let TaskInterface_Done(ByVal rhs As Boolean)
-  myBase.Done = rhs
+Private Property Let TaskInterface_Done(ByVal RHS As Boolean)
+  myBase.Done = RHS
 End Property
 
 Private Property Get TaskInterface_Done() As Boolean
@@ -173,14 +173,16 @@ End Property
 Public Property Get TaskInterface_Priority() As PriorityLevel
   TaskInterface_Priority = myBase.Priority
 End Property
-Private Property Let TaskInterface_busy(ByVal rhs As Boolean)
-mybusy = rhs
+Private Property Let TaskInterface_busy(ByVal RHS As Boolean)
+mybusy = RHS
 End Property
 
 Private Property Get TaskInterface_busy() As Boolean
 TaskInterface_busy = mybusy
 End Property
-
+Public Property Get TaskInterface_CodeData() As String
+TaskInterface_CodeData = ""
+End Property
 ' DELEGATED METHODS
 
 Private Sub TaskInterface_Dispose(ByVal Action As DisposeAction)

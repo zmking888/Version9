@@ -17,7 +17,7 @@ Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
 ' interface for iteration
-Public Index As Long
+Public index As Long
 
 ' Generic is base 0 in Stack Item
 ' Here we have base 1
@@ -226,7 +226,7 @@ On Error Resume Next
 Set aa = mstack.item(where)
 StackItemType = aa.Typename
 End Property
-Public Property Get StackItemTypeObjectType(where As Long) As String
+Public Property Get StackItemTypeObjectType(where As Long, v() As Variant) As String
 Dim aa As VarItem, bb As Object
 On Error Resume Next
 
@@ -234,10 +234,37 @@ Set aa = mstack.item(where)
 Select Case aa.Typename
 Case "N", "S"
 StackItemTypeObjectType = ""
+Case "*"
+Set bb = aa.ObjectRef
+If TypeOf bb Is mHandler Then
+Set bb = bb.ObjectRef
+CheckDeepAny bb, v()
+If bb.t1 = 3 Then
+StackItemTypeObjectType = "*[" + Typename(bb) + "]"
+ElseIf bb.t1 = 1 Then
+StackItemTypeObjectType = "*[Inventory]"
+Else
+StackItemTypeObjectType = "*[Buffer]"
+End If
+Else
+StackItemTypeObjectType = Typename(bb)
+End If
+Set bb = Nothing
 Case Else
 Set bb = aa.ObjectRef
 StackItemTypeObjectType = Typename(bb)
 Set bb = Nothing
+End Select
+End Property
+Public Property Get StackItemTypeIsObject(where As Long) As Boolean
+Dim aa As VarItem, bb As Object
+On Error Resume Next
+
+Set aa = mstack.item(where)
+Select Case aa.Typename
+Case "N", "S", "L"
+Case Else
+StackItemTypeIsObject = True
 End Select
 End Property
 Public Property Get Total() As Long
@@ -567,8 +594,8 @@ Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If Index >= 0 And Index <= mMany Then
-    Set aa = StackPickRef(Index + 1)
+If index >= 0 And index <= mMany Then
+    Set aa = StackPickRef(index + 1)
     If aa.ObjectRef Is Nothing Then
         If aa.Typename = "S" Then
             Value = aa.ItemStr

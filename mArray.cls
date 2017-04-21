@@ -13,12 +13,16 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Dim mmname As String
-Dim dnum As Long
+Dim dnum As Long, ndnum As Long
 Dim limit(10) As Long  ' max 9 dimensions
 Dim dtable(10) As Long
+Dim nlimit(10) As Long  ' max 9 dimensions
+
 Dim actualdata() As Variant
 Dim maxitems As Long
 Dim maxitems1 As Long
+Dim nmaxitems As Long
+Dim nmaxitems1 As Long
 Public myarrbase As Long
 Public common As Boolean
 Public IHaveClass As Boolean
@@ -61,7 +65,7 @@ Private Type SAFEARRAY1D
     cElements As Long
     lLBound As Long
 End Type
-Public Index As Long
+Public index As Long
 Public Sub Compute(p As Double, ss$)
 Dim v As Long
 On Error Resume Next
@@ -150,16 +154,16 @@ Loop
 
 End Sub
 Property Get Value() As Variant
-If Index >= 0 And Index <= maxitems1 Then
+If index >= 0 And index <= maxitems1 Then
 
-If IsObject(actualdata(Index)) Then
-    If Typename(actualdata(Index)) = "PropReference" Then
-        Value = actualdata(Index)
+If IsObject(actualdata(index)) Then
+    If Typename(actualdata(index)) = "PropReference" Then
+        Value = actualdata(index)
     Else
-        Set Value = actualdata(Index)
+        Set Value = actualdata(index)
     End If
 Else
-Value = actualdata(Index)
+Value = actualdata(index)
 End If
 End If
 End Property
@@ -467,27 +471,35 @@ Public Property Get arrname() As String
 arrname = mmname
 End Property
 Public Sub PushDim(nDim As Long)
-If dnum < 10 Then
-limit(dnum) = nDim
-maxitems = maxitems * nDim
-dnum = dnum + 1
+If ndnum < 10 Then
+nlimit(ndnum) = nDim
+nmaxitems = nmaxitems * nDim
+ndnum = ndnum + 1
 End If
-maxitems1 = maxitems - 1
+nmaxitems1 = nmaxitems - 1
 End Sub
 Public Sub PushEnd()
 On Error GoTo there11
-If dnum = 0 Then
+If ndnum = 0 Then
+dnum = 0
 maxitems = 1
 maxitems1 = 0
 ReDim actualdata(maxitems1) As Variant
 Else
-If maxitems1 < 0 Then
-ReDim actualdata(1) As Variant
+Dim i As Long
+For i = 0 To 9: limit(i) = nlimit(i): Next i
+    dnum = ndnum
+    maxitems = nmaxitems
+    maxitems1 = nmaxitems1
+
+If nmaxitems1 < 0 Then
+    ReDim actualdata(1) As Variant
 Else
-ReDim Preserve actualdata(maxitems1) As Variant
+    ReDim Preserve actualdata(maxitems1) As Variant
 End If
-Dim i As Long, mx As Long
+Dim mx As Long
 mx = maxitems
+i = 0
 If limit(i) > 0 Then
 If RevOrder Then
 Dim revlimit()
@@ -518,9 +530,9 @@ ReDim actualdata(maxitems)
 End Sub
 Public Sub StartResize()
 oldmaxitems = maxitems1
-dnum = 0 ' no actions
-maxitems = 1
-maxitems1 = 0
+ndnum = 0 ' no actions
+nmaxitems = 1
+nmaxitems1 = 0
 End Sub
 Public Function SerialItem(item As Variant, cursor As Long, command As Long) As Boolean
 If command = 1 Then
@@ -782,6 +794,9 @@ Private Sub Class_Initialize()
 dnum = 0 ' no actions
 maxitems = 1
 maxitems1 = 0
+ndnum = 0 ' no actions
+nmaxitems = 1
+nmaxitems1 = 0
 ReDim actualdata(0)
 CodeName = GetAnyName$
 Arr = True

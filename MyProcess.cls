@@ -316,7 +316,9 @@ On Error GoTo 0
    TaskInterface_Dispose tmThisTask
    
 End Sub
-
+Public Property Get TaskInterface_CodeData() As String
+TaskInterface_CodeData = mycode
+End Property
 
 ' DELEGATED PROPERTIES
 Private Property Let TaskInterface_Done(ByVal RHS As Boolean)

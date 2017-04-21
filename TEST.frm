@@ -387,6 +387,9 @@ If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor,
 End If
 End Sub
 
+Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)
+Label(index).Prompt = RHS
+End Property
 
 Public Property Get Label1(ByVal index As Long) As String
 Label1 = Label(index)
@@ -439,10 +442,26 @@ abt = False
 
 vH_title$ = ""
 s$ = Label(index)
+
+If MyBaseTask.IamLambda Then
+sHelp s$, LambdaList(MyBaseTask), vH_x, vH_y
+vHelp
+ElseIf MyBaseTask.IamThread Then
+If MyBaseTask.Process Is Nothing Then
+Else
+sHelp s$, MyBaseTask.Process.CodeData, vH_x, vH_y
+vHelp
+End If
+Else
+If index = 0 Then
+    fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
+Else
 Select Case Left$(LTrim(Label(2)) + " ", 1)
 Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
 End Select
+End If
+End If
 ElseIf index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
@@ -651,8 +670,8 @@ borderleft = bordertop
 allwidth = width1 * factor
 allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
-itemwidth3 = (itemWidth - 2 * borderleft) / 3
-itemwidth2 = (itemWidth - borderleft) / 2
+itemwidth3 = itemWidth * 2 / 5
+itemwidth2 = itemWidth * 3 / 5 - borderleft
 Move Left, top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.Move borderleft, bordertop, itemWidth, bordertop * 3
@@ -661,7 +680,7 @@ gList2.FloatLimitLeft = ScrX() - borderleft * 3
 gList3(0).Move borderleft, bordertop * 5, itemwidth2, bordertop * 4
 gList3(1).Move borderleft, bordertop * 9, itemwidth2, bordertop * 4
 gList3(2).Move borderleft, bordertop * 13, itemwidth2, bordertop * 4
-gList4.Move borderleft * 2 + itemwidth2, bordertop * 5, itemwidth2, bordertop * 12
+gList4.Move borderleft * 2 + itemwidth2, bordertop * 5, itemwidth3, bordertop * 12
 gList1.Move borderleft, bordertop * 18, itemWidth, bordertop * 12
 gList0.Move borderleft, bordertop * 31, itemWidth, bordertop * 3
 End Sub

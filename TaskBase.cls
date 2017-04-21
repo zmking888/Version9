@@ -29,6 +29,10 @@ myid = -1
 End Sub
 
 
+Private Property Get TaskInterface_CodeData() As String
+
+End Property
+
 Private Property Get TaskInterface_Process() As basetask
 Set TaskInterface_Process = myProcess
 End Property
@@ -40,8 +44,8 @@ End Property
 
 
 
-Private Property Let TaskInterface_busy(ByVal rhs As Boolean)
-mybusy = rhs
+Private Property Let TaskInterface_busy(ByVal RHS As Boolean)
+mybusy = RHS
 End Property
 
 Private Property Get TaskInterface_busy() As Boolean
@@ -54,8 +58,8 @@ End Property
 
 
 
-Private Property Let TaskInterface_Done(ByVal rhs As Boolean)
-  myDone = rhs
+Private Property Let TaskInterface_Done(ByVal RHS As Boolean)
+  myDone = RHS
 End Property
 
 
@@ -64,16 +68,16 @@ Private Property Get TaskInterface_Done() As Boolean
 End Property
 
 
-Private Property Let TaskInterface_ID(ByVal rhs As Long)
-myid = rhs
+Private Property Let TaskInterface_ID(ByVal RHS As Long)
+myid = RHS
 End Property
 
 Private Property Get TaskInterface_ID() As Long
 TaskInterface_ID = myid
 End Property
 
-Private Property Let TaskInterface_interval(ByVal rhs As Double)
-myInterval = rhs
+Private Property Let TaskInterface_interval(ByVal RHS As Double)
+myInterval = RHS
 End Property
 
 Private Property Get TaskInterface_interval() As Double
@@ -87,8 +91,8 @@ Private Property Get TaskInterface_Owner() As Object
 End Property
 
 
-Private Property Set TaskInterface_Owner(rhs As Object)
-  Set myOwner = rhs
+Private Property Set TaskInterface_Owner(RHS As Object)
+  Set myOwner = RHS
 End Property
 
 
