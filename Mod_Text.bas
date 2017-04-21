@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 9
+Global Const Revision = 11
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -25580,8 +25580,6 @@ If j <> 62 Then
             Else
                 Exit Function
             End If
-        Else
-            Exit Function
         End If
     Case 917, 69
         If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 2))
