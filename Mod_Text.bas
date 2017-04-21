@@ -25540,7 +25540,6 @@ If j <> 62 Then
              Set anything = st.StackItem(i).objref
                 If CheckDeepAny(anything, var()) Then
                 If Typename$(anything) = "mStiva" Then
-                ElseIf Typename$(anything) = "mArray" Then
                 Else
                 Exit Function
                 End If
@@ -25562,7 +25561,28 @@ If j <> 62 Then
         If j <> 83 Then Exit Function
     Case 928, 960, 65, 97  '' array
         If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 2))
-        If j <> 65 Then Exit Function
+        
+        If j <> 65 Then
+            If Typename$(st.StackItem(i)) = "mHandler" Then
+                If st.StackItem(i).t1 = 3 Then
+                    Set anything = st.StackItem(i).objref
+                    If CheckDeepAny(anything, var()) Then
+                        If Typename$(anything) = "mArray" Then
+                        Else
+                            Exit Function
+                        End If
+                    Else
+                        Exit Function
+                    End If
+                Else
+                    Exit Function
+                End If
+            Else
+                Exit Function
+            End If
+        Else
+            Exit Function
+        End If
     Case 917, 69
         If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 2))
         If j <> 69 Then Exit Function
