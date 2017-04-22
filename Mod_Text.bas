@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9733,13 +9733,13 @@ End Select
 ElseIf k < 5 Then
         If GetVar(bstack, n$, pos1, , , True) Then
         If Typename(var(pos1)) = "lambda" Then
-        Dim aaa As lambda
-        var(pos1).CopyTo aaa, var()
-        Set dummy = aaa
+        Dim AAA As lambda
+        var(pos1).CopyTo AAA, var()
+        Set dummy = AAA
             body.FeedNonLocal n$, dummy, var()
             Set dummy = Nothing
             dummy = Empty
-            Set aaa = Nothing
+            Set AAA = Nothing
         ElseIf Typename(var(pos1)) = "Group" Then
         CopyGroup var(pos1), bstack
         Set dummy = bstack.lastobj
@@ -12386,11 +12386,11 @@ itisavar:
                 If GetVar(bstackstr, q$, w) Then
                 If MyIsObject(var(w)) Then
                     If TypeOf var(w) Is lambda Then
-                        Dim aaa As lambda
+                        Dim AAA As lambda
                         r$ = ""
-                        var(w).CopyTo aaa, var()
-                        Set bstackstr.lastobj = aaa
-                        Set aaa = Nothing
+                        var(w).CopyTo AAA, var()
+                        Set bstackstr.lastobj = AAA
+                        Set AAA = Nothing
                     ElseIf TypeOf var(w) Is PropReference Then
                         r$ = var(w).Value
                     ElseIf TypeOf var(w) Is Group Then
@@ -16573,13 +16573,13 @@ Do
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
             If CheckIsmArray(bstack.lastobj, var()) Then
-            Dim aaa As New mHandler
-            With aaa
+            Dim AAA As New mHandler
+            With AAA
                 .t1 = 3
                Set .objref = bstack.lastobj
                
             End With
-                bstack.SetVarobJ w$, aaa
+                bstack.SetVarobJ w$, AAA
             Else
                 bstack.SetVar w$, p
             End If
@@ -32352,12 +32352,16 @@ subsub02:
                                                     End If
                                                  If subs.ExistKey(bb$) Then
                                                     i = subs.Value
-                                                    GoTo jump123
+                                                    If i = 0 Or i > Len(ec$) Then
+                                                        b$ = bb$
+                                                        Exec = 2
+                                                        Exit Do
+                                                    Else
+                                                        bb$ = Mid$(ec$, i)
+                                                        GoTo fromfirst0
+                                                    End If
                                                 Else
                                                     i = PosLabel(bb$, ec$)
-
-                                                    
-jump123:
                                                     If i = 0 Or i > Len(ec$) Then
                                                         b$ = bb$
                                                         Exec = 2
@@ -33540,9 +33544,9 @@ Dim aa As mEvent
 Set aa = a
 '' now put code to copy a to alfa
 alfa.BypassInit CLng(a.CurMaxSpace)
-Dim aaa() As GenItem, bbb() As Long, mytop As Long
-aa.CopySpaceUp aaa(), bbb(), mytop
-alfa.CopySpaceDown aaa(), bbb(), mytop
+Dim AAA() As GenItem, bbb() As Long, mytop As Long
+aa.CopySpaceUp AAA(), bbb(), mytop
+alfa.CopySpaceDown AAA(), bbb(), mytop
 alfa.ParamBlock aa.ParamsRead, aa.params
 alfa.NoHere = aa.NoHere
 Set bstack.lastobj = alfa
@@ -33865,13 +33869,13 @@ what$ = Left$(what$, Len(what$) - 1)
   Case "GuiM2000"
                              CreateFormObject aVar, 1
                                 Set pppp.item(i) = aVar
-                                Dim aaa As GuiM2000
-                                Set aaa = aVar
+                                Dim AAA As GuiM2000
+                                Set AAA = aVar
                                 With pppp.item(0)
-                                Set aaa.EventObj = .EventObj
+                                Set AAA.EventObj = .EventObj
                                 h$ = .modulename
                                 End With
-                                Set aaa = Nothing
+                                Set AAA = Nothing
                                 With aVar
                                  .MyName = what$
                                  .modulename = h$
@@ -33919,32 +33923,32 @@ Case "GuiEditBox"
                                 Set pppp.item(i) = aVar
                                 Dim aaa4 As GuiEditBox
                                 Set aaa4 = pppp.item(0)
-                                Set aaa = aaa4.GetCallBack
+                                Set AAA = aaa4.GetCallBack
                                 With aVar
-                                .ConstructArray aaa, what$, i
+                                .ConstructArray AAA, what$, i
                                 .Move 0, 2000, 6000, 1200
                               
-                                If aaa.prive <> 0 Then
-                                    .Linespace = players(aaa.prive).uMineLineSpace
+                                If AAA.prive <> 0 Then
+                                    .Linespace = players(AAA.prive).uMineLineSpace
                                 Else
                                     .Linespace = players(0).uMineLineSpace
                                 End If
                                 .SetUp
                                 .Text = what$ + "(" + LTrim(Str$(i)) + ")"
                                  End With
-                                 Set aaa = Nothing
+                                 Set AAA = Nothing
                               
 Case "GuiListBox"
                                 CreateFormObject aVar, 6
                                 Set pppp.item(i) = aVar
                                 Dim aaa5 As GuiListBox
                                 Set aaa5 = pppp.item(0)
-                                Set aaa = aaa5.GetCallBack
+                                Set AAA = aaa5.GetCallBack
                                 With aVar
                                 .ConstructArray aaa5.GetCallBack, what$, i
                                 .Move 0, 2000, 6000, 600
-                                If aaa.prive <> 0 Then
-                                    .Linespace = players(aaa.prive).uMineLineSpace
+                                If AAA.prive <> 0 Then
+                                    .Linespace = players(AAA.prive).uMineLineSpace
                                 Else
                                     .Linespace = players(0).uMineLineSpace
                                 End If
@@ -33956,7 +33960,7 @@ Case "GuiDropDown"
                                 Set pppp.item(i) = aVar
                                 Dim aaa6 As GuiDropDown
                                 Set aaa6 = pppp.item(0)
-                                Set aaa = aaa6.GetCallBack
+                                Set AAA = aaa6.GetCallBack
                                 With aVar
                                 .ConstructArray aaa5.GetCallBack, what$, i
                                 .Move 0, 2000, 6000, 600
@@ -34077,10 +34081,10 @@ contEvArray:
                                 For i = 0 To ar - 1
                                 CreateFormObject aVar, 1
                                 Set pppp.item(i) = aVar
-                                Dim aaa As GuiM2000
-                                Set aaa = aVar
-                                Set aaa.EventObj = mmmm
-                                Set aaa = Nothing
+                                Dim AAA As GuiM2000
+                                Set AAA = aVar
+                                Set AAA.EventObj = mmmm
+                                Set AAA = Nothing
                                 With aVar
                                  .MyName = what$
                                  .modulename = here$
@@ -39943,7 +39947,7 @@ End If
     Set myobject = .StackItem(i)
     If Not myobject Is Nothing Then
     If TypeOf myobject Is mHandler Then
-    Dim aaa As mHandler
+    Dim AAA As mHandler
     If myobject.indirect > -1 Then
     If MyIsObject(var(myobject.indirect)) Then
     If myobject.indirect <= var2used Then
@@ -41514,7 +41518,7 @@ ProcFlush = True
 End Function
 Function ProcOpenImage(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, scr As Object, x1 As Long
-Dim aaa() As String
+Dim AAA() As String
 If IsSelectorInUse Then
 SelectorInUse
 Exit Function
@@ -41540,15 +41544,15 @@ Else
 End If
 If InStr(w$, "|") > 0 Then
 If InStr(w$, "(*.") > 0 Then
-aaa() = Split(w$, "(*.")
+AAA() = Split(w$, "(*.")
 Else
-aaa() = Split(w$, "|")
+AAA() = Split(w$, "|")
 End If
 w$ = ""
-If UBound(aaa()) > LBound(aaa()) Then
+If UBound(AAA()) > LBound(AAA()) Then
 w$ = "|"
-For x1 = LBound(aaa()) + 1 To UBound(aaa())
-w$ = w$ & UCase(Left$(aaa(x1), InStr(aaa(x1), ")") - 1) & "|")
+For x1 = LBound(AAA()) + 1 To UBound(AAA())
+w$ = w$ & UCase(Left$(AAA(x1), InStr(AAA(x1), ")") - 1) & "|")
 Next x1
 End If
 End If
@@ -41556,14 +41560,14 @@ End If
     ' push to stack
     If multifileselection Then
     If ReturnListOfFiles <> "" Then
-    aaa() = Split(ReturnListOfFiles, "#")
-    If UBound(aaa()) > LBound(aaa()) Then
+    AAA() = Split(ReturnListOfFiles, "#")
+    If UBound(AAA()) > LBound(AAA()) Then
 
-For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
-    basestack.soros.PushStr aaa(x1)
+For x1 = UBound(AAA()) To LBound(AAA()) + 1 Step -1
+    basestack.soros.PushStr AAA(x1)
 Next x1
-basestack.soros.PushVal UBound(aaa()) - LBound(aaa())
-basestack.soros.PushStr aaa(x1)
+basestack.soros.PushVal UBound(AAA()) - LBound(AAA())
+basestack.soros.PushStr AAA(x1)
 End If
 Else
     basestack.soros.PushStr ReturnFile
@@ -41580,7 +41584,7 @@ ProcOpenImage = True
 End Function
 Function ProcOpenFile(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, scr As Object, x1 As Long, p As Double, par As Boolean, f As Boolean
-Dim aaa() As String, DUM As Boolean
+Dim AAA() As String, DUM As Boolean
 If IsSelectorInUse Then
 SelectorInUse
 Exit Function
@@ -41609,21 +41613,21 @@ End If
 End If
 If InStr(w$, "|") > 0 Then
     If InStr(w$, "(*.") > 0 Then
-        aaa() = Split(w$, "(*.")
+        AAA() = Split(w$, "(*.")
         w$ = ""
-        If UBound(aaa()) > LBound(aaa()) Then
+        If UBound(AAA()) > LBound(AAA()) Then
             w$ = "|"
-            For x1 = LBound(aaa()) + 1 To UBound(aaa())
-                w$ = w$ & UCase(Left$(aaa(x1), InStr(aaa(x1), ")") - 1) & "|")
+            For x1 = LBound(AAA()) + 1 To UBound(AAA())
+                w$ = w$ & UCase(Left$(AAA(x1), InStr(AAA(x1), ")") - 1) & "|")
             Next x1
         End If
     Else
-        aaa() = Split(w$, "|")
+        AAA() = Split(w$, "|")
         w$ = ""
-        If UBound(aaa()) > LBound(aaa()) Then
+        If UBound(AAA()) > LBound(AAA()) Then
             w$ = "|"
-            For x1 = LBound(aaa()) To UBound(aaa())
-                w$ = w$ & UCase(aaa(x1)) & "|"
+            For x1 = LBound(AAA()) To UBound(AAA())
+                w$ = w$ & UCase(AAA(x1)) & "|"
             Next x1
         End If
     End If
@@ -41632,14 +41636,14 @@ End If
     If OpenDialog(basestack, scr, frm$, s$, ss$, w$, Not par, DUM) Then
      If multifileselection Then
         If ReturnListOfFiles <> "" Then
-                aaa() = Split(ReturnListOfFiles, "#")
-                If UBound(aaa()) > LBound(aaa()) Then
+                AAA() = Split(ReturnListOfFiles, "#")
+                If UBound(AAA()) > LBound(AAA()) Then
             
-                        For x1 = UBound(aaa()) To LBound(aaa()) + 1 Step -1
-                            basestack.soros.PushStr aaa(x1)
+                        For x1 = UBound(AAA()) To LBound(AAA()) + 1 Step -1
+                            basestack.soros.PushStr AAA(x1)
                         Next x1
-                        basestack.soros.PushVal UBound(aaa()) - LBound(aaa())
-                        basestack.soros.PushStr aaa(x1)
+                        basestack.soros.PushVal UBound(AAA()) - LBound(AAA())
+                        basestack.soros.PushStr AAA(x1)
                  End If
             Else
             
