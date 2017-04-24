@@ -170,7 +170,7 @@ If Not TaskMaster Is Nothing Then TaskMaster.rest
          If some.Visible Then some.Refresh
          End If
         ' If TaskMaster.tickdrop < 5 Then
-          DoEvents
+         DoEvents
          ' Else
           'TaskMaster.tickdrop = 1
           'End If

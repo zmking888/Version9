@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7971,12 +7971,12 @@ fun60: 'Case "LEN.DISP(", "Ã« œ”.≈Ã÷("
     If .indirect < 0 Then
     If TypeOf .objref Is FastCollection Then
         r = SG * .objref.Count
-        
+        Set bstack.lastobj = Nothing
         IsNumber = FastSymbol(a$, ")", True)
         Exit Function
     ElseIf TypeOf .objref Is MemBlock Then
         r = SG * .objref.items
-        
+        Set bstack.lastobj = Nothing
         IsNumber = FastSymbol(a$, ")", True)
         Exit Function
     End If
@@ -16638,18 +16638,21 @@ Set Parent = Nothing
 End Sub
 Function Execute(bstack As basetask, b$, Once As Boolean, Optional linebyline As Boolean, Optional loopthis As Boolean = False) As Long
 Dim di As Object, nchr As Integer
+If Not bstack.IamAnEvent Then
 If mybreakkey Then
+
         ModalId = 0
               If Not TaskMaster Is Nothing Then TaskMaster.Dispose
              NOEXECUTION = False
              MOUT = False
             
-           b$ = "@Start : error {},{} "
-           ' '{Break},{ƒÈ·ÍÔﬁ}"
+           b$ = "@Start : error {}"
+           
            Once = False
            k1 = 0
                 MyDoEvents0 bstack.Owner
                MyEr "", ""
+    End If
 End If
 Set di = bstack.Owner
 Dim myobject As Object
@@ -16681,7 +16684,7 @@ Do While Len(b$) <> LLL
                         NOEXECUTION = False
                         MOUT = False
                         
-                        b$ = "@Start : error {},{} "
+                        b$ = "@Start : error {}"
                         Once = False
                         MyDoEvents0 bstack.Owner
                         MyEr "", ""
@@ -18014,6 +18017,7 @@ contAfter:
         sp = GetTaskId + 20000
         b$ = NLtrim$(Mid$(b$, 2))
             Set bs = New basetask
+            bs.IamAnEvent = bstack.IamAnEvent
             bs.reflimit = bstack.reflimit
                         Set bs.Parent = bstack
          bstack.PushThread CLng(sp), "after"
@@ -26002,7 +26006,7 @@ mybreakkey = Form1.mybreak1()
 End If
 End If
 RRCOUNTER = RRCOUNTER + 1
-If RRCOUNTER > 10000 Then If Not extreme Then MyDoEvents: RRCOUNTER = RRCOUNTER And &HFFFF
+If RRCOUNTER > 10000 Then If Not extreme Then MyDoEvents: RRCOUNTER = 1 ' RRCOUNTER And &HFFFF0000
 
 End Function
 Sub ResetBreak()
@@ -26789,13 +26793,30 @@ funcoperator:
 If x1 <> 0 Then
   If var(vvv).FuncList <> "" Then  ' maybe we have it
   If InStr(var(vvv).FuncList, Chr$(2) + f$ + "() ") > 0 Then
+      If FastSymbol(rest$, "(") Then
+        frm$ = BlockParam(rest$)
+        If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+        If Not FastSymbol(rest$, ")") Then
+        End If
+        frm$ = Trim$(frm$)
+    Else
+        frm$ = ""
+    End If
   IsSymbol3 rest$, "{"
     ss$ = block(rest$)
     If FastSymbol(rest$, "}") Then
              If GetSub(bstack.GroupName + f$ + "()", i) Then
                          If rinstr(sbf(i).sbgroup, bstack.GroupName) + Len(bstack.GroupName) - 1 = Len(sbf(i).sbgroup) Then
                          bstack.IndexSub = i
-                          sbf(i).sb = ss$
+                          If frm$ <> "" Then
+                            If lang = 1 Then
+                                sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
+                            Else
+                                sbf(i).sb = "ƒ…¡¬¡”≈ " + frm$ + vbCrLf + ss$
+                            End If
+                          Else
+                            sbf(i).sb = ss$
+                          End If
                           Set sbf(i).subs = Nothing
                           GoTo continuehere22
                           Else
@@ -26934,7 +26955,17 @@ x1 = Abs(IsLabel(bstack, rest$, f$))
 If x1 <> 0 Then
   If var(vvv).FuncList <> "" Then  ' maybe we have it
   If InStr(var(vvv).FuncList, Chr$(3) + f$ + " ") > 0 Then
-    IsSymbol3 rest$, "{"
+    If FastSymbol(rest$, "(") Then
+        frm$ = BlockParam(rest$)
+        If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+        If Not FastSymbol(rest$, ")") Then
+        End If
+        frm$ = Trim$(frm$)
+    Else
+        frm$ = ""
+    End If
+  
+      IsSymbol3 rest$, "{"
     ss$ = block(rest$)
     If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
     If FastSymbol(rest$, "}") Then
@@ -26942,7 +26973,15 @@ If x1 <> 0 Then
             '' IF sbf(I).sbGROUP
                          If rinstr(sbf(i).sbgroup, bstack.GroupName) + Len(bstack.GroupName) - 1 = Len(sbf(i).sbgroup) Then
                           bstack.IndexSub = i
+                          If frm$ <> "" Then
+                            If lang = 1 Then
+                                sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
+                            Else
+                                sbf(i).sb = "ƒ…¡¬¡”≈ " + frm$ + vbCrLf + ss$
+                            End If
+                          Else
                           sbf(i).sb = ss$
+                          End If
                           Set sbf(i).subs = Nothing
                           GoTo continuehere22 'there12345
                           End If
@@ -31421,6 +31460,7 @@ End Function
 Function ProcModuleEntry(basestack As basetask, ohere$, x1 As Long, rest$) As Boolean
 On Error GoTo there22
   If LastErNum = -1 Then GoTo there22
+
 Dim frm$, bs As basetask, i As Long, pa$, p As Double, loopthis As Boolean
 Dim subs As Long, snames As Long, vname As Long, vvv As Variant, S3 As Long
 
@@ -34810,6 +34850,7 @@ ElseIf i > 3 Then
         Set bs = New basetask
         bs.reflimit = varhash.Count
         Set bs.Parent = basestack
+        bs.IamAnEvent = basestack.IamAnEvent
         If basestack.IamThread Then Set bs.Process = basestack.Process
         If Not TheSame(here$, ss$) Then Set bs.Sorosref = basestack.soros
         Set bs.Owner = basestack.Owner

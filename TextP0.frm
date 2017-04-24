@@ -949,6 +949,7 @@ MOUB = Button
 
 If NOEDIT = True And (exWnd = 0 Or Button) Then
 Me.KeyPreview = True
+
 End If
 End Sub
 
