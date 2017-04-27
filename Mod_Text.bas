@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14217,8 +14217,13 @@ itisarrayorfunction:
             If bstackstr.UseGroupname <> "" Then
             If InStr(q1$, bstackstr.UseGroupname) = 1 Then
             
+            
+            If neoGetArray(bstackstr, "THIS." + ChrW(&HFFBF) + Mid$(q$, Len(bstackstr.UseGroupname) + 1), pppp, , True) Then
+                GoTo contStrArr
+            Else
             q1$ = bstackstr.UseGroupname + ChrW(&HFFBF) + Mid$(q1$, Len(bstackstr.UseGroupname) + 1)
             If GetSub(q1$, w1&) Then GoTo contStrFun
+            End If
             End If
             End If
 
@@ -26481,6 +26486,7 @@ If FastSymbol(rest$, "{") Then
                 MyEr "unkown command, use set or value", "άγνωστη εντολή, χρησιμοποίησε θέσε ή αξία"
                 Exit Function
         End Select
+        frm$ = ""
     ElseIf IsSymbol(nm$, ",") Then
     f$ = f$ + "value {link parent " + hlp + " to " + w$ + ":=" + w$ + "}" + vbCrLf
     End If

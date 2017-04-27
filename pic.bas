@@ -2304,9 +2304,11 @@ bb() = HTML(sText)
 If CBool(OpenClipboard(0)) Then
    
       Dim hMemHandle As Long, lpData As Long
-      
+      If IsWine Then
+      hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()))
+      Else
       hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
-      
+      End If
       If CBool(hMemHandle) Then
                
          lpData = GlobalLock(hMemHandle)

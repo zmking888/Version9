@@ -1266,7 +1266,11 @@ Private Function SetTextData( _
     Dim hMem As Long, lPtr As Long
     Dim lSize As Long
         lSize = LenB(sText)
+        If IsWine Then
+        hMem = GlobalAlloc(0, lSize + 1)
+        Else
     hMem = GlobalAlloc(0, lSize + 2)
+    End If
 If (hMem > 0) Then
         lPtr = GlobalLock(hMem)
         CopyMemory ByVal lPtr, ByVal StrPtr(sText), lSize + 1
