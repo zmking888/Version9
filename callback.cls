@@ -16,7 +16,7 @@ Attribute VB_Exposed = True
 Private objref As basetask
 Private mineHere$
 Public Event ErrorAtt(ByRef recover As Variant)
-Dim Locked As Boolean
+Dim locked As Boolean
 Friend Sub NoPublic(bstack As basetask, where$)
 
         Set objref = New basetask
@@ -27,6 +27,7 @@ End Sub
 Public Sub Cli(LoadFileAndSwitches$, Optional Prompt$ = ">")
 Dim ohere$
 If elevatestatus Then Exit Sub
+If basestack1.Owner Is Nothing Then Exit Sub
 elevatestatus = 1
 ohere$ = here$
 here$ = mineHere$
@@ -68,14 +69,14 @@ here$ = ohere$
 elevatestatus = 0
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.top >= Screen.Height Then Form1.Move 0, 0
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -133,12 +134,13 @@ Dim pos As Long, p As Double, s As String, drop$
 Set objref.lastobj = Nothing
 End Function
 Public Sub AddExecCode(code$)
-If Locked Then Exit Sub
+If locked Then Exit Sub
 Call Run(code$, False)
 End Sub
 Public Function Run(ByVal code$, Optional clean As Boolean = True) As Boolean
 Dim ohere$, stay As Variant
 If elevatestatus Then Exit Function
+ If basestack1.Owner Is Nothing Then Exit Function
 elevatestatus = 1
 If clean Then PushStage objref, 0
 ohere$ = here$

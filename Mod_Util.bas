@@ -4067,7 +4067,7 @@ againquery:
  a$ = INKEY$
  
 If a$ = "" Then
-
+If TaskMaster Is Nothing Then Set TaskMaster = New TaskMaster
     If TaskMaster.QueueCount > 0 Then
   ProcTask2 bstack
   If Not NOEDIT Or Not QRY Then
@@ -4099,6 +4099,15 @@ Else
     End If
 
   End If
+    If bstack Is Nothing Then
+    Set bstack = basestack1
+    NOEXECUTION = True
+    MOUT = True
+     ModalId = 0
+                         ShutEnabledGuiM2000
+                         MyDoEvents
+                         GoTo contqueryhere
+    End If
    If bstack.IamThread Then If myexit(bstack) Then GoTo contqueryhere
 
 If Screen.ActiveForm Is Nothing Then

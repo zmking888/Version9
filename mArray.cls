@@ -171,12 +171,12 @@ Public Sub PushProp(a As Variant)
 Set GroupRef = a
 Arr = False
 End Sub
-Public Sub CopySerialize(mmm() As Variant)
+Public Sub CopySerialize(MMM() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
 Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 
-GetMem4 VarPtrArray(mmm()), m_base
+GetMem4 VarPtrArray(MMM()), m_base
 GetMem4 VarPtrArray(actualdata()), m_base_0
 r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
@@ -192,14 +192,14 @@ r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
 r1 = SafeArrayUnlock(m_base)
 End Sub
-Public Sub CopyBackSerialize(mmm() As Variant)
+Public Sub CopyBackSerialize(MMM() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
 Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 If Not RevOrder Then Err.Raise vbObjectError + 12345, "CopyBack", "Failed. is not vb6"
 Dim backup()
 backup() = actualdata()
-GetMem4 VarPtrArray(mmm()), m_base
+GetMem4 VarPtrArray(MMM()), m_base
 GetMem4 VarPtrArray(backup()), m_base_0
 r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
@@ -331,7 +331,7 @@ End If
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.Count + k.Count + 1, 9
+k.SerialItem v, Me.Count + k.Count + 1, 10
 k.myarrbase = myarrbase
 k.RevOrder = RevOrder
 If Right$(k.arrname, 2) = "%(" Then
@@ -579,6 +579,13 @@ If dnum = 1 Then
     maxitems = cursor - 1
     limit(0) = maxitems
 End If
+maxitems1 = maxitems - 1
+ElseIf command = 10 Then
+   
+    ReDim Preserve actualdata(cursor) As Variant
+    maxitems = cursor - 1
+    limit(0) = maxitems
+dnum = 1
 maxitems1 = maxitems - 1
 End If
 SerialItem = True
