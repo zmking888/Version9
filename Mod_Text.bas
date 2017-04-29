@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2848,7 +2848,7 @@ subsentry10:
                                                                 subspoint = True
                                                                 bstack.IsInRetStackNumber p
                                                         
-                                                                bb$ = Mid$(sbf(bstack.Parent.OriginalCode).sb, Len(sbf(bstack.Parent.OriginalCode).sb) - CLng(p) + 1)
+                                                                bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
                                                         ElseIf p < 0 Then
                                                                 subspoint = False
                                                                 bstack.IsInRetStackNumber p
@@ -2860,9 +2860,9 @@ subsentry10:
 
                                                         Else
                                                           If bstack.OriginalCode = 0 Then
-                                                               bb$ = Mid$(sbf(bstack.Parent.OriginalCode).sb, Len(sbf(bstack.Parent.OriginalCode).sb) - CLng(p) + 1)
+                                                               bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
                                                           Else
-                                                               bb$ = Mid$(sbf(bstack.OriginalCode).sb, Len(sbf(bstack.OriginalCode).sb) - CLng(p) + 1)
+                                                               bb$ = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(sbf(Abs(bstack.OriginalCode)).sb) - CLng(p) + 1)
                                                                End If
                                                                End If
                                                               
@@ -3023,7 +3023,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
 CONTlastEtnum:
 If LastErNum <> 0 Then
 
-If FK$(13) = "" Then FK$(13) = GetNextLine((sbf(bstack.OriginalCode).sb))
+If FK$(13) = "" Then FK$(13) = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     End If
                         CopyGroup var(y1), bstack
                         Set tempRef = pppp.GroupRef '' pppp.item(v).Link
@@ -16970,10 +16970,10 @@ End If
    If bstack.OriginalCode < 0 Then
    sbb$ = GetNextLine((var(-bstack.OriginalCode).code$))
    Else
-    sbb$ = GetNextLine((sbf(bstack.OriginalCode).sb))
+    sbb$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     End If
     If Left$(sbb$, 10) = "'11001EDIT" Then
-    TestShowSub = Mid$(sbf(bstack.OriginalCode).sb, Len(sbb$) + 3)
+    TestShowSub = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(sbb$) + 3)
     If TestShowSub = "" Then
     TestShowSub = Mid$(sbf(FindPrevOriginal(bstack)).sb, Len(sbb$) + 3)
     End If
@@ -16985,7 +16985,7 @@ End If
     If bstack.OriginalCode < 0 Then
     TestShowSub = var(-bstack.OriginalCode).code$
     Else
-     TestShowSub = sbf(bstack.OriginalCode).sb
+     TestShowSub = sbf(Abs(bstack.OriginalCode)).sb
      End If
      Else
      If bstack.IamThread Then
@@ -21405,7 +21405,7 @@ Set mystack.FuncObj = Nothing
     If Not NERR Then   ' Nerr = true from command ERROR 0 means Fatal Error, shows a message and act as a crash!
             If mystack.UseGroupname <> "" Then
 If InStr(mystack.UseGroupname, ChrW(&H1FFF)) > 0 Then
-pa$ = GetNextLine((sbf(mystack.OriginalCode).sb))
+pa$ = GetNextLine((sbf(Abs(mystack.OriginalCode)).sb))
 FK$(13) = Mid$(pa$, 7) + "-" + LTrim(Str(Len(NLtrim$(frm$)) - 2))
 MyErMacro rest$, "Problem in class", "Πρόβλημα στη κλάση"
 GoFunc = True
@@ -26845,7 +26845,7 @@ If x1 <> 0 Then
   End If
   End If
   ' so is the first time, put it back
-  If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
+  If Left$(sbf(Abs(bstack.OriginalCode)).sb, 10) = "'11001EDIT" Then
    
    ss$ = rest$
    hlp$ = ""
@@ -26863,9 +26863,9 @@ If x1 <> 0 Then
      IsSymbol3 ss$, "{"
     frm$ = block(ss$)
   If Right$(ss$, 2) <> vbCrLf Then
-        b$ = GetNextLine((sbf(bstack.OriginalCode).sb)) + "+2"
+        b$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb)) + "+2"
   Else
-        b$ = GetNextLine((sbf(bstack.OriginalCode).sb))
+        b$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
         End If
         nm$ = GetStrUntil(",", Mid$(b$, 12))
       GetSub nm$, i
@@ -27010,7 +27010,7 @@ v = 123
   End If
   End If
   ' so is the first time, put it back
-  If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
+  If Left$(sbf(Abs(bstack.OriginalCode)).sb, 10) = "'11001EDIT" Then
    
    ss$ = rest$
    hlp$ = ""
@@ -27028,9 +27028,9 @@ v = 123
      IsSymbol3 ss$, "{"
     frm$ = block(ss$)
   If Right$(ss$, 2) <> vbCrLf Then
-        b$ = GetNextLine((sbf(bstack.OriginalCode).sb)) + "+2"
+        b$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb)) + "+2"
   Else
-        b$ = GetNextLine((sbf(bstack.OriginalCode).sb))
+        b$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
         End If
         nm$ = GetStrUntil(",", Mid$(b$, 12))
       GetSub nm$, i
@@ -28894,12 +28894,14 @@ conthere2:
               End If
               
               ''Execute bstack, s$, (True)
+
           x1 = IsLabelA("", s$, ss$)
         
              If x1 <> 0 Then
                 sss$ = s$
                 If Len(ss$) > 6 Then
                         x1 = IsLabelA("", s$, ss$)
+                        
                         If MyFunction(-2 * (ChrW(&H1FFF) = ss$), bstack, sss$, 1) Then '' >6 len for function
                         x1 = bstack.IndexSub
                         If Asc(s$) <> 32 Then
@@ -28907,14 +28909,18 @@ conthere2:
                         ss$ = ss$ + Left$(s$, 1)
                         s$ = Mid$(s$, 2)
                         Else
+                        
                         ss$ = ss$ + Left$(s$, 2)
                         s$ = Mid$(s$, 3)
                         End If
                         End If
-                             
-                                              var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1) + var(i).FuncList
                         
-                                              sbf(x1).sbgroup = here$ + "."
+                       ' If InStr(var(i).FuncList, Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1)) <> 0 Then
+                       If sbf(x1).sbgroup = here$ + "." Then
+                        Else
+                                              var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1) + var(i).FuncList
+                                            sbf(x1).sbgroup = here$ + "."
+                        End If
                         Else
                         x1 = 0
                          End If
@@ -28924,10 +28930,11 @@ conthere2:
                         x1 = IsLabelA("", s$, ss$)
                         If MyModule(bstack, sss$, 1) Then
                          x1 = bstack.IndexSub
-                         'If Typename(var(i)) = "Group" Then
+                         If sbf(x1).sbgroup = here$ + "." Then
+                         Else
                               var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + Str(x1) + Chr$(1) + var(i).FuncList
-                             ' End If
                               sbf(x1).sbgroup = here$ + "."
+                        End If
                       Else
                         x1 = 0
                        End If
@@ -29145,8 +29152,8 @@ If myobject Is Nothing Then GoTo exithere1
               End If
               
               ''Execute bstack, s$, (True)
-          x1 = IsLabelA("", s$, ss$)
-        
+   
+        x1 = IsLabelA("", s$, ss$)
              If x1 <> 0 Then
                 sss$ = s$
                 If Len(ss$) > 6 Then
@@ -29162,8 +29169,14 @@ If myobject Is Nothing Then GoTo exithere1
                         End If
                         End If
                         x1 = bstack.IndexSub
+                        
+                     
+                        If sbf(x1).sbgroup = here$ + "." Then
+                        Else
                                               var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1) + var(i).FuncList
                                               sbf(x1).sbgroup = here$ + "."
+                        End If
+                                              
                         Else
                         x1 = 0
                          End If
@@ -29173,8 +29186,11 @@ If myobject Is Nothing Then GoTo exithere1
                         x1 = IsLabelA("", s$, ss$)
                         If MyModule(bstack, sss$, 1) Then
                          x1 = bstack.IndexSub
+                         If sbf(x1).sbgroup = here$ + "." Then
+                         Else
                               var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + Str(x1) + Chr$(1) + var(i).FuncList
                               sbf(x1).sbgroup = here$ + "."
+                         End If
                       Else
                         x1 = 0
                        End If
@@ -29632,10 +29648,10 @@ If Len(TestShowSub) >= WaitShow And WaitShow > 0 Then
 Else
     WaitShow = 0
     
-    ss$ = GetNextLine((sbf(bstack.OriginalCode).sb))
+    ss$ = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     If Left$(ss$, 10) = "'11001EDIT" Then
     
-    TestShowSub = Mid$(sbf(bstack.OriginalCode).sb, Len(ss$) + 3)
+    TestShowSub = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(ss$) + 3)
     Else
          TestShowSub = ss$
     End If
@@ -30283,7 +30299,11 @@ If IsExp(basestack, rest$, p) Then
 End If
 If FastSymbol(rest$, ";") And scr.name = "DIS" Then
 adjustlinespace = False
+If IsWine Then
+    Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
+Else
     Form1.Move 0, 0, ScrX(), ScrY()
+    End If
     Form1.BackColor = players(-1).Paper
     
 Sleep 1
@@ -30362,7 +30382,11 @@ End If
 
 
 ElseIf FastSymbol(rest$, ";") And scr.name = "DIS" Then
+If IsWine Then
+Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
+Else
 Form1.Move 0, 0, ScrX(), ScrY()
+End If
 Form1.BackColor = players(-1).Paper
 Form1.Cls
 
@@ -31517,7 +31541,7 @@ myerror1:
         If bs.UseGroupname <> "" Then
 If InStr(bs.UseGroupname, ChrW(&H1FFF)) > 0 Then
 
-pa$ = GetNextLine((sbf(bs.OriginalCode).sb))
+pa$ = GetNextLine((sbf(Abs(bs.OriginalCode)).sb))
 FK$(13) = Mid$(pa$, 7) + "-" + CStr(Len(frm$))
 
 MyErMacro rest$, "Problem in class", "Πρόβλημα στη κλάση"
@@ -32322,15 +32346,15 @@ subsub02:
                                                                                                                     subspoint = True
                                                                                                                     bstack.IsInRetStackNumber p
                                                                                                     
-                                                                                                                    bb$ = Mid$(sbf(bstack.Parent.OriginalCode).sb, Len(sbf(bstack.Parent.OriginalCode).sb) - CLng(p) + 1)
+                                                                                                                    bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
                                                                                                                     
                                                                                                             ElseIf p < 0 Then
                                                                                                                     subspoint = False
                                                                                                                     bstack.IsInRetStackNumber p
                                                                                                   If bstack.OriginalCode = 0 Then
-                                                                                                    bb$ = Mid$(sbf(bstack.Parent.OriginalCode).sb, Len(sbf(bstack.Parent.OriginalCode).sb) - CLng(p) + 1)
+                                                                                                    bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
                                                                                                   Else
-                                                                                                                    bb$ = Mid$(sbf(bstack.OriginalCode).sb, Len(sbf(bstack.OriginalCode).sb) - CLng(p) + 1)
+                                                                                                                    bb$ = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(sbf(Abs(bstack.OriginalCode)).sb) - CLng(p) + 1)
                                                                                                                     End If
                                                                                                                     
                                                                                                             End If
@@ -32354,7 +32378,7 @@ subsub02:
                                                                                                 GoTo subsub02
                                                                                             Else
                                                                                                 i = PosLabel(bb$, sbf(x2).sb)
-                                                                                                If i <> 0 And i < Len(sbf(bstack.OriginalCode).sb) Then
+                                                                                                If i <> 0 And i < Len(sbf(Abs(bstack.OriginalCode)).sb) Then
                                                                                                     sbf(x2).subs.AddKey bb$, i
                                                                                                     bb$ = Mid$(sbf(x2).sb, i)
                                                                                                     GoTo subsub02
@@ -33151,8 +33175,11 @@ With players(GetCode(scr))
                     x1 = CLng(p)
                     If x1 = 0 And scr.name = "DIS" Then
                     If Not Form1.WindowState = 0 Then Form1.WindowState = 0: Form1.Refresh
+                    If IsWine Then
+                    Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
+                    Else
                     Form1.Move 0, 0, ScrX(), ScrY()
-        
+                    End If
                     FrameText scr, .SZ, CLng(Form1.Width), CLng(Form1.Height), .Paper
                     players(-1).MAXXGRAPH = .MAXXGRAPH
                     players(-1).MAXYGRAPH = .MAXYGRAPH
@@ -38538,11 +38565,11 @@ MyFunction = True
                                 Else
                                 ''*****************************************************************************
                                       If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-                                                If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
+                                                If Left$(sbf(Abs(bstack.OriginalCode)).sb, 10) = "'11001EDIT" Then
                                                         If InStr(here$, ChrW(&H1FFF)) > 0 Then
                                                                 s$ = ""
                                                         Else
-                                                                pa$ = sbf(bstack.OriginalCode).sb
+                                                                pa$ = sbf(Abs(bstack.OriginalCode)).sb
                                                                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                                                                          s$ = GetNextLine(pa$) & "-" & CStr(i) + vbCrLf
                                                                 End If
@@ -38582,11 +38609,11 @@ operators:
                                                 MyFunction = False
                                         Else
                                                   If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-                                                  If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
+                                                  If Left$(sbf(Abs(bstack.OriginalCode)).sb, 10) = "'11001EDIT" Then
                                                         If InStr(here$, ChrW(&H1FFF)) > 0 Then
                                                                 s$ = ""
                                                         Else
-                                                                pa$ = sbf(bstack.OriginalCode).sb
+                                                                pa$ = sbf(Abs(bstack.OriginalCode)).sb
                                                                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                                                                          s$ = GetNextLine(pa$) & "-" & CStr(i) + vbCrLf
                                                                 End If
@@ -38720,11 +38747,11 @@ jumpheretoo:
                                                 ss$ = block(rest$)
                                                 i = Len(rest$)
                                                 If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-                                                If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
+                                                If Left$(sbf(Abs(bstack.OriginalCode)).sb, 10) = "'11001EDIT" Then
                                                         If InStr(here$, ChrW(&H1FFF)) > 0 Then
                                                                 s$ = ""
                                                         Else
-                                                                pa$ = sbf(bstack.OriginalCode).sb
+                                                                pa$ = sbf(Abs(bstack.OriginalCode)).sb
                                                                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                                                                 
                                                                          s$ = GetNextLine(pa$) & "-" & CStr(i) + vbCrLf
@@ -42508,11 +42535,11 @@ BYPASS1:
                 ss$ = block(rest$)
                 i = Len(rest$)
                 If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-                If Left$(sbf(basestack.OriginalCode).sb, 10) = "'11001EDIT" Then
+                If Left$(sbf(Abs(basestack.OriginalCode)).sb, 10) = "'11001EDIT" Then
                         If InStr(here$, ChrW(&H1FFF)) > 0 Then
                                 s$ = ""
                         Else
-                                pa$ = sbf(basestack.OriginalCode).sb
+                                pa$ = sbf(Abs(basestack.OriginalCode)).sb
                                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                                             s$ = GetNextLine(pa$) & "-" & CStr(i) + vbCrLf
                                 End If
@@ -42571,7 +42598,7 @@ JUMP0:
                         If FastSymbol(rest$, "{") Then
                         If basestack.OriginalCode > x1 Then
                         ' we have collision so we need a new one
-                        If sbf(basestack.OriginalCode).sbgroup <> sbf(x1).sbgroup Then
+                        If sbf(Abs(basestack.OriginalCode)).sbgroup <> sbf(x1).sbgroup Then
                         GoTo jumpheretoo
                         End If
                         End If
@@ -42619,11 +42646,11 @@ jumpheretoo:
                                 ' Call preProcessor(basestack, ss$)
                                 i = Len(rest$)
                                 If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
-                                If Left$(sbf(basestack.OriginalCode).sb, 10) = "'11001EDIT" Then
+                                If Left$(sbf(Abs(basestack.OriginalCode)).sb, 10) = "'11001EDIT" Then
                                         If InStr(here$, ChrW(&H1FFF)) > 0 Then
                                                 s$ = ""
                                         Else
-                                                pa$ = sbf(basestack.OriginalCode).sb
+                                                pa$ = sbf(Abs(basestack.OriginalCode)).sb
                                                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                                                             s$ = GetNextLine(pa$) & "-" & CStr(i) + vbCrLf
                                                 End If
