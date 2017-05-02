@@ -48,7 +48,7 @@ Set LastGlist = Nothing
 form5iamloaded = True
 If Not s_complete Then
 Me.Move -10000
-Form1.Hide
+If Form1.Visible Then Form1.Hide
 
 End If
 
@@ -72,9 +72,9 @@ For Each x In Forms
 If x.Visible Then x.Visible = False
 Next
 Set x = Nothing
-
-Form1.helper1
-Exit Sub
+'Form1.helper1
+'MsgBox "quit"
+'Exit Sub
 Else
 For Each x In Forms
 If x.name <> Me.name Then Unload x
@@ -83,7 +83,31 @@ Set x = Nothing
 End If
 
 If m_bInIDE Then Exit Sub
+
 SetErrorMode SEM_NOGPFAULTERRORBOX
+End Sub
+Public Sub BackPort()
+If Not IsWine Then Exit Sub
+On Error Resume Next
+Set LastGlist = Nothing
+Set LastGlist2 = Nothing
+form5iamloaded = False '
+MediaPlayer1.closeMovie
+  DisableMidi
+ If Not TaskMaster Is Nothing Then TaskMaster.Dispose
+  Set TaskMaster = Nothing
+  
+Dim x As Form
+ModalId = 0
+
+For Each x In Forms
+If x.name <> Me.name Then
+If x.Visible Then x.Visible = False
+End If
+Next
+Set x = Nothing
+Form1.helper1
+
 End Sub
 Private Sub Form_KeyPress(KeyAscii As Integer)
 INK$ = INK$ & GetKeY(KeyAscii)

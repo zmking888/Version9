@@ -186,7 +186,6 @@ Wend
 End Sub
 Function IsWine()
 Static www As Boolean, wwb As Boolean, hLib As Long, ntdll As String
-
 If www Then
 Else
 Err.Clear
@@ -195,7 +194,7 @@ ntdll = "ntdll"
 hLib = LoadLibrary(StrPtr(ntdll))
 wwb = GetProcByName(hLib, "wine_get_version") <> 0
 If hLib <> 0 Then FreeLibrary hLib
-If Err.number > 0 Then wwb = False
+If Err.Number > 0 Then wwb = False
 www = True
 End If
 IsWine = wwb

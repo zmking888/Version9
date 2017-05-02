@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 16
+Global Const Revision = 17
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3645,6 +3645,10 @@ GoTo there
 End If
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
+If IsWine Then
+players(0).MAXXGRAPH = ScrX() - 1
+players(0).MAXYGRAPH = ScrY() - 1
+End If
 '' BY DEAFULT IS FALSE
 priorityOr = False  '  TRUE OR FALSE AND FALSE GIVE -1 BECAUSE OR AND XOR PROCESS LEFT FIRST TRUE OR ( FALSE AND FALSE)
 '' WITH priorityOr = FALSE WE HAVE FLAT SYSTEM.........TRUE OR FALSE AND FALSE GIVE 0
@@ -3743,7 +3747,11 @@ Set basestack1.Owner = Nothing
 Set LastGlist = Nothing
 Set LastGlist2 = Nothing
 If form5iamloaded Then
-    Unload Form5
+   If IsWine Then
+   Form5.BackPort
+   Else
+   Unload Form5
+   End If
 End If
 End Sub
 Public Sub terminatefinal()
@@ -5076,10 +5084,14 @@ End If
 Select Case V1&
 Case 1
 If Not numid.Find(v$, w1) Then GoTo LOOKFORVARNUM
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87
 num82:
 IsNumber = 0
 MyEr "Internal Error", "Åóùôåñéêü Ðñüâëçìá"
+Exit Function
+num87: ' "ISWINE"
+r = SG * IsWine
+IsNumber = True
 Exit Function
 ' Select Case v$
 num1: 'Case "THIS", "ÁÕÔÏ"   ' 1
@@ -6147,7 +6159,7 @@ olamazi
 
 r = SG * Form3.NeoASK(bstack)
 AskInput = False
-   
+If IsWine Then If bstack.Owner.Visible Then bstack.Owner.SetFocus
     IsNumber = FastSymbol(a$, ")", True)
 End If
 Exit Function
@@ -22316,8 +22328,9 @@ Case "DIR", "ÊÁÔÁËÏÃÏÓ"
     Identifier = ProcDir(basestack, rest$, lang)
 Exit Function
 Case "START", "ÁÑ×Ç"
-newStart basestack, rest$
-Exit Function
+    
+    Identifier = newStart(basestack, rest$)
+    Exit Function
 Case "REMOVE", "ÄÉÁÃÑÁÖÇ"
     Identifier = ProcRemove(basestack, rest$, lang)
 Exit Function
@@ -26266,6 +26279,9 @@ End With
 pagio$ = "LATIN"
 cLid = 1033
 DialogSetupLang 1
+With players(GetCode(bstack.Owner))
+.charset = 0
+End With
 End Sub
 Sub GREEK(bstack As basetask)
 On Error Resume Next
@@ -26278,7 +26294,6 @@ If bstack.tolayer > 0 Then
     ElseIf bstack.toback Then
     .Font.charset = 161
     Else
- 
     .DIS.Font.charset = bstack.myCharSet
     .TEXT1.Font.charset = bstack.myCharSet
     .List1.Font.charset = bstack.myCharSet
@@ -26288,6 +26303,9 @@ End With
 pagio$ = "GREEK"
 cLid = 1032
 DialogSetupLang 0
+With players(GetCode(bstack.Owner))
+.charset = 161
+End With
 End Sub
 Private Function GetLCIDFromKeyboard() As Long
     Dim Buffer As String, ret&, r&
@@ -29752,6 +29770,14 @@ If Form1.WindowState = 0 Then
     y = ((ScrY() - 1) - Form1.Height) / 2
     End If
 ' LETS MOVE
+
+If IsWine Then Form1.Visible = False
+If Form1.top > ScrY() - 100 Then Form1.top = 0
+If IsWine Then
+Sleep 10
+Form1.Up
+Form1.Visible = True
+End If
 Form1.Move x, y
 'Form1.follow IEX, IEY
 Form1.Up
@@ -30300,10 +30326,10 @@ End If
 If FastSymbol(rest$, ";") And scr.name = "DIS" Then
 adjustlinespace = False
 If IsWine Then
-    Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
+    Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
 Else
     Form1.Move 0, 0, ScrX(), ScrY()
-    End If
+End If
     Form1.BackColor = players(-1).Paper
     
 Sleep 1
@@ -30377,15 +30403,35 @@ players(basketcode).MineLineSpace = mAddTwipsTop
 players(basketcode).uMineLineSpace = mAddTwipsTop
 FrameText scr, SZ, CLng(W3 * p), CLng(sx), players(basketcode).Paper, Not (scr.name = "DIS")
 
-
 End If
 
 
 ElseIf FastSymbol(rest$, ";") And scr.name = "DIS" Then
+If IsWine Then Form1.Visible = False
+If Form1.top > ScrY() - 100 Then Form1.top = 0
 If IsWine Then
-Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
+Sleep 10
+Form1.Up
+
+ Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+    Form1.Cls
+   
+        Form1.Visible = True
+ If Not (Form1.Left = 0) Or Not (Form1.top = 0) Then
+        
+        Form1.Move Form1.Left, , scr.Width - Form1.Left, scr.Height - Form1.top
+        Form1.Cls
+        Form1.Move Form1.Left, , scr.Width - Form1.Left, scr.Height - Form1.top
+        
+        With players(GetCode(scr))
+        FrameText scr, .SZ, scr.Width - Form1.Left, scr.Height - Form1.top, .Paper, True
+        Form1.Move Form1.Left, , scr.Width - Form1.Left, scr.Height - Form1.top
+        
+        End With
+
+        End If
 Else
-Form1.Move 0, 0, ScrX(), ScrY()
+    Form1.Move 0, 0, ScrX(), ScrY()
 End If
 Form1.BackColor = players(-1).Paper
 Form1.Cls
@@ -30393,10 +30439,53 @@ Form1.Cls
 
 MyMode scr
 ElseIf scr.name = "DIS" Then
-Form1.Move Form1.Left + scr.Left, Form1.top + scr.top, scr.Width, scr.Height
+
+W3 = Form1.Left + scr.Left
+W4 = Form1.top + scr.top
+If IsWine Then Form1.Visible = False
+If Form1.top > ScrY() - 100 Then Form1.top = 0: W4 = Form1.top + scr.top
+If IsWine Then
+    Sleep 10
+    Form1.Up
+    scr.Move 0, 0
+    Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+    Form1.Cls
+    Form1.Up
+    Sleep 10
+    Form1.Move W3, W4, scr.Width, scr.Height
+    Form1.Cls
+    Form1.Visible = True
+    Form1.Up
+    Sleep 10
+    Form1.Refresh
+    If (scr.Width + Form1.Left > ScrX()) Or (scr.Height + Form1.top > ScrY()) Then
+       W3 = scr.Width + Form1.Left - ScrX()
+       W4 = scr.Height + Form1.top - ScrY()
+       If W4 < 0 Then W4 = 0
+       If W3 < 0 Then W3 = 0
+           If W3 = 0 And W4 = 0 Then
+           SetText scr
+        Else
+            scr.Move 0, 0, scr.Width - W3, scr.Height - W4
+
+        Form1.Move Form1.Left, , scr.Width, scr.Height
+        With players(GetCode(scr))
+        .mysplit = 0
+        .MAXXGRAPH = scr.Width
+        .MAXYGRAPH = scr.Height
+        
+        SetText scr
+        End With
+
+      End If
+    End If
+Else
 scr.Move 0, 0
+Form1.Move W3, W4, scr.Width, scr.Height
 Form1.Cls
 SetText scr
+End If
+
 Set scr = Nothing
 Exit Function
 Else
@@ -32842,6 +32931,7 @@ scr.ForeColor = mycolor(11)
 basestack.myBold = False
 basestack.myitalic = False
 pa = 0
+
             Err.Clear
             On Error Resume Next
 If IsStrExp(basestack, rest$, s$) Then
@@ -32898,6 +32988,7 @@ MyEr "", ""
   
 Form1.myBreak basestack
     basestack.toprinter = False
+    
     Form1.Cls
     
     Original basestack1, "NEW:CLEAR"
@@ -32968,7 +33059,10 @@ End If
         Do While Not scr.Visible Or NOEXECUTION
 mywait bstack, 5
         Loop
-If scr.Visible Then scr.SetFocus
+If scr.Visible Then
+scr.SetFocus
+
+End If
 End If
 Set scr = Nothing
 End Sub
@@ -33175,14 +33269,150 @@ With players(GetCode(scr))
                     x1 = CLng(p)
                     If x1 = 0 And scr.name = "DIS" Then
                     If Not Form1.WindowState = 0 Then Form1.WindowState = 0: Form1.Refresh
+                    If IsWine Then Form1.Visible = False
+                    If Form1.top > ScrY() - 100 Then Form1.top = 0
                     If IsWine Then
-                    Form1.Move 1, 1, ScrX() - 1, ScrY() - 1
-                    Else
-                    Form1.Move 0, 0, ScrX(), ScrY()
+                    SleepWait3 10
+                    Form1.Up
+                    End If
+                    Form1.top = 0
+                    Form1.Move 0, Form1.top, ScrX(), ScrY() - Form1.top
+                    If IsWine Then
+                    Form1.Visible = True
                     End If
                     FrameText scr, .SZ, CLng(Form1.Width), CLng(Form1.Height), .Paper
                     players(-1).MAXXGRAPH = .MAXXGRAPH
                     players(-1).MAXYGRAPH = .MAXYGRAPH
+                    Exit Sub
+        Else
+                    y1 = CLng(x1 * ScrY() / ScrX())
+        End If
+End If
+If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = CLng(p)
+End If
+If scr.name = "GuiM2000" Then
+ Set scr.Picture = LoadPicture("")
+               If FastSymbol(rest$, ";") Then 'CENTER
+                            FrameText scr, .SZ, x1, y1, .Paper, True
+                            scr.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2
+                            
+                Else
+                            scr.Move scr.Left, scr.top, x1, y1
+
+                            FrameText scr, .SZ, 0, 0, .Paper, True
+                            
+                End If
+                SetTextSZ scr, .SZ
+ElseIf scr.name = "dSprite" Then
+            RsetRegion scr
+            Set scr.Picture = LoadPicture("")
+                If FastSymbol(rest$, ";") Then 'CENTER
+                            FrameText scr, .SZ, x1, y1, .Paper, True
+                            scr.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2
+                Else
+                            scr.Move scr.Left, scr.top, x1, y1
+
+                            FrameText scr, .SZ, 0, 0, .Paper, True
+                            
+                End If
+                SetTextSZ scr, .SZ
+Else
+    If FastSymbol(rest$, ";") Then 'CENTER
+        Form1.WindowState = 0
+        If IsWine Then Form1.Visible = False
+        If Form1.top > ScrY() - 100 Then Form1.top = 0
+    
+        
+        FrameText scr, .SZ, x1, y1, .Paper
+      ''  Form1.Move 0, 0
+        Form1.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        Form1.Cls
+        If IsWine Then SleepWait3 10
+        Form1.Up
+        If Not (Form1.top = (ScrY() - .MAXYGRAPH) / 2) Or Not (Form1.Left = (ScrX() - .MAXXGRAPH) / 2) Then
+        Form1.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        End If
+        scr.Move 0, 0
+        If IsWine Then Form1.Visible = True
+       '''' Form1.follow IEX, IEY
+        
+        If ttl Then
+        If Form3.WindowState = 0 Then Form1.Show , Form5
+        Else
+        Form1.Show , Form5
+        End If
+    Else
+        Form1.WindowState = 0
+If IsWine Then Form1.Visible = False
+If Form1.top > ScrY() - 100 Then Form1.top = 0
+If IsWine Then
+SleepWait3 10
+Form1.Up
+End If
+        FrameText scr, .SZ, x1, y1, .Paper
+        Form1.Move 0, 0, .MAXXGRAPH, .MAXYGRAPH
+        
+        If IsWine Then
+        Form1.Cls
+        Form1.Visible = True
+        End If
+        players(-1).MAXXGRAPH = .MAXXGRAPH
+        players(-1).MAXYGRAPH = .MAXYGRAPH
+        Form1.Up
+        'Form1.follow IEX, IEY
+        scr.Move 0, 0
+                If ttl Then
+        If Form3.WindowState = 0 Then Form1.Show , Form5
+        Else
+        Form1.Show , Form5
+        End If
+    End If
+End If
+Else
+ifier = False
+Exit Sub
+End If
+''SleepWait 4
+End With
+End Sub
+
+Sub ProcWindowold(bstack As basetask, rest$, scr As Object, ifier As Boolean)
+Dim x1 As Long, y1 As Long, p As Double
+If scr.name = "GuiM2000" Then
+    Else
+If scr.name = "Form1" Then
+    DisableTargets q(), -1
+ElseIf scr.name = "DIS" Then
+    DisableTargets q(), 0
+ElseIf scr.name = "dSprite" Then
+    DisableTargets q(), val(scr.index)
+End If
+End If
+With players(GetCode(scr))
+        If IsExp(bstack, rest$, p) Then
+            .SZ = p
+            If .SZ < 4 Then .SZ = 4
+            If FastSymbol(rest$, ",") Then
+                If IsExp(bstack, rest$, p) Then
+                    x1 = CLng(p)
+                    If x1 = 0 And scr.name = "DIS" Then
+                    If Not Form1.WindowState = 0 Then Form1.WindowState = 0: Form1.Refresh
+                    If IsWine Then
+                        Form1.WindowState = 0
+                       ' Form1.Move 0, 0, ScrX() * 1.2, ScrY() * 1.2
+                        'Form1.Up
+                        Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+                        Form1.Refresh
+                        FrameText scr, .SZ, CLng(Form1.Width), CLng(Form1.Height), .Paper
+                        
+                    Else
+                        Form1.Move 0, 0, ScrX(), ScrY()
+                      FrameText scr, .SZ, CLng(Form1.Width), CLng(Form1.Height), .Paper
+         
+                    End If
+                   players(-1).MAXXGRAPH = .MAXXGRAPH
+                    players(-1).MAXYGRAPH = .MAXYGRAPH
+                   
                     Exit Sub
         Else
                     y1 = CLng(x1 * ScrY() / ScrX())
@@ -33218,13 +33448,27 @@ ElseIf scr.name = "dSprite" Then
 Else
     If FastSymbol(rest$, ";") Then 'CENTER
         Form1.WindowState = 0
-
-        FrameText scr, .SZ, x1, y1, .Paper
+         FrameText scr, .SZ, x1, y1, .Paper
+        
       ''  Form1.Move 0, 0
-        Form1.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+      
+      If IsWine Then
 
-       '''' Form1.follow IEX, IEY
+            FrameText scr, .SZ, x1, y1, .Paper
+        Form1.Up
+        Form1.Move 0, 0, .MAXXGRAPH - 1, .MAXYGRAPH - 1
+        Form1.Up
+        Form1.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2 ', .MAXXGRAPH, .MAXYGRAPH
         scr.Move 0, 0
+        Form1.Up
+        players(-1).MAXXGRAPH = .MAXXGRAPH
+        players(-1).MAXYGRAPH = .MAXYGRAPH
+        Else
+            Form1.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+            scr.Move 0, 0
+        End If
+       '''' Form1.follow IEX, IEY
+        
         If ttl Then
         If Form3.WindowState = 0 Then Form1.Show , Form5
         Else
@@ -33232,11 +33476,28 @@ Else
         End If
     Else
         Form1.WindowState = 0
-
+        
+        
+        If IsWine Then
+        FrameText scr, .SZ, x1, y1, .Paper
+        Form1.Up
+        Form1.Move 0, 0, .MAXXGRAPH - 1, .MAXYGRAPH - 1
+        Form1.Up
+        If .MAXXGRAPH >= ScrX() Or .MAXXGRAPH >= ScrY() Then
+        Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+        players(-1).MAXXGRAPH = ScrX() - 1
+        players(-1).MAXYGRAPH = ScrY() - 1
+        Else
+         players(-1).MAXXGRAPH = .MAXXGRAPH
+        players(-1).MAXYGRAPH = .MAXYGRAPH
+        End If
+        Else
         FrameText scr, .SZ, x1, y1, .Paper
         Form1.Move 0, 0, .MAXXGRAPH, .MAXYGRAPH
         players(-1).MAXXGRAPH = .MAXXGRAPH
         players(-1).MAXYGRAPH = .MAXYGRAPH
+        End If
+
         Form1.Up
         'Form1.follow IEX, IEY
         scr.Move 0, 0
@@ -33245,7 +33506,7 @@ Else
         Else
         Form1.Show , Form5
         End If
-    End If
+        End If
 End If
 Else
 ifier = False
@@ -40993,6 +41254,7 @@ Exit Function
         If y < 0 Then
         y = Abs(y)
         x = x - 1
+        If CLng(x + y) > basestack.soros.Count Then y = basestack.soros.Count - x
         For i = x + 1 To x + y
         
          basestack.soros.MakeTopItem CLng(i)
@@ -41000,6 +41262,7 @@ Exit Function
         Next i
         Else
            'y = y - 1
+If CLng(x + y - 1) > basestack.soros.Count Then y = basestack.soros.Count - x + 1
 
         For i = y To 1 Step -1
         
@@ -41038,7 +41301,7 @@ Exit Function
         If y < 0 Then
         y = Abs(Int(y))
         x = x - 1
-        
+          If CLng(x + y) > basestack.soros.Count Then y = basestack.soros.Count - x
         For i = y To 2 Step -1
         
          basestack.soros.MakeTopItemBack CLng(i + x)
@@ -41047,6 +41310,8 @@ Exit Function
         If x > 0 Then basestack.soros.MakeTopItemBack CLng(i + x)
         Else
         y = Int(y)
+        If CLng(x + y - 1) > basestack.soros.Count Then y = basestack.soros.Count - x + 1
+
         For i = 1 To y
         basestack.soros.MakeTopItemBack CLng(x + y - 1)
         Next i

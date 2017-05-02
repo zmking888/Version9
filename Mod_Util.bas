@@ -2743,9 +2743,23 @@ If Not Form1.WindowState = 0 Then Form1.WindowState = 0
 Sleep 10
 If Form1.WindowState = 0 Then
 Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+If Form1.top <> 0 Or Form1.Left <> 0 Then
+Form1.Cls
+Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+End If
+Else
+Sleep 100
+On Error Resume Next
+Form1.WindowState = 0
+Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+If Form1.top <> 0 Or Form1.Left <> 0 Then
+Form1.Cls
+Form1.Move 0, 0, ScrX() - 1, ScrY() - 1
+End If
 End If
 
-FrameText d, SzOne, Form1.Width, Form1.Height, PaperOne
+FrameText d, SzOne, (ScrX() - 1 - Form1.Left), (ScrY() - 1 - Form1.top), PaperOne
+
 If lckfrm = 0 Then
 SetText d
 bstack.Owner.Font.charset = bstack.myCharSet
@@ -2765,7 +2779,7 @@ bstack.Owner.Font.charset = bstack.myCharSet
 .Paper = bstack.Owner.BackColor
 End With
 
- 
+
  
 ' check to see if
 Dim ss$, skipthat As Boolean
@@ -3856,7 +3870,6 @@ End If
 
 End If
 
-
 .MAXXGRAPH = dd.Width
 .MAXYGRAPH = dd.Height
 .FTEXT = 0
@@ -3962,7 +3975,7 @@ If Form1.Visible = False Then
     Sleep 100
     End If
 Else
-If Form1.top >= Screen.Height Then Form1.Move 0, 0
+If Form1.top >= ScrY() Then Form1.Move 0, 0
 End If
 If dq.Visible = False Then dq.Visible = True
 If exWnd = 0 Then Form1.KeyPreview = True
@@ -4001,6 +4014,7 @@ If Not bstack.IamThread Then
  If Not iamactive Then
  If Not Form1.Visible Then
  If Form1.WindowState = 1 Then Form1.WindowState = 0
+ If Form1.top > ScrY() - 100 Then Form1.top = 0
  Form1.Visible = True
  End If
  k1 = 0: MyDoEvents1 Form1

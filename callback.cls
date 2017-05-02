@@ -62,18 +62,21 @@ End If
 
 
 Switches para$
-
 Form1.MyPrompt cLine, Prompt$
 finalize:
 here$ = ohere$
 elevatestatus = 0
+If IsWine Then
+DoEvents
+Sleep 5
+End If
 End Sub
 Property Let ShowGui(RHS As Boolean)
 If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.top >= Screen.Height Then Form1.Move 0, 0
+If Form1.top >= ScrY() Then Form1.Move 0, 0
 Else
 If Form1.WindowState = 0 Then
 If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
@@ -245,5 +248,5 @@ GarbageFlush
 TerminateM2000
 terminatefinal
 l_complete = False
-
+'MsgBox "terminate"
 End Sub

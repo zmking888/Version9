@@ -11,7 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-Option Explicit
+ Option Explicit
 Dim netdisplay As Boolean
 Private LastItemCount As Long
 Public WithEvents glistN As gList
@@ -42,28 +42,28 @@ Private mNostateDir As Boolean
 Private mselectedFile As String
 Dim filetypes As String
 Dim ReturnFile As String
-Private Declare Function GetDriveType Lib "kernel32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
-Private Declare Function GetVolumeInformation Lib "kernel32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
+Private Declare Function GetDriveType Lib "KERNEL32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
+Private Declare Function GetVolumeInformation Lib "KERNEL32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Text1Dir As String
 Private topoffsetpixel As Long
 
-Property Let SortType(ByVal rhs As Long)
-If Not Mydir.SortType = rhs Then
-Mydir.SortType = rhs
+Property Let SortType(ByVal RHS As Long)
+If Not Mydir.SortType = RHS Then
+Mydir.SortType = RHS
 If path$ <> "" Then reload
 End If
 End Property
 
-Property Let FileTypesToDisplay(ByVal rhs As String)
-filetypes = rhs
+Property Let FileTypesToDisplay(ByVal RHS As String)
+filetypes = RHS
 End Property
-Property Let FilePath(rhs As String)
+Property Let FilePath(RHS As String)
 Dim first As String
-glistN.Enabled = False
-If rhs = "" Or Not (path$ = rhs) Then
-path$ = rhs
-mDoc1.textDoc = rhs
+glistN.enabled = False
+If RHS = "" Or Not (path$ = RHS) Then
+path$ = RHS
+mDoc1.textDoc = RHS
 ''glistN.AddPixels = 10
 If Not NoHeadLine Then
 glistN.HeadLine = " " ' give a fake headline
@@ -77,7 +77,7 @@ myDir2.Nofiles = Mydir.Nofiles
 myDir2.SortType = Mydir.SortType
 myDir2.TopFolder = Mydir.TopFolder
 If recnow3checked Then myDir2.LevelStop = 3 Else myDir2.LevelStop = 0
-first = myDir2.Dir2(rhs, filetypes, recnowchecked)
+first = myDir2.Dir2(RHS, filetypes, recnowchecked)
 glistN.ShowMe
 glistN.StickBar = True
 glistN.ShowBar = False
@@ -228,7 +228,7 @@ If NostateDir Then
 ElseIf Not glistN.ListSep(item - 1) Then
 ' item is from 1
 ' new addition locked=false
-TEXT1.Locked = False
+TEXT1.locked = False
 
 If Mydir.List(item - 1) = "..." Then
 If Mydir.Nofiles Then
@@ -276,8 +276,8 @@ End If
 End If
 End Sub
 Public Sub AbordAll()
-glistN.Enabled = False
-TEXT1.glistN.Enabled = False
+glistN.enabled = False
+TEXT1.glistN.enabled = False
 If Not myDir2 Is Nothing Then
 myDir2.abort = True
 Set myDir2 = Nothing
@@ -409,7 +409,7 @@ ElseIf Left$(Mydir.List(item), 1) = Chr$(2) Then
                 
               A.top = A.top + topoffsetpixel
                 
-                   If item = glistN.listindex And Not glistN.ListSep(item) Then
+                   If item = glistN.ListIndex And Not glistN.ListSep(item) Then
             'SetTextColor thisHDC, 0
                  ' b.Top = b.Bottom - 1
                 FillBack thisHDC, b, &HBFBFBB
@@ -428,7 +428,7 @@ ElseIf Left$(Mydir.List(item), 1) = Chr$(2) Then
                 PrintItem thisHDC, "\" + Mydir.ExtractName(Mydir.List(item)), A
                 End If
 Else
-    If item = glistN.listindex Then
+    If item = glistN.ListIndex Then
     
              If Mydir.ReadMark(item) And multifileselection Then
             FillBack thisHDC, b, &HFF '&HFFFF00
@@ -494,7 +494,7 @@ If ascii = 32 Then
 If Not NostateDir Then
 If multifileselection Then
 
-item = glistN.listindex
+item = glistN.ListIndex
 If item >= 0 Then
 ascii = 0
 If Mydir.ReadMark(item) Then
@@ -525,7 +525,7 @@ Sub reload()
  disablemenu
 Dim anystr As String
 
-schedule = Mydir.List(glistN.listindex)
+schedule = Mydir.List(glistN.ListIndex)
 Set myDir2 = New recDir ' we get a new...the old is reference by myDir
 myDir2.IncludedFolders = Mydir.IncludedFolders
 myDir2.Nofiles = Mydir.Nofiles
@@ -580,7 +580,7 @@ End If
 RaiseEvent NewHeadline(Mydir.path)
 
 glistN.CalcAndShowBar
-glistN.Enabled = True
+glistN.enabled = True
 glistN.ShowMe2
 If Mydir.Nofiles Then
 If Mydir.path = "" Then
@@ -595,22 +595,22 @@ End If
 If schedule <> "" Then
 If Left$(schedule, 1) <> Chr$(2) And schedule <> "..." Then
 
- findit = glistN.find(schedule)
-If findit >= 0 Then glistN.listindex = findit Else glistN.listindex = 0
+ findit = glistN.Find(schedule)
+If findit >= 0 Then glistN.ListIndex = findit Else glistN.ListIndex = 0
 Else
-glistN.listindex = 0
+glistN.ListIndex = 0
 End If
 schedule = ""
 ElseIf TEXT1 <> "" And Not Mydir.Nofiles And Not netdisplay Then
-findit = glistN.find(TEXT1)
+findit = glistN.Find(TEXT1)
 If findit >= 0 Then
 glistN.ShowThis findit + 1
 Else
-glistN.listindex = 0
+glistN.ListIndex = 0
 If Not SaveDialog Then TEXT1 = ""
 End If
 Else
-glistN.listindex = 0
+glistN.ListIndex = 0
 'Text1 = ""
 End If
 
@@ -662,9 +662,9 @@ Public Property Get NostateDir() As Boolean
 NostateDir = mNostateDir
 End Property
 
-Public Property Let NostateDir(ByVal rhs As Boolean)
-glistN.BlockItemcount = Not rhs
-mNostateDir = rhs
+Public Property Let NostateDir(ByVal RHS As Boolean)
+glistN.BlockItemcount = Not RHS
+mNostateDir = RHS
 End Property
 
 Private Sub myDir2_FeedBack(FileName As String)
@@ -678,9 +678,9 @@ selectedFile = ReturnFile
 
 End Property
 
-Public Property Let selectedFile(ByVal rhs As String)
+Public Property Let selectedFile(ByVal RHS As String)
 Text1Dir = ""
-mselectedFile = rhs
+mselectedFile = RHS
 End Property
 Public Sub ResetHeightSelector()
 Dim oldval As String
@@ -704,9 +704,9 @@ Public Property Get PreserveNpixelsHeaderRight() As Long
 PreserveNpixelsHeaderRight = mPreserveNpixelsHeaderRight
 End Property
 
-Public Property Let PreserveNpixelsHeaderRight(ByVal rhs As Long)
-mPreserveNpixelsHeaderRight = rhs
-glistN.PreserveNpixelsHeaderRightTwips = rhs * Screen.TwipsPerPixelX
+Public Property Let PreserveNpixelsHeaderRight(ByVal RHS As Long)
+mPreserveNpixelsHeaderRight = RHS
+glistN.PreserveNpixelsHeaderRightTwips = RHS * Screen.TwipsPerPixelX
 End Property
 Public Function GetPath() As String
 If hiddenDir <> "" Then

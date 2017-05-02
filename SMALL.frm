@@ -224,7 +224,11 @@ INK$ = ""
 On Error Resume Next
 If Not bstack.Owner Is Nothing Then
 If bstack.Owner.Visible Then
+If bstack.Owner.name = "DIS" Then
+Form1.SetFocus
+Else
 bstack.Owner.SetFocus
+End If
 End If
 End If
   escok = oldesc
@@ -451,15 +455,16 @@ Sleep 1
 If Forms.Count > 5 Then
 
 Else
-Form1.SetFocus
+If Form1.Visible Then Form1.SetFocus
 End If
 Form1.ZOrder 0
-Sleep 2
+If Form1.Visible Then Sleep 2
  Set x = Nothing
 End If
 Else
 If Not ((exWnd <> 0) Or AVIRUN Or IsSelectorInUse) Then
-Form1.Hide
+Form1.Visible = False
+'Form1.Hide
 If Form5.Visible Then Form5.Visible = False: foundform5 = True
 End If
 

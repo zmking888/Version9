@@ -1653,6 +1653,7 @@ NOEXECUTION = False
 myBreak basestack1
 MyNew basestack1, "", 0
 MyClear basestack1, ""
+
 Dim mybasket As basket
 mybasket = players(DisForm)
 PlaceBasket DIS, mybasket
@@ -1685,9 +1686,12 @@ s_complete = True
 
 
 players(DisForm) = mybasket
-
+'If IsWine Then
+'Form1.Move 0, 0, ScrX() * 1.5, ScrY() * 1.5
+'End If
 End Sub
 Public Sub MyPrompt(LoadFileAndSwitches$, Prompt$)
+Static forwine As Long
 
 onetime = onetime + 1
 On Error GoTo finale
@@ -1740,6 +1744,14 @@ Form2.ComputeNow
  Show
  
 If onetime = 1 Then
+If IsWine Then
+If forwine = 0 Then
+forwine = 1
+newStart basestack1, ""
+ElseIf Form1.Visible = False Then
+
+End If
+End If
 Form1.SetFocus
 End If
     QUERY basestack1, Prompt$, qq$, (mybasket.mx * 4), True
@@ -1893,10 +1905,16 @@ Private Sub Form_Unload(Cancel As Integer)
 
 End Sub
 Public Sub helper1()
+If DisStack Is Nothing Then
+Else
     Set DisStack.Owner = Nothing
      Set DisStack = Nothing
+End If
+   If MeStack Is Nothing Then
+Else
     Set MeStack.Owner = Nothing
     Set MeStack = Nothing
+    End If
     TEXT1.Dereference
     Set Point2Me = Nothing
     Set fonttest = Nothing

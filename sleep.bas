@@ -215,7 +215,7 @@ l = NOEDIT
   ''If A > 10 Then Sleep 0
 While a > b.MARKTWO And l = NOEDIT
 MyDoEvents2 Form1
-If TaskMaster.Processing Then TaskMaster.TimerTick Else Sleep 0
+If Not TaskMaster Is Nothing Then If TaskMaster.Processing Then TaskMaster.TimerTick Else Sleep 0
 
  a = a \ 3
 Wend

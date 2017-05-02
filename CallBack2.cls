@@ -26,14 +26,14 @@ Friend Sub NoPublic(bstack As basetask, where$)
         mineHere$ = where$
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.count = 0 Then Exit Property
+If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.top >= Screen.Height Then Form1.Move 0, 0
+If Form1.top >= ScrY() Then Form1.Move 0, 0
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -129,7 +129,7 @@ Set oldsoros = Nothing
 here$ = ohere$
 End Sub
 Public Sub CallModule(modulename$, ParamArray a())
-Static once As Boolean, where As Long, what
+Static Once As Boolean, where As Long, what
 If Status <> 0 Then Exit Sub
 If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
 'MyEr "Not Found", "Δεν Βρέθηκε"
@@ -157,9 +157,9 @@ If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
 Exit Sub
 End If
 
-If once Then Exit Sub
+If Once Then Exit Sub
 Dim ohere$
-once = True
+Once = True
 ohere$ = here$
 here$ = full$
 
@@ -272,7 +272,7 @@ PopStage objref
 Set objref.Sorosref = oldsoros
 Set oldsoros = Nothing
 here$ = ohere$
-once = False
+Once = False
 End Sub
 
 Public Sub ExecuteStatement(ByVal code$)
