@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -17467,8 +17467,14 @@ ContExit:
             i = Abs(IsLabelOnly(b$, w$))
             If i = 0 Then
                     i = IsNumberLabel(b$, w$)
-                    b$ = w$
-                    Execute = 12
+                    If i = 0 Then
+        
+                b$ = "NEXT"
+                Execute = 2
+                    Else
+                        b$ = w$
+                        Execute = 12
+                    End If
             ElseIf i = 1 Then
                 b$ = w$
                 Execute = 12
