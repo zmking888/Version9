@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 18
+Global Const Revision = 19
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37257,35 +37257,62 @@ ElseIf y1 < 5 And y1 > 0 Then
        If var(i).ReadOnly Then
             ReadOnly
             MyClear = False
-            
+            Exit Function
             End If
-                   GarbageCollector.Done = False
+            If var(i).UseIterator Then
+            ReadOnly
+            MyClear = False
+            Exit Function
+            End If
            
+                   GarbageCollector.Done = False
+           If var(i).indirect > -1 Then Stop
             If GarbageCollector.Find(objptr(var(i).objref)) Then
-            ElseIf GarbageCollector.Find(objptr(var(i).objref)) Then
+            ElseIf GarbageCollector.Find(objptr(var(i))) Then
             
             End If
-         Set var(i) = New mHandler
-         Set var(i).objref = New FastCollection
+             If Not var(i).objref Is Nothing Then var(i).objref.GarbageJob2
+             Set var(i) = Nothing
+       
               If GarbageCollector.Done Then
             If GarbageCollector.ReferCountValue = 1 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
+            
+             MakeitObjectInventory var(i)
        
-       Else
+       ElseIf var(i).t1 = 2 Then
        GarbageCollector.Done = False
            
             If GarbageCollector.Find(objptr(var(i).objref)) Then
-            ElseIf GarbageCollector.Find(objptr(var(i).objref)) Then
+            ElseIf GarbageCollector.Find(objptr(var(i))) Then
             
             End If
-       Set var(i).objref = New MemBlock
+       
+       Set var(i) = Nothing
                      If GarbageCollector.Done Then
             If GarbageCollector.ReferCountValue = 1 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
+        Set var(i) = New mHandler
+
+         var(i).t1 = 2
+       Set var(i).objref = New MemBlock
+       Else
+       If var(i).UseIterator Then
+       ''var(i).index_cursor = var(i).index_start
+       Set var(i) = Nothing
+       var(i) = CLng(0)
+       Else
+
+       If Typename$(var(i).objref) = "mArray" Then
+       With var(i)
+        Set .objref = New mArray
+       End With
+       End If
+       End If
        End If
        Else
          MissingGroup
@@ -39443,32 +39470,46 @@ Dim s$, what$, i As Long, p As Double, queue As Boolean
             If GetlocalVar(bstack.GroupName & what$, i) Then
        
             If Not MyIsObject(var(i)) Then GoTo makeitnow1
-            GoTo there12
-            ElseIf GetVar(bstack, bstack.GroupName & what$, i) Then
-             If Not MyIsObject(var(i)) Then GoTo makeitnow1
-            GoTo there12
-            Else
-            i = GlobalVar(bstack.GroupName & what$, s$)     ' MAKE ONE  '
-
+            If FastSymbol(rest$, "=") Then
+             GoTo there12
+             Else
              GoTo makeitnow1
+             End If
+           ' use global inventory for global ' change from revision 19-version 8.7
+            ElseIf here$ = "" Then
+            If Not GetVar(bstack, bstack.GroupName & what$, i) Then
+            ' If Not MyIsObject(var(i)) Then GoTo makeitnow1
+            'GoTo there12
+            GoTo lookglobal
             End If
-            ElseIf GetVar(bstack, bstack.GroupName & what$, i) Then
-             If Not MyIsObject(var(i)) Then GoTo makeitnow1
-                GoTo there12
+             GoTo makeitnow1
+            Else
+lookglobal:
+            i = GlobalVar(bstack.GroupName & what$, s$)     ' MAKE ONE  '
+                    If Not MyIsObject(var(i)) Then GoTo makeitnow1
+             If FastSymbol(rest$, "=") Then
+             GoTo there12
+             Else
+             GoTo makeitnow1
+             End If
+            End If
+            ElseIf GetVar(bstack, bstack.GroupName & what$, i, True) Then
+             GoTo makeitnow1
             Else
         
                 i = GlobalVar(bstack.GroupName & what$, s$) ' MAKE ONE
                 If i <> 0 Then
 makeitnow1:
                     MakeitObjectInventory var(i), queue
-there12:
 ' here look for block
                     If FastSymbol(rest$, "=") Then
+there12:
+                    
                         Set bstack.lastobj = var(i)
                         ProcInventory = AddInventory(bstack, rest$)
                         Exit Function
                     Else
-                    ' DO NOTHING
+                    ' nothing
                     End If
                 End If
             End If
@@ -41360,7 +41401,7 @@ If Not IsExp(basestack, rest$, x) Then x = 1
 End Function
 Function ProcSort(basestack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, s$, sx As Double, sy As Double, pppp As mArray
-Dim x1 As Long, y1 As Long, p As Double, ML As Long, desc As Boolean
+Dim x1 As Long, y1 As Long, p As Double, ML As Long, desc As Boolean, numb As Boolean
 ProcSort = False
 desc = IsLabelSymbolNew(rest$, "÷»…Õœ’”¡", "DESCENDING", lang)
     y1 = Abs(IsLabel(basestack, rest$, s$))
@@ -41372,8 +41413,20 @@ desc = IsLabelSymbolNew(rest$, "÷»…Õœ’”¡", "DESCENDING", lang)
                         Exit Function
                         End If
                             If var(i).t1 = 1 Then
+                            If IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then
+                                numb = IsLabelSymbolNew(rest$, "¡—…»Ãœ”", "NUMBER", lang)
+                                If Not numb Then
+                                If Not IsLabelSymbolNew(rest$, " ≈…Ã≈Õœ", "TEXT", lang) Then
+                                MyEr "Expected Text or Number", "–ÂÒﬂÏÂÌ·  ÂﬂÏÂÌÔ ﬁ ¡ÒÈËÏ¸Ú"
+                                ProcSort = False
+                                Exit Function
+                                End If
+                                End If
+                                var(i).objref.NumericSort = numb
+                            End If
                             If FastSymbol(rest$, ",") Then
                                 If IsExp(basestack, rest$, p) Then
+                                    
                                     If p <> 0 Then
                                         var(i).objref.Sort
                                     Else

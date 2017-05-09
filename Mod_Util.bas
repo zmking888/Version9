@@ -6124,7 +6124,7 @@ Public Sub MissingDocRef()  ' this is for identifier or execute part
 MyEr "invalid document pointer", "μη έγκυρος δείκτης εγγράφου"
 End Sub
 Public Sub MissingObjReturn()
-MyEr "Missing Object", "Δεν βρήκα αντικείενο"
+MyEr "Missing Object", "Δεν βρήκα αντικείμενο"
 End Sub
 Public Sub NoNewLambda()
     MyEr "No New statement for lambda", "Όχι δήλωση νέου για λαμδα"
