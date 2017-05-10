@@ -337,6 +337,8 @@ Done = False
 k = Hash(HashFunc(Key)) - 1
 
 If k >= 0 Then
+Dim safety As Long
+safety = k
 Do
     If PriveSpace(k).Key = Key Then
     Find = True: lastfind = Key: index = k: Done = True: Exit Function
@@ -345,7 +347,11 @@ Do
      
      k = PriveSpace(k).Pleft - 1
      If k = ParentIndex Then Exit Do
+     If safety = k Then
+     Exit Do
+     End If
 Loop Until k < 0
+
 End If
 End Function
 Function ExistKey(RHS) As Boolean
@@ -354,11 +360,15 @@ Key = CLng(RHS)
 If Len(Key) = 0 Then Exit Function
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
+Dim safety As Long
+safety = k
 Do
     If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Exit Function
     If k = PriveSpace(k).Pleft - 1 Then Exit Do
      k = PriveSpace(k).Pleft - 1
-
+    If safety = k Then
+    Exit Do
+    End If
 Loop Until k < 0
 End If
 End Function
@@ -394,13 +404,13 @@ Private Sub place(ByVal b, ByVal a)
 End Sub
 
 Private Function HashFunc2(where As Long)
-HashFunc2 = MyMod(uintnew(PriveSpace(where).Key Or &HAFFAFF7) + hashlen + 1, hashlen)
+HashFunc2 = MyMod(uintnew(PriveSpace(where).Key) + hashlen + 1, hashlen)
 End Function
 Private Function HashFunc1(nkey As Long)
-HashFunc1 = MyMod(uintnew(nkey Or &HAFFAFF7) + hashlen + 1, hashlen)
+HashFunc1 = MyMod(uintnew(nkey) + hashlen + 1, hashlen)
 End Function
 Private Function HashFunc(a As Long)
-HashFunc = MyMod(uintnew(a Or &HAFFAFF7) + hashlen + 1, hashlen)
+HashFunc = MyMod(uintnew(a) + hashlen + 1, hashlen)
 End Function
 Private Function UINT(ByVal a As Integer) As Long
  Dim b As Integer
