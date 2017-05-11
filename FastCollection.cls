@@ -697,13 +697,14 @@ Set PriveSpace(i).iValue = Nothing
             If GarbageCollector.Find(objptr(vvv)) Then
             End If
             End If
-       Set vvv = Nothing
+      
        
               If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue = 1 Then
+            If GarbageCollector.ReferCountValue <= 2 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
+            Set vvv = Nothing
 End If
 Next i
 End If

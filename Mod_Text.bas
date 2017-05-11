@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 20
+Global Const Revision = 21
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9227,9 +9227,13 @@ contgroup:
           
                             IsNumber = SpeedGroup(bstack, pppp, "VAL", v$, a$, w2) = 1
                                  r = SG * bstack.LastValue
+            
+            
             Else
+                        
                         If pppp.item(w2).HasValue Then
-                        IsNumber = SpeedGroup(bstack, pppp, "VAL", v$, a$, w2) = 1
+                       
+                        IsNumber = SpeedGroup(bstack, pppp, "VAL", v$, "", w2) = 1
                                  r = SG * bstack.LastValue
                         
                         Else
@@ -14361,8 +14365,7 @@ contlambdastr:
                 
     End If
     ElseIf Typename(pppp.item(w2)) = "Group" Then
-    
-    IsString = SpeedGroup(bstackstr, pppp, "VAL$", q$, a$, w2) = 1
+    IsString = SpeedGroup(bstackstr, pppp, "VAL$", q$, "", w2) = 1
                         r$ = bstackstr.LastValue
                         Exit Function
     Else
@@ -37265,21 +37268,33 @@ ElseIf y1 < 5 And y1 > 0 Then
             Exit Function
             End If
            
-                   GarbageCollector.Done = False
-           If var(i).indirect > -1 Then Stop
+   
+           If var(i).indirect > -1 Then Exit Function
             If GarbageCollector.Find(objptr(var(i).objref)) Then
-            ElseIf GarbageCollector.Find(objptr(var(i))) Then
-            
-            End If
-             If Not var(i).objref Is Nothing Then var(i).objref.GarbageJob2
+            If Not var(i).objref Is Nothing Then
+             var(i).objref.GarbageJob2
+             End If
+             If GarbageCollector.Find(objptr(var(i).objref)) Then
+             End If
+             ElseIf GarbageCollector.Find(objptr(var(i))) Then
+             Else
+               If Not var(i).objref Is Nothing Then
+             var(i).objref.GarbageJob2
              Set var(i) = Nothing
+             MakeitObjectInventory var(i)
+             Exit Function
+             End If
+            End If
+            
+             
        
               If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue = 1 Then
+            If GarbageCollector.ReferCountValue <= 2 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
-            
+
+            Set var(i) = Nothing
              MakeitObjectInventory var(i)
        
        ElseIf var(i).t1 = 2 Then
@@ -37290,9 +37305,9 @@ ElseIf y1 < 5 And y1 > 0 Then
             
             End If
        
-       Set var(i) = Nothing
+ 
                      If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue = 1 Then
+            If GarbageCollector.ReferCountValue <= 2 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
@@ -44986,7 +45001,8 @@ obj.objref.GarbageJob
 End If
 End If
 Next i
-Set obj = .ValueObj
+'Set obj = .ValueObj
+GarbageCollector.Done = False
 GarbageCollector.GarbageJob
 End If
 End With

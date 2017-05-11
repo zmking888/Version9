@@ -129,12 +129,13 @@ If IsObject(myVar(i).Value) Then
             
             End If
             End If
-            Set myVar(i).Value = Nothing
+            
             If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue = 1 Then
+            If GarbageCollector.ReferCountValue <= 2 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
+            Set myVar(i).Value = Nothing
 End If
 Next i
 

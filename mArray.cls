@@ -569,9 +569,24 @@ Dim aa As Variant
 Fill aa
 ElseIf command = 8 Then
 If dnum = 1 Then
+If cursor = -1 Then
+dnum = 0 ' no actions
+maxitems = 1
+maxitems1 = 0
+ndnum = 0 ' no actions
+nmaxitems = 1
+nmaxitems1 = 0
+ReDim actualdata(0)
+CodeName = GetAnyName$
+Arr = True
+limit(0) = 0
+Else
     ReDim Preserve actualdata(cursor) As Variant
+    
     maxitems = cursor
+End If
     limit(0) = maxitems
+
 End If
 ElseIf command = 9 Then
 If dnum = 1 Then

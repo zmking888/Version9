@@ -82,13 +82,13 @@ Friend Sub ReduceHash(newTop As Long, v())
             
             End If
             End If
-            Set v(.NDX) = Nothing
+            
             If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue = 1 Then
+            If GarbageCollector.ReferCountValue <= 2 Then
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
-            
+            Set v(.NDX) = Nothing
             End If
             v(.NDX) = Empty
             End If

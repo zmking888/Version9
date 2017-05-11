@@ -2053,7 +2053,7 @@ again4:
   ElseIf MaybeIsSymbol(a$, "+-*/", "=", True) Then
   addone col(), pos2, 15
     pos2 = k - Len(a$) + 1
-  ElseIf FastSymbol(a$, "/*-+=~^&|<>") Then
+  ElseIf FastSymbol(a$, "/*-+=~^|<>") Then
   addone col(), pos2, 14
     pos2 = k - Len(a$) + 1
   If FastSymbol(a$, "/*-+=~^&|<>") Then
