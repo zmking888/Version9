@@ -28,7 +28,7 @@ End Sub
 
 ''Public Par1 As Variant
 Private Sub Class_Terminate()
-If t1 = 1 And indirect = -1 Then
+If indirect = -1 Then
 If GarbageCollector.Find(objptr(objref)) Then
         If GarbageCollector.ReferCountValue = 2 Then
                 GarbageCollector.RemoveWithNoFind

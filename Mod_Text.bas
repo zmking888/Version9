@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2583,12 +2583,12 @@ varhash.ItemCreator w$, where
 UnFloatGroup bstack, w$, where, bstack.lastobj, True
 End If
 
-
-
- bstack.MoveNameDot w$
+ 'bstack1.MoveNameDot w$
 var(where).FloatGroupName = w$
 
-NeoCall objptr(bstack), "VOID " + "." + ChrW(&H1FFF) + oper$ + "()", lang, ok
+
+NeoCall objptr(bstack), "VOID " + w$ + "." + ChrW(&H1FFF) + oper$ + "()", lang, ok
+
 If soroslen < bstack.soros.Total Then
 If soroslen + 1 = bstack.soros.Total And flag Then
 r = bstack.soros.PopVal
