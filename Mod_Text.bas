@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2967,6 +2967,7 @@ breakexit:
                         CopyGroup var(y1), bstack
                          Set tempRef = pppp.GroupRef  '  pppp.item(v).Link
                         Set pppp.item(v) = bstack.lastobj
+                         Set bstack.lastobj = Nothing
                          Set pppp.item(v).LinkRef = tempRef
 
       
