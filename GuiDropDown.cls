@@ -127,8 +127,8 @@ aa.bold = ThisBold
 Set Textbox.glistN.Font = aa
 End If
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
 Public Property Set Container(glistNN As gList)
@@ -290,13 +290,13 @@ Private Sub glistN_ScrollSelected(item As Long, y As Long)
 End Sub
 
 
-Public Property Get List(Index) As Variant
+Public Property Get List(index) As Variant
 On Error Resume Next
-List = glistN.List(CLng(Index))
+List = glistN.List(CLng(index))
 End Property
-Public Property Let List(Index, RHS As Variant)
+Public Property Let List(index, RHS As Variant)
 On Error Resume Next
-glistN.List(CLng(Index)) = CStr(RHS)
+glistN.List(CLng(index)) = CStr(RHS)
 End Property
 
 Private Sub glistN_Selected(item As Long)
@@ -429,10 +429,10 @@ glistN.ShowPan
 End If
 'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top + Callback.Controls(CtrlName).Height
+    Callback.PopUpPos Pad, Left, top, Callback.Controls(CtrlName).Height
     Else
 
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top + Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top, Callback.Controls(CtrlName).Height
 End If
 
 ElseIf KeyCode = vbKeyTab Then
@@ -600,9 +600,9 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
     End If
 'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top + Callback.Controls(CtrlName).Height
+    Callback.PopUpPos Pad, Left, top, Callback.Controls(CtrlName).Height
     Else
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top + Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top, Callback.Controls(CtrlName).Height
 End If
 
 
@@ -679,21 +679,21 @@ If glistN Is Nothing Then Exit Property
 Textbox.vartext = RHS
 
 End Property
-Public Property Get Locked() As Boolean
-Locked = Textbox.Locked
+Public Property Get locked() As Boolean
+locked = Textbox.locked
 End Property
 
-Public Property Let Locked(ByVal RHS As Boolean)
-If RHS = Textbox.Locked Then Exit Property
+Public Property Let locked(ByVal RHS As Boolean)
+If RHS = Textbox.locked Then Exit Property
 If RHS Then
-If Not Textbox.Locked Then
+If Not Textbox.locked Then
 glistN.BypassLeaveonChoose = True
 
 Textbox.SetFocus
 glistN.BypassLeaveonChoose = False
 End If
 End If
-Textbox.Locked = RHS
+Textbox.locked = RHS
 End Property
 Public Sub additem(a$)
 glistN.additemFast a$
@@ -779,7 +779,7 @@ Public Sub Shutdown()
 'new
 glistN.Shutdown
 glistN.enabled = False
-Textbox.Locked = True
+Textbox.locked = True
 
 End Sub
 

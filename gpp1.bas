@@ -1,6 +1,6 @@
 Attribute VB_Name = "gpp1"
 Option Explicit
-Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As Long, mydpi As Long
+Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As Long, mydpi As Long, prFactor As Single, szFactor As Single
 
       Private Type DOCINFO
           cbSize As Long
@@ -136,12 +136,12 @@ End Type
       Private Declare Function ClosePrinter Lib "winspool.drv" _
       (ByVal hPrinter As Long) As Long
 
-      Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
+      Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
-      Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+      Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
 Const GMEM_MOVEABLE = &H2
 Const GMEM_ZEROINIT = &H40
 
@@ -186,6 +186,7 @@ End Sub
             ShowProperties = False
             Exit Function
           End If
+          
           If UBound(adevmode) <> nsize + 100 Then
          ReDim adevmode(1 To nsize + 100) As Byte
          
@@ -370,27 +371,27 @@ b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" 
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
 
 End Sub
-Function signlong(ByVal A As Double) As Double
-If A < 0 Then A = 0
-If A > 4294967295# Then A = 4294967295#
-If A > CDbl(2147483647) Then
-signlong = ((CDbl(&H80000000) + A) + CDbl(&H80000000)) ' And &HFFFFFFFF
+Function signlong(ByVal a As Double) As Double
+If a < 0 Then a = 0
+If a > 4294967295# Then a = 4294967295#
+If a > CDbl(2147483647) Then
+signlong = ((CDbl(&H80000000) + a) + CDbl(&H80000000)) ' And &HFFFFFFFF
 Else
-signlong = A
+signlong = a
 End If
 End Function
-Function uintnew(ByVal A As Double) As Double
-If A > CDbl(2147483647) Then A = CDbl(2147483647)
-If A < CDbl(-2147483648#) Then A = CDbl(-2147483648#)
-If A < 0 Then
-uintnew = 4294967296# + A
+Function uintnew(ByVal a As Double) As Double
+If a > CDbl(2147483647) Then a = CDbl(2147483647)
+If a < CDbl(-2147483648#) Then a = CDbl(-2147483648#)
+If a < 0 Then
+uintnew = 4294967296# + a
 Else
-uintnew = A
+uintnew = a
 End If
 End Function
-Function UINT(ByVal A As Long) As Long 'δίνει έναν integer σαν unsign integer σε long
+Function UINT(ByVal a As Long) As Long 'δίνει έναν integer σαν unsign integer σε long
  Dim b As Long
- b = A And &HFFFF
+ b = a And &HFFFF
  If b < 0 Then
  UINT = CLng(&H10000 + b)
  Else
@@ -398,10 +399,10 @@ Function UINT(ByVal A As Long) As Long 'δίνει έναν integer σαν unsign integer σε
  End If
  
  End Function
-Function cUbyte(ByVal A As Long) As Long
+Function cUbyte(ByVal a As Long) As Long
 Dim c As Long
 
-c = Abs(A) And &HFF&
+c = Abs(a) And &HFF&
 If c > 127 Then
 cUbyte = c - &H100
 Else
@@ -409,10 +410,10 @@ cUbyte = c
 End If
 
 End Function
-Function cUint(ByVal A As Long) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Function cUint(ByVal a As Long) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
 Dim c As Long
 
-c = Abs(A) And &HFFFF&
+c = Abs(a) And &HFFFF&
 If c > 32767 Then
 cUint = CInt(c - &H10000)
 Else
@@ -420,32 +421,32 @@ cUint = CInt(c)
 End If
 
 End Function
-Function LowWord(A As Long) As Long
+Function LowWord(a As Long) As Long
 Const bb = 65535
-LowWord = cUint(CLng(bb And A))
+LowWord = cUint(CLng(bb And a))
 End Function
 Function HighLow(h As Long, l As Long) As Long
 Const bb = 65536
 HighLow = h * bb + l
 End Function
-Function HighWord(A As Long) As Long
+Function HighWord(a As Long) As Long
 Dim b As Double
-b = A
+b = a
 Const bb = 65536
 HighWord = Int(b / bb)
 End Function
 Function cUlngFromVariant(ByVal c As Variant) As Long
-Dim A As Double
+Dim a As Double
 On Error GoTo cu1
-A = Abs(Int(c))
-If A > CDbl(2147483647#) Then
-If A > CDbl(4294967296#) Then
+a = Abs(Int(c))
+If a > CDbl(2147483647#) Then
+If a > CDbl(4294967296#) Then
 cUlngFromVariant = 0
 Else
-cUlngFromVariant = A - 4294967296#
+cUlngFromVariant = a - 4294967296#
 End If
 Else
-cUlngFromVariant = CLng(A)
+cUlngFromVariant = CLng(a)
 End If
 Exit Function
 cu1:
@@ -453,13 +454,13 @@ cUlngFromVariant = 0
 
 
 End Function
-Function cUlng(ByVal A As Double) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Function cUlng(ByVal a As Double) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
 On Error GoTo cu1
-A = Abs(Int(A))
-If A > CDbl(2147483647#) Then
-cUlng = A - 4294967296#
+a = Abs(Int(a))
+If a > CDbl(2147483647#) Then
+cUlng = a - 4294967296#
 Else
-cUlng = CLng(A)
+cUlng = CLng(a)
 End If
 Exit Function
 cu1:
@@ -470,24 +471,24 @@ Function Sput(ByVal Sl As String) As String
 Sput = Chr(2) + Right$("00000000" & Hex$(cUlng(CDbl(Len(Sl)))), 8) + Sl
 End Function
 
-Function PACKLNG$(ByVal A As Double)
-PACKLNG$ = Right$("00000000" & Hex$(cUlng(A)), 8)
+Function PACKLNG$(ByVal a As Double)
+PACKLNG$ = Right$("00000000" & Hex$(cUlng(a)), 8)
 End Function
-Function PACKLNG2$(ByVal A As Double)  ' with error return..
+Function PACKLNG2$(ByVal a As Double)  ' with error return..
 ' this if only for print
 On Error GoTo cu22
 Dim internal As Long
-A = Int(A)
-If A > 4294967296# Then
+a = Int(a)
+If a > 4294967296# Then
 PACKLNG2$ = "???+"
-ElseIf A < 0 Then
+ElseIf a < 0 Then
 ' error
 PACKLNG2$ = "???-"
 Else
-    If A > CDbl(2147483647#) Then
-    internal = A - 4294967296#
+    If a > CDbl(2147483647#) Then
+    internal = a - 4294967296#
     Else
-    internal = CLng(A)
+    internal = CLng(a)
     End If
 
 If internal <= 65535 And internal >= 0 Then
@@ -509,8 +510,8 @@ UNPACKLNG = cUlng(val("&H" & s$))
 End If
 End Function
 
-Function ORGAN(A As Long) As String
-Select Case A
+Function ORGAN(a As Long) As String
+Select Case a
 Case 1
 ORGAN = "Acoustic Grand Piano"
 Case 2

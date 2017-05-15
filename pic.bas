@@ -527,7 +527,7 @@ End Function
 Public Function ARRAYtoStr(ffff() As Byte) As String
 Dim a As String, j As Long
 For j = 1 To UBound(ffff())
-a = a + Chr(ffff(j))
+a = a + ChrW(ffff(j))
 Next j
 ARRAYtoStr = a
 End Function
@@ -535,7 +535,7 @@ Public Sub LoadArray(ffff() As Byte, a As String)
 Dim j As Long
 ReDim ffff(1 To Len(a)) As Byte
 For j = 1 To UBound(ffff())
-ffff(j) = CByte(AscW(Mid$(a, j, 1)))
+ffff(j) = CByte(AscW(Mid$(a, j, 1)) And &HFF)
 Next j
 
 End Sub
@@ -2440,9 +2440,12 @@ If (OpenClipboard(0) <> 0) Then
         
         If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
-
+If IsWine Then
+        sr1 = Left$(sr, Len(sr1))
+        GetTextData = Left$(sr1, Len(sr1))
+Else
             GetTextData = Left$(sr, Len(sr1))
-          
+End If
         End If
 
 End If

@@ -351,13 +351,13 @@ Private Function getRGBquad(rgb As RGBQUAD) As Long
 getRGBquad = cUlng(rgb.rgbRed + rgb.rgbGreen * 256 + rgb.rgbBlue * 256 * 256)
 
 End Function
-Private Function cUlng(ByVal A As Double) As Long ' πέρνει έναν umsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Private Function cUlng(ByVal a As Double) As Long ' πέρνει έναν umsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
 On Error GoTo cu1
-A = Abs(Int(A))
-If A > CDbl(2147483647#) Then
-cUlng = A - 4294967296#
+a = Abs(Int(a))
+If a > CDbl(2147483647#) Then
+cUlng = a - 4294967296#
 Else
-cUlng = CLng(A)
+cUlng = CLng(a)
 End If
 Exit Function
 cu1:
@@ -655,13 +655,13 @@ Public Function Create( _
 End Function
 Public Property Get BytesPerScanLine() As Long
     ' Scans must align on dword boundaries:
-    Dim A As Long, b As Long
+    Dim a As Long, b As Long
 
-    A = m_tBI.bmiHeader.biWidth * m_tBI.bmiHeader.biBitCount
-    b = A Mod 32
+    a = m_tBI.bmiHeader.biWidth * m_tBI.bmiHeader.biBitCount
+    b = a Mod 32
     If b > 0 Then b = 32 - b
     
-    BytesPerScanLine = (A + b) \ 8
+    BytesPerScanLine = (a + b) \ 8
     
    
 End Property
@@ -925,9 +925,9 @@ Dim cDib As New cDIBSection
     Set Resample = cDib
 End Function
 
-Private Sub swaplong(A As Long, b As Long)
+Private Sub swaplong(a As Long, b As Long)
 Dim c As Long
-c = A: A = b: b = c
+c = a: a = b: b = c
 End Sub
 
 Public Sub ThumbnailPaint(DestPic As Object, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetx As Long = 0, Optional ByVal offsety As Long, Optional ByVal border As Long = 0, Optional ByVal rtxy As Double = 1#)
@@ -935,7 +935,7 @@ Public Sub ThumbnailPaint(DestPic As Object, Optional ByVal zf As Single = -1, O
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    
-     Dim A As Single
+     Dim a As Single
          oldSc = DestPic.ScaleMode
    DestPic.ScaleMode = vbPixels
 
@@ -1038,7 +1038,7 @@ Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single 
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    Dim lox As Long, loy As Long
    
-     Dim A As Single
+     Dim a As Single
    '  Exit Sub
 
    CopiesCount copiesNUM, MyDM()
@@ -1144,7 +1144,7 @@ Public Sub ThumbnailPaintDummy(DestPic As Object, Optional ByVal zf As Single = 
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    
-     Dim A As Single
+     Dim a As Single
          oldSc = DestPic.ScaleMode
    DestPic.ScaleMode = vbPixels
 
@@ -1242,7 +1242,7 @@ Public Sub ThumbnailPaintDummyOLD(DestPic As Object, Optional ByVal zf As Single
    Dim oldSc As Long, dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
-     Dim A As Single
+     Dim a As Single
       
    oldSc = DestPic.ScaleMode
    DestPic.ScaleMode = vbPixels
@@ -1319,8 +1319,8 @@ Public Sub ThumbnailPartPaint(DestPic As Object, _
    Dim oldSc As Long, mS As Long
       'DestPic.Refresh
    oldSc = DestPic.ScaleMode
-   DestPic.FontName = "Arial"
-   DestPic.Font.charset = 161
+  ' DestPic.FontName = "Arial"
+ '  DestPic.Font.charset = 161
    
    DestPic.ScaleMode = vbPixels
     If lText <> "" Then
@@ -1386,7 +1386,7 @@ End Sub
 Public Sub SaveDib(f As String)
 Dim bDib() As Byte
 Dim tSA As SAFEARRAY2D
-Dim A$, mf As Integer, ff As BITMAPFILEHEADER
+Dim a$, mf As Integer, ff As BITMAPFILEHEADER
 
 On Error Resume Next
     With tSA
@@ -2164,7 +2164,7 @@ Public Sub ThumbnailPaintdib(DestPic As cDIBSection, Optional ByVal zf As Single
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
    If Width = 0 Then GoTo tp1
    On Error GoTo tp1
-     Dim A As Single
+     Dim a As Single
      
 ' this is only for redraw purposes.........bug of windows
 

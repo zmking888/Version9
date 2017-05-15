@@ -3943,11 +3943,11 @@ End Property
 Public Property Let locked(ByVal RHS As Boolean)
 glistN.enabled = Not RHS
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 
@@ -4543,7 +4543,6 @@ Public Sub mn3sub()
 On Error Resume Next
 Dim aa$
 aa$ = GetTextData(13)
-
 If aa$ = "" Then aa$ = Clipboard.GetText(1)
 If ParaSelStart = 2 And glistN.List(glistN.ListIndex) = "" Then
 SelStart = SelStart - 1

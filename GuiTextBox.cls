@@ -148,13 +148,13 @@ Info = glistN.HeadLine
 End Property
 
 Public Property Let Info(ByVal RHS As String)
-Locked = False
+locked = False
 glistN.restrictLines = 0
 glistN.HeadLineHeightMinimum = glistN.HeightPixels
 glistN.HeadLine = RHS
 
 glistN.ShowMe
-Locked = True
+locked = True
 End Property
 
 Public Property Get top() As Variant
@@ -198,7 +198,7 @@ Set .Font = ff
 .dcolor = Callback.Controls(1).dcolor
 .ShowMe
 End With
-Locked = False
+locked = False
 enabled = True
 Retired
 
@@ -229,11 +229,11 @@ End Sub
 
 
 
-Private Sub glistN_ChangeListItem(item As Long, Content As String)
+Private Sub glistN_ChangeListItem(item As Long, content As String)
 If Not enabled Then Exit Sub
 Dim this As String, thispos As Long, VR(2)
 thispos = glistN.SelStart - Len(mprompt)
-this = Mid$(Content, 1 + Len(mprompt))
+this = Mid$(content, 1 + Len(mprompt))
 '' RaiseEvent ValidString(this, thispos)
 VR(0) = this
 VR(1) = thispos
@@ -244,7 +244,7 @@ VR(1) = thispos
       End If
       
 thispos = VR(1) + Len(mprompt)
-Content = mprompt + VR(0)
+content = mprompt + VR(0)
 If thispos <> glistN.SelStart And VR(0) <> "" Then glistN.SelStart = thispos: glistN.ShowMe
 End Sub
 
@@ -283,7 +283,7 @@ End Property
 
 
 Private Sub glistN_CheckGotFocus()
-If Not Locked Then
+If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 ' RaiseEvent GotFocus
 If enabled Then
@@ -314,7 +314,7 @@ End If
 End Sub
 
 Private Sub glistN_CheckLostFocus()
-If Not Locked Then
+If Not locked Then
 If mStayOpen Then
 glistN.NoCaretShow = True
 
@@ -426,11 +426,11 @@ Private Sub glistN_SpinnerValue(ThatValue As Long)
       End If
      '' vartext = str(ThatValue)
 End Sub
-Public Property Get Locked() As Boolean
-Locked = Not glistN.enabled
+Public Property Get locked() As Boolean
+locked = Not glistN.enabled
 End Property
 
-Public Property Let Locked(ByVal RHS As Boolean)
+Public Property Let locked(ByVal RHS As Boolean)
 glistN.enabled = Not RHS
 End Property
 Public Sub Spinner(ShowBar As Boolean, MinValue As Long, maxvalue As Long, LargeValue As Long)
@@ -572,11 +572,11 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Let ShowAlways(ByVal vNewValue As Variant)

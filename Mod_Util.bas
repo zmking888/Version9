@@ -342,6 +342,15 @@ If GetForegroundWindow = Screen.ActiveForm.hWnd Then
 End If
 MOUSEY:
 End Function
+Public Sub OnlyInAGroup()
+    MyEr "Only in a group", "Μόνο σε μια ομάδα"
+End Sub
+Public Sub WrongOperator()
+MyEr "Wrong operator", "λάθος τελεστής"
+End Sub
+Public Sub NoOperatorForThatObject(ss$)
+    MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
+End Sub
 Public Sub MyEr(er$, ergr$)
 If Left$(LastErName, 1) = Chr(0) Then
     LastErName = ""
@@ -820,6 +829,17 @@ Exit Sub
 SPerror:
  BACKSPRITE = ""
 Set raster = Nothing
+End Sub
+Sub ThumbImage(d1 As Object, x1 As Long, y1 As Long, f As String, border As Long, tpp As Long, ttl$)
+On Error Resume Next
+With players(GetCode(d1))
+If Left$(f, 4) = "cDIB" And Len(f) > 12 Then
+Dim ph As New cDIBSection
+If cDib(f, ph) Then
+ph.ThumbnailPartPaint d1, x1 / tpp, y1 / tpp, 0, 0, border <> 0, , ttl$, .XGRAPH / tpp, .YGRAPH / tpp
+End If
+End If
+End With
 End Sub
 Sub SImage(d1 As Object, x1 As Long, y1 As Long, f As String)
 '
@@ -6089,6 +6109,9 @@ End Sub
 Public Sub MissingDoc()  ' this is for identifier or execute part
 MyEr "missing document type variable", "λείπει μεταβλητή τύπου εγγράφου"
 End Sub
+Public Sub MissingLabel()
+MyEr "Missing label/Number line", "Λείπει Ετικέτα/Αριθμός γραμμής"
+End Sub
 Public Sub MissFuncParammeterdOCVar(ar$)
 MyEr "Not a Document variable " + ar$, "Δεν είναι μεταβλητή τύπου εγγράφου " + ar$
 End Sub
@@ -6098,7 +6121,9 @@ End Sub
 Public Sub MissingCodeBlock()
 MyEr "missing block {}", "λείπει μπλοκ κώδικα σε {}"
 End Sub
-
+Public Sub MissingArray(w$)
+MyEr "Can't find array " & w$ & ")", "Δεν βρίσκω πίνακα " & w$ & ")"
+End Sub
 Public Sub ErrNum()
 MyEr "Error in number", "Λάθος στον αριθμό"
 End Sub

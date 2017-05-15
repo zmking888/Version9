@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5189,9 +5189,9 @@ num15: 'Case "MODE", "ΤΥΠΟΣ"
 With players(GetCode(bstack.Owner))
 If bstack.toprinter Then
     If .uMineLineSpace > .MineLineSpace Then
-        r = SG * .SZ / 6
+        r = SG * .SZ / szFactor / 2
     Else
-         r = SG * .SZ / 3
+         r = SG * .SZ / szFactor
     End If
     Else
     If .uMineLineSpace > .MineLineSpace Then
@@ -5800,7 +5800,11 @@ foundprivate:
         End If
     
 Else
+If IsNumeric(var(VR)) Then
     r = SG * var(VR)
+    Else
+    r = SG * val(var(VR))
+    End If
 End If
 
 IsNumber = True
@@ -8039,7 +8043,18 @@ len1234:
                         Set bstack.lastobj = Nothing
                         Exit Function
                     ElseIf .t1 = 3 Then
-                     r = SG * .objref.Count
+                   ' if CheckDeepAny
+                   Set anything = bstack.lastobj
+                   If CheckDeepAny(anything, var()) Then
+                     If Typename(anything) = "mHandler" Then
+                     r = SG * anything.objref.Count
+                     Else
+                     
+                     r = SG * anything.Count
+                     End If
+                     Else
+                     r = 0
+                     End If
                             IsNumber = FastSymbol(a$, ")", True)
                         Set bstack.lastobj = Nothing
                         Exit Function
@@ -12525,7 +12540,8 @@ fstr2: '"EVAL$(", "ΕΚΦΡ$(", "ΕΚΦΡΑΣΗ$("
                   Else
          
                   MyErMacroStr a$, "Index out of limits", "Δείκτης εκτός ορίων"
-
+                    IsString = False
+                  Exit Function
                 End If
                 Else
                 MissPar
@@ -13758,6 +13774,8 @@ fstr39: '"MENU$(", "ΕΠΙΛΟΓΗ$(", "ΕΠΙΛΟΓΕΣ$("
         If p > 0 And .listcount >= p Then
             r$ = .List(CLng(p) - 1)
             IsString = True
+            Else
+            MyErMacroStr a$, "index out of limits", "ο δείκτης είναι εκτός ορίων"
         End If
     End With
     End If
@@ -14397,7 +14415,9 @@ contlambdastr:
                    .index = Int(p)
                    End If
                    Else
+               
                    MyErMacroStr a$, "Index out of limits", "Δείκτης εκτός ορίων"
+                   IsString = False
                    Exit Function
                    End If
                Else
@@ -15243,6 +15263,7 @@ assignvalue3:
                             var(v) = p
                         End If
                         Else
+checkobject:
                         Set myobject = bstack.lastobj
                             If TypeOf bstack.lastobj Is Group Then ' oh is a group
                                 Set bstack.lastobj = Nothing
@@ -15304,6 +15325,16 @@ assignvalue3:
                             Set bstack.lastobj = Nothing
                             Set myobject = Nothing
                         End If
+                    ElseIf IsStrExp(bstack, b$, ss$) Then
+                    If bstack.lastobj Is Nothing Then
+                    If ss$ = "" Then
+                    var(v) = 0
+                    Else
+                    var(v) = val(ss$)
+                    End If
+                    Else
+                    GoTo checkobject
+                    End If
                     Else
                     ' if is string then what???
                         NoValueForVar w$
@@ -15311,7 +15342,9 @@ assignvalue3:
                         Exit Function
                     End If
                     GoTo loopcontinue1
+                    
                 Else
+                
                     If var(v) Is Nothing Then
                         AssigntoNothing  ' Use Declare
                         interpret = False
@@ -15644,6 +15677,7 @@ somethingelse:
                 If FastOperator(b$, "=", i) Then
                 
                     If IsExp(bstack, b$, p) Then
+checkobject1:
                         Set myobject = bstack.lastobj
                         If CheckIsmArray(myobject, var()) Then
                             Set bstack.lastobj = New mHandler
@@ -15656,6 +15690,16 @@ somethingelse:
                         Set myobject = Nothing
                         Set bstack.lastobj = Nothing
                         GoTo loopcontinue1
+                    ElseIf IsStrExp(bstack, b$, ss$) Then
+                    If bstack.lastobj Is Nothing Then
+                    If ss$ = "" Then
+                    p = 0
+                    Else
+                    p = val(ss$)
+                    End If
+                    End If
+                    GoTo checkobject1
+                    
                     Else
                         GoTo aproblem1
                     End If
@@ -15688,7 +15732,10 @@ jumpiflocal:
         ElseIf GetVar(bstack, w$, v, True) Then
         ' CHECK FOR GLOBAL
             GoTo somethingelse
+            Else
+        GoTo PROCESSCOMMAND
         End If
+        
 Else
 
 
@@ -16593,11 +16640,13 @@ Do
     Case 1
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-            If CheckIsmArray(bstack.lastobj, var()) Then
+            Dim anything As Object
+            Set anything = bstack.lastobj
+            If CheckIsmArray(anything, var()) Then
             Dim AAA As New mHandler
             With AAA
                 .t1 = 3
-               Set .objref = bstack.lastobj
+               Set .objref = anything
                
             End With
                 bstack.SetVarobJ w$, AAA
@@ -18025,7 +18074,7 @@ contUpdate:
         b$ = ": set " + Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1) + "=" + Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1) + vbCrLf + b$
              sss = Len(b$)
              Else
-             MyEr "Only in a group", "Μόνο σε μια ομάδα"
+             OnlyInAGroup
              Execute = 0
              Exit Function
                 End If
@@ -19216,7 +19265,7 @@ ContOn:
                 'Exit Do
                 Else
                 If i > 0 Then
-                MyEr "Missing label/Number line", "Λείπει Ετικέτα/Αριθμός γραμμής"
+                MissingLabel
                 sss = LLL
                   Execute = 0
                 Exit Function
@@ -19364,7 +19413,7 @@ ContGoto:
         If myexit(bstack) Then Execute = 1: Exit Function
         If Trim$(b$) = "" Or FastSymbol(b$, ":") Then
                 Execute = 0
-                MyEr "No Label or Number in GOTO", "Χωρίς όνομα ή αριθμό η ΠΡΟΣ"
+                MissingLabel
                 Exit Function
         Else
         ' GET OUT FOR NEXT
@@ -19539,6 +19588,7 @@ assignvalue3:
                             var(v) = p
                         End If
                         Else
+checkobject:
                         Set myobject = bstack.lastobj
                             If TypeOf bstack.lastobj Is Group Then ' oh is a group
                                 Set bstack.lastobj = Nothing
@@ -19588,10 +19638,6 @@ assignvalue3:
                             Set var(v) = myobject
                             CopyEvent var(v), bstack
                             Set var(v) = bstack.lastobj
-                             '    'a refrence to mEvent
-                            '    Set var(v) = Nothing
-                             '   Set var(v) = myobject  'a refrence to mEvent
-                              '  Set bstack.lastobj = Nothing
                             Else
                                 Set myobject = Nothing
                                 Set bstack.lastobj = Nothing
@@ -19605,6 +19651,16 @@ assignvalue3:
                             Set bstack.lastobj = Nothing
                             Set myobject = Nothing
                         End If
+                    ElseIf IsStrExp(bstack, b$, ss$) Then
+                    If bstack.lastobj Is Nothing Then
+                    If ss$ = "" Then
+                    var(v) = 0
+                    Else
+                    var(v) = val(ss$)
+                    End If
+                    Else
+                    GoTo checkobject
+                    End If
                     Else
                     ' if is string then what???
                         NoValueForVar w$
@@ -19943,7 +19999,7 @@ here1234:
                             Set bstack.lastobj = Nothing
                         End If
                     Else
-                    MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
+                    NoOperatorForThatObject ss$
                     Execute = 0
                     Exit Function
                     End If
@@ -19957,6 +20013,7 @@ here1234:
                 If FastOperator(b$, "=", i) Then
                 
                     If IsExp(bstack, b$, p) Then
+checkobject1:
                         Set myobject = bstack.lastobj
                         If CheckIsmArray(myobject, var()) Then
                             Set bstack.lastobj = New mHandler
@@ -19969,6 +20026,13 @@ here1234:
                         Set myobject = Nothing
                         Set bstack.lastobj = Nothing
                         GoTo loopcontinue
+                    ElseIf IsStrExp(bstack, b$, ss$) Then
+                            If ss$ = "" Then
+                            p = 0
+                            Else
+                            p = val(ss$)
+                            End If
+                            GoTo checkobject1
                     Else
                         GoTo aproblem1
                     End If
@@ -20251,8 +20315,10 @@ cont184575:
            
             End If
             End If
-              
-            
+            Else
+                       NoValueForVar w$
+                        Execute = 0
+                        Exit Function
             End If
             End If
     End If
@@ -20895,7 +20961,7 @@ If GetSub(w$ + ")", i) Then
 Else
 b$ = ss$ + b$
 GoTo autogosub
-MyEr "Can't find array " & w$ & ")", "Δεν βρίσκω πίνακα " & w$ & ")"
+    MissingArray w$
 Execute = 0: Exit Function
 End If
 End If
@@ -21287,7 +21353,7 @@ LONGERR:
             OverflowLong
     ElseIf Err.Number = 450 Then
             Execute = 0
-            MyEr "Wrong operator", "λάθος τελεστής"
+            WrongOperator
             End If
 End Function
 Function GoFunc(mystack As basetask, what$, rest$, vl As Variant, Optional recursive As Long, Optional ByVal choosethis As Long = -1, Optional ByVal strg As Boolean = False, Optional skiplastpar As Boolean = False) As Boolean
@@ -25031,14 +25097,17 @@ Wend
             hlp$ = "[" + Typename(var(h&)) + "]"
             End If
         Else
+        
             If Len(var(h&)) > 3 * .mx Then
                 hlp$ = " = " & Chr(34) + Left$(CStr(var(h&)), 4) & "..." & Chr(34)
             Else
                 hlp$ = " = " & Chr(34) + CStr(var(h&)) + Chr(34)
             End If
+            
         End If
         End If
     s$ = s$ & hlp$
+    
 Else
 
 If MyIsObject(var(h&)) Then
@@ -25086,11 +25155,58 @@ LOOPNEXT:
 pn& = pn& + 1
 Loop
 s$ = ""
+If Not bstack.StaticCollection Is Nothing Then
+Dim st1 As Long, mList As FastCollection
+Set mList = bstack.StaticCollection
+For st1 = 1 To mList.Count
+mList.index = st1 - 1
+If Left$(mList.KeyToString, 2) <> "%_" Then
+If s$ <> "" Then s$ = s$ + ", "
+If mList.IsObj Then
+If TypeOf mList.ValueObj Is mHandler Then
+s$ = s$ + mList.KeyToString + "*[" + Typename(mList.ValueObj.objref) + "]"
+Else
+s$ = s$ + mList.KeyToString + " [" + Typename(mList.ValueObj) + "]"
+End If
+Else
+If IsNumeric(mList.Value) Then
+s$ = s$ + mList.KeyToString + " =" + Str$(mList.Value)
+Else
+If Len(var(h&)) > 3 * .mx Then
+ s$ = s$ + mList.KeyToString + " = " & Chr(34) + Left$(mList.Value, 4) & "..." & Chr(34)
+ Else
+s$ = s$ + mList.KeyToString + " = " & Chr(34) + mList.Value + Chr(34)
+End If
+End If
+End If
+End If
+Next st1
+If s$ <> "" Then
+If lang = 1 Then
+
+s$ = " Static Variables: " + s$
+Else
+s$ = " Στατικές Μεταβλητές: " + s$
+End If
+If tofile >= 0 Then
+ putUniString tofile, vbCrLf
+If Uni(tofile) Then
+        putUniString tofile, s$
+                Else
+                putANSIString tofile, s$
+
+    End If
+End If
+
+
+
+End If
+End If
 If GarbageCollector.Count > 0 Then
 If lang = 1 Then
-s$ = "Objects for destroy:" + Str$(GarbageCollector.Count)
+s$ = s$ + "Objects for destroy:" + Str$(GarbageCollector.Count)
 Else
-s$ = "Αντικείμενα για καταστροφή:" + Str$(GarbageCollector.Count)
+s$ = s$ + "Αντικείμενα για καταστροφή:" + Str$(GarbageCollector.Count)
 End If
 End If
 
@@ -25267,9 +25383,11 @@ End If
 
 End Function
 Sub getfirstpage()
+Dim try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
+
 'If pwox > phoy Then mydpi = phoy Else mydpi = pwox
 ''mydpi = pwox / 4
 If pwox <= phoy Then
@@ -25277,15 +25395,31 @@ mydpi = pwox
 Else
 mydpi = phoy
 End If
+''prFactor = 1
+prFactor = mydpi / 288#
+mydpi = 288
+
+
+again:
+On Error Resume Next
 ' DC FROM PRINTER
+oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
 oprinter.WhiteBits
 oprinter.GetDpi mydpi, mydpi
 Form1.PrinterDocument1.Cls
 oprinter.needHDC
+
 Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
 oprinter.FreeHDC
-Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi / 4) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi / 4 + 0.5), 3, 1))
+If Err > 0 And try1 < 2 Then
+try1 = try1 + 1
+prFactor = prFactor * 2
+mydpi = mydpi / 2
+GoTo again
+End If
+szFactor = mydpi * dv15 / 1440#
+Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi + 0.5), 3, 1))
 pnum = 0
 End If
 End Sub
@@ -25308,25 +25442,32 @@ With Form1.PrinterDocument1
 .CurrentY = 0
 End With
 oprinter.CopyPicture Form1.PrinterDocument1
-oprinter.ThumbnailPaintPrinter 1, , False, True, True, , , , , , Form3.CaptionW & " " & Str$(pnum)
+oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , , , , , Form3.CaptionW & " " & Str$(pnum)
 Form1.PrinterDocument1.Cls
 End If
 End Sub
 Sub getenddoc()
 pnum = pnum + 1
+If prFactor = 0 Then prFactor = 1
 oprinter.CopyPicture Form1.PrinterDocument1
-oprinter.ThumbnailPaintPrinter 1, 100, False, True, True, , , , , , Form3.CaptionW & " " & Str$(pnum)
+oprinter.ThumbnailPaintPrinter 1, 100 * prFactor, False, True, True, , , , , , Form3.CaptionW & " " & Str$(pnum)
 oprinter.ClearUp
 Form1.PrinterDocument1.Picture = LoadPicture("")
 End Sub
 Sub Landscape(bstack As basetask)
-Dim dummy As Object
+Dim dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
-
-'If pwox > phoy Then mydpi = phoy Else mydpi = pwox
+If pwox <= phoy Then
 mydpi = pwox
+Else
+mydpi = phoy
+End If
+prFactor = mydpi / 288
+mydpi = 288
+again:
+
 
 If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
@@ -25335,36 +25476,66 @@ If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5))
 oprinter.WhiteBits
 oprinter.GetDpi mydpi, mydpi
 oprinter.needHDC
+On Error Resume Next
 Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
 oprinter.FreeHDC
-Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi / 4) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi / 4 + 0.5), 3, 1))
-
+If Err > 0 And try1 < 2 Then
+oprinter.ClearUp
+try1 = try1 + 1
+prFactor = prFactor * 2
+mydpi = mydpi / 2
+GoTo again
 End If
-
+szFactor = mydpi * dv15 / 1440#
+Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi / 4) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi / 4 + 0.5), 3, 1))
+End If
+If bstack.toprinter Then
+    SetText Form1.PrinterDocument1
+    Else
+    PlaceBasket Form1.PrinterDocument1, players(-2)
+    SetText Form1.PrinterDocument1
+End If
 
 End Sub
 Sub Portrait(bstack As basetask)
-Dim dummy As Object
+Dim dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
-
-'If pwox > phoy Then mydpi = phoy Else mydpi = pwox
-mydpi = pwox / 4
+If pwox <= phoy Then
+mydpi = pwox
+Else
+mydpi = phoy
+End If
+prFactor = mydpi / 288
+mydpi = 288
+szFactor = mydpi * dv15 / 1440#
+again:
 If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
 oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
-
 oprinter.WhiteBits
 oprinter.GetDpi mydpi, mydpi
 oprinter.needHDC
 Set Form1.PrinterDocument1 = hDCToPicture(oprinter.HDC1, 0, 0, oprinter.Width, oprinter.Height)
 oprinter.FreeHDC
+If Err > 0 And try1 < 2 Then
+try1 = try1 + 1
+prFactor = prFactor * 2
+mydpi = mydpi / 2
+GoTo again
+End If
+szFactor = mydpi * dv15 / 1440#
 Form1.PrinterDocument1.Scale (0, 0)-(Form1.ScaleX(Int(psw / pwox * (mydpi / 4) + 0.5), 3, 1), Form1.ScaleY(Int(psh / phoy * mydpi / 4 + 0.5), 3, 1))
 
 End If
-
+If bstack.toprinter Then
+    SetText Form1.PrinterDocument1
+    Else
+    PlaceBasket Form1.PrinterDocument1, players(-2)
+    SetText Form1.PrinterDocument1
+End If
 End Sub
 Function StripTerminator(ByVal strString As String) As String
     Dim intZeroPos As Long
@@ -30056,8 +30227,16 @@ End If
 End If
 Exit Function
 End If
-
-If FastSymbol(rest$, "?") Then
+If FastSymbol(rest$, "+") Then
+Form1.List1.Clear
+For Each xp In Printers
+Form1.List1.additemFast xp.DeviceName & " (" & xp.port & ")"
+Next xp
+For i = 0 To Form1.List1.listcount - 1
+If pname & " (" & port & ")" = Form1.List1.List(i) Then Form1.List1.ListIndex = i
+Next i
+Exit Function
+ElseIf FastSymbol(rest$, "?") Then
 Form1.List1.Clear
 For Each xp In Printers
 Form1.List1.additemFast xp.DeviceName & " (" & xp.port & ")"
@@ -30077,7 +30256,8 @@ Next xp
 ReDim MyDM(1 To 1) As Byte
 Exit Function
 End If
-If Not IsExp(basestack, rest$, p) Then p = players(-2).SZ
+getfirstpage
+If Not IsExp(basestack, rest$, p) Then p = players(-2).SZ / szFactor
 
 If FastSymbol(rest$, ",") Then
 If IsStrExp(basestack, rest$, s$) Then
@@ -30086,9 +30266,12 @@ If xp.DeviceName & " (" & xp.port & ")" = s$ Then
 pname = xp.DeviceName
 port = xp.port
 Set Printer = xp
+ReDim MyDM(1 To 1) As Byte
 If FastSymbol(rest$, ",") Then
 If IsStrExp(basestack, rest$, ss$) Then
+If ss$ <> "" Then
 LoadArray MyDM(), ss$
+End If
 End If
 Exit For
 End If
@@ -30115,14 +30298,18 @@ players(-2) = players(0)  'COPY dis
 With players(-2)
 players(-2).curpos = 0
 players(-2).currow = 0
-.SZ = CSng(p * 3)
+If p = 0 Then p = .SZ
+szFactor = mydpi * dv15 / 1440#
+.SZ = CSng(p * szFactor)
 End With
 PlaceBasket Form1.PrinterDocument1, players(-2)
 SetText Form1.PrinterDocument1
 
 Else
-SetTextSZ Form1.PrinterDocument1, CSng(p * 3)
+SetTextSZ Form1.PrinterDocument1, CSng(p * mydpi * dv15 / 1440)
+
 LCTbasket Form1.PrinterDocument1, players(-2), 0, 0
+'realfactor = CSng(players(-2).SZ) / prFactor / p
 End If
 
 With Printer   ' for no specific reason..I have to think it again
@@ -30167,7 +30354,7 @@ p = 0 ' dis
 Set basestack.lastobj = Nothing
 End If
 If basestack.lastobj Is Nothing Then
-If p > 32 Then p = 0 ' dis
+If p > 32 Or p < 0 Then p = 0 ' dis
 Else
 If Typename(basestack.lastobj) = "mHandler" Then
     i = basestack.lastobj.indirect
@@ -30190,6 +30377,7 @@ basestack.tolayer = CLng(p)
 
 If FastSymbol(rest$, "{") Then
 If p > 32 Then
+jumphere:
     If players(p).MAXXGRAPH = 0 Then
         SetTextBasketBack scr1, players(0)
         SetText scr1, prive.MineLineSpace, True
@@ -30727,29 +30915,38 @@ End Function
 
 
 Function ProcCls(basestack As basetask, rest$) As Boolean
-If basestack.toprinter Then Exit Function
+'If basestack.toprinter Then Exit Function
 Dim scr As Object, p As Double
  ProcCls = True
 Set scr = basestack.Owner
 If Not IsExp(basestack, rest$, p) Then p = -scr.BackColor
 With players(GetCode(scr))
 .Paper = mycolor(p)
-If Not basestack.toprinter Then
+
 If FastSymbol(rest$, ",") Then
     If IsExp(basestack, rest$, p) Then
+    If Not basestack.toprinter Then
     If p < 0 Then p = .My + p
         .mysplit = Int(p)
         If .mysplit >= .My Then .mysplit = 0: .pageframe = 0
         .pageframe = Int((.My - .mysplit) * 2 / 3)
-    Else
+
+    End If
+        Else
         ProcCls = False
         Set scr = Nothing
         Exit Function
     End If
 End If
-End If
+If basestack.toprinter Then
+If oprinter.Height > 0 Then
+oprinter.Cls CLng(mycolor(.Paper))
+oprinter.PaintPicture Form1.PrinterDocument1.hDC
 
+End If
+Else
 ClearScrNew scr, players(GetCode(scr)), CLng(mycolor(.Paper))   '' here 1.15 is not rgb but standard colors
+End If
 ''.Paper = scr.BackColor  ' Αυτό θα γίνει του BASESTACK
 If Form4.Visible Then
 vHelp
@@ -31090,13 +31287,28 @@ If i = False Then RepPlain bstack, bstack.Owner, pa$ + ss$
 
 End Function
 Function ProcImage(bstack As basetask, rest$, lang As Long) As Boolean
-Dim photo As Object, pppp As mArray, s$, x1 As Long, y1 As Long, w$, it As Long, p As Double
+Dim photo As Object, pppp As mArray, s$, x1 As Long, y1 As Long, w$, it As Long, p As Double, part As Boolean, border As Long, titl$
+
 ProcImage = True
+part = IsLabelSymbolNew(rest$, "ΠΛΑΙΣΙΟ", "FRAME", lang)
+
 If IsStrExp(bstack, rest$, s$) Then
     x1 = 0
     y1 = 0
     If Not (Left$(s$, 4) = "cDIB" And Len(s$) > 12) Then If ExtractType(s$) = "" Then s$ = s$ + ".bmp"
-    If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", lang) Then
+    ' "ΜΕΡΟΣ", "PART"
+    If part Then
+        If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then x1 = p
+        If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p Else ProcImage = False: MissNumExpr: Exit Function
+        
+        If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then border = p Else ProcImage = False: MissNumExpr: Exit Function
+        If FastSymbol(rest$, ",") Then If Not IsStrExp(bstack, rest$, titl$) Then ProcImage = False: MissStringExpr: Exit Function
+        'If bstack.toprinter Then
+        'ThumbImage bstack.Owner, x1, y1, s$, border, 1440 / mydpi, titl$
+        'Else
+        ThumbImage bstack.Owner, x1, y1, s$, border, dv15, titl$
+        'End If
+    ElseIf IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", lang) Then
         If CFname(s$) <> "" Or (Left$(s$, 4) = "cDIB" And Len(s$) > 12) Then
             Select Case Abs(IsLabel(bstack, rest$, w$))
             Case 3
@@ -35914,7 +36126,14 @@ DisableTargets q(), val(scr.index)
 End If
 End If
 If IsExp(bstack, rest$, p) Then
+If bstack.toprinter Then
+If prFactor = 0 Then
+prFactor = 1
+End If
+.SZ = CSng(p) * szFactor
+Else
 .SZ = CSng(p)
+End If
 If .SZ < 4 Then .SZ = 4
 If Not bstack.toprinter Then
 If FastSymbol(rest$, ",") Then
@@ -35934,7 +36153,7 @@ Set scr = Nothing
 Exit Function
 End If
 Else
-.SZ = .SZ * 3
+'.SZ = .SZ * 3
 End If
 Err.Clear
 scr.Font.Size = .SZ

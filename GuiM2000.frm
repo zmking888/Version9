@@ -622,10 +622,10 @@ Set var1(0) = Nothing
 MyDoEvents
 
 End Sub
-Public Sub PopUpPos(vv As Variant, ByVal x As Variant, ByVal y As Variant)
+Public Sub PopUpPos(vv As Variant, ByVal x As Variant, ByVal y As Variant, ByVal y1 As Variant)
 Dim that As Object
 x = x + Left
-y = y + top
+y = y + top + y1
 Set that = vv
 If Me Is that Then Exit Sub
 If that.Visible Then
@@ -633,12 +633,12 @@ If Not that.enabled Then Exit Sub
 End If
 If x + that.Width > ScrX() Then
 If y + that.Height > ScrY() Then
-that.Move ScrX() - that.Width, ScrY() - that.Height
+that.Move ScrX() - that.Width, y - that.Height - y1
 Else
 that.Move ScrX() - that.Width, y
 End If
 ElseIf y + that.Height > ScrY() Then
-that.Move x, ScrY() - Height
+that.Move x, y - that.Height - y1
 Else
 that.Move x, y
 End If

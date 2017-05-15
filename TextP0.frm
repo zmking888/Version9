@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -1197,7 +1197,6 @@ Case vbKeyTab
 Case vbKeyV
     If ctrl And (shift And &H2) = 2 Then
         Pad$ = GetTextData(CF_UNICODETEXT)
-    
         If Pad$ <> "" Then
           '  For i = 1 To Len(pad$)
               '  If Asc(Mid$(pad$, i, 1)) > 31 Then
