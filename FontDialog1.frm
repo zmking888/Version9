@@ -142,9 +142,9 @@ loadfileiamloaded = True
 scrTwips = Screen.TwipsPerPixelX
 ' clear data...
 setupxy = 20
-gList1.Enabled = True
-gList2.Enabled = True
-gList3.Enabled = True
+gList1.enabled = True
+gList2.enabled = True
+gList3.enabled = True
 gList3.LeaveonChoose = True
 gList3.VerticalCenterText = True
 gList3.restrictLines = 1
@@ -262,7 +262,7 @@ Dim i As Integer
 For i = 0 To Screen.FontCount - 1
 If Screen.Fonts(i) = ReturnFontName Then
 TEXT1 = Screen.Fonts(i)
-TEXT1.Locked = False
+TEXT1.locked = False
 gList3.Font.charset = ReturnCharset
 gList3.Font.bold = ReturnBold
 gList3.Font.Italic = ReturnItalic
@@ -272,11 +272,11 @@ End If
 Next i
 If ReturnSize >= 6 Then gList4.List(4) = "  " & CStr(ReturnSize)
 gList4.List(6) = "  " & CStr(ReturnCharset)
-gList4.Enabled = True
+gList4.enabled = True
 gList2.TabStop = False
 gList1.ShowMe
-TEXT1.Locked = False
-gList3.listindex = 0
+TEXT1.locked = False
+gList3.ListIndex = 0
 gList3.SoftEnterFocus
 End Sub
 
@@ -392,7 +392,7 @@ cListCount = Screen.FontCount
 End Sub
 
 Private Sub gList1_GotFocus()
-If gList1.listindex = -1 Then gList1.listindex = gList1.ScrollFrom
+If gList1.ListIndex = -1 Then gList1.ListIndex = gList1.ScrollFrom
 End Sub
 
 
@@ -444,7 +444,7 @@ skip = True
 CopyFromLParamToRect a, thisrect
 CopyFromLParamToRect b, thisrect
 a.top = a.top + 2
-If gList1.listindex = item Then
+If gList1.ListIndex = item Then
 b.Left = 0
 FillBack thisHDC, b, 0
 gList1.ForeColor = &HFFFFFF
@@ -511,9 +511,9 @@ If TEXT1 = "" Then Exit Sub
 If Direction Then
 ReturnBold = gList4.ListSelected(1)
 ReturnItalic = gList4.ListSelected(2)
-ReturnSize = Val(Trim$(gList4.List(4)))
-ReturnCharset = Val(Trim$(gList4.List(6)))
-If gList1.listindex > -1 Then ReturnFontName = Screen.Fonts(gList1.listindex)
+ReturnSize = val(Trim$(gList4.List(4)))
+ReturnCharset = val(Trim$(gList4.List(6)))
+If gList1.ListIndex > -1 Then ReturnFontName = Screen.Fonts(gList1.ListIndex)
 Unload Me
 End If
 End Sub
@@ -593,18 +593,19 @@ DeleteObject my_brush
 End Sub
 
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList2.FontSize = 14.25 * factor
-factor = gList2.FontSize / 14.25
-gList1.FontSize = 11.25 * factor
-gList4.FontSize = 11.25 * factor
-factor = gList1.FontSize / 11.25
+gList2.FontSize = 14.25 * factor * dv15 / 15
+factor = gList2.FontSize / 14.25 / dv15 * 15
+gList1.FontSize = 11.25 * factor * dv15 / 15
+gList4.FontSize = 11.25 * factor * dv15 / 15
+
+factor = gList1.FontSize / 11.25 / dv15 * 15
 
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
 lastfactor = factor
 gList1.addpixels = 10 * factor
-gList3.FontSize = 11.25 * factor
+gList3.FontSize = 11.25 * factor * dv15 / 15
 setupxy = 20 * factor
 gList1.LeftMarginPixels = 5 * factor
  gList3.LeftMarginPixels = factor * 5
@@ -645,14 +646,14 @@ End Sub
 Private Sub gList4_ChangeListItem(item As Long, content As String)
 Dim content1 As Single
 If item = 4 Then
-content1 = Val("0" & Trim$(content))
+content1 = val("0" & Trim$(content))
 If content1 > 144 Then
 content = gList4.List(item)
 Else
 content = "  " & CStr(content1)
 End If
 ElseIf item = 6 Then
-content1 = Val("0" & Trim$(content))
+content1 = val("0" & Trim$(content))
 If content1 > 255 Then
 content = gList4.List(item)
 Else
@@ -669,7 +670,7 @@ End Sub
 
 Private Sub gList4_LostFocus()
 If gList4.EditFlag Then
-If Val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
 End If
 gList4.EditFlag = False
 gList4.NoCaretShow = True
@@ -701,7 +702,7 @@ If Not gList4.EditFlag Then
  gList4.EditFlag = True
  gList4.NoCaretShow = False
  gList4.ShowMe2
- If Val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+ If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
 End If
  Else
  gList4.EditFlag = False
@@ -712,7 +713,7 @@ gList3.Font.charset = Trim$(gList4.List(6))
 End Sub
 Private Sub gList4_Selected2(item As Long)
 Dim t$()
-If Val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
 If item = 4 Or item = 6 Then
 If Not gList4.EditFlag Then
  gList4.EditFlag = True
@@ -759,7 +760,7 @@ ElseIf KeyCode = vbKeyReturn Then
 DestroyCaret
 If TEXT1 <> "" Then
 gList3.EditFlag = False
-gList3.Enabled = False
+gList3.enabled = False
 
 glist3_PanLeftRight True
 KeyCode = 0
@@ -785,5 +786,5 @@ Public Sub hookme(this As gList)
 Set LastGlist3 = this
 End Sub
 Private Sub gList2_RefreshDesktop()
-If Form1.Visible Then Form1.refresh: If Form1.DIS.Visible Then Form1.DIS.refresh
+If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub

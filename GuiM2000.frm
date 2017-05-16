@@ -195,6 +195,9 @@ End If
 End Sub
 
 Private Sub Form_Activate()
+
+On Error Resume Next
+
 If PopupOn Then PopupOn = False
 If novisible Then Hide: Unload Me
 If gList2.HeadLine <> "" Then If ttl Then Form3.CaptionW = gList2.HeadLine: Form3.Refresh
@@ -207,11 +210,13 @@ ResizeMark.top = Height - MarkSize * dv15
 ResizeMark.BackColor = GetPixel(Me.hDC, 0, 0)
 ResizeMark.Visible = Sizable
 If Sizable Then ResizeMark.ZOrder 0
+
 If Typename(ActiveControl) = "gList" Then
 Hook hWnd, ActiveControl
 Else
 Hook hWnd, Nothing
 End If
+
 End Sub
 Private Sub Form_Deactivate0()
 If PopupOn Then
@@ -268,6 +273,32 @@ End Sub
 
 Private Sub Form_Initialize()
 mEnabled = True
+End Sub
+
+
+Private Sub Form_KeyPress(KeyAscii As Integer)
+If Me.Visible Then
+If ActiveControl Is Nothing Then
+Dim w As Object
+    If Controls.Count > 0 Then
+    For Each w In Controls
+    If w.Visible Then
+    If TypeOf w Is gList Then
+    w.SetFocus
+    Exit For
+    End If
+    End If
+    Next w
+    Set w = Nothing
+    End If
+    Else
+    
+    If Typename(ActiveControl) = "gList" Then ActiveControl.SetFocus
+End If
+Else
+Debug.Print MyName$
+choosenext
+End If
 End Sub
 
 Private Sub Form_LostFocus()
@@ -398,6 +429,7 @@ scrTwips = Screen.TwipsPerPixelX
 ' clear data...
 lastfactor = 1
 setupxy = 20
+gList2.Font.Size = 14.25 * dv15 / 15
 gList2.enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True

@@ -319,7 +319,7 @@ Else
 Move selectorLastX, selectorLastY
 End If
 'If TEXT1 <> "" Then
-TEXT1.Locked = False
+TEXT1.locked = False
 gList3.ListIndex = 0
 gList3.SoftEnterFocus
 If gList1.Value <> gList1.ListIndex Then
@@ -357,7 +357,7 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addx As Long, addy As Long, factor As Single, Once As Boolean
+Dim addX As Long, addy As Long, factor As Single, Once As Boolean
 If Once Then Exit Sub
 If Button = 0 Then dr = False
 If bordertop < 150 Then
@@ -367,9 +367,9 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mo
 End If
 If dr Then
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-    If x < (Width - borderleft) Or x > Width Then addx = (x - Lx)
+    If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     
-   If Not ExpandWidth Then addx = 0
+   If Not ExpandWidth Then addX = 0
         If lastfactor = 0 Then lastfactor = 1
         factor = lastfactor
 
@@ -377,12 +377,12 @@ If dr Then
   
         Once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addx = -(Width - ScrX()) + addx
-        If (addy + Height) / height1 > 0.4 And ((Width + addx) / width1) > 0.4 Then
+        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
 
         If addy <> 0 Then
          If ((addy + Height) / height1) > ScrY() Then
-      addx = 0
+      addX = 0
       addy = 0
          Else
         SizeDialog = ((addy + Height) / height1)
@@ -391,18 +391,18 @@ If dr Then
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((Width * lastfactor / factor + addx) / Height * lastfactor / factor) < (width1 / height1) Then
-        addx = -Width * lastfactor / factor - 1
+        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -Width * lastfactor / factor - 1
       
            End If
 
-        If addx = 0 Then
+        If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, DialogPreview, Width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, DialogPreview, (Width + addx) * lastfactor / factor
+         ScaleDialog lastfactor, DialogPreview, (Width + addX) * lastfactor / factor
          End If
 
         
@@ -467,10 +467,10 @@ selectorLastY = top
 Sleep 200
 loadfileiamloaded = False
 End Sub
-Private Sub MakeFolder(ByVal A$)
-A$ = Left$(A$, Len(A$) - 1)
+Private Sub MakeFolder(ByVal a$)
+a$ = Left$(a$, Len(a$) - 1)
 On Error Resume Next
-MkDir A$
+MkDir a$
 Sleep 1
 End Sub
 
@@ -679,13 +679,13 @@ gList3.NoCaretShow = False
 gList3.BackColor = &H0
 gList3.ForeColor = &HFFFFFF
 Else
-If KeyCode = vbKeyReturn Then GoTo HERE
+If KeyCode = vbKeyReturn Then GoTo here
 End If
 gList3.ShowMe2
 KeyCode = 0
 
 ElseIf KeyCode = vbKeyReturn Then
-HERE:
+here:
 DestroyCaret
 If TEXT1 <> "" Then
 gList3.EditFlag = False
@@ -876,46 +876,46 @@ Beep
 End If
 End Sub
 Public Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = CLng(Rnd * 3) + setupxy / 3
 
-CopyFromLParamToRect A, thatRect
-A.Left = A.Right - setupxy
-A.top = b
-A.Bottom = b + setupxy / 5
-mySelector.FillThere thathDC, VarPtr(A), thatbgcolor
-A.top = b + setupxy / 5 + setupxy / 10
-A.Bottom = b + setupxy \ 2
-mySelector.FillThere thathDC, VarPtr(A), thatbgcolor
+CopyFromLParamToRect a, thatRect
+a.Left = a.Right - setupxy
+a.top = b
+a.Bottom = b + setupxy / 5
+mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
+a.top = b + setupxy / 5 + setupxy / 10
+a.Bottom = b + setupxy \ 2
+mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
 
 End Sub
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-mySelector.FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+mySelector.FillThere thathDC, VarPtr(a), 0
 b = 5
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-mySelector.FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
 
 End Sub
 Sub PlaceSettings()
 ' using global var settings
-Dim A() As String, i As Long, j As Long
-A() = Split(Settings, ",")
+Dim a() As String, i As Long, j As Long
+a() = Split(Settings, ",")
 For i = 0 To gList1.listcount - 1
 gList1.ListSelectedNoRadioCare(i) = False
 Next i
-For i = LBound(A()) To UBound(A())
-If gList1.GetMenuId(A(i), j) Then
+For i = LBound(a()) To UBound(a())
+If gList1.GetMenuId(a(i), j) Then
 gList1.ListSelectedNoRadioCare(j) = True
 End If
 Next i
@@ -923,15 +923,15 @@ End Sub
 Function ReadSettings() As Boolean
 ' using global var settings
 ' we have to read at NostateDir=true
-Dim A() As String, i As Long, j As Long
-A() = Split(Settings, ",")
+Dim a() As String, i As Long, j As Long
+a() = Split(Settings, ",")
 ' reset some flags
 gList1.StickBar = False
 mySelector.mselChecked = False
 multifileselection = False
 ExpandWidth = False
-For i = LBound(A()) To UBound(A())
-While gList1.Id(j) <> A(i)
+For i = LBound(a()) To UBound(a())
+While gList1.Id(j) <> a(i)
 j = j + 1
 Wend
 j = j + 1  ' now we are in base 1
@@ -984,17 +984,17 @@ Next i
 Settings = s
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList2.FontSize = 14.25 * factor
-factor = gList2.FontSize / 14.25
-gList1.FontSize = 11.25 * factor
-factor = gList1.FontSize / 11.25
+gList2.FontSize = 14.25 * factor * dv15 / 15
+factor = gList2.FontSize / 14.25 / dv15 * 15
+gList1.FontSize = 11.25 * factor * dv15 / 15
+factor = gList1.FontSize / 11.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, PreviewFile As Boolean, Optional NewWidth As Long = -1)
 On Error Resume Next
 lastfactor = factor
 gList1.addpixels = 10 * factor
-gList3.FontSize = 11.25 * factor
+gList3.FontSize = 11.25 * factor * dv15 / 15
 mySelector.PreserveNpixelsHeaderRight = 20 * factor
 setupxy = 20 * factor
 oldLeftMarginPixels = 30 * factor
@@ -1080,20 +1080,20 @@ Else
 ''Shape1.Visible = False
 End If
 End Sub
-Private Sub ImageMove(A As myImage, neoTop As Long, NeoLeft As Long, NeoWidth As Long, NeoHeight As Long)
-If A.image Is Nothing Then Exit Sub
+Private Sub ImageMove(a As myImage, neoTop As Long, NeoLeft As Long, NeoWidth As Long, NeoHeight As Long)
+If a.image Is Nothing Then Exit Sub
 
 
-If A.image.Width = 0 Then Exit Sub
-If A.image.Type = vbPicTypeIcon Then
+If a.image.Width = 0 Then Exit Sub
+If a.image.Type = vbPicTypeIcon Then
 
 Dim aa As New cDIBSection
 aa.BackColor = BackColor
-aa.CreateFromPicture A.image
+aa.CreateFromPicture a.image
 aa.ResetBitmapTypeToBITMAP
 PaintPicture aa.Picture, neoTop, NeoLeft, NeoWidth, NeoHeight
 Else
-PaintPicture A.image, neoTop, NeoLeft, NeoWidth, NeoHeight
+PaintPicture a.image, neoTop, NeoLeft, NeoWidth, NeoHeight
 End If
 Refresh
 End Sub

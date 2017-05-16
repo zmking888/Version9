@@ -121,19 +121,19 @@ loadfileiamloaded = True
 scrTwips = Screen.TwipsPerPixelX
 ' clear data...
 setupxy = 20
-gList3.Enabled = True
+gList3.enabled = True
 gList3.LeaveonChoose = True
 gList3.VerticalCenterText = True
 gList3.restrictLines = 1
 gList3.PanPos = 0
-gList2.Enabled = True
+gList2.enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.HeadLine = ""
 gList2.FloatList = True
 gList2.MoveParent = True
 gList3.NoPanRight = False
 gList1.NoPanLeft = False
-gList1.Enabled = True
+gList1.enabled = True
 gList1.NoFreeMoveUpDown = True
 gList1.ShowBar = True
 gList1.restrictLines = 7
@@ -141,7 +141,7 @@ gList1.StickBar = True
 gList1.HeadLine = "B | G | R"
 Set TEXT1 = New myTextBox
 Set TEXT1.Container = gList3
-TEXT1.Locked = False
+TEXT1.locked = False
  lastfactor = ScaleDialogFix(SizeDialog)
 If ExpandWidth Then
 If LastWidth = 0 Then LastWidth = -1
@@ -273,7 +273,7 @@ End Sub
 
 
 Private Sub gList1_GotFocus()
-If gList1.listindex = -1 Then gList1.listindex = gList1.ScrollFrom
+If gList1.ListIndex = -1 Then gList1.ListIndex = gList1.ScrollFrom
 End Sub
 
 
@@ -329,15 +329,15 @@ End Sub
 
 Private Sub gList1_selected2(item As Long)
 TEXT1 = Right$("00000" & Hex$(item), 6)
-refresh
+Refresh
 glist3_PanLeftRight True
 End Sub
 
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 
 If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
-                gList1.Enabled = False  '??
-                    gList3.Enabled = False
+                gList1.enabled = False  '??
+                    gList3.enabled = False
             Unload Me
 End If
 End Sub
@@ -395,7 +395,7 @@ End Sub
 Private Sub glist3_ChangeListItem(item As Long, content As String)
 Dim realitem As Long
 If item = 0 Then
-Err.clear
+Err.Clear
 On Error Resume Next
 content = Right$(PACKLNG(UNPACKLNG(content)), 6)
 If Err.Number > 0 Then
@@ -450,7 +450,7 @@ ElseIf KeyCode = vbKeyReturn Then
 DestroyCaret
 If TEXT1 <> "" Then
 gList3.EditFlag = False
-gList3.Enabled = False
+gList3.enabled = False
 
 glist3_PanLeftRight True
 KeyCode = 0
@@ -565,16 +565,16 @@ DeleteObject my_brush
 End Sub
 
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList2.FontSize = 14.25 * factor
-factor = gList2.FontSize / 14.25
-gList1.FontSize = 26 * factor
-factor = gList1.FontSize / 26
+gList2.FontSize = 14.25 * factor * dv15 / 15
+factor = gList2.FontSize / 14.25 / dv15 * 15
+gList1.FontSize = 11.25 * factor * dv15 / 15
+factor = gList1.FontSize / 11.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
 lastfactor = factor
 gList1.addpixels = 10 * factor
-gList3.FontSize = 11.25 * factor
+gList3.FontSize = 11.25 * factor * dv15 / 15
 gList3.LeftMarginPixels = factor * 5
 setupxy = 20 * factor
 
@@ -623,5 +623,5 @@ Public Sub hookme(this As gList)
 Set LastGlist3 = this
 End Sub
 Private Sub gList2_RefreshDesktop()
-If Form1.Visible Then Form1.refresh: If Form1.DIS.Visible Then Form1.DIS.refresh
+If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub

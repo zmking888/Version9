@@ -40,7 +40,8 @@ Private Declare Function SetErrorMode Lib "KERNEL32" ( _
 Private Const SEM_NOGPFAULTERRORBOX = &H2&
 Private Sub Form_Activate()
 'If Form1.WindowState <> vbMinimized And Form1.Visible Then Form1.ActiveControl.SetFocus
-If Form1.Visible Then Form1.SetFocus
+Me.ZOrder 1
+'If Form1.Visible Then Form1.SetFocus
 End Sub
 
 Private Sub Form_Load()

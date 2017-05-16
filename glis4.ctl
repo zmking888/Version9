@@ -2,7 +2,7 @@ VERSION 5.00
 Begin VB.UserControl gList 
    Appearance      =   0  'Flat
    AutoRedraw      =   -1  'True
-   BackColor       =   &H80000005&
+   BackColor       =   &H00000000&
    ClientHeight    =   7800
    ClientLeft      =   0
    ClientTop       =   0

@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -322,8 +322,14 @@ End If
 End Sub
 
 Private Sub Form_Activate()
-If ASKINUSE Then Me.ZOrder 1
-releasemouse = True
+If ASKINUSE Then
+Me.ZOrder 1
+Else
+If QRY Or GFQRY Then
+If Form1.Visible Then Form1.SetFocus
+End If
+End If
+If Form1.Visible Then releasemouse = True
 End Sub
 Private Sub Form_GotFocus()
 UseEsc = True
@@ -1188,7 +1194,7 @@ Case vbKeyTab
     If (shift And 1) = 1 Then
     INK$ = INK$ & Chr$(6)
     KeyCode = 0
-    ElseIf ctrl Or shift = 2 Then
+    ElseIf ctrl Or shift = 2 Or Not (QRY Or GFQRY) Then
     ctrl = False
         choosenext
         KeyCode = 0

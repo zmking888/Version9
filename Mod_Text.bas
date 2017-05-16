@@ -53,7 +53,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 7
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8927,7 +8927,7 @@ car1023:
         Set anything = bstack.lastobj
         If CheckIsmArray(anything, var()) Then
             Set pppp = anything
-            pppp.Car anything
+            pppp.car anything
             If TypeOf anything Is mArray Then
                 Set pppp = anything
                 Set anything = New mHandler
@@ -30942,7 +30942,11 @@ If basestack.toprinter Then
 If oprinter.Height > 0 Then
 oprinter.Cls CLng(mycolor(.Paper))
 oprinter.PaintPicture Form1.PrinterDocument1.hDC
-
+.curpos = 0
+.currow = .mysplit
+.lastprint = False
+scr.CurrentX = 0
+scr.CurrentY = 0
 End If
 Else
 ClearScrNew scr, players(GetCode(scr)), CLng(mycolor(.Paper))   '' here 1.15 is not rgb but standard colors

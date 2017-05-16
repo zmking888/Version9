@@ -521,11 +521,11 @@ Dim oldx&, oldy&
 With mb
 oldx& = dqq.CurrentX
 oldy& = dqq.CurrentY
-dqq.DrawMode = vbInvert
+dqq.DrawMode = vbXorPen
 If t& = 1 Then
-dqq.Line (x * .Xt, y * .Yt + .uMineLineSpace)-(x * .Xt + .Xt - DXP, y * .Yt - .uMineLineSpace + .Yt - DYP), , BF
+dqq.Line (x * .Xt, Int(y * .Yt + .uMineLineSpace))-(x * .Xt + .Xt - DXP, y * .Yt - .uMineLineSpace + .Yt - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
 Else
-dqq.Line (x * .Xt, y * .Yt + Int(((.Yt - .uMineLineSpace * 2)) * 0.8) + .uMineLineSpace)-(x * .Xt + .Xt - DXP, y * .Yt + Int(((.Yt - .uMineLineSpace * 2)) * 0.8) + .uMineLineSpace + Int((.Yt - .uMineLineSpace * 2) * 0.2) - DYP), , BF
+dqq.Line (x * .Xt, Int((y + 1) * .Yt - .uMineLineSpace - .Yt \ 6 - DYP))-(x * .Xt + .Xt - DXP, (y + 1) * .Yt - .uMineLineSpace - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
 End If
 dqq.DrawMode = vbCopyPen
 dqq.CurrentX = oldx&
@@ -534,15 +534,24 @@ End With
 End Sub
 
 Public Sub oldLCTCB(dqq As Object, mb As basket, t&)
-dqq.DrawMode = vbInvert
+
+dqq.DrawMode = vbXorPen
 With mb
 'QRY = Not QRY
+If IsWine Then
 If t& = 1 Then
-dqq.Line (.curpos * .Xt, .currow * .Yt + .uMineLineSpace)-(.curpos * .Xt + .Xt, .currow * .Yt - .uMineLineSpace + .Yt), , BF
+dqq.Line (.curpos * .Xt, .currow * .Yt + .uMineLineSpace)-(.curpos * .Xt + .Xt, .currow * .Yt - .uMineLineSpace + .Yt), (mycolor(.mypen) Xor dqq.BackColor), BF
 Else
-dqq.Line (.curpos * .Xt, .currow * .Yt + Int(((.Yt - .uMineLineSpace * 2)) * 0.8) + .uMineLineSpace)-(.curpos * .Xt + .Xt - DXP, .currow * .Yt + Int(((.Yt - .uMineLineSpace * 2)) * 0.8) + .uMineLineSpace + Int((.Yt - .uMineLineSpace * 2) * 0.2) - DYP), , BF
+dqq.Line (.curpos * .Xt, (dqq.ScaleY((.currow + 1) * .Yt - .uMineLineSpace, 1, 3) - .Yt \ DYP \ 6 - 1) * DYP)-(.curpos * .Xt + .Xt - DXP, (.currow + 1) * .Yt - .uMineLineSpace - DYP), (mycolor(.mypen) Xor dqq.BackColor), BF
+
 End If
-'' mydoevents********************
+Else
+If t& = 1 Then
+dqq.Line (.curpos * .Xt, .currow * .Yt + .uMineLineSpace)-(.curpos * .Xt + .Xt, .currow * .Yt - .uMineLineSpace + .Yt), &HFFFFFF, BF
+Else
+dqq.Line (.curpos * .Xt, (dqq.ScaleY((.currow + 1) * .Yt - .uMineLineSpace, 1, 3) - .Yt \ DYP \ 6 - 1) * DYP)-(.curpos * .Xt + .Xt - DXP, (.currow + 1) * .Yt - .uMineLineSpace - DYP), &HFFFFFF, BF
+End If
+End If
 End With
 dqq.DrawMode = vbCopyPen
 End Sub
@@ -567,14 +576,17 @@ If t& = -1 Or Not Form1.ActiveControl Is dqq Then
         End If
         Exit Sub
 End If
+
 If t& = 1 Then
-        CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2), 1, 3)
+       ' CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY((.Yt - .uMineLineSpace * 2), 1, 3)
+       CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY(.Yt - .uMineLineSpace * 2, 1, 3)
         SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY(.currow * .Yt + .uMineLineSpace, 1, 3)
         On Error Resume Next
         If Not extreme Then If INK$ = "" Then dqq.Refresh
 Else
-        CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY(Int((.Yt - .uMineLineSpace * 2) * 0.2), 1, 3)
-        SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY(.currow * .Yt + Int(((.Yt - .uMineLineSpace * 2)) * 0.8) + .uMineLineSpace, 1, 3)
+    CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), .Yt \ DYP \ 6 + 1
+        
+            SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY((.currow + 1) * .Yt - .uMineLineSpace, 1, 3) - .Yt \ DYP \ 6 - 1
         On Error Resume Next
         If Not extreme Then If INK$ = "" Then dqq.Refresh
 End If

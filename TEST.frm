@@ -685,11 +685,11 @@ gList1.Move borderleft, bordertop * 18, itemWidth, bordertop * 12
 gList0.Move borderleft, bordertop * 31, itemWidth, bordertop * 3
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList2.FontSize = 14.25 * factor
-factor = gList2.FontSize / 14.25
-gList1.FontSize = 11.25 * factor
-gList4.FontSize = 12 * factor
-factor = gList1.FontSize / 11.25
+gList2.FontSize = 14.25 * factor * dv15 / 15
+factor = gList2.FontSize / 14.25 / dv15 * 15
+gList1.FontSize = 11.25 * factor * dv15 / 15
+gList4.FontSize = 12 * factor * dv15 / 15
+factor = gList1.FontSize / 11.25 / dv15 * 15
 gList3(0).FontSize = gList1.FontSize
 gList3(1).FontSize = gList1.FontSize
 gList3(2).FontSize = gList1.FontSize

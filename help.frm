@@ -180,8 +180,8 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addx As Long, addy As Long, factor As Single, once As Boolean
-If once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, Once As Boolean
+If Once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -195,11 +195,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addx = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addx = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -210,21 +210,21 @@ Else
 
         
   
-        once = True
+        Once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addx = -(Width - ScrX()) + addx
-        If (addy + Height) / vH_y > 0.4 And ((Width + addx) / vH_x) > 0.4 Then
+        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If (addy + Height) / vH_y > 0.4 And ((Width + addX) / vH_x) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / vH_y)
         Helplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((Width * Helplastfactor / factor + addx) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
-        addx = -Width * Helplastfactor / factor - 1
+        If ((Width * Helplastfactor / factor + addX) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
+        addX = -Width * Helplastfactor / factor - 1
       
            End If
 
-        If addx = 0 Then
+        If addX = 0 Then
         
         If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
 
@@ -232,7 +232,7 @@ Else
         
         Else
         Lx = x * Helplastfactor / factor
-             ScaleDialog Helplastfactor, (Width + addx) * Helplastfactor / factor
+             ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
          
    
          End If
@@ -249,7 +249,7 @@ Else
         ly = y
    
 End If
-once = False
+Once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -363,7 +363,7 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
-Private Sub Label1_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, Skip As Boolean)
+Private Sub Label1_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
 
 FillThereMyVersion thisHDC, thisrect, &HF0F0F0
@@ -371,8 +371,8 @@ FillThereMyVersion thisHDC, thisrect, &HF0F0F0
 End If
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList1.FontSize = 14.25 * factor
-factor = gList1.FontSize / 14.25
+gList1.FontSize = 14.25 * factor * dv15 / 15
+factor = gList1.FontSize / 14.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -400,7 +400,7 @@ gList1.FloatLimitLeft = ScrX() - borderleft * 3
 
 
 End Sub
-Public Sub hookme(This As gList)
+Public Sub hookme(this As gList)
 
 ''Set LastGlist2 = this
 

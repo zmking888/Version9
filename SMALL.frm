@@ -341,22 +341,30 @@ End Sub
 
 
 Private Sub Form_Activate()
-If QRY Then
+If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
+Else
+'If Not Screen.ActiveForm Is Nothing Then
 End If
+
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
 ElseIf KeyCode = 27 And ASKINUSE Then
+
     NOEXECUTION = True
+Else
+choosenext
 End If
 End Sub
 
 Private Sub Form_KeyPress(KeyAscii As Integer)
 If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
+Else
+
 End If
 If Not BLOCKkey Then INK$ = INK$ & Chr(KeyAscii)
 End Sub
@@ -402,6 +410,8 @@ Private Sub Form_Resize()
  If Form4.Visible Then Form4.Visible = False: reopen4 = True
  If Form3.Visible Then If trace Then Form2.Visible = False: reopen2 = True
  If reopen2 Or reopen4 Then Timer1.enabled = True: Exit Sub
+ ElseIf Forms.Count > 4 And Not Form1.Visible Then
+ Exit Sub
  End If
  Timer1.enabled = Timer1.Interval < 10000
  

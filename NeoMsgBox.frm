@@ -21,15 +21,23 @@ Begin VB.Form NeoMsgBox
       TabStop         =   0   'False
       Top             =   135
       Width           =   3420
-      _extentx        =   6033
-      _extenty        =   873
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "NeoMsgBox.frx":000C
-      enabled         =   -1  'True
-      backcolor       =   3881787
-      forecolor       =   16777215
-      capcolor        =   16777215
+      _ExtentX        =   6033
+      _ExtentY        =   873
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   161
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Enabled         =   -1  'True
+      Backcolor       =   3881787
+      ForeColor       =   16777215
+      CapColor        =   16777215
    End
    Begin M2000.gList command1 
       Height          =   525
@@ -38,13 +46,21 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   1
       Top             =   4245
       Width           =   3225
-      _extentx        =   5689
-      _extenty        =   926
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "NeoMsgBox.frx":0030
-      showbar         =   0   'False
-      forecolor       =   16777215
+      _ExtentX        =   5689
+      _ExtentY        =   926
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      ForeColor       =   16777215
    End
    Begin M2000.gList command1 
       Height          =   525
@@ -53,13 +69,21 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   2
       Top             =   4305
       Width           =   3330
-      _extentx        =   5874
-      _extenty        =   926
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "NeoMsgBox.frx":0054
-      showbar         =   0   'False
-      forecolor       =   16777215
+      _ExtentX        =   5874
+      _ExtentY        =   926
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList1 
       Height          =   1995
@@ -67,14 +91,22 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   3
       Top             =   960
       Width           =   4755
-      _extentx        =   8387
-      _extenty        =   3519
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "NeoMsgBox.frx":0078
-      showbar         =   0   'False
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   8387
+      _ExtentY        =   3519
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   315
@@ -82,12 +114,20 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   4
       Top             =   3600
       Width           =   4590
-      _extentx        =   8096
-      _extenty        =   556
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "NeoMsgBox.frx":009C
-      showbar         =   0   'False
+      _ExtentX        =   8096
+      _ExtentY        =   556
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
    End
 End
 Attribute VB_Name = "NeoMsgBox"
@@ -115,7 +155,7 @@ Dim iTop As Long, iLeft As Long, iwidth As Long, iheight As Long
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
-Dim A$
+Dim a$
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
 Dim height1 As Long, width1 As Long
@@ -173,7 +213,7 @@ textbox1.MaxCharLength = 100
 If AskInput Then
 gList3.Visible = True
 textbox1 = AskStrInput$
-textbox1.Locked = False
+textbox1.locked = False
 textbox1.enabled = True
 
 Else
@@ -220,7 +260,7 @@ Set myOk = New myButton
 Set myOk.Container = command1(0)
 
   Set myOk.Callback = Me
-  myOk.Index = 1
+  myOk.index = 1
   myOk.Caption = AskOk$
 myOk.enabled = True
 Set myCancel = New myButton
@@ -312,7 +352,7 @@ If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor,
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addx As Long, addy As Long, factor As Single, Once As Boolean
+Dim addX As Long, addy As Long, factor As Single, Once As Boolean
 If Once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
@@ -327,31 +367,31 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addx = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addx = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
     
    ''If Not ExpandWidth Then
-   addx = 0
+   addX = 0
         If lastfactor = 0 Then lastfactor = 1
         factor = lastfactor
 
         
   
         Once = True
-         If Width > ScrX() Then addx = -(Width - ScrX()) + addx
+         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
       
-        If (addy + Height) / height1 > 0.4 And ((Width + addx) / width1) > 0.4 Then
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then
         If ((addy + Height) / height1) * width1 > ScrX() * 0.9 Then
-        addy = 0: addx = 0
+        addy = 0: addX = 0
 
         Else
         SizeDialog = ((addy + Height) / height1)
@@ -360,18 +400,18 @@ Else
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((Width * lastfactor / factor + addx) / Height * lastfactor / factor) < (width1 / height1) Then
-        addx = -Width * lastfactor / factor - 1
+        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -Width * lastfactor / factor - 1
       
            End If
 
-        If addx = 0 Then
+        If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (Width + addx) * lastfactor / factor
+         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
         
@@ -468,13 +508,14 @@ End If
 End If
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList2.FontSize = 14.25 * factor
-gList1.FontSize = 13.5 * factor
-gList3.FontSize = 13.5 * factor
+gList2.FontSize = 14.25 * factor * dv15 / 15
+gList1.FontSize = 13.5 * factor * dv15 / 15
+gList3.FontSize = 13.5 * factor * dv15 / 15
 
-factor = gList2.FontSize / 14.25
+
+factor = gList2.FontSize / 14.25 / dv15 * 15
 command1(0).FontSize = 11.75 * factor
-factor = gList1.FontSize / 11.75
+factor = gList1.FontSize / 11.75 / dv15 * 15
 command1(1).FontSize = command1(0).FontSize
 ScaleDialogFix = factor
 End Function
@@ -512,20 +553,20 @@ Image1.Width = aImage.Width
 End If
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT, b As Long
+Dim a As RECT, b As Long
 b = 2
-CopyFromLParamToRect A, thatRect
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), 0
+CopyFromLParamToRect a, thatRect
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), 0
 b = 5
-A.Left = b
-A.Right = setupxy - b
-A.top = b
-A.Bottom = setupxy - b
-FillThere thathDC, VarPtr(A), rgb(255, 160, 0)
+a.Left = b
+a.Right = setupxy - b
+a.top = b
+a.Bottom = setupxy - b
+FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
 
 End Sub
@@ -537,21 +578,21 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
-Private Sub ImageMove(A As myImage, neoTop As Long, NeoLeft As Long, NeoWidth As Long, NeoHeight As Long)
-If A.image Is Nothing Then Exit Sub
-If A.image.Width = 0 Then Exit Sub
-If A.image.Type = vbPicTypeIcon Then
+Private Sub ImageMove(a As myImage, neoTop As Long, NeoLeft As Long, NeoWidth As Long, NeoHeight As Long)
+If a.image Is Nothing Then Exit Sub
+If a.image.Width = 0 Then Exit Sub
+If a.image.Type = vbPicTypeIcon Then
 Dim aa As New cDIBSection
 aa.BackColor = BackColor
-aa.CreateFromPicture A.image
+aa.CreateFromPicture a.image
 aa.ResetBitmapTypeToBITMAP
 PaintPicture aa.Picture, neoTop, NeoLeft, NeoWidth, NeoHeight
 Else
-PaintPicture A.image, neoTop, NeoLeft, NeoWidth, NeoHeight
+PaintPicture a.image, neoTop, NeoLeft, NeoWidth, NeoHeight
 End If
 
 End Sub
@@ -571,8 +612,8 @@ Private Sub gList3_Selected2(item As Long)
  command1(0).SetFocus
 End Sub
 
-Private Sub InterPress_Press(Index As Long)
-If Index = 0 Then
+Private Sub InterPress_Press(index As Long)
+If index = 0 Then
 AskResponse$ = AskCancel$
 AskCancel$ = ""
 Else
@@ -583,10 +624,10 @@ End If
 AskOk$ = ""
 Unload Me
 End Sub
-Private Sub glist1_ReadListItem(item As Long, Content As String)
+Private Sub glist1_ReadListItem(item As Long, content As String)
 
 If item >= 0 Then
-Content = ListPad.TextLine(item + 1)
+content = ListPad.TextLine(item + 1)
 End If
 End Sub
 Private Sub ListPad_BreakLine(data As String, datanext As String)

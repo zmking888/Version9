@@ -29,16 +29,24 @@ Begin VB.Form MyPopUp
       TabIndex        =   0
       Top             =   0
       Width           =   4155
-      _extentx        =   7329
-      _extenty        =   9657
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "MyPopUp.frx":0000
-      enabled         =   -1  'True
+      _ExtentX        =   7329
+      _ExtentY        =   9657
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   161
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Enabled         =   -1  'True
       dcolor          =   32896
-      backcolor       =   3881787
-      forecolor       =   14737632
-      capcolor        =   9797738
+      Backcolor       =   3881787
+      ForeColor       =   14737632
+      CapColor        =   9797738
    End
 End
 Attribute VB_Name = "MyPopUp"
@@ -138,7 +146,7 @@ Else
 part1 = " " + GetStrUntil("(", (myobject.textinform)) + "("
 .additemFast myobject.textinform
 End If
-.addsep
+.AddSep
 .additemFast "Αποκοπή Ctrl+X"
 .menuEnabled(2) = that.Form1mn1Enabled
 .additemFast "Αντιγραφή Ctrl+C"
@@ -146,14 +154,14 @@ End If
 .additemFast "Επικόλληση Ctrl+V"
 .menuEnabled(4) = that.Form1mn3Enabled
 If Typename(myobject) <> "GuiEditBox" Then
-.addsep
+.AddSep
 .additemFast "Έξοδος με αλλαγές (ESC)"
-.addsep
+.AddSep
 .additemFast "Έξοδος χωρίς αλλαγές shift F12"
 Else
 k = 4
 End If
-.addsep
+.AddSep
 .additemFast "Αναζήτησε πάνω F2"
 .menuEnabled(10 - k) = that.Form1supEnabled
 .additemFast "Αναζήτησε κάτω F3"
@@ -162,7 +170,7 @@ End If
 .menuEnabled(12 - k) = that.Form1mscatEnabled
 .additemFast "Αλλαγή λέξης F5"
 .menuEnabled(13 - k) = that.Form1rthisEnabled
-.addsep
+.AddSep
 .additemFast "Αναδίπλωση λέξεων F1"
 
 .MenuItem 16 - k, True, False, Not that.nowrap, "warp"
@@ -173,12 +181,12 @@ End If
 .additemFast "Εμφάνιση Παραγράφων F10"
 .MenuItem 19 - k, True, False, that.showparagraph, "para"
 .additemFast "Μέτρηση λέξεων F9"
-.addsep
+.AddSep
 .additemFast "Βοήθεια ctrl+F1"
 If Not EditTextWord Then
 If k = 0 Then
 .HeadLine = "Μ2000 Συντάκτης"
-.addsep
+.AddSep
 .additemFast "Τμήματα/Συναρτήσεις F12"
 .menuEnabled(23 - k) = SubsExist()
 End If
@@ -197,19 +205,19 @@ Else
 part1 = " " + GetStrUntil("(", (myobject.textinform)) + "("
 .additemFast myobject.textinform
 End If
-.addsep
+.AddSep
 .additemFast "Cut   Ctrl+X"
 .menuEnabled(2) = that.Form1mn1Enabled
 .additemFast "Copy  Ctrl+C"
 .menuEnabled(3) = that.Form1mn2Enabled
 .additemFast "Paste Ctrl+V"
 .menuEnabled(4) = that.Form1mn3Enabled
-.addsep
+.AddSep
 If Typename(myobject) <> "GuiEditBox" Then
 .additemFast "Save and Exit (ESC)"
-.addsep
+.AddSep
 .additemFast "Discard Changes shift F12"
-.addsep
+.AddSep
 Else
 k = 4
 End If
@@ -221,7 +229,7 @@ End If
 .menuEnabled(12 - k) = that.Form1mscatEnabled
 .additemFast "Replace word F5"
 .menuEnabled(13 - k) = that.Form1rthisEnabled
-.addsep
+.AddSep
 .additemFast "Word Wrap F1"
 .MenuItem 16 - k, True, False, Not that.nowrap, "warp"
 .additemFast "Drag Enabled"
@@ -231,12 +239,12 @@ End If
 .additemFast "Paragraph Mark F10"
 .MenuItem 19 - k, True, False, that.showparagraph, "para"
 .additemFast "Word count F9"
-.addsep
+.AddSep
 .additemFast "Help ctrl+F1"
 If Not EditTextWord Then
 If k = 0 Then
 .HeadLine = "Μ2000 Editor"
-.addsep
+.AddSep
 .additemFast "Modules/Functions F12"
 .menuEnabled(23 - k) = SubsExist()
 End If
@@ -257,7 +265,7 @@ Else
 PopUpLastWidth = -1
 End If
 ScaleDialog Pouplastfactor, PopUpLastWidth
-gList1.listindex = 0
+gList1.ListIndex = 0
 gList1.ShowBar = True
 gList1.ShowBar = False
 gList1.NoPanLeft = False
@@ -291,7 +299,7 @@ If Button = 1 Then
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addx As Long, addy As Long, factor As Single, Once As Boolean
+Dim addX As Long, addy As Long, factor As Single, Once As Boolean
 If Once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
@@ -306,11 +314,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addx = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addx = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -323,19 +331,19 @@ Else
   
         Once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addx = -(Width - ScrX()) + addx
-        If (addy + Height) / height1 > 0.4 And ((Width + addx) / width1) > 0.4 Then
+        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / height1)
         Pouplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((Width * Pouplastfactor / factor + addx) / Height * Pouplastfactor / factor) < (width1 / height1) Then
-        addx = -Width * Pouplastfactor / factor - 1
+        If ((Width * Pouplastfactor / factor + addX) / Height * Pouplastfactor / factor) < (width1 / height1) Then
+        addX = -Width * Pouplastfactor / factor - 1
       
            End If
 
-        If addx = 0 Then
+        If addX = 0 Then
         
         If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, Width
 
@@ -343,7 +351,7 @@ Else
         
         Else
         Lx = x * Pouplastfactor / factor
-             ScaleDialog Pouplastfactor, (Width + addx) * Pouplastfactor / factor
+             ScaleDialog Pouplastfactor, (Width + addX) * Pouplastfactor / factor
          
    
          End If
@@ -377,7 +385,7 @@ End Sub
 Private Sub gList1_ChangeListItem(item As Long, content As String)
 Dim content1 As Long
 If item = 0 Then
-content1 = Int(Val("0" & Trim$(Mid$(content, Len(part1) + 1))))
+content1 = Int(val("0" & Trim$(Mid$(content, Len(part1) + 1))))
 
         If content1 > myobject.mdoc.DocLines Or content1 < 0 Then
         content = gList1.List(item)
@@ -418,16 +426,16 @@ Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 gokeyboard = True
 If KeyCode = vbKeyEscape Then Unload Me: Exit Sub
 
-If gList1.listindex = -1 Then gList1.ListindexPrivateUse = lastitem
+If gList1.ListIndex = -1 Then gList1.ListindexPrivateUse = lastitem
 
-If KeyCode >= vbKey0 And KeyCode <= vbKey9 And gList1.EditFlag = False And gList1.listindex = 0 Then
+If KeyCode >= vbKey0 And KeyCode <= vbKey9 And gList1.EditFlag = False And gList1.ListIndex = 0 Then
                         lastitem = 0
                     gList1.PromptLineIdent = Len(part1)
                     gList1.List(0) = ""
                     gList1.SelStart = 3
                     gList1.EditFlag = True
 
-ElseIf gList1.listindex = 0 And gList1.EditFlag = True Then
+ElseIf gList1.ListIndex = 0 And gList1.EditFlag = True Then
         If KeyCode = vbKeyDown Or KeyCode = vbKeyReturn And gList1.EditFlag = True Then
         gList1.EditFlag = False
         lastitem = 0
@@ -478,7 +486,7 @@ DoCommand item
 Else
 If Not gList1.EditFlag Then
 gList1.ListindexPrivateUse = item - 1
-lastitem = gList1.listindex
+lastitem = gList1.ListIndex
 gList1.ShowMe2
 
 
@@ -601,8 +609,8 @@ Unload Me
 End Sub
 
 Function ScaleDialogFix(ByVal factor As Single) As Single
-gList1.FontSize = 11.25 * factor
-factor = gList1.FontSize / 11.25
+gList1.FontSize = 11.25 * factor * dv15 / 15
+factor = gList1.FontSize / 11.25 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -640,5 +648,5 @@ Private Sub gList1_SpecialColor(rgbcolor As Long)
 rgbcolor = rgb(100, 132, 254)
 End Sub
 Private Sub gList1_RefreshDesktop()
-If Form1.Visible Then Form1.refresh: If Form1.DIS.Visible Then Form1.DIS.refresh
+If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub
