@@ -4132,8 +4132,8 @@ If shift <> 0 Then
             SelStartSilent = ii
     Else
             SelStartSilent = ii
-            SelLengthSilent = 6
-            InsertTextNoRender = Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))
+            SelLengthSilent = Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))
+            InsertTextNoRender = ""
             SelStartSilent = ii
     
     End If

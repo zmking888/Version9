@@ -54,7 +54,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4215,10 +4215,6 @@ Do
                                 Exit Function
                             End If
                             po = r
-                            If Not FastSymbol(aa$, ")") Then
-                                IsExpA = False
-                                Exit Function
-                            End If
                         Else
                             IsExpA = False
                             Exit Function
@@ -4245,10 +4241,6 @@ Do
                                 Exit Function
                             End If
                             po = r
-                            If Not FastSymbol(aa$, ")") Then
-                                IsExpA = False
-                                Exit Function
-                            End If
                         Else
                             IsExpA = False
                             Exit Function
