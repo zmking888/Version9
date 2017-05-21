@@ -1734,8 +1734,8 @@ Form2.ComputeNow
    
     End If
    
-    If Not Form1.Visible Then Form1.Show , Form5
-    If Not releasemouse Then Form1.SetFocus
+    If Not Form1.Visible Then Form1.Show , Form5: releasemouse = False
+    If Not releasemouse Then Form1.SetFocus: releasemouse = True
   
     NORUN1 = False
 
@@ -1750,15 +1750,15 @@ Form2.ComputeNow
  Show
  
 If onetime = 1 Then
-If IsWine Then
-If forwine = 0 Then
-forwine = 1
-newStart basestack1, ""
-ElseIf Form1.Visible = False Then
-
-End If
-End If
-Form1.SetFocus
+    If IsWine Then
+    If forwine = 0 Then
+    forwine = 1
+    newStart basestack1, ""
+    ElseIf Form1.Visible = False Then
+    
+    End If
+    End If
+    Form1.SetFocus
 End If
     QUERY basestack1, Prompt$, qq$, (mybasket.mx * 4), True
     If ExTarget = True Then Exit Sub
@@ -2164,6 +2164,7 @@ TEXT1.SelStart = ii
 TEXT1.SelLength = JJ
 JJ = where
 Else
+
 TEXT1.SelStart = ii
 End If
 
@@ -2172,7 +2173,7 @@ If TEXT1.SelText <> "" Then
 
     a$ = vbCrLf + TEXT1.SelText & "*"
     If shift <> 0 Then  ' тумых
-        a$ = Replace(a$, vbCrLf + Space$(6), vbCrLf)
+        a$ = Replace(a$, vbCrLf + Space$(6 + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod 6), vbCrLf)
         TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
          TEXT1.SelStartSilent = ii
          TEXT1.SelLengthSilent = Len(a$) - 3
@@ -2192,6 +2193,11 @@ If shift <> 0 Then
 
             TEXT1.SelStartSilent = ii
             TEXT1.SelLengthSilent = 6
+            TEXT1.InsertTextNoRender = ""
+            TEXT1.SelStartSilent = ii
+    Else
+            TEXT1.SelStartSilent = ii
+            TEXT1.SelLengthSilent = Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))
             TEXT1.InsertTextNoRender = ""
             TEXT1.SelStartSilent = ii
     End If
@@ -2578,6 +2584,11 @@ MYFONT = defFontname
              DIS.ForeColor = mycolor(PenOne)
              On Error Resume Next
              cc.Value = Form1.FontName
+             cc.ValueKey = "DIV"
+        cc.ValueType = REG_DWORD
+        
+            UseIntDiv = cc.Value
+          
                  cc.ValueKey = "LINESPACE"
         cc.ValueType = REG_DWORD
         If cc.Value >= 0 And cc.Value <= 120 * dv15 Then
@@ -2656,6 +2667,10 @@ End If
         cc.ValueType = REG_DWORD
         basestack.myBold = cc.Value <> 0
         Form1.Font.bold = basestack.myBold
+            cc.ValueKey = "DIV"
+        cc.ValueType = REG_DWORD
+        
+            UseIntDiv = cc.Value
     cc.ValueKey = "LINESPACE"
         cc.ValueType = REG_DWORD
         If cc.Value >= 0 And cc.Value <= 120 * dv15 Then

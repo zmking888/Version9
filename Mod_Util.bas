@@ -4341,6 +4341,7 @@ LASTQUERYLIST = 2
 End If
 End With
 contqueryhere:
+If TaskMaster Is Nothing Then Exit Function
 If TaskMaster.QueueCount > 0 Then TaskMaster.RestEnd
 players(GetCode(dq)) = prive
 Set dq = Nothing
@@ -4699,14 +4700,15 @@ Public Sub gsb_file(Optional assoc As Boolean = True)
       deassociate ".gsb", "M2000 Ver" & Str$(VerMajor) & "." & CStr(VerMinor \ 100) & " User Module", cd & "M2000.EXE"
    End If
 End Sub
-Public Sub Switches(s$)
+Public Sub Switches(s$, Optional fornow As Boolean = False)
 Dim cc As cRegistry
 Set cc = New cRegistry
+cc.Temp = fornow
 cc.ClassKey = HKEY_CURRENT_USER
     cc.SectionKey = basickey
 Dim d$, w$, p As Long, b As Long
 If s$ <> "" Then
-s$ = mylcasefILE(s$)
+'s$ = mylcasefILE(s$)
     Do While FastSymbol(s$, "-")
     
             If IsLabel(basestack1, s$, d$) > 0 Then
@@ -4736,6 +4738,11 @@ s$ = mylcasefILE(s$)
                  ' LoadFont (mcd & "TITUSCBZ.TTF")
                     
                cc.Value = "Monospac821Greek BT"
+            ElseIf d$ = "DIV" Then
+                cc.ValueKey = "DIV"
+                    cc.ValueType = REG_DWORD
+                  cc.Value = 0
+                  UseIntDiv = False
             ElseIf d$ = "LINESPACE" Then
                 cc.ValueKey = "LINESPACE"
                     cc.ValueType = REG_DWORD
@@ -4775,6 +4782,7 @@ s$ = mylcasefILE(s$)
             cc.ValueKey = "COMMAND"
                  cc.ValueType = REG_SZ
                     cc.Value = "LATIN"
+                    If fornow Then pagio$ = "LATIN"
             ElseIf d$ = "DARK" Then
             cc.ValueKey = "HTML"
                  cc.ValueType = REG_SZ
@@ -4783,6 +4791,10 @@ s$ = mylcasefILE(s$)
             cc.ValueKey = "CASESENSITIVE"
              cc.ValueType = REG_SZ
                     cc.Value = "NO"
+            If fornow Then
+                casesensitive = False
+            End If
+
             ElseIf d$ = "PRI" Then
             cc.ValueKey = "PRIORITY-OR"
             cc.ValueType = REG_DWORD
@@ -4834,6 +4846,11 @@ If IsLabel(basestack1, s$, d$) > 0 Then
         cc.ValueKey = "FONT"
             cc.ValueType = REG_SZ
             If ISSTRINGA(s$, w$) Then cc.Value = w$
+            ElseIf d$ = "DIV" Then
+                cc.ValueKey = "DIV"
+                    cc.ValueType = REG_DWORD
+                  cc.Value = -1
+                  UseIntDiv = True
         ElseIf d$ = "LINESPACE" Then
             cc.ValueKey = "LINESPACE"
                 cc.ValueType = REG_DWORD
@@ -4873,6 +4890,7 @@ If IsLabel(basestack1, s$, d$) > 0 Then
                 cc.ValueKey = "COMMAND"
                 cc.ValueType = REG_SZ
                 cc.Value = "GREEK"
+                If fornow Then pagio$ = "GREEK"
         ElseIf d$ = "DARK" Then
             cc.ValueKey = "HTML"
                  cc.ValueType = REG_SZ
@@ -4881,6 +4899,10 @@ If IsLabel(basestack1, s$, d$) > 0 Then
                 cc.ValueKey = "CASESENSITIVE"
                 cc.ValueType = REG_SZ
                 cc.Value = "YES"
+                If fornow Then
+                     casesensitive = True
+                End If
+
         ElseIf d$ = "PRI" Then
         cc.ValueKey = "PRIORITY-OR"
                 cc.ValueType = REG_DWORD
@@ -6269,6 +6291,9 @@ MyEr "Wrong Use of Return", "Κακή χρήση της επιστροφής"
 End Sub
 Public Sub DevZero()
     MyEr "division by zero", "διαίρεση με το μηδέν"
+End Sub
+Public Sub DevZeroMacro(aa$)
+    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
 End Sub
 Public Sub ErrInExponet(a$)
 MyErMacro a$, "Error in exponet", "Λάθος στον εκθέτη"

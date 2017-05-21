@@ -52,17 +52,20 @@ Wend
 If ExtractType(cLine) <> "gsb" Then cLine = ""
 If cLine <> "" Then
 para$ = ExtractPath(cLine) + ExtractName(cLine)
-cLine = Trim$(Mid$(cLine, Len(para$) + 1))
-s$ = cLine + " " + s$
-cLine = para$
+para$ = Trim$(Mid$(cLine, Len(para$) + 1))
+'s$ = cLine + " " + s$
+cLine = Left$(cLine, Len(cLine$) - Len(para$))
 ElseIf s$ <> "" Then
 para$ = Trim$(s$)
 End If
 
 
 
-Switches para$
+Switches para$, True
+If Trim$(para$) <> "" Then interpret basestack1, para$
+If Not INK$ = Chr(27) Then
 Form1.MyPrompt cLine, Prompt$
+End If
 finalize:
 here$ = ohere$
 elevatestatus = 0

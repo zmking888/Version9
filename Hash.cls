@@ -216,14 +216,14 @@ End Sub
 Public Function HashFunc0(a$) As Long
 Dim i&, p2 As Long, p1 As Integer, p4 As Long, k As Long, p3 As Long
   p4 = Len(a$) * 2 '- 2
-  p2 = StrPtr(a$): p4 = p2 + p4
-   For i = p4 To p4 - 6 Step -2
+  p2 = StrPtr(a$): p4 = p2 + p4 - 2
+   For i = p4 To p4 - 4 Step -2
   GetMem2 i, p1
   p3 = UINT(p1)
   HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF
   Next i
   k = 2
-  For i = p4 - 8 To p2 Step -2
+  For i = p4 - 6 To p2 Step -2
   GetMem2 i, p1
   p3 = UINT(p1)
   HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF

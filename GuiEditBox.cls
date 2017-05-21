@@ -4107,7 +4107,7 @@ If SelText <> "" Then
 
     a$ = vbCrLf + SelText & "*"
     If shift <> 0 Then  ' тумых
-        a$ = Replace(a$, vbCrLf + Space$(6), vbCrLf)
+        a$ = Replace(a$, vbCrLf + Space$(6 + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod 6), vbCrLf)
         InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
          SelStartSilent = ii
          SelLengthSilent = Len(a$) - 3
@@ -4130,6 +4130,12 @@ If shift <> 0 Then
             SelLengthSilent = 6
             InsertTextNoRender = ""
             SelStartSilent = ii
+    Else
+            SelStartSilent = ii
+            SelLengthSilent = 6
+            InsertTextNoRender = Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))
+            SelStartSilent = ii
+    
     End If
     Else
         SelStartSilent = JJ

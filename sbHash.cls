@@ -28,7 +28,7 @@ Dim toplim As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private lastfind As String
 Private Hash() As Long
-Public Index As Long
+Public index As Long
 Private Sub Class_Initialize()
     MaxSpace = 10
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -173,7 +173,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).NDX: Find = True: lastfind = Key: Index = k: Exit Function
+    num = PriveSpace(k).NDX: Find = True: lastfind = Key: index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -192,7 +192,7 @@ Do
     With PriveSpace(k)
     If .Key = Key Then
     internal = .KeyType
-    num = .NDX: Find2 = True: lastfind = Key: Index = k: Exit Function
+    num = .NDX: Find2 = True: lastfind = Key: index = k: Exit Function
     End If
      k = .Pleft - 1
      End With
@@ -257,16 +257,16 @@ Private Sub ab(ByVal a As Long, b As Long)
 b = (b + a + 1024 * a) Xor &H83F3CF
 End Sub
 Public Function HashFunc0(a$) As Long
- Dim i&, p2 As Long, p1 As Integer, p4 As Long, k As Long, p3 As Long
+Dim i&, p2 As Long, p1 As Integer, p4 As Long, k As Long, p3 As Long
   p4 = Len(a$) * 2 '- 2
-  p2 = StrPtr(a$): p4 = p2 + p4
-   For i = p4 To p4 - 6 Step -2
+  p2 = StrPtr(a$): p4 = p2 + p4 - 2
+   For i = p4 To p4 - 4 Step -2
   GetMem2 i, p1
   p3 = UINT(p1)
   HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF
   Next i
   k = 2
-  For i = p4 - 8 To p2 Step -2
+  For i = p4 - 6 To p2 Step -2
   GetMem2 i, p1
   p3 = UINT(p1)
   HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF

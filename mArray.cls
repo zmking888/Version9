@@ -239,9 +239,14 @@ If Count > 0 Then
     Case Else
     If TypeOf Me.item(0) Is mHandler Then
         If Me.item(0).t1 = 3 Then
-        Set m = New mHandler
-        m.t1 = 3
-        Set m.objref = Me.item(0)
+        'Set m = New mHandler
+        'm.t1 = 3
+        Set m = Me.item(0)
+       ' If Not CheckIsmArray(m, var()) Then
+        '    Set m = New mHandler
+         '   m.t1 = 3
+          '  Set m.objref = Me.item(0)
+        'End If
         Set k = Nothing
         Exit Sub
         End If

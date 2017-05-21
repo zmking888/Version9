@@ -2,6 +2,7 @@ Attribute VB_Name = "Module1"
 Option Explicit
 Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
+Public LastUse As Double
 Private simplestack1 As rndvars
 Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
@@ -40,7 +41,7 @@ Public UseEsc As Boolean
 ' 1 to 32 for layers
 ' 0 for DIS
 Public NowDec$, NowThou$
-Public priorityOr As Boolean, NoUseDec As Boolean, mNoUseDec As Boolean
+Public priorityOr As Boolean, NoUseDec As Boolean, mNoUseDec As Boolean, UseIntDiv As Boolean
 Public csvsep$, csvDec$
 Public Const DisForm = 0
 Public Const BackForm = -1
@@ -52,8 +53,8 @@ Public UKEY$
 Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, WaitShow As Long
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
-Global Const VerMinor = 7
-Global Const Revision = 25
+Global Const VerMinor = 8
+Global Const Revision = 0
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3845,6 +3846,105 @@ End If
 If LastErNum = -2 Then IsExp = False
 If par > 0 Then IsExp = False
 End Function
+Function rightoperator(bstack As basetask, aa$, po As Double) As Boolean
+Dim r As Double, ac As Double, MUL As Long, r1 As Double
+r1 = 1
+MUL = 0
+''second  loop Logic...
+Do
+    If Fast2Symbol(aa$, "**", 2, "^", 1) Then
+            ' get from right number or expression
+            If IsNumber(bstack, aa$, r) Then
+                po = po ^ r
+            ElseIf FastSymbol(aa$, "(") Then
+                If IsExp(bstack, aa$, r) Then
+                    po = po ^ r
+                    If Not FastSymbol(aa$, ")") Then ' Την οποία την ψάχνουμε  εμείς και την πετάμε
+                        rightoperator = False
+                        Exit Function
+                    End If
+                Else
+                    rightoperator = False
+                    Exit Function
+                End If
+            Else
+                rightoperator = False
+                Exit Function
+            End If
+    ElseIf MUL > 0 Then
+            ' do it before we find next / or *
+            Select Case MUL
+            Case 500
+            bstack.soros.DataVal r1
+             r1 = 1
+            Case 1
+                po = r1 * po
+            
+            Case 2
+                If po = 0 Then
+                    'DIVISION BY ZERO
+                
+                    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
+                
+                    rightoperator = False
+                    Exit Function
+                Else
+                    po = r1 / po
+                End If
+            End Select
+            r1 = po
+            MUL = 0
+    ElseIf FastSymbol(aa$, "*") Then
+            If logical(bstack, aa$, r) Then
+                MUL = 1
+                r1 = po
+                po = r
+            ElseIf FastSymbol(aa$, "(") Then
+                If IsExp(bstack, aa$, r) Then
+                    MUL = 1
+                    r1 = po
+                    po = r
+                    If Not FastSymbol(aa$, ")") Then
+                        rightoperator = False
+                        Exit Function
+                    End If
+                Else
+                    rightoperator = False
+                    Exit Function
+                End If
+            Else
+                rightoperator = False
+                Exit Function
+            End If
+    ElseIf FastSymbol(aa$, "/") Then
+            If logical(bstack, aa$, r) Then
+                MUL = 2
+                r1 = po
+                po = r
+            ElseIf FastSymbol(aa$, "(") Then
+                If IsExp(bstack, aa$, r) Then
+                    MUL = 2
+                    r1 = po
+                    po = r
+                    If Not FastSymbol(aa$, ")") Then
+                        rightoperator = False
+                        Exit Function
+                    End If
+                Else
+                    rightoperator = False
+                    Exit Function
+                End If
+            Else
+                rightoperator = False
+                Exit Function
+            End If
+    
+        Else
+    rightoperator = True
+         Exit Do
+        End If
+Loop
+End Function
 Function IsExpA(bstack As basetask, aa$, rr As Double, parenthesis As Long, Optional ByVal noand As Boolean = True) As Boolean
 Dim r As Double, ac As Double, po As Double, MUL As Long, r1 As Double
 Dim logic As Boolean, l As Boolean, park As Object
@@ -3936,6 +4036,9 @@ again2:
                                     IsExpA = False
                                     Exit Function
                                 End If
+                            Else
+                                IsExpA = False
+                                Exit Function
                             End If
     Else
     
@@ -3953,12 +4056,15 @@ Do
             If IsNumber(bstack, aa$, r) Then ' κοιτάμε αν είναι αριθμός ή μεταβλητή
                 po = po ^ r
             ElseIf FastSymbol(aa$, "(") Then  ' πρώτα ανοίγει την παρένθεση ώστε να μην προχωρήσει όταν η IsExp βρεί την παρένθεση )
-                If IsExp(bstack, aa$, r) Then ' Τώρα ψάχνουμε για παράσταση (η IsExp κάλεση την IsExpA και τώρα καλούμε νέα IsExp
+                If IsExp(bstack, aa$, r) Then
                     po = po ^ r
-                    If Not FastSymbol(aa$, ")") Then ' Την οποία την ψάχνουμε  εμείς και την πετάμε
+                    If Not FastSymbol(aa$, ")") Then
                         IsExpA = False
                         Exit Function
                     End If
+                Else
+                    IsExpA = False
+                    Exit Function
                 End If
             Else
                 IsExpA = False
@@ -3978,7 +4084,7 @@ Do
                 If po = 0 Then
                     'DIVISION BY ZERO
                 
-                    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
+                    DevZeroMacro aa$
                 
                     IsExpA = False
                     Exit Function
@@ -3987,19 +4093,48 @@ Do
                 End If
             Case 3
                 po = r1 * po
-            Case 4
+            Case 4, 44
+            '' check for **, ^, /, *
+                If Fix(po) = 0 Then
+                    'DIVISION BY ZERO
+                    DevZeroMacro aa$
+                    IsExpA = False
+                    Exit Function
+                ElseIf MUL = 4 Then
+                    po = Fix(r1 / po)
+                Else
+                   If po < 0 Then
+
+                    po = Int((r1 - Abs(r1 - Abs(po) * Int(r1 / Abs(po)))) / po)
+   
+                   Else
+                    po = Int(r1 / po)
+                    End If
+                   End If
+            Case 40 ' Old version use switches "+DIV"
                 If Int(po) = 0 Then
                     'DIVISION BY ZERO
-                    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
+                    DevZeroMacro aa$
                     IsExpA = False
                     Exit Function
                 Else
                     po = Int(Int(r1) / Int(po))
                 End If
-            Case 5
-                If Int(po) = 0 Then
+            Case 5, 55
+                If Fix(po) = 0 Then
                     'DIVISION BY ZERO
-                    MyErMacro aa$, "division by zero", "διαίρεση με το μηδέν"
+                    DevZeroMacro aa$
+                    IsExpA = False
+                    Exit Function
+                ElseIf MUL = 5 Then
+                         po = r1 - Fix(r1 / po) * po
+                Else
+                        po = Abs(r1 - Abs(po) * Int(r1 / Abs(po)))
+                  End If
+            Case 50 ' Old version use switches "+DIV"
+              If Int(po) = 0 Then
+                    'DIVISION BY ZERO
+                    DevZeroMacro aa$
             
                     IsExpA = False
                     Exit Function
@@ -4024,6 +4159,9 @@ Do
                         IsExpA = False
                         Exit Function
                     End If
+                Else
+                    IsExpA = False
+                    Exit Function
                 End If
             Else
                 IsExpA = False
@@ -4043,6 +4181,9 @@ Do
                         IsExpA = False
                         Exit Function
                     End If
+                Else
+                    IsExpA = False
+                    Exit Function
                 End If
             Else
                 IsExpA = False
@@ -4051,38 +4192,137 @@ Do
      ElseIf MaybeIsSymbol(aa$, "DMΔΥdmδυ") Then
               If Fast2Label(aa$, "DIV", 3, "ΔΙΑ", 3, "", 0, 4) Then
                     If logical(bstack, aa$, r) Then
-                        MUL = 4
-                        r1 = po
-                        po = r
+                        If UseIntDiv Then  ' also 10 DIV 2*3 now is (10 DIV 2)*3
+                            MUL = 40
+                            r1 = po
+                            po = r
+                        Else
+                            MUL = 4
+                            ' right operator * / ^ **
+                            r1 = po
+                            If Not rightoperator(bstack, aa$, r) Then ' 10 DIV 2*3 now is 10 DIV (2*3)
+                                IsExpA = False
+                                Exit Function
+                            End If
+                            po = r
+                        End If
                     ElseIf FastSymbol(aa$, "(") Then
                         If IsExp(bstack, aa$, r) Then
-                            MUL = 4
+                            If UseIntDiv Then MUL = 40 Else MUL = 4
                             r1 = po
+                            If Not FastSymbol(aa$, ")") Then
+                                IsExpA = False
+                                Exit Function
+                            End If
                             po = r
                             If Not FastSymbol(aa$, ")") Then
                                 IsExpA = False
                                 Exit Function
                             End If
+                        Else
+                            IsExpA = False
+                            Exit Function
+                        End If
+                    Else
+                            IsExpA = False
+                            Exit Function
+                    End If
+                ElseIf Fast2Label(aa$, "DIV#", 4, "ΔΙΑ#", 4, "", 0, 5) Then
+                    If logical(bstack, aa$, r) Then
+                        MUL = 44
+                        r1 = po
+                        If Not rightoperator(bstack, aa$, r) Then
+                            IsExpA = False
+                            Exit Function
+                        End If
+                        po = r
+                    ElseIf FastSymbol(aa$, "(") Then
+                        If IsExp(bstack, aa$, r) Then
+                            MUL = 44
+                            r1 = po
+                            If Not FastSymbol(aa$, ")") Then
+                                IsExpA = False
+                                Exit Function
+                            End If
+                            po = r
+                            If Not FastSymbol(aa$, ")") Then
+                                IsExpA = False
+                                Exit Function
+                            End If
+                        Else
+                            IsExpA = False
+                            Exit Function
+                        End If
+                    Else
+                            IsExpA = False
+                            Exit Function
+                    End If
+                ElseIf Fast2Label(aa$, "MOD", 3, "ΥΠΟΛ", 4, "ΥΠΟΛΟΙΠΟ", 8, 9) Then
+        
+                    If logical(bstack, aa$, r) Then
+                        If UseIntDiv Then
+                            MUL = 50
+                            r1 = po
+                            po = r
+                        Else
+                        MUL = 5
+                        r1 = po
+                        If Not rightoperator(bstack, aa$, r) Then
+                            IsExpA = False
+                            Exit Function
+                        End If
+                        po = r
+                        End If
+                    ElseIf FastSymbol(aa$, "(") Then
+                        If IsExp(bstack, aa$, r) Then
+                        If UseIntDiv Then MUL = 50 Else MUL = 5
+                            r1 = po
+                            If Not FastSymbol(aa$, ")") Then
+                                IsExpA = False
+                                Exit Function
+                            End If
+                            If Not rightoperator(bstack, aa$, r) Then
+                                IsExpA = False
+                                Exit Function
+                            End If
+                            po = r
+
+                        Else
+                            IsExpA = False
+                            Exit Function
                         End If
                     Else
                         IsExpA = False
                         Exit Function
                     End If
-        ElseIf Fast2Label(aa$, "MOD", 3, "ΥΠΟΛΟΙΠΟ", 8, "ΥΠΟΛ", 4, 9) Then
+
+                    ElseIf Fast2Label(aa$, "MOD#", 4, "ΥΠΟΛ#", 5, "ΥΠΟΛΟΙΠΟ#", 9, 10) Then
         
                     If logical(bstack, aa$, r) Then
-                        MUL = 5
+                        MUL = 55
                         r1 = po
+                        If Not rightoperator(bstack, aa$, r) Then
+                            IsExpA = False
+                            Exit Function
+                        End If
                         po = r
                     ElseIf FastSymbol(aa$, "(") Then
                         If IsExp(bstack, aa$, r) Then
-                            MUL = 5
+                            MUL = 55
                             r1 = po
-                            po = r
                             If Not FastSymbol(aa$, ")") Then
                                 IsExpA = False
                                 Exit Function
                             End If
+                            If Not rightoperator(bstack, aa$, r) Then
+                                IsExpA = False
+                                Exit Function
+                            End If
+                            po = r
+
+                        Else
+                            IsExpA = False
+                            Exit Function
                         End If
                     Else
                         IsExpA = False
@@ -4472,6 +4712,7 @@ End If
 Loop
  Set park = Nothing
 End Function
+
 Function IsNumberA(a$, k As Long) As Boolean
 If a$ <> "" Then
 k = val("0" & Left$(a$, InStr(2, a$ & " ", " ") - 1))
@@ -5085,10 +5326,19 @@ End If
 Select Case V1&
 Case 1
 If Not numid.Find(v$, w1) Then GoTo LOOKFORVARNUM
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88
 num82:
 IsNumber = 0
 MyEr "Internal Error", "Εσωτερικό Πρόβλημα"
+Exit Function
+num88: ' "ΟΘΟΝΗ","SHOW"
+If bstack.Owner.name = "DIS" Then
+r = SG * GetForegroundWindow = Screen.ActiveForm.hWnd
+Else
+r = SG * GetForegroundWindow = bstack.Owner.hWnd
+End If
+
+IsNumber = True
 Exit Function
 num87: ' "ISWINE"
 r = SG * IsWine
@@ -8927,7 +9177,7 @@ car1023:
         Set anything = bstack.lastobj
         If CheckIsmArray(anything, var()) Then
             Set pppp = anything
-            pppp.car anything
+            pppp.Car anything
             If TypeOf anything Is mArray Then
                 Set pppp = anything
                 Set anything = New mHandler
@@ -9288,12 +9538,27 @@ contlambdahere:
                 GoTo contAr2
                 ElseIf Typename(pppp.item(w2)) = "mHandler" Then
                 Set bstack.lastobj = pppp.item(w2)
-               Set pppp = New mArray
+                If bstack.lastobj.t1 = 3 Then
+                        Set anything = bstack.lastobj
+                       If CheckIsmArray(anything, var()) Then
+                       Set pppp = anything
+                       Else
+                        Set pppp = New mArray
+                        pppp.Arr = False
+                        Set pppp.GroupRef = bstack.lastobj
+                       End If
+                       Set anything = Nothing
+                
+                Else
+                Set pppp = New mArray
                 pppp.Arr = False
                 Set pppp.GroupRef = bstack.lastobj
-                Set bstack.lastobj = Nothing
-                GoTo contAr2
                 End If
+                End If
+                Set bstack.lastobj = Nothing
+                
+                GoTo contAr2
+                
     Else
     ' here is the fault
 
@@ -15851,7 +16116,7 @@ err123456:
                 End If
                 Case "ΔΙΑΚΟΠΤΕΣ", "SWITCHES"
                     If IsStrExp(bstack, b$, ss$) Then
-                    Switches ss$
+                    Switches ss$, here$ <> ""   ' NON LOCAL FROM cli OR using SET SWITCHES
                 End If
                 Case "MONITOR", "ΕΛΕΓΧΟΣ"
                     If IsSupervisor Then
@@ -24899,6 +25164,7 @@ Exit Function
 Else
 End If
 End Select
+If MyShell <> 0 Then AppActivate MyShell
 11111:
 MyShell = 0
 ' its a document
@@ -28922,7 +29188,7 @@ k.HasParametersSet = .HasParametersSet
 End With
 Set bstack.lastobj = k
 End Sub
-Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False, Optional temp As Boolean = False)
+Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False, Optional Temp As Boolean = False)
 'temp = False
 While Right$(what$, 1) = "."
 what$ = Left$(what$, Len(what$) - 1)
@@ -28978,7 +29244,7 @@ With myobject
                                             ss$ = ""
                                             If Not neoGetArrayLinkOnly(bstack, s$, i) Then  ''
                                                 j = -1
-                                            If temp Then
+                                            If Temp Then
                                                     GlobalArr bstack, s$, ss$, 0, j  ''bstack.GroupName &
                                                   Set var(j) = vvl 'PRESERVE POINTER
                                                   Else
@@ -29024,7 +29290,7 @@ With myobject
                                             
                                              v = GlobalVar(bstack.GroupName & Mid$(s$, 2), 0)
                                                    Set spare = vvl
-                                                        UnFloatGroup bstack, Mid$(s$, 2), v, spare, glob, temp
+                                                        UnFloatGroup bstack, Mid$(s$, 2), v, spare, glob, Temp
                                                     '    vvl.EndFloat
                                                         Set spare = Nothing
                                              ps.DataStr s$ + Str(v)
@@ -29034,7 +29300,7 @@ With myobject
                                              
                                              v = GlobalVar(bstack.GroupName & s$, 0)
                                                  Set spare = vvl
-                                                        UnFloatGroup bstack, s$, v, spare, glob, temp
+                                                        UnFloatGroup bstack, s$, v, spare, glob, Temp
                                                     
                                                         Set spare = Nothing
                                              
@@ -42513,7 +42779,9 @@ tempList2delete = Sput(strTemp + ss$) + tempList2delete
 s$ = App.path
 AddDirSep s$
 s$ = s$ & "M2000.EXE "
-If Shell(s$ & Chr(34) + strTemp + ss$ & Chr(34), vbNormalFocus) > 0 Then
+LastUse = Shell(s$ & Chr(34) + strTemp + ss$ & Chr(34), vbNormalFocus)
+If LastUse <> 0 Then
+If ML = 0 Then AppActivate LastUse
 'killfile strTemp + ss$
 End If
 End If

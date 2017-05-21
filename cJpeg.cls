@@ -103,7 +103,7 @@ Private Const DIB_RGB_COLORS  As Long = 0
 'Variable types needed for DIBSections.
 Private Type SAFEARRAYBOUND
     cElements         As Long
-    lLbound           As Long
+    lLBound           As Long
 End Type
 Private Type SAFEARRAY2D
     cDims             As Integer
@@ -147,7 +147,7 @@ Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 Private Declare Function SetStretchBltMode Lib "gdi32" (ByVal hDC As Long, ByVal nStretchMode As Long) As Long
 Private Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" (lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 
 
 'Custom variable types used for this JPEG encoding implementation
@@ -996,9 +996,9 @@ Public Function SampleHDC(ByVal lHDC As Long, lWidth As Long, lHeight As Long, O
             With SA                        'This code copies the pointer of the 2-D bitmap
                 .cbElements = 1            'pixel data to the pointer of the Pixel() array.
                 .cDims = 2                 'This allows you to read/modify the pixel data
-                .Bounds(0).lLbound = 0     'as if it were stored in the Pixel() array.
+                .Bounds(0).lLBound = 0     'as if it were stored in the Pixel() array.
                 .Bounds(0).cElements = BI.bmiHeader.biHeight
-                .Bounds(1).lLbound = 0
+                .Bounds(1).lLBound = 0
                 .Bounds(1).cElements = ((BI.bmiHeader.biWidth * 3 + 3) And &HFFFFFFFC)
                 .pvData = lPtr             'Note that this is extreamly efficient, since it copies
             End With                       'a pointer to the data, and not the data itself.

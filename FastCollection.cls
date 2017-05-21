@@ -91,8 +91,8 @@ End Sub
 
 Public Sub AddKey(RHS, Optional aValue As Variant)
     index = -1
-    If CStr(RHS) = "" Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-    lastkey = CStr(RHS)
+    lastkey = RHS
+    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
     Done = False
     If Not IsMissing(aValue) Then
     
@@ -131,7 +131,7 @@ End Sub
 
 Public Sub ToKey(RHS)
     Done = Find(RHS)
-    If Done Then lastkey = CStr(RHS)
+    If Done Then lastkey = RHS
 End Sub
 Public Sub RemoveWithNoFind()
 If AllowSameKey Then Exit Sub
@@ -471,11 +471,8 @@ End If
 End Function
 Function Find(RHS) As Boolean
 Dim k As Long, Key As String
-If CStr(RHS) = "" Then
-Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
-Else
-Key = CStr(RHS)
-End If
+Key = RHS
+If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
 If Len(Key) = 0 Then Exit Function
@@ -494,8 +491,8 @@ End Function
 Function ExistKey0(RHS) As Boolean
 If AllowSameKey Then Exit Function
 Dim k As Long, Key As String
-Key = CStr(RHS)
-If Len(Key) = 0 Then Exit Function
+Key = RHS
+If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
@@ -506,8 +503,8 @@ End If
 End Function
 Function ExistKey(RHS) As Boolean
 Dim k As Long, Key As String
-Key = CStr(RHS)
-If Len(Key) = 0 Then Exit Function
+Key = RHS
+If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
@@ -560,23 +557,15 @@ Private Sub place(ByVal b, ByVal a)
     PriveSpace(a).Pleft = k
     PriveSpace(a).lastpos = b
 End Sub
-Private Function HashFunc0(a$) As Long
- Dim i&, p2 As Long, p1 As Integer, p4 As Long, k As Long, p3 As Long
-  p4 = Len(a$) * 2 '- 2
-  p2 = StrPtr(a$): p4 = p2 + p4
-   For i = p4 To p4 - 6 Step -2
-  GetMem2 i, p1
-  p3 = UINT(p1)
-  HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF
+Public Function HashFunc0(a$) As Long
+  Dim i&, p2 As Long, p1 As Integer, p4 As Long
+  p4 = Len(a$) * 2
+  p2 = StrPtr(a$): p4 = p2 + p4 - 2
+  For i = p4 To p2 Step -1
+    GetMem2 i, p1
+    HashFunc0 = HashFunc0 Xor p1
   Next i
-  k = 2
-  For i = p4 - 8 To p2 Step -2
-  GetMem2 i, p1
-  p3 = UINT(p1)
-  HashFunc0 = (HashFunc0 + p3 + 1024& * p3) Xor &H83F3CF
- i = i - 2 * k
-  k = k + 1
-  Next i
+  If HashFunc0 = 0 Then HashFunc0 = 1
 End Function
 Private Function HashFunc2(where As Long)
 HashFunc2 = MyMod(uintnew(PriveSpace(where).firsthash Or &HAFFAFF7) + Len(PriveSpace(where).Key) + hashlen + 1, hashlen)

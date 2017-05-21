@@ -29,7 +29,7 @@ Option Explicit
 '   * Added VB5 Enums
 '   * Added CreateKey and DeleteKey methods
 ' =========================================================
-
+Private mTemp As Boolean
 'Registry Specific Access Rights
 Private Const KEY_QUERY_VALUE = &H1
 Private Const KEY_SET_VALUE = &H2
@@ -299,6 +299,7 @@ End Property
 Public Property Let Value( _
         ByVal vValue As Variant _
     )
+If mTemp Then Exit Property
 Dim ordType As Long
 Dim c As Long
 Dim hKey As Long
@@ -609,3 +610,7 @@ Function StripTerminator(ByVal strString As String) As String
         StripTerminator = strString
     End If
 End Function
+
+Public Property Let Temp(ByVal vNewValue As Variant)
+mTemp = CBool(vNewValue)
+End Property

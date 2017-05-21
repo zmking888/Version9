@@ -107,7 +107,7 @@ Function NumberofDrives() As Integer
     DriveCount = 0
 ' Search for a null -- which separates the drives
     For i = 1 To BuffLen
-        If Asc(Mid(Buffer, i, 1)) = 0 Then _
+        If AscW(Mid(Buffer, i, 1)) = 0 Then _
           DriveCount = DriveCount + 1
     Next i
     NumberofDrives = DriveCount
@@ -124,9 +124,9 @@ Function DriveName(Index As Integer) As String
     TheDrive = ""
     DriveCount = 0
     For i = 1 To BuffLen
-        If Asc(Mid(Buffer, i, 1)) <> 0 Then _
+        If AscW(Mid(Buffer, i, 1)) <> 0 Then _
           TheDrive = TheDrive & Mid(Buffer, i, 1)
-        If Asc(Mid(Buffer, i, 1)) = 0 Then 'null separates drives
+        If AscW(Mid(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
             If DriveCount = Index Then
                 DriveName = UCase(Left(TheDrive, 1))
@@ -143,7 +143,7 @@ Dim oshell, ofile, oFolder
 Set oshell = CreateObject("Shell.Application")
 If Not oshell Is Nothing Then
 Set oFolder = oshell.NameSpace(NET_HOOD)
-For Each ofile In oFolder.Items
+For Each ofile In oFolder.items
 If ofile.name = "" Then
 If all = "" Then
 all = "(" + ofile.GetLink.path + ")"
@@ -182,7 +182,7 @@ Set oshell = CreateObject("Shell.Application")
 If Not oshell Is Nothing Then
 Set oFolder = oshell.NameSpace(NET_HOOD)
 
-For Each ofile In oFolder.Items
+For Each ofile In oFolder.items
 If ofile.name = giveAname Then
 FindNetworkFolderPath = ofile.GetLink.path
 Exit For
