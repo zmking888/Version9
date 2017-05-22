@@ -1,5 +1,6 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
 Alias "GetTextMetricsA" (ByVal hDC As Long, _
@@ -587,16 +588,21 @@ If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim a As Single, b As Single, k As Single, r As Single
-Dim BR As Byte, BG As Byte, bbb As Byte, ba$
-Dim BR1 As Byte, BG1 As Byte, BBb1 As Byte
+Dim BR As Byte, BG As Byte, bbb As Byte ', ba$
+Dim BR1 As Byte, BG1 As Byte, BBb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - alpha) / 100#)
 BG1 = 255 * ((100 - alpha) / 100#)
 BBb1 = 255 * ((100 - alpha) / 100#)
-ba$ = Hex$(bckColor)
-ba$ = Right$("00000" & ba$, 6)
-BR = val("&h" & Mid$(ba$, 1, 2))
-BG = val("&h" & Mid$(ba$, 3, 2))
-bbb = val("&h" & Mid$(ba$, 5, 2))
+ppBa = VarPtr(bckColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
+
+'ba$ = Hex$(bckColor)
+'ba$ = Right$("00000" & ba$, 6)
+'BR = val("&h" & Mid$(ba$, 1, 2))
+'BG = val("&h" & Mid$(ba$, 3, 2))
+'bbb = val("&h" & Mid$(ba$, 5, 2))
 Dim pw As Long, ph As Long
     piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
@@ -873,12 +879,16 @@ If zoomfactor <= 0.01 Then zoomfactor = 0.01
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 
 Dim k As Single, r As Single
-Dim BR As Byte, BG As Byte, bbb As Byte, ba$
-ba$ = Hex$(bckColor)
-ba$ = Right$("00000" + ba$, 6)
-BR = val("&h" + Mid$(ba$, 1, 2))
-BG = val("&h" + Mid$(ba$, 3, 2))
-bbb = val("&h" + Mid$(ba$, 5, 2))
+Dim BR As Byte, BG As Byte, bbb As Byte, ppBa As Long
+ppBa = VarPtr(bckColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
+'ba$ = Hex$(bckColor)
+'ba$ = Right$("00000" + ba$, 6)
+'BR = val("&h" + Mid$(ba$, 1, 2))
+'BG = val("&h" + Mid$(ba$, 3, 2))
+'bbb = val("&h" + Mid$(ba$, 5, 2))
 
     piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
@@ -1020,13 +1030,18 @@ On Error Resume Next
 If cDIBbuffer0.hDIb = 0 Then Exit Sub
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 'Dim a As Single, b As Single
-Dim k As Single, r As Single
-Dim BR As Byte, BG As Byte, bbb As Byte, ba$
-ba$ = Hex$(bckColor)
-ba$ = Right$("00000" + ba$, 6)
-BR = val("&h" + Mid$(ba$, 1, 2))
-BG = val("&h" + Mid$(ba$, 3, 2))
-bbb = val("&h" + Mid$(ba$, 5, 2))
+Dim k As Single, r As Single, ppBa As Long
+Dim BR As Byte, BG As Byte, bbb As Byte ', ba$
+ppBa = VarPtr(bckColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
+
+'ba$ = Hex$(bckColor)
+'ba$ = Right$("00000" + ba$, 6)
+'BR = val("&h" + Mid$(ba$, 1, 2))
+'BG = val("&h" + Mid$(ba$, 3, 2))
+'bbb = val("&h" + Mid$(ba$, 5, 2))
 
     piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
@@ -1148,13 +1163,17 @@ Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
-Dim k As Single, r As Single
+Dim k As Single, r As Single, ppBa As Long
 Dim BR As Byte, BG As Byte, bbb As Byte, ba$
-ba$ = Hex$(bckColor)
-ba$ = Right$("00000" & ba$, 6)
-BR = val("&h" & Mid$(ba$, 1, 2))
-BG = val("&h" & Mid$(ba$, 3, 2))
-bbb = val("&h" & Mid$(ba$, 5, 2))
+ppBa = VarPtr(bckColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
+'ba$ = Hex$(bckColor)
+'ba$ = Right$("00000" & ba$, 6)
+'BR = val("&h" & Mid$(ba$, 1, 2))
+'BG = val("&h" & Mid$(ba$, 3, 2))
+'bbb = val("&h" & Mid$(ba$, 5, 2))
 
     piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
@@ -1935,12 +1954,17 @@ Dim tSA As SAFEARRAY2D
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
 '.........................
-Dim BR As Integer, BG As Integer, bbb As Integer, ba$
-ba$ = Hex$(lBackColor)
-ba$ = Right$("00000" & ba$, 6)
-BR = val("&h" & Mid$(ba$, 1, 2))
-BG = val("&h" & Mid$(ba$, 3, 2))
-bbb = val("&h" & Mid$(ba$, 5, 2))
+Dim BR As Integer, BG As Integer, bbb As Integer, ppBa As Long  ', ba$, copy1 as long
+ppBa = VarPtr(lBackColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
+
+'ba$ = Hex$(lBackColor)
+'ba$ = Right$("00000" & ba$, 6)
+'BR = val("&h" & Mid$(ba$, 1, 2))
+'BG = val("&h" & Mid$(ba$, 3, 2))
+'bbb = val("&h" & Mid$(ba$, 5, 2))
 
 '..................................
 Dim mmx As Long, mmy As Long, cc As Long
@@ -2025,7 +2049,11 @@ Dim tSA As SAFEARRAY2D
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
 '.........................
-Dim BR As Integer, BG As Integer, bbb As Integer, ba$
+Dim BR As Integer, BG As Integer, bbb As Integer, ppBa As Long, ba$
+ppBa = VarPtr(lBackColor)
+GetMem1 ppBa, BR
+GetMem1 ppBa + 1, BG
+GetMem1 ppBa + 2, bbb
 ba$ = Hex$(lBackColor)
 ba$ = Right$("00000" & ba$, 6)
 BR = val("&h" & Mid$(ba$, 1, 2))
@@ -3690,7 +3718,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "PLAYSCORE", 64, "паифеижымг", 64, "MOVIE", 65, "MEDIA", 65, "MUSIC", 65, "таимиа", 65, "лоусийг", 65, "DURATION", 66, "диаяйеиа", 66 _
 , "VOLUME", 67, "емтасг", 67, "TAB", 68, "стгкг", 68, "HEIGHT", 69, "уьос", 69, "POS", 70, "хесг", 70, "ROW", 71, "цяаллг", 71, "TIMECOUNT", 72, "жоятос", 72 _
 , "TICK", 73, "тий", 73, "TODAY", 74, "сглеяа", 74, "NOW", 75, "тыяа", 75, "MENU.VISIBLE", 76, "епикоцес.жамеяес", 76, "MENUITEMS", 77, "епикоцес", 77 _
-, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88)
+, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89)
 For i = 0 To UBound(myid()) Step 2
     aHash.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
 Next i

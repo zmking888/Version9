@@ -203,7 +203,7 @@ Public Type target
     ty As Long
     back As Long 'background fill color' -1 no fill
     fore As Long 'border line ' -1 no line
-    enable As Boolean ' in use
+    Enable As Boolean ' in use
     Pen As Long
     layer As Long
     Xt As Long
@@ -2845,7 +2845,8 @@ End With
 
 ' ********
 SetNormal d
-   
+   Dim osbit As String
+   If Is64bit Then osbit = " (64-bit)" Else osbit = " (32-bit)"
         LCTbasket d, players(basketcode), BAR, 0
         rs = RESOURCES
             If bstack.myCharSet = 161 Then
@@ -2854,7 +2855,7 @@ SetNormal d
             Else
                     wwPlain bstack, players(DisForm), "Έκδοση Διερμηνευτή: " & CStr(VerMajor) & "." & Left$(CStr(VerMinor), 1) & " (" & CStr(Revision) & ")", d.Width, 0, True
                 End If
-                   wwPlain bstack, players(DisForm), "Λειτουργικό Σύστημα: " & os, d.Width, 0, True
+                   wwPlain bstack, players(DisForm), "Λειτουργικό Σύστημα: " & os & osbit, d.Width, 0, True
             
                       wwPlain bstack, players(DisForm), "Όνομα Χρήστη: " & Tcase(Originalusername), d.Width, 0, True
                 
@@ -2865,7 +2866,7 @@ SetNormal d
                     wwPlain bstack, players(DisForm), "Interpreter Version: " & CStr(VerMajor) & "." & Left$(CStr(VerMinor), 1) & " rev. (" & CStr(Revision) & ")", d.Width, 0, True
                  End If
               
-                      wwPlain bstack, players(DisForm), "Operating System: " & os, d.Width, 0, True
+                      wwPlain bstack, players(DisForm), "Operating System: " & os & osbit, d.Width, 0, True
                 
                    wwPlain bstack, players(DisForm), "User Name: " & Tcase(Originalusername), d.Width, 0, True
         

@@ -4,6 +4,7 @@ Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
 Public LastUse As Double
 Private simplestack1 As rndvars
+Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWnd As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
 Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
@@ -54,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 1
+Global Const Revision = 2
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3456,7 +3457,7 @@ Id& = UBound(j())
 ScanTarget = -1
 For i& = iu& To Id&
 With j(i&)
-If .enable And .layer = MyL Then
+If .Enable And .layer = MyL Then
 XX& = x \ .Xt
 YY& = y \ .Yt
 If .Lx <= XX& And .tx >= XX& And .ly <= YY& And .ty >= YY& Then
@@ -3472,7 +3473,7 @@ Dim iu&, Id&, i&
 iu& = LBound(j())
 Id& = UBound(j())
 For i& = iu& To Id&
- If j(i&).layer = MyL Then j(i&).enable = False
+ If j(i&).layer = MyL Then j(i&).Enable = False
 Next i&
 End Sub
 
@@ -3515,7 +3516,7 @@ With BoxTarget
 .ty = yl&
 .back = b
 .fore = f
-.enable = True
+.Enable = True
 .Pen = prive.mypen
 .Xt = XXT&
 .Yt = YYT&
@@ -5318,10 +5319,18 @@ End If
 Select Case V1&
 Case 1
 If Not numid.Find(v$, w1) Then GoTo LOOKFORVARNUM
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89
 num82:
 IsNumber = 0
 MyEr "Internal Error", "Εσωτερικό Πρόβλημα"
+Exit Function
+num89: '"OSBIT"
+If Is64bit Then
+r = SG * 64
+Else
+r = SG * 32
+End If
+IsNumber = True
 Exit Function
 num88: ' "ΟΘΟΝΗ","SHOW"
 If bstack.Owner.name = "DIS" Then
@@ -16100,7 +16109,7 @@ err123456:
                 var(v) = UBound(q()) - 1
                 Targets = True
                 ElseIf IsExp(bstack, b$, p) Then
-                  q(var(v)).enable = Not (p = 0)
+                  q(var(v)).Enable = Not (p = 0)
                   RTarget bstack, q(var(v))
                 Else
                 interpret = False
@@ -16108,7 +16117,7 @@ err123456:
                 End If
                 Case "ΔΙΑΚΟΠΤΕΣ", "SWITCHES"
                     If IsStrExp(bstack, b$, ss$) Then
-                    Switches ss$, here$ <> ""   ' NON LOCAL FROM cli OR using SET SWITCHES
+                    Switches ss$, bstack.IamChild   ' NON LOCAL FROM cli OR using SET SWITCHES
                 End If
                 Case "MONITOR", "ΕΛΕΓΧΟΣ"
                     If IsSupervisor Then
@@ -17515,7 +17524,7 @@ err123:
                 var(v) = UBound(q()) - 1
                 Targets = True
                 ElseIf IsExp(bstack, b$, p) Then
-                  q(var(v)).enable = Not (p = 0)
+                  q(var(v)).Enable = Not (p = 0)
                   RTarget bstack, q(var(v))
                 Else
                   Execute = 0
@@ -25047,8 +25056,9 @@ End Function
 Public Function MyShell(ww$, Optional way As VbAppWinStyle = vbNormalFocus) As Long
 Dim frm$, exst As Boolean, pexist As Boolean, PP$, EXE$, param$
 ' logic
-'
+
 On Error GoTo 11111
+If Is64bit Then Wow64EnableWow64FsRedirection False
 If ExtractType(ww$) <> "" Then
 
 frm$ = ExtractPath(ww$) + ExtractName(ww$)
@@ -25067,6 +25077,7 @@ End If
 If ww$ = "" Then
 If param$ <> "" Then
 MyShell = Shell(Trim$(param$), way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
 End If
@@ -25078,7 +25089,10 @@ frm$ = CFname(ww$)
 If ExtractName(frm$) <> ExtractName(ww$) Then
 On Error Resume Next
 
-MyShell = Shell(Trim$(ww$ & " " & param$), way)
+'MyShell = Shell(Trim$(ww$ & " " & param$), way)
+EXE$ = Trim$(ww$)
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param$), 0, way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 If Err.Number > 0 Then
 Err.Clear
 ww$ = PathFromApp(ww$)
@@ -25087,6 +25101,7 @@ ww$ = ReplaceStr(Chr(34), "", ww$) & " " & param$
 MyShell = Shell(Trim$(ww$), way)
 End If
 End If
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
 If CFname(ww$) <> "" Then ww$ = frm$: exst = True
@@ -25119,28 +25134,36 @@ EXE$ = EXE$ & ".exe"
 frm$ = PathFromApp(Trim$(EXE$ & " " & ww$))
 If frm$ <> "" Then
 MyShell = Shell(frm$, way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
 MyShell = Shell(Trim$(EXE$ & " " & ww$ & " " & param$), way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
 End If
 Case "exe", "bat", "com" ' can be run immediatly
 If pexist Then
 MyShell = Shell(Trim$(PP$ & EXE$ & " " & ww$), way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
 frm$ = PathFromApp(Trim$(EXE$ & " " & ww$))
 If frm$ <> "" Then
 MyShell = Shell(frm$, vbNormalFocus)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
 MyShell = Shell(Trim$(EXE$ & " " & ww$), way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
 End If
 Case "@@@"
-MyShell = Shell(RTrim$("explorer " & ww$), way)
+'MyShell = Shell(RTrim$("explorer " & ww$), way)
+EXE$ = "explorer"
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Case Else ' its a document
 PP$ = ReplaceStr("file:", "", PP$)
 frm$ = PCall(PP$ & EXE$)
@@ -25152,6 +25175,7 @@ frm$ = ReplaceStr("@", "", frm$)
 Else
 End If
 MyShell = Shell(Trim$(frm$ & " " & ww$ & " " & param$), way)
+If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
 End If
@@ -40283,7 +40307,7 @@ Dim p As Double, again$, Clsid() As GUID, LNames() As String, clsNumber As Long,
 Dim usemodule As Boolean, where As Long, page$
 If FastSymbol(rest$, "!") Then
 mylist basestack, -2, lang   ' proportional
-ElseIf Fast2Symbol(rest$, "LIB", 3, "COM", 3) Then
+ElseIf IsLabelSymbolNew(rest$, "COM", "COM", lang) Then
 If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", lang) Then
 If here$ <> "" Then
     MyEr "Only in command line interpreter", "Μόνο στον μεταφραστή γραμμής"
@@ -45024,7 +45048,7 @@ MyDelay = True
 
 End Function
 Private Function MyMod(r1 As Double, po) As Double
-MyMod = Sgn(r1) * (Int(Abs(r1)) - Int(Int(Abs(r1) / Abs(Int(po))) * Abs(Int(po))))
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 Private Function AddInventory(bstack As basetask, rest$) As Boolean
 Dim p As Double, s$, pppp As mArray, lastindex As Long

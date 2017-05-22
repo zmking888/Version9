@@ -340,7 +340,7 @@ Private Function HashFunc(a$)
 HashFunc = MyMod(uintnew(HashFunc0(a$) Or &HAFFAFF7 + Len(a$) + hashlen + 1), hashlen)
 End Function
 Private Function MyMod(r1 As Double, po) As Double
-MyMod = Sgn(r1) * (Int(Abs(r1)) - Int(Int(Abs(r1) / Abs(Int(po))) * Abs(Int(po))))
+MyMod = r1 - Fix(r1 / po) * po
 End Function
 Private Function uintnew(ByVal a As Double) As Double
 If a > CDbl(2147483647) Then a = CDbl(2147483647)
