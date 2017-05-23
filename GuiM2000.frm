@@ -96,6 +96,7 @@ Dim novisible As Boolean
 Private mModalId As Double, mModalIdPrev As Double
 Public IamPopUp As Boolean
 Private mEnabled As Boolean
+Private excludeme As New FastCollection
 Public Sub AddGuiControl(widget As Object)
 GuiControls.Add widget
 End Sub
@@ -151,15 +152,22 @@ Set myEvent = aEvent
 End Property
 
 Public Sub Callback(b$)
+
 If ByPassEvent Then
-CallEventFromGuiOne Me, myEvent, b$
+Dim Mark$
+Mark$ = Split(b$, "(")(0)
+If excludeme.ExistKey(Mark$) Then Exit Sub
+
+If Not CallEventFromGuiOne(Me, myEvent, b$) Then If Visible Then excludeme.AddKey Mark$
 Else
 CallEventFromGui Me, myEvent, b$
 End If
 End Sub
 Public Sub CallbackNow(b$, VR())
-
-CallEventFromGuiNow Me, myEvent, b$, VR()
+Dim Mark$
+Mark$ = Split(b$, "(")(0)
+If excludeme.ExistKey(Mark$) Then Exit Sub
+If Not CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.AddKey Mark$
 End Sub
 
 
@@ -171,6 +179,7 @@ If w.enabled Then w.Visible = True
     
 Next w
 End If
+Set excludeme = New FastCollection
 gList2.PrepareToShow
 End Sub
 Public Sub RefreshALL()

@@ -25,6 +25,7 @@ Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Intege
 Private mParamBlock As String, mParams As Long
 Private Hash() As Long
 Public NoHere$
+Public exclude As LongHash
 Public Function Extern(ParamArray a()) As Long
 Attribute Extern.VB_UserMemId = 0
 ' default function

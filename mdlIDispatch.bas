@@ -40,7 +40,9 @@ Public Function FindDISPID(pobjTarget As Object, ByVal pstrProcName As Variant) 
 
     Dim lngRet      As Long
     FindDISPID = -1
-    Dim A$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
+    If pobjTarget Is Nothing Then Exit Function
+
+    Dim a$(0 To 0), arrdispid(0 To 0) As Long, myptr() As Long
     ReDim myptr(0 To 0)
     myptr(0) = StrPtr(pstrProcName)
     
@@ -286,6 +288,8 @@ jumphere:
            End If
     
             Else
+            
+            
                 Err.Raise lngRet
             End If
          End If
@@ -313,7 +317,7 @@ End If
 CallByNameFixParamArray = VarRet
 Exit Function
 exithere:
-    If Err.number <> 0 Then CallByNameFixParamArray = VarRet
+    If Err.Number <> 0 Then CallByNameFixParamArray = VarRet
 Err.Clear
     If items > 0 Then
                 ' Fill parameters arrays. The array must be
@@ -464,7 +468,7 @@ Else
   ''  If Err.Number <> 0 Then ReadOneParameter = varRet
 Err.Clear
 End Function
-Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, VAL1, ERrR$)
+Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, val1, ERrR$)
     
     Dim CallType As cbnCallTypes
     
@@ -492,7 +496,7 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, VAL1, ERrR$)
        
       
                 ReDim varArr(0 To 0)
-                varArr(0) = VAL1
+                varArr(0) = val1
                 With params
                     .cArgs = 1
                     .rgPointerToVariantArray = VarPtr(varArr(0))
@@ -523,7 +527,7 @@ Public Sub ChangeOneParameter(pobjTarget As Object, dispid As Long, VAL1, ERrR$)
     Set IDsp = Nothing
     
 End Sub
-Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, VAL1, ERrR$, ThisIndex As Variant)
+Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, val1, ERrR$, ThisIndex As Variant)
     
     Dim CallType As cbnCallTypes
     
@@ -552,7 +556,7 @@ Public Sub ChangeOneIndexParameter(pobjTarget As Object, dispid As Long, VAL1, E
       
                 ReDim varArr(0 To 1)
                 varArr(1) = ThisIndex
-                varArr(0) = VAL1
+                varArr(0) = val1
                 With params
                     .cArgs = 2
                     .rgPointerToVariantArray = VarPtr(varArr(0))
@@ -589,12 +593,12 @@ If Not KnownProp.Find(LCase(KnownPropName)) Then KnownProp.AddKey LCase$(KnownPr
 KnownProp.Value = v
 
 End Sub
-Private Function getone(KnownPropName As String, This As Long) As Boolean
+Private Function getone(KnownPropName As String, this As Long) As Boolean
 On Error Resume Next
 Dim v As Long
 InitMe
 If KnownProp.Find(LCase$(KnownPropName)) Then
-getone = True: This = KnownProp.Value
+getone = True: this = KnownProp.Value
 End If
 End Function
 
@@ -611,4 +615,6 @@ Set o = obj
 CallByNameFixParamArray o, strvar, VbGet, varg(), varg2(), 0, obj1
 Set MakeObjectFromString = obj1
 End Function
+
+
 

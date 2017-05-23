@@ -22,10 +22,10 @@ Public Type EventSink
     hMem        As Long     ' memory address
 End Type
 ' for DEP
-Private Declare Function VirtualAlloc Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flAllocationType As Long, ByVal flProtect As Long) As Long
-Private Declare Function VirtualFree Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal dwFreeType As Long) As Long
-Private Declare Function VirtualLock Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
-Private Declare Function VirtualUnlock Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
+Private Declare Function VirtualAlloc Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flAllocationType As Long, ByVal flProtect As Long) As Long
+Private Declare Function VirtualFree Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal dwFreeType As Long) As Long
+Private Declare Function VirtualLock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
+Private Declare Function VirtualUnlock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
 Private Const MEM_DECOMMIT = &H4000
 Private Const MEM_RELEASE = &H8000
 Private Const MEM_COMMIT = &H1000
@@ -48,10 +48,10 @@ Public Declare Function SysReAllocString Lib "oleaut32" ( _
 Public Declare Function VarPtrArray Lib "msvbvm60" Alias "VarPtr" ( _
     PtrDest() As Any) As Long
 
-Public Declare Sub CpyMem Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Public Declare Sub CpyMem Lib "kernel32" Alias "RtlMoveMemory" ( _
     pDst As Any, pSrc As Any, ByVal dwLen As Long)
 
-Public Declare Sub FillMem Lib "KERNEL32" Alias "RtlFillMemory" ( _
+Public Declare Sub FillMem Lib "kernel32" Alias "RtlFillMemory" ( _
     pDst As Any, ByVal dlen As Long, ByVal Fill As Byte)
 
 Public Declare Function IsEqualGUID Lib "ole32" ( _
@@ -60,13 +60,13 @@ Public Declare Function IsEqualGUID Lib "ole32" ( _
 Public Declare Function CLSIDFromString Lib "ole32" ( _
     ByVal lpsz As Long, GUID As Any) As Long
 
-Public Declare Function GlobalAlloc Lib "KERNEL32" ( _
+Public Declare Function GlobalAlloc Lib "kernel32" ( _
     ByVal uFlags As Long, ByVal dwBytes As Long) As Long
 
-Public Declare Function GlobalFree Lib "KERNEL32" ( _
+Public Declare Function GlobalFree Lib "kernel32" ( _
     ByVal hMem As Long) As Long
 
-Public Declare Function LCID_def1 Lib "KERNEL32" Alias "GetSystemDefaultLCID" ( _
+Public Declare Function LCID_def1 Lib "kernel32" Alias "GetSystemDefaultLCID" ( _
     ) As Long
 
 Private Const E_NOINTERFACE As Long = &H80004002
@@ -231,6 +231,9 @@ End Function
 ' ObjSetAddRef ObjectFromPtr, Ptr
 
 Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
+Static once As Boolean
+If once Then Exit Function
+once = True
 Dim btASM As Long
 
  btASM = VirtualAlloc(ByVal 0&, MAXCODE, MEM_COMMIT, PAGE_EXECUTE_READWRITE)
@@ -280,6 +283,7 @@ Dim btASM As Long
         VirtualFree btASM, MAXCODE, MEM_DECOMMIT
         VirtualFree btASM, 0, MEM_RELEASE
     '    Debug.Print btASM
+    once = False
 End Function
 
 Private Sub AddPush(pASM As Long, lng As Long)

@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 2
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2607,11 +2607,11 @@ End Sub
 
 
 Private Function SpeedGroup(bstack As basetask, pppp As mArray, Prefix$, ByVal w$, b$, v As Long) As Long
-Dim Vars As Long, vname As Long, y1 As Long, subs As Long, snames As Long, i As Long, ec$, ohere$, p As Double
+Dim Vars As Long, VName As Long, y1 As Long, subs As Long, snames As Long, i As Long, ec$, ohere$, p As Double
 Dim depth As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, S3 As Long
 
 Dim kolpo As Boolean, bb$, Once As Boolean, dd As Variant, subsfc As FastCollection
-Vars = var2used: vname = varhash.Count
+Vars = var2used: VName = varhash.Count
 subs = sb2used: snames = subHash.Count
 Dim mm As mStiva, tempRef As Object
 If Prefix = "VAL" Then
@@ -3043,7 +3043,7 @@ End If
 fastexit:
 
 var2used = Vars
-varhash.ReduceHash vname, var()
+varhash.ReduceHash VName, var()
 
  sb2used = subs
  subHash.ReduceHash snames, sbf()
@@ -4250,7 +4250,7 @@ Do
                             IsExpA = False
                             Exit Function
                     End If
-                ElseIf Fast2Label(aa$, "MOD", 3, "ΥΠΟΛ", 4, "ΥΠΟΛΟΙΠΟ", 8, 9) Then
+                ElseIf Fast2Label(aa$, "MOD", 3, "ΥΠΟΛΟΙΠΟ", 8, "ΥΠΟΛ", 4, 9) Then
         
                     If logical(bstack, aa$, r) Then
                         If UseIntDiv Then
@@ -13709,6 +13709,11 @@ fstr31: '"TYPE$(", "ΤΥΠΟΣ$("
                         
                         r$ = Typename(var(w1).objref)
                      End Select
+                     ElseIf Typename(var(w1)) = "PropReference" Then
+                     
+                                r$ = Typename$(var(w1).Value)
+                    
+
                      End If
                    
                     IsString = FastSymbol(a$, ")")
@@ -21625,7 +21630,7 @@ End Function
 Function GoFunc(mystack As basetask, what$, rest$, vl As Variant, Optional recursive As Long, Optional ByVal choosethis As Long = -1, Optional ByVal strg As Boolean = False, Optional skiplastpar As Boolean = False) As Boolean
 Dim p As Double, i As Long, f As Long, it As Long, pa$
 Dim x1 As Long, frm$, par As Boolean, ohere$, w$
-Dim Vars As Long, vname As Long, subs As Long, snames As Long
+Dim Vars As Long, VName As Long, subs As Long, snames As Long
 Dim threads As Long, vvv As Variant
 
 Dim basestack As basetask
@@ -21710,7 +21715,7 @@ End If
 If here$ <> ohere$ Or mystack.IamChild Then     ' so now we check that we are in an new namespace...
 ' this system must change.. and become member of a basetask
 ' these are for safety
-vname = varhash.Count
+VName = varhash.Count
 Vars = var2used
 subs = sb2used: snames = subHash.Count
 i = 1: FK$(13) = ""
@@ -21836,7 +21841,7 @@ there1234:
     here$ = ohere$
 
     var2used = Vars
-         varhash.ReduceHash vname, var()
+         varhash.ReduceHash VName, var()
 If UBound(var()) / 3 >= var2used And UBound(var()) > 2999 Then
 On Error Resume Next
     
@@ -21883,7 +21888,7 @@ Set mystack.FuncObj = Nothing
 
      If Not nokillvars Then
     var2used = Vars
- varhash.ReduceHash vname, var()
+ varhash.ReduceHash VName, var()
 If UBound(var()) / 3 >= var2used And UBound(var()) > 2999 Then
 On Error Resume Next
     ReDim Preserve var(UBound(var()) / 2 + 1) As Variant
@@ -28407,6 +28412,10 @@ End If
 End If
  indirect = True
 End If
+If TypeOf vv Is PropReference Then
+If IsObject(vv.Value) Then Set vv = vv.Value Else MyEr "No Object found", "Δεν βρήκα αντικείμενο": Exit Sub
+End If
+
 Do
 ReDim var1(0 To 0)
 Erase var2()
@@ -28513,7 +28522,12 @@ End If
     var(newref).ConstructObj oo, l
 Set oo = Nothing
 Else
+If vv Is var(vIndex) Then
 var(newref).Construct vIndex, l, indirect   ' this is the link vindex is an index to var()
+Else
+var(newref).ConstructObj vv, l
+End If
+'Debug.Print vIndex, l, FN$
 End If
 ' so for every method or property we use this simple struct
 ' we can define the value type
@@ -28590,6 +28604,26 @@ End If
 End If
 ElseIf IsLabelSymbolNew(rest$, "ΘΕΣΕ", "SET", language) Then
 ' we make a new reference to that property
+' make a read now
+l = FindDISPID(vv, FN$)
+FN$ = UCase(FN$)
+If l <> -1 Then
+ReadOneParameter vv, l, s$, myVar
+x1 = Abs(IsLabel(bstack, rest$, s$))
+    If x1 < 5 Then
+        If GetlocalVar(s$, newref) Then
+            var(newref) = CDbl(myVar)
+        Else
+            newref = GlobalVarRefOnly(s$, True)
+            If IsObject(myVar) Then
+                Set var(newref) = myVar
+            Else
+            var(newref) = myVar
+            End If
+    End If
+
+End If
+End If
 End If
  If FastSymbol(rest$, ",") Then
  If Not IsStrExp(bstack, rest$, FN$) Then Exit Do
@@ -28629,13 +28663,17 @@ Else
 Set vv = vv.objref
 End If
 End If
+If TypeOf vv Is PropReference Then
+If IsObject(vv.Value) Then Set vv = vv.Value Else ok = False: MyEr "No Object found", "Δεν βρήκα αντικείμενο": Exit Sub
+End If
+
 ReDim var1(0 To 0)
 Dim var2() As String
 ReDim var2(0 To 0)
 ' expression or label:=expression'
 
 ''Exit Sub
-Dim what$, it As Long, items As Long
+Dim what$, it As Long, items As Long, y3 As Long
 
 ' we have parameters..(by value)
 If FastSymbol(rest$, "(") Then  ' we have "(par1, par2...) as result"
@@ -28649,6 +28687,7 @@ Else
  result = CallByNameFixParamArray(vv, FN$, VbMethod, var1(), var2(), 0, retobject, namarg)
 End If
 If Not retobject Is Nothing Then
+    y3 = IsLabelSymbolNew(rest$, "ΜΕΓΕΓΟΝΟΤΑ", "WITHEVENTS", language)
      If IsLabelSymbolNew(rest$, "ΩΣ", "AS", language) Then
              glob = IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", language)
              If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
@@ -28657,6 +28696,24 @@ If Not retobject Is Nothing Then
                                 Else
                                     it = GlobalVar(what$, 0, glob)
                                     Set var(it) = retobject
+                                End If
+                                If y3 <> 0 Then
+                                            Dim ev As ComShinkEvent
+                                    If GetShink(ev, it, what$) Then
+                                            ' private
+                                            ' no need for a name, we do not address it in any way.
+                                            ' ev knows how to call handler
+                                                     If Not GetVar(bstack, ChrW(&HFFBF) + "_" + what$, it) Then
+                                                        
+                                                        it = GlobalVar(ChrW(&HFFBF) + "_" + what$, s$, , glob)
+                                                        End If
+                                                    Set var(it) = ev
+                                     Else
+                                            MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
+                                            ok = False
+                                             
+                                         '   End Sub
+                                     End If
                                 End If
             End If
      End If
@@ -28812,8 +28869,16 @@ Else
 Set o = o.objref
 End If
 End If
+If TypeOf o Is PropReference Then
+If o.IsObj Then Set o = o.Value
+End If
 er$ = ""
+RETVAR = Empty
 ReadProp = ReadOneParameter(o, propIndex, er$, RETVAR)
+If Not IsObject(RETVAR) Then
+    If IsNumeric(RETVAR) Then RETVAR = CDbl(RETVAR)
+
+End If
 If er$ <> "" Then
 there:
 BadGetProp
@@ -32089,7 +32154,7 @@ On Error GoTo there22
   If LastErNum = -1 Then GoTo there22
 
 Dim frm$, bs As basetask, i As Long, pa$, p As Double, loopthis As Boolean
-Dim subs As Long, snames As Long, vname As Long, vvv As Variant, S3 As Long
+Dim subs As Long, snames As Long, VName As Long, vvv As Variant, S3 As Long
 
 Dim subspoint As Boolean
 'LastErName = "": LastErNameGR = ""
@@ -32104,7 +32169,7 @@ i = 1
         Set .Sorosref = basestack.soros   'same stack
         Set .Owner = .Parent.Owner
         .OriginalName$ = ohere$
-        .Vars = var2used: vname = varhash.Count
+        .Vars = var2used: VName = varhash.Count
         .commnum = comhash.Count
         subs = sb2used: snames = subHash.Count
 
@@ -32209,7 +32274,7 @@ thh1:
                     .ThrowThreads
                   
                     var2used = .Vars
-                    varhash.ReduceHash vname, var()
+                    varhash.ReduceHash VName, var()
                     If UBound(var()) / 3 >= var2used And UBound(var()) > 2999 Then
                         ReDim Preserve var(UBound(var()) / 2) As Variant
                     End If
@@ -34566,7 +34631,7 @@ If a.enabled Then
             End If
             End If
             If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
-            If Not GetSub(f$, klm) Then PopStage bstack: GoTo conthere
+            If Not GetSub(f$, klm) Then PopStage bstack: CallEventFromGuiOne = False: GoTo conthere
             s1$ = sbf(klm).sb
             If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
@@ -34644,7 +34709,7 @@ Set bstack.Sorosref = bb
          End If
             If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
   
-            If Not GetSub(f$, klm) Then PopStage bstack: bb.Flush: GoTo conthere
+            If Not GetSub(f$, klm) Then PopStage bstack: bb.Flush: CallEventFromGuiNow = False: GoTo conthere
             '' look for '11001EDIT
             s1$ = sbf(klm).sb
             If Left$(s1$, 10) = "'11001EDIT" Then
@@ -34830,14 +34895,19 @@ Dim pppp As mArray, mmmm As mEvent
 '         see .upgrade in UnFloatGroupReWriteVars and UnFloatGroup
 
  If IsLabelSymbolNew(rest$, "ΕΦΑΡΜΟΓΗ", "APPLICATION", lang) Then
- 
- Set mm = New CallBack2
+ If IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", lang) Then
+     Set var(i) = Form1
+ Else
+    Set mm = New CallBack2
  
                      With mm
                      .NoPublic bstack, ""
+                     
                     End With
+
                      Set var(i) = mm
                      Set mm = Nothing
+    End If
                         Exit Function
 ElseIf IsLabelSymbolNew(rest$, "ΤΜΗΜΑ", "MODULE", lang) Then
          Set mm = New CallBack2
@@ -38213,8 +38283,14 @@ MyDeclare = False
                          ' private
                          ' no need for a name, we do not address it in any way.
                          ' ev knows how to call handler
-                         ii = GlobalVar(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
-                         Set var(ii) = ev
+                            If Not GetVar(bstack, ChrW(&HFFBF) + "_" + w$, ii) Then
+                            
+                            ii = GlobalVar(ChrW(&HFFBF) + "_" + w$, s$, , y1 = True)
+                            End If
+                            
+                            
+                            Set var(ii) = ev
+
                          Else
                          MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
                             MyDeclare = False
@@ -45331,17 +45407,16 @@ Set bb.objref = aa
  bb.t1 = 3
 Set GetAnewEvent = bb
 End Function
-Public Function CallEventFromCOM(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs()) As Boolean
+Public Function CallEventFromCOM(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), exclude As Boolean) As Boolean
 Dim tr As Boolean, extr As Boolean, olescok As Boolean
 Dim f$, F1$, klm As Long
 'olescok = escok
 'escok = False
 CallEventFromCOM = True
 F1$ = evCom.modulename$
-aString$ = UCase(aString$)
 f$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
 'Debug.Print f$
-If Not subHash.Find(f$, klm) Then Exit Function
+If Not subHash.Find(f$, klm) Then exclude = True: Exit Function
 extr = extreme
 extreme = True
 tr = trace
@@ -45875,3 +45950,5 @@ MMM$ = here$
     
   
 End Sub
+
+

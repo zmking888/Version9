@@ -105,10 +105,11 @@ End Property
 Private Sub Class_Terminate()
 Set hardlink = Nothing
 End Sub
-Public Property Get Index() As Variant
-Index = mIndex
+Public Property Get index() As Variant
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Variant)
+Public Property Let index(ByVal RHS As Variant)
 mIndex = RHS
 End Property
+

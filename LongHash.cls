@@ -1,0 +1,180 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "LongHash"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = True
+Option Explicit
+ Private Type item
+ Key As Long
+ Container As String
+ infostr As String
+ firsthash As Long
+ lastpos As Long
+ Pleft As Long  ' a list
+ End Type
+'
+Private PriveSpace() As item
+Dim MaxSpace As Long
+Dim hashlen As Long
+Dim lastkey As Long, lastfind As Long
+Dim toplim As Long
+Private ParentIndex As Long
+Public Done As Boolean
+Public index As Long
+Private Hash() As Long
+
+Private Sub Class_Initialize()
+    MaxSpace = 30
+    ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
+    hashlen = MaxSpace * 2 + 3
+    toplim = -1
+End Sub
+Public Sub ForceFlush(NewSpace As Long)
+    MaxSpace = NewSpace
+    ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
+    hashlen = MaxSpace * 2 + 3
+    toplim = -1
+End Sub
+
+Private Sub ExpandHash()
+    Dim i As Long
+    hashlen = hashlen * 2 + 3
+    
+    ReDim Hash(hashlen) As Long
+    For i = 0 To MaxSpace \ 2 - 1
+    place HashFunc2(i), i
+    Next i
+End Sub
+
+
+Private Function Malloc() As Long
+    If toplim + 1 >= MaxSpace Then
+           '' expand hash
+           MaxSpace = MaxSpace * 2
+           ReDim Preserve PriveSpace(MaxSpace) As item
+           If MaxSpace > hashlen Then ExpandHash
+    End If
+        toplim = toplim + 1
+        Malloc = toplim
+End Function
+Property Get Count()
+Count = toplim + 1
+End Property
+Private Function Find(Key As Long) As Boolean
+Dim k As Long
+ParentIndex = -1
+Done = False
+k = Hash(HashFunc(Key)) - 1
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then
+    Find = True: lastfind = Key: index = k: Exit Function
+    End If
+     ParentIndex = k
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
+End If
+End Function
+Friend Function ExistKey(Key As Long) As Boolean
+Dim k As Long
+Done = False
+k = Hash(HashFunc(Key)) - 1
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then ExistKey = True: index = k: Done = True: Exit Function
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
+End If
+End Function
+
+Public Property Get Key() As Long
+If index > -1 Then
+    Key = PriveSpace(index).Key
+End If
+End Property
+Public Property Get Child() As Boolean
+If index > -1 Then
+    Child = Hash(PriveSpace(index).lastpos) - 1 <> index
+End If
+End Property
+Public Property Get HasCollision() As Boolean
+If index > -1 Then
+    HasCollision = (Hash(PriveSpace(index).lastpos) - 1 <> index) Or (PriveSpace(index).Pleft > 0)
+End If
+End Property
+Public Sub AddKey(RHS As Long, Optional aValue As String = "", Optional aInfo As String = "")
+    index = -1
+    lastkey = RHS
+    Done = False
+    ItemCreator lastkey, aValue, aInfo
+    
+End Sub
+Private Sub ItemCreator(Key As Long, storethis As String, andthis As String)
+Dim a As Long, first As Long
+Done = False
+first = HashFunc0(Key)
+a = Malloc()
+With PriveSpace(a)
+    .Key = Key
+    .Container = storethis
+    .infostr = andthis
+    .firsthash = first
+place HashFunc1(first), a
+End With
+End Sub
+Private Sub place(ByVal b, ByVal a)
+Dim k As Long
+
+    k = Hash(b)
+    Hash(b) = a + 1
+    PriveSpace(a).Pleft = k
+    PriveSpace(a).lastpos = b
+End Sub
+
+Private Function HashFunc2(where As Long)
+HashFunc2 = MyMod(uintnew(PriveSpace(where).firsthash Or &HAFFAFF7 + 5 + hashlen), hashlen)
+End Function
+Public Function HashFunc0(ByVal v As Long) As Long
+       If v = 0 Then v = 1 Else HashFunc0 = v
+End Function
+Private Function HashFunc1(readyhash)
+HashFunc1 = MyMod(uintnew(readyhash Or &HAFFAFF7 + 5 + hashlen), hashlen)
+End Function
+Private Function HashFunc(a As Long)
+HashFunc = MyMod(uintnew(HashFunc0(a) Or &HAFFAFF7 + 5 + hashlen), hashlen)
+End Function
+Private Function MyMod(r1 As Double, po) As Double
+MyMod = r1 - Fix(r1 / po) * po
+End Function
+Private Function uintnew(ByVal a As Double) As Double
+If a > CDbl(2147483647) Then a = CDbl(2147483647)
+If a < CDbl(-2147483648#) Then a = CDbl(-2147483648#)
+If a < 0 Then
+uintnew = 4294967296# + a
+Else
+uintnew = a
+End If
+End Function
+Property Get Value() As String
+If index = -1 Then
+Else
+    Value = PriveSpace(index).Container
+End If
+End Property
+Property Get Info() As String
+If index = -1 Then
+Else
+    Info = PriveSpace(index).infostr
+End If
+End Property
+
+
+

@@ -72,7 +72,7 @@ End Type
 Private Type IEnumConnectionPoints
     iunk                        As IUnknown
     Next                        As Long
-    Skip                        As Long
+    skip                        As Long
     Reset                       As Long
     Clone                       As Long
 End Type
@@ -223,6 +223,7 @@ Public modulename$  ' module name plus name of object
 Public modulenameonly$
 Public VarIndex As Long
 ' by Edanmo
+Private exclude As New LongHash, inUse As New LongHash
 Private Sub pvSetParamArray(ByVal Ptr As Long, aParams() As Variant)
     Dim tDPAR       As DISPPARAMS
     Dim SafeArray   As SAFEARRAY_1D
@@ -361,12 +362,12 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
     Dim strName     As String
 'If dispid = 4 Then Stop
     ' get IDispatch from the object
-    pVTbl = ObjPtr(obj)
+    pVTbl = objptr(obj)
     CpyMem pVTbl, ByVal pVTbl, 4
     CpyMem oDispatch, ByVal pVTbl, Len(oDispatch)
 
     ' get ITypeInfo
-    hRet = CallPointer(oDispatch.GetTypeInfo, ObjPtr(obj), 0, LCID_DEF, VarPtr(pTypeInfo))
+    hRet = CallPointer(oDispatch.GetTypeInfo, objptr(obj), 0, LCID_DEF, VarPtr(pTypeInfo))
     If hRet Then GoTo finalize
 
     ' ITypeInfo VTable
@@ -395,6 +396,7 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
 
     ' GetNames
     hRet = CallPointer(oTypeInfo.GetNames, pTypeInfo, dispid, VarPtr(strName), 1, VarPtr(pcNames))
+    Debug.Print pcNames
 finalize:
     If Len(strName) = 0 Then
         ' no string... :(
@@ -413,23 +415,41 @@ finalize:
 End Function
 
 Public Sub FireEvent(ByVal dispid As Long, ByVal params As Long)
+Static Once As Boolean
+If Once Then Exit Sub
+If exclude.ExistKey(dispid) Then Exit Sub
+Once = True
     Dim strEvent    As String
     Dim vParams()   As Variant
-    Dim NumVar As Long, what$
+    Dim NumVar As Long, what$, delme As Boolean
     ' get the name of the event
+    If inUse.ExistKey(dispid) Then
+    strEvent = inUse.Value
+    what$ = inUse.Info
+    Else
     strEvent = GetMemberName(oTarget, dispid, iid_event, what$)
-
+    inUse.AddKey dispid, strEvent, what$
+    End If
+ 
+ 'If inUse.ExistKey(strEvent) Then Exit Sub
+ ''inUse.AddKey strEvent
     ' param array
+   
     vParams = pvGetParamArray(params, NumVar)
 
     ' forward the event
    ' RaiseEvent EventRaised(strEvent, vParams)
    On Error Resume Next
  ''   Debug.Print "FireEvent", strEvent, what$
- If Not CallEventFromCOM(Me, strEvent, what$, NumVar, vParams()) Then
+
+ If Not CallEventFromCOM(Me, strEvent, what$, NumVar, vParams(), delme) Then
     MyEr "Problem With Event: " + strEvent, "Πρόβλημα με το γεγονός: " + strEvent
  End If
+''inUse.Remove strEvent
+   If delme Then exclude.AddKey dispid, ""
+
     pvSetParamArray params, vParams
+    Once = False
 End Sub
 
 Public Sub Detach()
@@ -457,7 +477,7 @@ Public Function Attach(obj As Object) As Boolean
 
     ' IUnknown VTable
     Set oTarget = obj
-    pTarget = ObjPtr(obj)
+    pTarget = objptr(obj)
     CpyMem pVTblTarget, ByVal pTarget, 4
     CpyMem oUnk, ByVal pVTblTarget, Len(oUnk)
 
@@ -497,7 +517,7 @@ Public Function Attach(obj As Object) As Boolean
     Set oSink = CreateEventSink(iid_event, Me)
 
     ' advise the event sink
-    hRet = CallPointer(oCP.Advise, pCP, ObjPtr(oSink), VarPtr(dwCookie))
+    hRet = CallPointer(oCP.Advise, pCP, objptr(oSink), VarPtr(dwCookie))
     If hRet Then Exit Function
 
     ' wohoo, done!
