@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7029,6 +7029,10 @@ IsNumber = False
     Exit Function
 fun35: 'Case "VALID(", "ΕΓΚΥΡΟ("
     IsNumber = True
+    Dim OLD1$, OLD2$
+    OLD1$ = LastErName
+    OLD2$ = LastErNameGR
+    MyEr "", ""
     w1 = 1
     s$ = aheadstatus(a$, True, w1) & "   "  ' version 6.5(11)
     n$ = Left$(a$, w1 - 1)
@@ -7072,8 +7076,10 @@ jumphere:
       IsNumber = FastSymbol(a$, ")")
           r = 0
         End If
-    
+       If "" <> LastErName Then Stop
+    If "" <> LastErNameGR Then Stop
         LastErNum = 0
+        LastErNum1 = 0
     Exit Function
 fun36: 'Case "EVAL(", "ΕΚΦΡ(", "ΕΚΦΡΑΣΗ("
     IsNumber = False
@@ -12716,8 +12722,10 @@ foundprivate:
                             Else
                                 W3 = rinstr(q$, ".")
                                 s$ = Left$(q$, Len(q$) - 1)
-                                q1$ = Left$(s$, Len(q$) - W3 + 1) + ChrW(&HFFBF) + Mid$(s$, Len(q$) - W3 + 2, W3 - 2) + "." + ChrW(&H1FFF) + "$()"
-                                If GetSub(q1$, w1) Then GoTo foundprivate
+                                
+                                'q1$ = Left$(s$, Len(q$) - W3 + 1) + ChrW(&HFFBF) + Mid$(s$, Len(q$) - W3 + 2, W3 - 2) + "." + ChrW(&H1FFF) + "$()"
+                                q1$ = Left$(s$, W3) + ChrW(&HFFBF) + Mid$(s$, W3 + 1) + "." + ChrW(&H1FFF) + "$()"
+                                  If GetSub(q1$, w1) Then GoTo foundprivate
                                 InternalEror
                                 IsString = False
                             End If
@@ -16182,6 +16190,7 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
                 Case "ΤΕΛΟΣ", "END"
    
                     If NORUN1 Then NORUN1 = False: interpret = True: b$ = "": Exit Function   ' send environment....to hell
+                    If bstack.IamChild Then NERR = True: NOEXECUTION = True
                     ExTarget = True: INK$ = Chr(27): UKEY$ = Chr$(27)  ': UINK$ = Chr(27)    ' send escape...for any good reason...
                 Case Else
                     LastErNum = 0 ' LastErNum1 = 0
@@ -16596,16 +16605,24 @@ If Not IsExp(bstack, b$, p) Then here$ = ohere$: Exit Function
  If Not bstack.lastobj Is Nothing Then
      Set myobject = pppp.GroupRef
      If pppp.IHaveClass Then
-             bstack.soros.PushObj bstack.lastobj
-            If Typename(pppp.item(v)) = "Empty" Then
-            Set pppp.item(v) = New Group
-            End If
+           '  bstack.soros.PushObj bstack.lastobj
+           ' If Typename(pppp.item(v)) = "Empty" Then
+           ' Set pppp.item(v) = New Group
+           ' End If
             
-            SpeedGroup bstack, pppp, "@READ", w$, "", v
-            
+            'SpeedGroup bstack, pppp, "@READ", w$, "", v
+            Set pppp.item(v) = bstack.lastobj
+            Set pppp.item(v).LinkRef = myobject
+            With pppp.item(v)
+                 .HasStrValue = myobject.HasStrValue
+                .HasValue = myobject.HasValue
+                .HasSet = myobject.HasSet
+                .HasParameters = myobject.HasParameters
+                .HasParametersSet = myobject.HasParametersSet
+            End With
                
             
-            Set pppp.item(v).LinkRef = myobject
+            'Set pppp.item(v).LinkRef = myobject
      Else
             If Typename(bstack.lastobj) = "mHandler" Then
                                    CheckGarbage bstack
@@ -16649,7 +16666,29 @@ Do While FastSymbol(b$, ",")
 If pppp.UpperMonoLimit > v Then
 v = v + 1
 If Not IsExp(bstack, b$, p) Then here$ = ohere$: Exit Function
+If Not bstack.lastobj Is Nothing Then
+     Set myobject = pppp.GroupRef
+     If pppp.IHaveClass Then
+         Set pppp.item(v) = bstack.lastobj
+            
+            With pppp.item(v)
+                 .HasStrValue = myobject.HasStrValue
+                .HasValue = myobject.HasValue
+                .HasSet = myobject.HasSet
+                .HasParameters = myobject.HasParameters
+                .HasParametersSet = myobject.HasParametersSet
+            End With
+        
+        
+     Else
+        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
+        Set pppp.item(v) = bstack.lastobj
+    End If
+    Set pppp.item(v).LinkRef = myobject
+    Set bstack.lastobj = Nothing
+     Else
 pppp.item(v) = p
+End If
 Else
 Exit Do
 End If
@@ -21122,16 +21161,22 @@ End If
      If Not bstack.lastobj Is Nothing Then
      Set myobject = pppp.GroupRef
      If pppp.IHaveClass Then
-             bstack.soros.PushObj bstack.lastobj
-            If Typename(pppp.item(v)) = "Empty" Then
-            Set pppp.item(v) = New Group
-            End If
+            ' bstack.soros.PushObj bstack.lastobj
+          ' If Typename(pppp.item(v)) = "Empty" Then
+          ' Set pppp.item(v) = New Group
+          '  End If
             
-            SpeedGroup bstack, pppp, "@READ", w$, "", v
+         ' SpeedGroup bstack, pppp, "@READ", w$, "", v
             
-               
-            
+            Set pppp.item(v) = bstack.lastobj
             Set pppp.item(v).LinkRef = myobject
+            With pppp.item(v)
+                 .HasStrValue = myobject.HasStrValue
+                .HasValue = myobject.HasValue
+                .HasSet = myobject.HasSet
+                .HasParameters = myobject.HasParameters
+                .HasParametersSet = myobject.HasParametersSet
+            End With
      Else
             If Typename(bstack.lastobj) = "mHandler" Then
                                    CheckGarbage bstack
@@ -21204,21 +21249,29 @@ End If
     End If
 Do While FastSymbol(b$, ",")
 If pppp.UpperMonoLimit > v Then
-v = v + 1
+    v = v + 1
 
-If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-  If Not bstack.lastobj Is Nothing Then
+    If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
+    If Not bstack.lastobj Is Nothing Then
      Set myobject = pppp.GroupRef
      If pppp.IHaveClass Then
-     bstack.soros.PushObj bstack.lastobj
-     SpeedGroup bstack, pppp, "@READ", w$, "", v
+         Set pppp.item(v) = bstack.lastobj
+            
+            With pppp.item(v)
+                 .HasStrValue = myobject.HasStrValue
+                .HasValue = myobject.HasValue
+                .HasSet = myobject.HasSet
+                .HasParameters = myobject.HasParameters
+                .HasParametersSet = myobject.HasParametersSet
+            End With
+        
+        
      Else
-     If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-
-     Set pppp.item(v) = bstack.lastobj
-     End If
-     Set pppp.item(v).LinkRef = myobject
-     Set bstack.lastobj = Nothing
+        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
+        Set pppp.item(v) = bstack.lastobj
+    End If
+    Set pppp.item(v).LinkRef = myobject
+    Set bstack.lastobj = Nothing
      Else
 pppp.item(v) = p
 End If
@@ -23193,8 +23246,10 @@ NERR:
                       '          MyErMacro rest$, "Overflow long, expect lower than (2147483648)", "Υπερχείλιση ακεραίου, περιμένω μικρότερο από (2147483648)"
                        ' Else
                         '        Err.Clear
+                        If MOUT And rest$ = "" Then
+                        Else
                                 MyErMacro rest$, "unknown identifier " & what$, "’γνωστο αναγνωριστικό " & what$
-                        'End If
+                        End If
                         Identifier = True
             End If
 End Select
@@ -23417,8 +23472,8 @@ Dim i As Long, Vlist As Boolean, FList, f$, aa$, v As Long
 Dim s() As String
 If Typename(q) <> "Group" Then Exit Function
 'Debug.Print "link to ", name$
-Dim old1 As String
-old1 = bstack.UseGroupname
+Dim OLD1 As String
+OLD1 = bstack.UseGroupname
 
 'If Not usefinal Then
 'If here$ = "" Then
@@ -23509,7 +23564,7 @@ End If
 LinkGroup = Vlist Or FList <> ""
 End With
 
-bstack.UseGroupname = old1
+bstack.UseGroupname = OLD1
 End Function
 
 Sub GlobalArr(bstack As basetask, name$, rst$, items As Long, q As Long, Optional useglobalname As Boolean = False, Optional reverse As Boolean = False)
@@ -29461,8 +29516,11 @@ conthere2:
                         End If
                         End If
                         
-                       ' If InStr(var(i).FuncList, Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1)) <> 0 Then
+                       '
                        If sbf(x1).sbgroup = here$ + "." Then
+                       If InStr(var(i).FuncList, Chr$(2) + ss$ + "() ") = 0 Then
+                        var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1) + var(i).FuncList
+                       End If
                         Else
                                               var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + "()" + Str(x1) + Chr$(1) + var(i).FuncList
                                             sbf(x1).sbgroup = here$ + "."
@@ -29477,6 +29535,10 @@ conthere2:
                         If MyModule(bstack, sss$, 1) Then
                          x1 = bstack.IndexSub
                          If sbf(x1).sbgroup = here$ + "." Then
+                                                If InStr(var(i).FuncList, Chr$(2) + ss$ + "() ") = 0 Then
+                                 var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + Str(x1) + Chr$(1) + var(i).FuncList
+        
+                       End If
                          Else
                               var(i).FuncList = Chr$(1) + Chr$(2) + ss$ + Str(x1) + Chr$(1) + var(i).FuncList
                               sbf(x1).sbgroup = here$ + "."
@@ -29508,6 +29570,7 @@ conthere2:
                  End If
                 End With
                 With var(i)
+                'Debug.Print what$ + ".", var(i).FuncList
                  .GroupName = what$ + "."
                  .FloatGroupName = myobject.FloatGroupName
               '  .Varlist = frm$
@@ -32193,12 +32256,19 @@ End If
  Do
   frm$ = Mid$(sbf(x1).sb, i)
 againmod:
-       If LastErNum = -1 Then GoTo myerror1
+       If LastErNum = -1 Then
+       GoTo myerror1
+       End If
         Select Case Execute(bs, frm$, False, False, loopthis)
 
         Case 0
         
 myerror1:
+If MOUT And Not NOEXECUTION Then
+    MOUT = False
+    rest$ = "": MyEr "", ""
+    Exit Do
+End If
                     If sb2used <> 0 And Not NERR Then
         If bs.UseGroupname <> "" Then
 If InStr(bs.UseGroupname, ChrW(&H1FFF)) > 0 Then
@@ -32272,7 +32342,7 @@ thh1:
                     On Error Resume Next
                     With bs
                     .ThrowThreads
-                  
+                  MOUT = False
                     var2used = .Vars
                     varhash.ReduceHash VName, var()
                     If UBound(var()) / 3 >= var2used And UBound(var()) > 2999 Then
@@ -32306,6 +32376,7 @@ thh1:
                     Exit Do
         Case 2
                     i = 1
+                    
                     If frm$ <> "" Then
                             If frm$ = "BREAK" Then
                             
@@ -33178,7 +33249,7 @@ againhere:
                                                             With bs.soros
                                                                      i = 1
                                                                      For v = v To VN
-                                                                              If .StackItemTypeIsObject(i) = "" Then
+                                                                              If Not .StackItemTypeIsObject(i) Then
                                                                                        pppp.item(v) = .StackItem(i)
                                                                               Else
                                                                                        Set pppp.item(v) = .StackItem(i)

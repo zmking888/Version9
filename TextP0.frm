@@ -611,10 +611,10 @@ INK$ = INK$ & Chr(item)
 End Sub
 
 Public Sub mn5sub()
- If Not EditTextWord Then
+ 'If Not EditTextWord Then
  ' check if { } is ok...
- If Not blockCheck(TEXT1.Text, DialogLang) Then Exit Sub
- End If
+ 'If Not blockCheck(TEXT1.Text, DialogLang) Then Exit Sub
+ 'End If
 
 CancelEDIT = True
 MyDoEvents
@@ -1978,8 +1978,9 @@ If KeyCode = vbKeyPause Then
             End If
             BreakMe = True
             If ASKINUSE Then
-                If BreakMe Then Exit Sub
-                Unload NeoMsgBox: ASKINUSE = False: Exit Sub
+                
+                If BreakMe Then noentrance = False: Exit Sub
+                Unload NeoMsgBox: ASKINUSE = False: noentrance = False: Exit Sub
                 End If
             If Form3.ask(basestack1, "Break Key - Hard Reset" & vbCrLf & "Μ2000 - Execution Stop / Τερματισμός Εκτέλεσης") = 1 Then
             
@@ -2004,6 +2005,7 @@ MOUT = False
 End If
 End If
 BreakMe = False
+noentrance = False
  Exit Sub
  
 End If
@@ -2016,6 +2018,7 @@ result = -1
 Case vbKeyReturn, vbKeyTab, vbKeyDown
 result = 1
 Case Else
+noentrance = False
 Exit Sub
 End Select
 KeyCode = 0
@@ -2027,6 +2030,7 @@ End If
 
 If noentrance Then
 KeyCode = 0
+noentrance = False
 Exit Sub
 End If
 noentrance = True
@@ -2035,6 +2039,15 @@ With TEXT1
 .Form1mn2Enabled = .Form1mn1Enabled
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
 End With
+
+If KeyCode = 13 And shift = 2 Then
+KeyCode = 0
+shift = 0
+UKEY$ = ""
+TEXT1.insertbrackets
+noentrance = False
+Exit Sub
+End If
 Select Case KeyCode
 Case vbKeyReturn
 nochange = True
@@ -2042,17 +2055,11 @@ nochange = True
 
 
 If TEXT1.AutoIntNewLine Then
-
-KeyCode = 0
-Else
-
+    KeyCode = 0
+    nochange = False
+    Exit Sub
 End If
-
-'TEXT1.glistN.ShowMe2
 nochange = False
-'gList1_MarkOut
-
-
 Case vbKeyControl
 ctrl = True
 KeyCode = 0

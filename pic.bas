@@ -589,14 +589,14 @@ zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim a As Single, b As Single, k As Single, r As Single
 Dim BR As Byte, BG As Byte, bbb As Byte ', ba$
-Dim BR1 As Byte, BG1 As Byte, BBb1 As Byte, ppBa As Long
+Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte, ppBa As Long
 BR1 = 255 * ((100 - alpha) / 100#)
 BG1 = 255 * ((100 - alpha) / 100#)
-BBb1 = 255 * ((100 - alpha) / 100#)
+bbb1 = 255 * ((100 - alpha) / 100#)
 ppBa = VarPtr(bckColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
+GetMem1 ppBa + 2, BR
 
 'ba$ = Hex$(bckColor)
 'ba$ = Right$("00000" & ba$, 6)
@@ -881,9 +881,9 @@ Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim k As Single, r As Single
 Dim BR As Byte, BG As Byte, bbb As Byte, ppBa As Long
 ppBa = VarPtr(bckColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
+GetMem1 ppBa + 2, BR
 'ba$ = Hex$(bckColor)
 'ba$ = Right$("00000" + ba$, 6)
 'BR = val("&h" + Mid$(ba$, 1, 2))
@@ -1033,9 +1033,9 @@ Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim k As Single, r As Single, ppBa As Long
 Dim BR As Byte, BG As Byte, bbb As Byte ', ba$
 ppBa = VarPtr(bckColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
+GetMem1 ppBa + 2, BR
 
 'ba$ = Hex$(bckColor)
 'ba$ = Right$("00000" + ba$, 6)
@@ -1165,15 +1165,11 @@ zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
 Dim k As Single, r As Single, ppBa As Long
 Dim BR As Byte, BG As Byte, bbb As Byte, ba$
+Dim BR1 As Byte, BG1 As Byte, bbb1 As Byte
 ppBa = VarPtr(bckColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
-'ba$ = Hex$(bckColor)
-'ba$ = Right$("00000" & ba$, 6)
-'BR = val("&h" & Mid$(ba$, 1, 2))
-'BG = val("&h" & Mid$(ba$, 3, 2))
-'bbb = val("&h" & Mid$(ba$, 5, 2))
+GetMem1 ppBa + 2, BR
 
     piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
@@ -1956,9 +1952,9 @@ Dim tSA As SAFEARRAY2D
 '.........................
 Dim BR As Integer, BG As Integer, bbb As Integer, ppBa As Long  ', ba$, copy1 as long
 ppBa = VarPtr(lBackColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
+GetMem1 ppBa + 2, BR
 
 'ba$ = Hex$(lBackColor)
 'ba$ = Right$("00000" & ba$, 6)
@@ -2051,9 +2047,9 @@ Dim tSA As SAFEARRAY2D
 '.........................
 Dim BR As Integer, BG As Integer, bbb As Integer, ppBa As Long, ba$
 ppBa = VarPtr(lBackColor)
-GetMem1 ppBa, BR
+GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
-GetMem1 ppBa + 2, bbb
+GetMem1 ppBa + 2, BR
 ba$ = Hex$(lBackColor)
 ba$ = Right$("00000" & ba$, 6)
 BR = val("&h" & Mid$(ba$, 1, 2))

@@ -370,7 +370,7 @@ Else
 ''If LastErNum1 <= 0 Then LastErNum = Val(" " & Mid$(er$, rinstr(er$, " ")) + ".0") Else Exit Sub
 LastErNum = val(" " & Mid$(er$, rinstr(er$, " ")) + ".0")
 End If
-If LastErNum = 0 Then LastErNum = -1 ' general
+If LastErNum = 0 Then LastErNum = -1 ': Debug.Print er$, ergr$: Stop
 LastErNum1 = LastErNum
 ''If iRVAL(HERE$, 0) < 1 Then
 If InStr("*" + LastErName, NLtrim$(er$)) = 0 Then

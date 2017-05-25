@@ -190,6 +190,7 @@ Event RemoveOne(that As String)
 Event PushMark2Undo(that As String)
 Event PushUndoIfMarked()
 Event addone(that As String)
+Event getpair(a$, b$)
 Event MayRefresh(ok As Boolean)
 Event CheckGotFocus()
 Event CheckLostFocus()
@@ -825,7 +826,7 @@ End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
 If dropkey Then KeyAscii = 0: Exit Sub
-Dim bb As Boolean, kk$
+Dim bb As Boolean, kk$, pair$
 If ListIndex < 0 Then
 Else
     If Not state Then
@@ -861,13 +862,21 @@ Else
             Else
   kk$ = GetKeY(KeyAscii)
   End If
-  
-             RaiseEvent RemoveOne(kk$)
+  RaiseEvent getpair(kk$, pair$)
+             '
+             
             If SelStart = 0 Then mSelstart = 1
-           
+            RaiseEvent RemoveOne(kk$)
+           If pair$ <> "" Then
+           mSelstart = mSelstart + 1
+           RaiseEvent RemoveOne(pair$)
+           mSelstart = mSelstart - 1
+           End If
             SelStartEventAlways = SelStart + 1
             RaiseEvent PureListOn
-                List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 2) + kk$ + Mid$(List(SELECTEDITEM - 1), SelStart - 1)
+                List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 2) + kk$ + pair$ + Mid$(List(SELECTEDITEM - 1), SelStart - 1)
+                
+        
             RaiseEvent PureListOff
          
             End If

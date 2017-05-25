@@ -310,8 +310,7 @@ End Sub
 
 Private Sub glistN_addone(that As String)  '
 ' push undo addone
-' from delete or backspace..
-If Not enabled Then Exit Sub
+' from delete or backspace..If Not enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
@@ -376,6 +375,21 @@ End If
 undomode = 0
 End If
 End Sub
+Public Sub insertbrackets()
+Dim i As Long, j As Long
+If SelLength = 0 Then
+Dim a$
+a$ = Left$(CurrentParagraph, Charpos)
+i = ((Len(a$) - Len(LTrim$(a$))) \ 6) * 6
+j = SelStart
+RemoveUndo "{" + vbCrLf + Space$(i + 6) + vbCrLf + Space$(i) + "}"
+InsertText = "{" + vbCrLf + Space$(i + 6) + vbCrLf + Space$(i) + "}"
+SelStartSilent = j + i + 3 + 6
+Render
+End If
+
+ 
+End Sub
 Public Sub ManualInform()
 If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
@@ -386,6 +400,21 @@ End If
 End Sub
 
 
+
+Private Sub glistN_getpair(a As String, b As String)
+If Not UsedAsTextBox Then
+Select Case a
+Case Chr$(34)
+b = Chr$(34)
+Case "("
+b = ")"
+Case "{"
+b = "}"
+Case "["
+b = "]"
+End Select
+End If
+End Sub
 
 Private Sub glistN_Maybelanguage()
 If Not glistN.enabled Then Exit Sub
@@ -808,6 +837,7 @@ If shift = 2 Then
     End If
 
 End If
+
 Dim selstart2 As Long, b As Boolean, Pad$, cc As Long
 Dim l1 As Long, c1 As Long
 If KeyCode = 18 Then
@@ -1621,20 +1651,20 @@ End Sub
 
 Private Sub mDoc_BreakLine(data As String, datanext As String)
  ' Nowrap = True mean no Wrap
- Dim data1 As String, datanext1 As String
+ Dim Data1 As String, datanext1 As String
  If nowrap Then
     datanext = data
     data = ""
  Else
     If showparagraph Then
    ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
-         data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
+         Data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
         
-        glistN.BreakLine data1, datanext1, , ChrW(&HB7)
-        If data1 <> "" Then
+        glistN.BreakLine Data1, datanext1, , ChrW(&HB7)
+        If Data1 <> "" Then
         
         datanext = Left$(data, Len(datanext1))
-        data = Right$(data, Len(data1))
+        data = Right$(data, Len(Data1))
         Else
             datanext = data
              data = ""
