@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -148,6 +148,7 @@ Public Type modfun
     sbc As Long
     sbgroup As String
     subs As FastCollection
+    locked As Boolean
 End Type
 Private sbf() As modfun
 Public var2used As Long
@@ -23235,7 +23236,7 @@ conthereplease:
             
             If here$ <> ohere$ Then
 
-            If Not ProcModuleEntry(basestack, ohere$, x1, rest$) Then GoTo NERR
+            If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
    
     
             Else
@@ -27520,6 +27521,8 @@ If x1 <> 0 Then
             '' IF sbf(I).sbGROUP
                          If rinstr(sbf(i).sbgroup, bstack.GroupName) + Len(bstack.GroupName) - 1 = Len(sbf(i).sbgroup) Then
                           bstack.IndexSub = i
+                          If sbf(bstack.IndexSub).locked Then
+                          Else
                           If frm$ <> "" Then
                             If lang = 1 Then
                                 sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
@@ -27528,6 +27531,7 @@ If x1 <> 0 Then
                             End If
                           Else
                           sbf(i).sb = ss$
+                          End If
                           End If
                           Set sbf(i).subs = Nothing
                           GoTo continuehere22 'there12345
@@ -32212,7 +32216,7 @@ x1 = Abs(IsLabel(basestack, rest$, s$))
     End If
 
 End Function
-Function ProcModuleEntry(basestack As basetask, ohere$, x1 As Long, rest$) As Boolean
+Function ProcModuleEntry(basestack As basetask, ohere$, x1 As Long, rest$, Optional lang As Long = -1) As Boolean
 On Error GoTo there22
   If LastErNum = -1 Then GoTo there22
 
@@ -32221,10 +32225,10 @@ Dim subs As Long, snames As Long, VName As Long, vvv As Variant, S3 As Long
 
 Dim subspoint As Boolean
 'LastErName = "": LastErNameGR = ""
-i = 1
 
 ' ******************************************* module entry..............
 
+i = 1
         Set bs = New basetask
        With bs
         .reflimit = varhash.Count
@@ -32248,6 +32252,38 @@ i = 1
         End If
        .StaticInUse$ = here$
        End With
+If lang <> -1 Then
+    If IsSymbol(rest$, ";") Then
+        Dim what$, what1$
+Do
+   
+        If IsLabel(basestack, rest$, what$) = 1 Then
+ 
+            
+        
+            If IsLabelSymbolNew(rest$, "ΩΣ", "AS", lang) Then
+                If IsLabel(basestack, rest$, what1$) <> 1 Then GoTo myerror1
+            Else
+            what1$ = what$
+            End If
+                    If subHash.Find(ohere$ & "." & what1$, i) Then
+                        MyModule bs, what$ + " {}", lang
+                        sbf(bs.IndexSub).locked = True
+                        sbf(bs.IndexSub).sb = sbf(i).sb
+                        sbf(bs.IndexSub).sbc = sbf(i).sbc
+                        sbf(bs.IndexSub).sbgroup = sbf(i).sbgroup
+                         
+                    ElseIf subHash.Find(what1$, i) Then
+                        MyModule bs, what$ + " {}", lang
+                        sbf(bs.IndexSub).locked = True
+                        sbf(bs.IndexSub).sb = sbf(i).sb
+                        sbf(bs.IndexSub).sbc = sbf(i).sbc
+                        sbf(bs.IndexSub).sbgroup = sbf(i).sbgroup
+                    End If
+                End If
+        Loop Until Not IsSymbol(rest$, ",")
+    End If
+End If
        i = 1
 
 If myexit(bs) Then
@@ -35704,6 +35740,7 @@ End If
  End If
 
     If it Then
+       
         resp = True
         Set bs = New basetask
         bs.reflimit = varhash.Count
@@ -35733,6 +35770,7 @@ End If
         Else
             Call GoFunc(bs, what$, rest$, vvl)
         End If
+myerror1:
         If Not bs.StaticCollection Is Nothing Then
             basestack.Parent.SetVarobJ "%_" + bs.StaticInUse, bs.StaticCollection
         End If
@@ -43527,6 +43565,7 @@ BYPASS1:
                         
                 If FastSymbol(rest$, "{") Then
                 ss$ = block(rest$)
+                
                 i = Len(rest$)
                 If Right$(ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
                 If Left$(sbf(Abs(basestack.OriginalCode)).sb, 10) = "'11001EDIT" Then
@@ -43589,6 +43628,16 @@ JUMP0:
                         End If
                         Exit Function
                 ElseIf GetlocalSub(basestack.GroupName & what$, x1) Then
+                 If FastSymbol(rest$, "(") Then
+                                frm$ = BlockParam(rest$)
+                             If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+                            If Not FastSymbol(rest$, ")") Then
+                       
+                            
+                            End If
+                           frm$ = Trim$(frm$)
+
+                        End If
                         If FastSymbol(rest$, "{") Then
                         If basestack.OriginalCode > x1 Then
                         ' we have collision so we need a new one
@@ -43603,19 +43652,38 @@ JUMP0:
                         End If
                                 i = Len(rest$) ''
                                 what$ = block(rest$) + " "
+                                ' here for locked
+                                If Not sbf(x1).locked Then
                                 While Left$(what$, 10) = "'11001EDIT"
                                         SetNextLine what$
                                 Wend
                                 If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
-                                what$ = "'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + what$
+                                s$ = "'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i)
+                                  If frm$ <> "" Then
+                                If lang = 1 Then
+                                what$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf + what$
+                                Else
+                                what$ = s$ + vbCrLf + "Διάβασε " + frm$ + vbCrLf + what$
+                                End If
+                                Else
+                                what$ = s$ + vbCrLf + what$
+                                End If
                                 If Not FastSymbol(rest$, "}") Then
                                         MyModule = False
                                 Else
                                 ' Call preProcessor(basestack, what$)
-                                If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
+                                
                                 sbf(x1).sb = what$
                                 basestack.IndexSub = x1
                                 Set sbf(x1).subs = Nothing
+                                
+                                End If
+                                Else
+                                If Not FastSymbol(rest$, "}") Then
+                                        MyModule = False
+                                Else
+                                      basestack.IndexSub = x1
+                                End If
                                 End If
                         Else
                                 rest$ = ":" & basestack.GroupName & what$ & " " & rest$

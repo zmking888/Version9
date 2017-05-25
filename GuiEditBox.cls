@@ -23,6 +23,8 @@ Public tabwidth As Long
 Public ShadowMarks As Boolean
 Public LineComment1 As String
 Public LineComment2 As String
+Public CommentSymbols As String
+Public ComSymbolsWidth As Long
 Public MultiLineComment1 As String
 Private mMultiLineComment2 As String
 Public Form1mn1Enabled As Boolean
@@ -183,8 +185,10 @@ dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 LineComment1 = "\"
 LineComment2 = "'"
-MultiLineComment1 = "{"
-MultiLineComment2 = "}"
+CommentSymbols = "[\][\]"
+ComSymbolsWidth = 2
+MultiLineComment1 = "\*"
+MultiLineComment2 = "*/"
 Dim ff As New StdFont
 With Callback
 white = .Controls(1).ForeColor
@@ -1959,7 +1963,8 @@ If kind > 0 Then
   drop$ = aheadstatus(a$, False, pos1)
   If pos1 > 1 Then
   ColorizeExpressions Mid$(a$, 1, pos1 - 1), col(), k - Len(a$) + pos1 - 1, pos2, feedthis
-  If feedthis > 0 And pos1 >= Len(a$) Then Exit Sub
+  If feedthis = 1 Then Exit Sub
+ If feedthis > 0 And pos1 >= Len(a$) Then Exit Sub
   feedthis = 0
    a$ = Mid$(a$, pos1)
    End If
@@ -1988,6 +1993,26 @@ ElseIf IsSymbol(a$, ";") Then
 addone col(), pos2, 14
 pos2 = k - Len(a$) + 1
     GoTo again
+ ElseIf MaybeIsSymbol(a$, LineComment2) Then
+drop$ = "  "
+If pos2 > 0 Then
+ addone col(), pos2, 7
+
+Else
+addone col(), 1, 7
+End If
+feedthis = 1
+ Exit Sub
+ElseIf MaybeIsSymbol2(a$, ComSymbolsWidth, CommentSymbols) Then
+drop$ = "  "
+If pos2 > 0 Then
+ addone col(), pos2, 7
+
+Else
+addone col(), 1, 7
+End If
+feedthis = 1
+  Exit Sub
 ElseIf FastSymbol(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
 addone col(), pos2, 15
 
@@ -2398,19 +2423,20 @@ End If
 If Remove Then If ok Then a$ = Mid$(a$, i + 1 + Len(tail$))
 MaybeIsSymbol = ok
 End Function
-Function MaybeIsSymbol2(a$, c$, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
+Function MaybeIsSymbol2(a$, num As Long, c$, Optional num2 As Long, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
+If num <= 0 Then Exit Function
 Dim i As Long, ok As Boolean
 If a$ = "" Or c$ = "" Then Exit Function
 i = 1
 While Mid$(a$, i, 1) = " "
     i = i + 1
 Wend
-If i > Len(a$) Then Exit Function
-ok = InStr(Mid$(a$, i, Len(c$)), c$) > 0
-If tail$ <> "" And ok Then
-ok = Mid$(a$, i + Len(c$), Len(tail$)) Like tail$
+If i > num Then Exit Function
+ok = Mid$(a$, i, num) Like c$
+If num2 > 0 And ok Then
+ok = Mid$(a$, i + num, num2) Like tail$  '' tail$="[abc]" for one num2
 End If
-If Remove Then If ok Then a$ = Mid$(a$, i + Len(c$) + Len(tail$))
+If Remove Then If ok Then a$ = Mid$(a$, i + num + num2)
 MaybeIsSymbol2 = ok
 End Function
 
@@ -2574,6 +2600,9 @@ marvel:
   If pos1 > 1 Then
 marvel2:
  ColorizeExpressions Mid$(a$, 1, pos1 - 1), col(), k - Len(a$) + pos1 - 1, pos2, feedthis
+ If feedthis = 1 Then
+ Exit Sub
+ End If
  feedback = feedthis
   a$ = Mid$(a$, pos1)
   If FastSymbol(a$, ",") Then
@@ -2637,7 +2666,10 @@ a$ = NLtrim$(a$)
 feedback = 0
  ColorizeExpressions drop$, col(), k - Len(a$) + pos1 - 1, pos2, feedback
 
- ''If feedthis Then Exit Sub
+ If feedthis = 1 Then
+ feedthis = 0
+ Exit Sub
+ End If
   a$ = Mid$(a$, pos1)   '''was pos1
 ''  If InStr(DROP$, " ") = 0 Then
 If InStr(drop$, " ") = 0 Or kind >= 0 Then GoTo again3
@@ -2658,7 +2690,7 @@ If InStr(drop$, " ") = 0 Or kind >= 0 Then GoTo again3
    Loop
 
 GoTo again
-ElseIf MaybeIsSymbol(a$, "\'") Then
+ElseIf MaybeIsSymbol(a$, LineComment2) Then
 If pos2 > 0 Then
  addone col(), pos2, 7
 
@@ -2667,13 +2699,15 @@ addone col(), 1, 7
 End If
  pos2 = k - Len(a$) + 1
  Exit Sub
-''If pos2 > 0 Then
-''addone col(), pos2 + 1, 7
- 
-''Exit Sub
-''Else
-''addone col(), k - Len(a$) + 1, 7
-''End If
+ElseIf MaybeIsSymbol2(a$, ComSymbolsWidth, CommentSymbols) Then
+If pos2 > 0 Then
+ addone col(), pos2, 7
+
+Else
+addone col(), 1, 7
+End If
+ pos2 = k - Len(a$) + 1
+ Exit Sub
 ElseIf Not onetime Then
 If FastSymbol(a$, ",") Then
 ElseIf FastSymbol(a$, ":") Then
