@@ -2819,6 +2819,9 @@ If Not IsSupervisor Then
     ss$ = ReadUnicodeOrANSI(userfiles & "desktop.inf")
     If ss$ <> "" Then
      skipthat = interpret(bstack, ss$)
+     If mycolor(PenOne) <> d.ForeColor Then
+     PenOne = -d.ForeColor
+     End If
     End If
 End If
 If SzOne < 36 And d.Height / SzOne > 250 Then SetDouble d: BAR = BAR + 1
@@ -3881,9 +3884,38 @@ While (.mx Mod .Column) > 0 And (.mx / .Column >= 3)
 Wend
 End If
 If .Column = 0 Then .Column = .mx
+' second stage
+If .mx Mod .Column > 0 Then
+
+
+If .mx Mod 4 <> 0 Then .mx = 4 * (.mx \ 4)
+If .mx < 4 Then .mx = 4
+.My = Int(y / (.Yt + .MineLineSpace * 2))
+.Yt = .Yt + .MineLineSpace * 2
+If .mx < 2 Then .mx = 2: x = 2 * .Xt
+If .My < 2 Then .My = 2: y = 2 * .Yt
+If (.mx Mod 2) = 1 And .mx > 1 Then
+.mx = .mx - 1
+End If
+mymul = Int(.mx / 8)
+If mymul = 1 Then mymul = 2
+If mymul = 0 Then
+.Column = .mx \ 2 - 1
+Else
+.Column = Int(.mx / mymul)
+
+While (.mx Mod .Column) > 0 And (.mx / .Column >= 3)
+.Column = .Column + 1
+Wend
+End If
+If .Column = 0 Then .Column = .mx
+
+End If
+
 .Column = .Column - 1 ' FOR PRINT 0 TO COLUMN-1
 
 If .Column < 4 Then .Column = 4
+
 
 .SZ = Size
 
@@ -4860,7 +4892,7 @@ If IsLabel(basestack1, s$, d$) > 0 Then
         ElseIf d$ = "SIZE" Then
             cc.ValueKey = "SIZE"
             cc.ValueType = REG_DWORD
-            If IsNumberLabel(s$, w$) Then If val(w$) >= 8 And val(w$) <= 28 Then cc.Value = CLng(val(w$))
+            If IsNumberLabel(s$, w$) Then If val(w$) >= 8 And val(w$) <= 48 Then cc.Value = CLng(val(w$))
           
         ElseIf d$ = "PEN" Then
             cc.ValueKey = "PAPER"

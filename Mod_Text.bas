@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4013,7 +4013,13 @@ again2:
                Else
                
                Set park = Nothing
-               If (MUL + Len(ss$) - 1) > 0 Then Mid$(aa$, 1, MUL + Len(ss$) - 1) = ss$
+               If (MUL + Len(ss$) - 1) > 0 Then
+               If aa$ = "" Then
+                aa$ = ss$
+               Else
+                Mid$(aa$, 1, MUL + Len(ss$) - 1) = ss$
+               End If
+               End If
                 MUL = 0
                End If
         End If
@@ -32254,7 +32260,7 @@ i = 1
        End With
 If lang <> -1 Then
     If IsSymbol(rest$, ";") Then
-        Dim what$, what1$
+        Dim what$, WHAT1$
 Do
    
         If IsLabel(basestack, rest$, what$) = 1 Then
@@ -32262,18 +32268,18 @@ Do
             
         
             If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
-                If IsLabel(basestack, rest$, what1$) <> 1 Then GoTo myerror1
+                If IsLabel(basestack, rest$, WHAT1$) <> 1 Then GoTo myerror1
             Else
-            what1$ = what$
+            WHAT1$ = what$
             End If
-                    If subHash.Find(ohere$ & "." & what1$, i) Then
+                    If subHash.Find(ohere$ & "." & WHAT1$, i) Then
                         MyModule bs, what$ + " {}", lang
                         sbf(bs.IndexSub).locked = True
                         sbf(bs.IndexSub).sb = sbf(i).sb
                         sbf(bs.IndexSub).sbc = sbf(i).sbc
                         sbf(bs.IndexSub).sbgroup = sbf(i).sbgroup
                          
-                    ElseIf subHash.Find(what1$, i) Then
+                    ElseIf subHash.Find(WHAT1$, i) Then
                         MyModule bs, what$ + " {}", lang
                         sbf(bs.IndexSub).locked = True
                         sbf(bs.IndexSub).sb = sbf(i).sb
@@ -40735,7 +40741,9 @@ End Function
 Function ProcVersion(bstack As basetask) As Boolean
 Dim prive
 prive = GetCode(bstack.Owner)
-PlainBaSket bstack.Owner, players(prive), CStr(App.Major) & "." & CStr((App.Minor \ 1000) - 1) & " (" & CStr(App.Minor Mod 1000) & ")"
+' from 8.8 rev 6 change
+'PlainBaSket bstack.Owner, players(prive), CStr(App.Major) & "." & CStr((App.Minor \ 1000) - 1) & " (" & CStr(App.Minor Mod 1000) & ")"
+PlainBaSket bstack.Owner, players(prive), CStr(App.Major) & "." & CStr((App.Minor \ 100)) & " (" & CStr(App.Minor Mod 100) & ")"
 crNew bstack, players(prive)
 ProcVersion = True
 End Function

@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -2692,7 +2692,7 @@ End If
         cc.Value = 14
         SzOne = 14
         Else
-        If cc.Value >= 8 And cc.Value <= 28 Then
+        If cc.Value >= 8 And cc.Value <= 48 Then
         SzOne = cc.Value
         Else
         cc.Value = 14
