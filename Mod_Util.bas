@@ -946,7 +946,7 @@ If cr Then
 ddd.CurrentY = nl + UAddTwipsTop ''* 2
 ddd.CurrentX = 0
 Else
- ddd.CurrentY = mytop
+ddd.CurrentY = mytop
 ddd.CurrentX = nr.Right * dv15
 End If
 End If
@@ -1571,6 +1571,7 @@ Else
           MyPrintNew dd, mb.uMineLineSpace, whNoSpace$, Not nocr, fake
     Else
     MyPrintNew dd, mb.uMineLineSpace, wh$, Not nocr, fake
+    
     End If
 End If
 End Sub
@@ -1894,7 +1895,12 @@ If Not nopr Then crNew bstack, mybasket
             ' 1ST
 If Not nopr Then ddd.CurrentY = ddd.CurrentY - mybasket.Yt:   npy = npy - 1
     End If
-If Not nopr Then GetXYb2 ddd, mybasket, ruller&, npy
+' If Not nopr Then GetXYb2 ddd, mybasket, ruller&, npy
+If Not nopr Then
+    If nonewline Then npy = npy + 1
+    
+    ruller& = ddd.CurrentX \ mybasket.Xt
+End If
 conthere:
 If Not nopr Then LCTbasket ddd, mybasket, npy, PX: ddd.CurrentX = ddd.CurrentX + dv2x15
 End If
@@ -2252,13 +2258,16 @@ ResetColumns = True
 .charset = dq.Font.charset
 .SZ = dq.FontSize
 Else
-If Not (fonttest.FontName = .FontName And fonttest.Font.charset = .charset And fonttest.Font.Size = .SZ) Then
+If Not (fonttest.FontName = .FontName And fonttest.Font.charset = dq.Font.charset And fonttest.Font.Size = .SZ) Then
+fonttest.Font.charset = .charset
+If fonttest.Font.charset = .charset Then
 StoreFont .FontName, .SZ, .charset
 dq.Font.charset = 0
 dq.FontSize = 9
 dq.FontName = .FontName
 dq.Font.charset = .charset
 dq.FontSize = .SZ
+End If
 End If
 End If
 If alinespace <> -1 Then
@@ -2332,14 +2341,11 @@ mSz = mSz * factor
 .uMineLineSpace = AddTwipsTop * factor
 .double = factor <> 1
 End If
-StoreFont dq.Font.name, mSz, dq.Font.charset
 dq.FontSize = mSz
+StoreFont dq.Font.name, mSz, dq.Font.charset
+SetText dq
 
-.Yt = fonttest.TextHeight("fj")
-.Xt = fonttest.TextWidth("W") + dv15
-.mx = Int(dq.Width / .Xt)
-.My = Int(dq.Height / (.Yt + .uMineLineSpace * 2))
-.Yt = .Yt + .uMineLineSpace * 2
+
 
 If .My <= 0 Then .My = 1
 If .mx <= 0 Then .mx = 1
@@ -2347,6 +2353,7 @@ If .mx <= 0 Then .mx = 1
 .MAXXGRAPH = dq.Width
 .MAXYGRAPH = dq.Height
 End With
+
 End Sub
 
 Public Sub SetTextBasketBack(dq As Object, mb As basket)
@@ -3852,7 +3859,10 @@ dd.Font.Size = Size
 Size = dd.Font.Size
 
 ''Sleep 1  '' USED TO GIVE TIME TO LOAD FONT
+If fonttest.FontName = dd.Font.name And dd.Font.Size = fonttest.Font.Size Then
+Else
 StoreFont dd.Font.name, Size, dd.Font.charset
+End If
 .Yt = fonttest.TextHeight("fj")
 .Xt = fonttest.TextWidth("W")
 
@@ -3862,7 +3872,7 @@ fonttest.Font.Size = Size
 Wend
 dd.Font.Size = Size
 .Yt = TextHeight(fonttest, "fj")
-.Xt = TextWidth(fonttest, "W") + dv15
+.Xt = fonttest.TextWidth("W") + dv15
 
 .mx = Int(x / .Xt)
 .My = Int(y / (.Yt + .MineLineSpace * 2))
@@ -3890,8 +3900,8 @@ If .mx Mod .Column > 0 Then
 
 If .mx Mod 4 <> 0 Then .mx = 4 * (.mx \ 4)
 If .mx < 4 Then .mx = 4
-.My = Int(y / (.Yt + .MineLineSpace * 2))
-.Yt = .Yt + .MineLineSpace * 2
+'.My = Int(y / (.Yt + .MineLineSpace * 2))
+'.Yt = .Yt + .MineLineSpace * 2
 If .mx < 2 Then .mx = 2: x = 2 * .Xt
 If .My < 2 Then .My = 2: y = 2 * .Yt
 If (.mx Mod 2) = 1 And .mx > 1 Then
@@ -4397,9 +4407,8 @@ End With
 End Sub
 Public Sub GetXYb2(dd As Object, mb As basket, x As Long, y As Long)
 With mb
-
 x = dd.CurrentX \ .Xt
-y = (dd.CurrentY) \ .Yt
+y = Int((dd.CurrentY / .Yt) + 0.5)
 End With
 End Sub
 Sub Gradient(TheObject As Object, ByVal f&, ByVal t&, ByVal xx1&, ByVal xx2&, ByVal yy1&, ByVal yy2&, ByVal hor As Boolean, ByVal all As Boolean)

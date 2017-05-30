@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1567,7 +1567,7 @@ If f = 1 Then  ''
 ElseIf f = 2 Then
     work = True
     oldCol = .Column
-    scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .mypen, BF
+    scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - DYP), .mypen, BF
     crNew basestack, prive
     LCTbasketCur scr, prive
     W4 = True
@@ -31010,6 +31010,7 @@ mmy = scr.Height
 If adjustlinespace Then
 If scr.name = "DIS" Then
 mAddTwipsTop = dv15 * (((Form1.Height - sx * W4) / sx / 2) \ dv15)
+
 Else
 mAddTwipsTop = dv15 * (((scr.Height - sx * W4) / sx / 2) \ dv15)
 End If
