@@ -488,7 +488,7 @@ Text = Space$(5)
 thiscur = 1
 
 For i = 0 To listcount - 1
-Pad$ = List(i) + vbCrLf
+Pad$ = list(i) + vbCrLf
 l = Len(Pad)
 If Len(Text) < thiscur + l Then Text = Text + Space$((thiscur + l) + 100)
 Mid$(Text, thiscur, l) = Pad$
@@ -561,7 +561,7 @@ End Sub
 Public Property Get ListValue() As String
 ' this was text before
 RaiseEvent PureListOn
-If SELECTEDITEM <= 0 Then Else ListValue = List(ListIndex)
+If SELECTEDITEM <= 0 Then Else ListValue = list(ListIndex)
 RaiseEvent PureListOff
 End Property
 
@@ -845,7 +845,7 @@ Else
              RaiseEvent Selected2(-2)
      Else
         If myEnabled Then
-        If maxchar = 0 Or (maxchar > Len(List(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
+        If maxchar = 0 Or (maxchar > Len(list(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
          RaiseEvent SyncKeyboard(KeyAscii)
          If KeyAscii > 31 And SELECTEDITEM > 0 Then
             If EditFlag Then
@@ -874,7 +874,7 @@ Else
            End If
             SelStartEventAlways = SelStart + 1
             RaiseEvent PureListOn
-                List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 2) + kk$ + pair$ + Mid$(List(SELECTEDITEM - 1), SelStart - 1)
+                list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 2) + kk$ + pair$ + Mid$(list(SELECTEDITEM - 1), SelStart - 1)
                 
         
             RaiseEvent PureListOff
@@ -946,7 +946,7 @@ state = True
 If SELECTEDITEM - topitem > 0 And SELECTEDITEM - topitem - 1 <= lines And cX > 0 And cX < UserControl.ScaleWidth Then
  If SELECTEDITEM > 0 Then
          If Not BlockItemcount Then
-             REALCUR List(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
+             REALCUR list(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
              mSelstart = mSelstart + 1
 RaiseEvent ChangeSelStart(mSelstart)
              End If
@@ -1072,7 +1072,7 @@ Select Case KeyCode
 Case vbKeyHome
 If EditFlag Then
 If mSelstart = 1 Then
-mSelstart = Len(List(ListIndex)) - Len(NLtrim(List(ListIndex))) + 1
+mSelstart = Len(list(ListIndex)) - Len(NLtrim(list(ListIndex))) + 1
 Else
 mSelstart = 1
 End If
@@ -1087,7 +1087,7 @@ ShowThis 1
 End If
 Case vbKeyEnd
 If EditFlag Then
-mSelstart = Len(List(ListIndex)) + 1
+mSelstart = Len(list(ListIndex)) + 1
 Else
     ShowThis listcount
     Do While Not (Not ListSep(ListIndex) Or ListIndex = 0)
@@ -1205,7 +1205,7 @@ Case vbKeySpace
 If SELECTEDITEM > 0 Then
 If EditFlag Then
 If mSelstart = 0 Then mSelstart = 1
- If maxchar = 0 Or (maxchar > Len(List(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
+ If maxchar = 0 Or (maxchar > Len(list(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
  bb = enabled
  enabled = False
      RaiseEvent PushUndoIfMarked
@@ -1213,14 +1213,14 @@ If mSelstart = 0 Then mSelstart = 1
  enabled = bb
  RaiseEvent PureListOn
  If shift = 5 Then
- List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 1) & ChrW(&H2007) & Mid$(List(SELECTEDITEM - 1), SelStart)
+ list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&H2007) & Mid$(list(SELECTEDITEM - 1), SelStart)
  RaiseEvent RemoveOne(ChrW(&H2007))
  ElseIf shift = 3 Then
- List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 1) & ChrW(&HA0) & Mid$(List(SELECTEDITEM - 1), SelStart)
+ list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & ChrW(&HA0) & Mid$(list(SELECTEDITEM - 1), SelStart)
  RaiseEvent RemoveOne(ChrW(&HA0))
  
  Else
-  List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 1) & " " & Mid$(List(SELECTEDITEM - 1), SelStart)
+  list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) & " " & Mid$(list(SELECTEDITEM - 1), SelStart)
  RaiseEvent RemoveOne(" ")
  End If
  RaiseEvent PureListOff
@@ -1261,7 +1261,7 @@ If bb Then ShowMe2
 ElseIf ListIndex > 0 Then
 ShowThis SELECTEDITEM - 1
 If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
-mSelstart = Len(List(ListIndex)) + 1
+mSelstart = Len(list(ListIndex)) + 1
 End If
 ElseIf SelStart > 1 Then
 mSelstart = SelStart - 1
@@ -1270,7 +1270,7 @@ End If
 Case vbKeyRight
 If EditFlag Then
 If MultiLineEditBox Then
-If SelStart <= Len(List(SELECTEDITEM - 1)) Then
+If SelStart <= Len(list(SELECTEDITEM - 1)) Then
 mSelstart = SelStart + 1
 RaiseEvent MayRefresh(bb)
 If bb Then ShowMe2
@@ -1283,13 +1283,13 @@ If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
 
 End If
 Else
-If SelStart <= Len(List(SELECTEDITEM - 1)) Then mSelstart = SelStart + 1
+If SelStart <= Len(list(SELECTEDITEM - 1)) Then mSelstart = SelStart + 1
 End If
 End If
 Case vbKeyDelete
 If EditFlag Then
 If mSelstart = 0 Then mSelstart = 1
-If SelStart > Len(List(SELECTEDITEM - 1)) Then
+If SelStart > Len(list(SELECTEDITEM - 1)) Then
 If listcount > SELECTEDITEM Then
 If Not NoEvents Then
 
@@ -1299,8 +1299,8 @@ End If
 End If
 Else
  RaiseEvent PureListOn
- RaiseEvent addone(Mid$(List(SELECTEDITEM - 1), SelStart, 1))
-List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 1) + Mid$(List(SELECTEDITEM - 1), SelStart + 1)
+ RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, 1))
+list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + 1)
 RaiseEvent PureListOff
 ShowMe2
 End If
@@ -1312,10 +1312,10 @@ If EditFlag Then
     If SelStart > 1 Then
         SelStart = SelStart - 1  ' make it a delete because we want selstart to take place before list() take value
      RaiseEvent PureListOn
-        RaiseEvent addone(Mid$(List(SELECTEDITEM - 1), SelStart, 1))
+        RaiseEvent addone(Mid$(list(SELECTEDITEM - 1), SelStart, 1))
       
 
-        List(SELECTEDITEM - 1) = Left$(List(SELECTEDITEM - 1), SelStart - 1) + Mid$(List(SELECTEDITEM - 1), SelStart + 1)
+        list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 1) + Mid$(list(SELECTEDITEM - 1), SelStart + 1)
         RaiseEvent PureListOff
         ShowMe2  'refresh now
     Else
@@ -1608,7 +1608,7 @@ If (cX > ScaleWidth / 4 And cX < ScaleWidth * 3 / 4) And scrollme = 0 Then x = l
             SELECTEDITEM = topitem + YYT + 1
             
              If Not BlockItemcount Then
-             REALCUR List(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
+             REALCUR list(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
       
               mSelstart = mSelstart + 1
               
@@ -1643,7 +1643,7 @@ If (cX > ScaleWidth / 4 And cX < ScaleWidth * 3 / 4) And scrollme = 0 Then x = l
         Else
         If Not Timer1.enabled Then
          If Not BlockItemcount Then
-             REALCUR List(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
+             REALCUR list(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
               mSelstart = mSelstart + 1
          
       
@@ -1793,7 +1793,7 @@ If (Button And 3) > 0 And myEnabled Then
              ' compute selstart always
              If Not BlockItemcount Then
              
-             REALCUR List(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
+             REALCUR list(SELECTEDITEM - 1), cX - scrollme, dummy, mSelstart, True
               mSelstart = mSelstart + 1
 RaiseEvent ChangeSelStart(mSelstart)
 
@@ -2056,7 +2056,7 @@ Else
 End If
 YYT = YYT - 1
 If topitem + YYT < listcount Then
-REALCUR List(topitem + YYT), x - scrollme, dummy, M_CURSOR
+REALCUR list(topitem + YYT), x - scrollme, dummy, M_CURSOR
 ListindexPrivateUse = topitem + YYT
 If ListIndex = -1 Then
         If itemcount = 0 Then
@@ -2076,7 +2076,7 @@ ListindexPrivateUse = listcount - 1
             ListindexPrivateUse = 0
             
             End If
-SelStart = Len(List(ListIndex)) + 1
+SelStart = Len(list(ListIndex)) + 1
 
 End If
 RaiseEvent selected(SELECTEDITEM)
@@ -2267,25 +2267,25 @@ End If
 If Me.BackStyle = 1 Then ShowMe2
 End If
 End Sub
-Property Get List(item As Long) As String
+Property Get list(item As Long) As String
 Dim that$
 If itemcount = 0 Or BlockItemcount Then
 RaiseEvent ReadListItem(item, that$)
-List = that$
+list = that$
 Exit Property
 End If
 If item < 0 Then Exit Property
 If item >= listcount Then
 'Err.Raise vbObjectError + 1050
 Else
-List = mList(item).content
+list = mList(item).content
 End If
 End Property
 
-Property Let List(item As Long, ByVal b$)
+Property Let list(item As Long, ByVal b$)
 On Error GoTo nnn1
 If itemcount = 0 Or BlockItemcount Then
-If List(item) <> b$ Then
+If list(item) <> b$ Then
 RaiseEvent PureListOff
 RaiseEvent ChangeListItem(item, b$)
 End If
@@ -2428,7 +2428,7 @@ Public Sub moveto(ByVal Key As String)
 Dim i As Long
 RaiseEvent PureListOn
 For i = 0 To listcount - 1
-If List(i) Like Key Then Exit For
+If list(i) Like Key Then Exit For
 Next i
 RaiseEvent PureListOff
 If i < listcount Then
@@ -2443,11 +2443,11 @@ FindItemStartWidth = -1
 If j = 0 Then Exit Function
 If NoCase Then
 For i = offset To listcount - 1
-If StrComp(Left$(List(i), j), Key, vbTextCompare) = 0 Then Exit For
+If StrComp(Left$(list(i), j), Key, vbTextCompare) = 0 Then Exit For
 Next i
 Else
 For i = offset To listcount - 1
-If StrComp(Left$(List(i), j), Key, vbBinaryCompare) = 0 Then Exit For
+If StrComp(Left$(list(i), j), Key, vbBinaryCompare) = 0 Then Exit For
 Next i
 End If
 If i < listcount Then
@@ -2462,7 +2462,7 @@ If skipme Then Find = i: Exit Function
 Find = -1
 RaiseEvent PureListOn
 For i = 0 To listcount - 1
-If List(i) Like Key Then Exit For
+If list(i) Like Key Then Exit For
 Next i
 RaiseEvent PureListOff
 If i < listcount Then
@@ -2723,7 +2723,7 @@ If SelStart = 0 Then SelStart = 1
 scrollme = 0
 again123:
 
-REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
+REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
 REALX2 = scrollme + REALX
 If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: GoTo again123
 If REALX2 - Width * 0.2 * dragslow < 0 Then
@@ -2837,10 +2837,10 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
                                    MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, i, True
                         End If
 
-                 PrintLineControlSingle UserControl.hDC, List(i), nr
+                 PrintLineControlSingle UserControl.hDC, list(i), nr
                  Me.ForeColor = fg
              Else
-                 If ListSep(i) And List(i) = "" Then
+                 If ListSep(i) And list(i) = "" Then
                    hnr.Left = 0
                    hnr.Right = nr.Right
                    hnr.top = nr.top + mytPixels \ 2
@@ -2856,7 +2856,7 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
          
                '    ForeColor = fg
                     End If
-                    PrintLineControlSingle UserControl.hDC, List(i), nr
+                    PrintLineControlSingle UserControl.hDC, list(i), nr
                     
                 End If
       
@@ -2886,10 +2886,10 @@ nr.Bottom = nr.top + mytPixels + 1
                                         DrawStyle = vbSolid
                                  If CenterText Then
                                         ' (UserControl.ScaleWidth- LeftMarginPixels * scrTwips-UserControlTextWidth(list$(selecteitem-1)))/2
-                                          REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips + (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - UserControlTextWidth(List$(SELECTEDITEM - 1))) / 2
+                                          REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips + (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - UserControlTextWidth(list$(SELECTEDITEM - 1))) / 2
                                           REALX2 = scrollme / 2 + REALX
                                             Else
-                                   REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
+                                   REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
                                     REALX2 = scrollme + REALX
                                    End If
                                    If InternalCursor Then
@@ -2986,7 +2986,7 @@ If SelStart = 0 Then SelStart = 1
 scrollme = 0
 again123:
 
-REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
+REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
 REALX2 = scrollme + REALX
 If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: GoTo again123
 If REALX2 - Width * 0.2 * dragslow < 0 Then
@@ -3046,12 +3046,12 @@ CurrentY = 0
  MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.top + mytPixels / 2, i, True
  End If
 
-   PrintLineControlSingle UserControl.hDC, List(i), nr
+   PrintLineControlSingle UserControl.hDC, list(i), nr
  If nfg = fg Then Me.ForeColor = fg
  Else
     nfg = fg
   RaiseEvent SpecialColor(nfg)
- If ListSep(i) And List(i) = "" Then
+ If ListSep(i) And list(i) = "" Then
  hnr.Left = 0
  hnr.Right = nr.Right
  hnr.top = nr.top + mytPixels \ 2
@@ -3071,7 +3071,7 @@ CurrentY = 0
    End If
  End If
 
- PrintLineControlSingle UserControl.hDC, List(i), nr
+ PrintLineControlSingle UserControl.hDC, list(i), nr
  End If
 
    End If
@@ -3103,10 +3103,10 @@ If SELECTEDITEM > 0 Then
                                              RaiseEvent PureListOff
                                           If CenterText Then
                                         ' (UserControl.ScaleWidth- LeftMarginPixels * scrTwips-UserControlTextWidth(list$(selecteitem-1)))/2
-                                          REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips + (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - UserControlTextWidth(List$(SELECTEDITEM - 1))) / 2
+                                          REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips + (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - UserControlTextWidth(list$(SELECTEDITEM - 1))) / 2
                                           REALX2 = scrollme / 2 + REALX
                                             Else
-                                   REALX = UserControlTextWidth(Mid$(List(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
+                                   REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
                                     REALX2 = scrollme + REALX
                                    End If
                                    RaiseEvent PureListOn
@@ -4654,12 +4654,12 @@ tothere = tothere - 1
 If tothere = ListIndex Then Exit Sub
 Dim thatwidth As Long, c$, dummy1 As Long
 If SelStart < 1 Then
-c$ = List(ListIndex)
+c$ = list(ListIndex)
 Else
-c$ = Left$(List(ListIndex), SelStart - 1)
+c$ = Left$(list(ListIndex), SelStart - 1)
 End If
 thatwidth = UserControlTextWidth(c$) + LeftMarginPixels * scrTwips
-REALCUR List(tothere), thatwidth, (dummy1), mSelstart, True
+REALCUR list(tothere), thatwidth, (dummy1), mSelstart, True
 mSelstart = mSelstart + 1
 End Sub
 
@@ -4684,7 +4684,7 @@ If ListIndex < 0 Then Exit Sub
 Dim one$
 Dim mline$, pos As Long, Epos As Long, oldselstart As Long
 RaiseEvent PureListOn
-mline$ = List(ListIndex)
+mline$ = list(ListIndex)
 RaiseEvent PureListOff
 'Enabled = False
 pos = SelStart
@@ -4736,7 +4736,7 @@ RaiseEvent selected(ListIndex + 1)
 RaiseEvent MarkIn
 MarkNext = 1
 ListindexPrivateUse = listcount - 1
-SelStart = Len(List(ListIndex)) + 1
+SelStart = Len(list(ListIndex)) + 1
 RaiseEvent selected(ListIndex + 1)
 RaiseEvent MarkOut
 ShowMe2
@@ -4749,7 +4749,7 @@ If listcount > 0 Then
                     If SelStart = 0 Then
                     LL = scrollme
                     Else
-                    LL = UserControlTextWidthPixels(Left$(List(ListIndex), SelStart)) + scrollme
+                    LL = UserControlTextWidthPixels(Left$(list(ListIndex), SelStart)) + scrollme
                     End If
                     If LL < WidthPixels Then
                     ShowMe2

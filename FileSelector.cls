@@ -111,7 +111,7 @@ If NostateDir Then
 ' as a setup menu
 Else
 If Not mselChecked Then Exit Sub
-If Mydir.List(item) = "..." Or Mid$(Mydir.List(item), 1) = Chr$(2) Or item < 0 Then Exit Sub
+If Mydir.list(item) = "..." Or Mid$(Mydir.list(item), 1) = Chr$(2) Or item < 0 Then Exit Sub
 If Button = 1 Then
 
 If x < 20 * lastfactor And y < 20 * lastfactor Then
@@ -132,12 +132,12 @@ If NostateDir Then Exit Sub
 If fakeitemcount = 0 Then fakeitemcount = 1
 cListCount = fakeitemcount
 End Sub
-Private Function mylcasefILE(ByVal A$) As String
-A$ = NLtrim$(A$)
+Private Function mylcasefILE(ByVal a$) As String
+a$ = NLtrim$(a$)
 If casesensitive Then
-mylcasefILE = A$
+mylcasefILE = a$
 Else
- mylcasefILE = LCase(A$) '!!!!!!!!!!
+ mylcasefILE = LCase(a$) '!!!!!!!!!!
  End If
 
 End Function
@@ -151,7 +151,7 @@ s$ = mylcasefILE(Key)
 'Command2.Enabled = False
 For i = 0 To Mydir.listcount - 1
 If Mydir.abort Then Exit For
-If mylcasefILE(Mydir.List(i)) = s$ Then
+If mylcasefILE(Mydir.list(i)) = s$ Then
 
 'If Mydir.List(I) Like "*" & key Then
 '********************************************
@@ -159,7 +159,7 @@ where = i
 ''Command2.Enabled = True
 Exit For
 End If
-If Left$(Mydir.List(i), 1) = Chr$(2) Then Exit For
+If Left$(Mydir.list(i), 1) = Chr$(2) Then Exit For
 Next i
 If Mydir.abort Then where = -1: Exit Sub
 'If Not Command2.Enabled Then
@@ -179,22 +179,22 @@ If NostateDir Then
 ' as a setup menu
 Else
 ' item is from 1
-If Mydir.List(item - 1) = "..." Then
+If Mydir.list(item - 1) = "..." Then
 If Mydir.Nofiles Or (netdisplay And item > LastItemCount) Then
 TEXT1 = SelectFolderButton
 End If
 ElseIf Not glistN.ListSep(item - 1) Then
-If Left$(Mydir.List(item - 1), 1) = Chr$(2) Then
+If Left$(Mydir.list(item - 1), 1) = Chr$(2) Then
 'Caption = Mid$(Mydir.List(item - 1), 2)
 If Mydir.path = "" Then
 If netdisplay And item > LastItemCount Then
-If Mid$(Mydir.List(item - 1), 2, 1) = "(" Then
-TEXT1 = FindNetworkFolderPath(Mid$(Mydir.List(item - 1), 2))
+If Mid$(Mydir.list(item - 1), 2, 1) = "(" Then
+TEXT1 = FindNetworkFolderPath(Mid$(Mydir.list(item - 1), 2))
 Else
-TEXT1 = Mid$(Mydir.List(item - 1), 2)
+TEXT1 = Mid$(Mydir.list(item - 1), 2)
 End If
 Else
-m = FreeDiskSpace(Mid$(Mydir.List(item - 1), 2, 1))
+m = FreeDiskSpace(Mid$(Mydir.list(item - 1), 2, 1))
 If m < 0 Then reload: Exit Sub
 
 If m > 1000 Then
@@ -204,17 +204,17 @@ TEXT1 = Format(m, "##,###,##0.0") & " MB Free"
 End If
 End If
 ElseIf Mydir.Nofiles Then
-If Mid$(Mydir.List(item - 1), 2, 1) = "(" Then
-TEXT1 = FindNetworkFolderPath(Mid$(Mydir.List(item - 1), 2))
+If Mid$(Mydir.list(item - 1), 2, 1) = "(" Then
+TEXT1 = FindNetworkFolderPath(Mid$(Mydir.list(item - 1), 2))
 Else
-TEXT1 = "\" & Mydir.ExtractName(Mid$(Mydir.List(item - 1), 2))
+TEXT1 = "\" & Mydir.ExtractName(Mid$(Mydir.list(item - 1), 2))
 End If
 End If
 Else
     If recnowchecked Then
-  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.List(item - 1))
+  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.list(item - 1))
     Else
-    RaiseEvent TraceFile(Mydir.path + Mydir.List(item - 1))
+    RaiseEvent TraceFile(Mydir.path + Mydir.list(item - 1))
     End If
 End If
 End If
@@ -230,23 +230,23 @@ ElseIf Not glistN.ListSep(item - 1) Then
 ' new addition locked=false
 TEXT1.locked = False
 
-If Mydir.List(item - 1) = "..." Then
+If Mydir.list(item - 1) = "..." Then
 If Mydir.Nofiles Then
 TEXT1 = SelectFolderButton
 End If
 Else
-If Left$(Mydir.List(item - 1), 1) = Chr$(2) Then
+If Left$(Mydir.list(item - 1), 1) = Chr$(2) Then
 'Caption = Mid$(Mydir.List(item - 1), 2)
 If Mydir.path = "" Then
 If netdisplay And item > LastItemCount Then
 
-If Mid$(Mydir.List(item - 1), 2, 1) = "(" Then
-TEXT1 = FindNetworkFolderPath(Mid$(Mydir.List(item - 1), 2))
+If Mid$(Mydir.list(item - 1), 2, 1) = "(" Then
+TEXT1 = FindNetworkFolderPath(Mid$(Mydir.list(item - 1), 2))
 Else
-TEXT1 = Mid$(Mydir.List(item - 1), 2)
+TEXT1 = Mid$(Mydir.list(item - 1), 2)
 End If
 Else
-m = FreeDiskSpace(Mid$(Mydir.List(item - 1), 2, 1))
+m = FreeDiskSpace(Mid$(Mydir.list(item - 1), 2, 1))
 If m < 0 Then reload: Exit Sub
 If m > 1000 Then
 TEXT1 = Format(m / 1000, "##,###,##0.0") & " GB Free"
@@ -255,20 +255,20 @@ TEXT1 = Format(m, "##,###,##0.0") & " MB Free"
 End If
 End If
 ElseIf Mydir.Nofiles Then
-If Mid$(Mydir.List(item - 1), 2, 1) = "(" Then
-TEXT1 = FindNetworkFolderPath(Mid$(Mydir.List(item - 1), 2))
+If Mid$(Mydir.list(item - 1), 2, 1) = "(" Then
+TEXT1 = FindNetworkFolderPath(Mid$(Mydir.list(item - 1), 2))
 Else
-TEXT1 = "\" & Mydir.ExtractName(Mid$(Mydir.List(item - 1), 2))
+TEXT1 = "\" & Mydir.ExtractName(Mid$(Mydir.list(item - 1), 2))
 End If
 End If
 Else
     If recnowchecked Then
-    Text1Dir = Mydir.FindFolder(item - 1) + Mydir.List(item - 1)
-  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.List(item - 1))
+    Text1Dir = Mydir.FindFolder(item - 1) + Mydir.list(item - 1)
+  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.list(item - 1))
   ' Text1 = Mydir.List(item - 1)
     Else
-    Text1Dir = Mydir.path + Mydir.List(item - 1)
-    RaiseEvent TraceFile(Mydir.path + Mydir.List(item - 1))
+    Text1Dir = Mydir.path + Mydir.list(item - 1)
+    RaiseEvent TraceFile(Mydir.path + Mydir.list(item - 1))
     ' Text1 = Mydir.List(item - 1)
     End If
 End If
@@ -303,9 +303,9 @@ End If
 ' this selected file isn't the same as the GET
 selectedFile = TEXT1
 If netdisplay Then
-If Mid$(Mydir.List(item), 2, 1) = "(" Then
+If Mid$(Mydir.list(item), 2, 1) = "(" Then
 ' change with path
-netselect = FindNetworkFolderPath(Mid$(Mydir.List(item), 2)) ' again because maybe is closed
+netselect = FindNetworkFolderPath(Mid$(Mydir.list(item), 2)) ' again because maybe is closed
 End If
 End If
 If item < 0 Then Exit Sub ' -2 is a signal and here is not used
@@ -319,7 +319,7 @@ myDir2.Nofiles = Mydir.Nofiles
 myDir2.SortType = Mydir.SortType
 myDir2.TopFolder = Mydir.TopFolder
 If recnow3checked Then myDir2.LevelStop = 3
-If Mydir.List(item) = "..." Then
+If Mydir.list(item) = "..." Then
 
 If GetPath <> "" Then
 If Len(Mydir.path) < 4 Or (ExtractPath(ExtractPath(Mydir.path, False), , True) = "") Then
@@ -334,29 +334,29 @@ Else
 End If
 anystr = myDir2.Dir2(path$, filetypes, recnowchecked)
 End If
-ElseIf Left$(Mydir.List(item), 1) = Chr$(2) Then
+ElseIf Left$(Mydir.list(item), 1) = Chr$(2) Then
 myDir2.IncludedFolders = True
 If netdisplay And netselect <> "" Then
 anystr = myDir2.Dir2(netselect, filetypes, recnowchecked)
 Else
-anystr = myDir2.Dir2(Mid$(Mydir.List(item), 2), filetypes, recnowchecked)
+anystr = myDir2.Dir2(Mid$(Mydir.list(item), 2), filetypes, recnowchecked)
 End If
 Else
 
 If recnowchecked Then
 If Mydir.path = "" Then
-TEXT1 = Mid$(Mydir.List(item), 2)
+TEXT1 = Mid$(Mydir.list(item), 2)
 Else
-TEXT1 = Mydir.FindFolder(item) + Mydir.List(item)
+TEXT1 = Mydir.FindFolder(item) + Mydir.list(item)
 End If
-  RaiseEvent doubleclick(Mydir.FindFolder(item) + Mydir.List(item))
+  RaiseEvent doubleclick(Mydir.FindFolder(item) + Mydir.list(item))
 Else
 If Mydir.path = "" Then
-TEXT1 = Mid$(Mydir.List(item), 2)
+TEXT1 = Mid$(Mydir.list(item), 2)
 Else
-TEXT1 = Mydir.List(item)
+TEXT1 = Mydir.list(item)
 End If
- RaiseEvent doubleclick(Mydir.path + Mydir.List(item))
+ RaiseEvent doubleclick(Mydir.path + Mydir.list(item))
 End If
 
 skipselected2 = False
@@ -375,25 +375,25 @@ End Property
 
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 ' item is from 0
-Dim A As RECT, b As RECT
+Dim a As RECT, b As RECT
 Dim what$, ThatPara As Long, i As Long
 If NostateDir Then
 ' as a setup menu
 If item <> -1 Then skip = False
 Else
-CopyFromLParamToRect A, thisrect
+CopyFromLParamToRect a, thisrect
 CopyFromLParamToRect b, thisrect
-A.Left = A.Left + 1
-A.Right = glistN.WidthPixels
+a.Left = a.Left + 1
+a.Right = glistN.WidthPixels
 b.Right = glistN.WidthPixels
 If item < 0 Then  ' this is a headline
 If Not skip Then FillBack thisHDC, b, glistN.CapColor
       mDoc1.TextParagraphLine 1, what$, ThatPara
       glistN.HeadlineHeight = mDoc1.DocLines * (onelineheight + 1) + 2
-      A.top = A.top + 1
+      a.top = a.top + 1
       For i = 1 To mDoc1.DocLines
-        PrintItem thisHDC, mDoc1.TextLine(i), A
-        A.top = A.top + onelineheight + 1
+        PrintItem thisHDC, mDoc1.TextLine(i), a
+        a.top = a.top + onelineheight + 1
       Next i
  If topoffsetpixel = 0 Then topoffsetpixel = glistN.LineTopOffsetPixels
      
@@ -403,11 +403,11 @@ If Not skip Then FillBack thisHDC, b, glistN.CapColor
 
 
 
-ElseIf Left$(Mydir.List(item), 1) = Chr$(2) Then
+ElseIf Left$(Mydir.list(item), 1) = Chr$(2) Then
                 'DrawFrameControl thisHDC, a, 0, item
-                A.Left = A.Left + 1
+                a.Left = a.Left + 1
                 
-              A.top = A.top + topoffsetpixel
+              a.top = a.top + topoffsetpixel
                 
                    If item = glistN.ListIndex And Not glistN.ListSep(item) Then
             'SetTextColor thisHDC, 0
@@ -420,12 +420,12 @@ ElseIf Left$(Mydir.List(item), 1) = Chr$(2) Then
                 End If
        
                  If Mydir.path = "" Then
-                 A.Left = A.Left + 1
+                 a.Left = a.Left + 1
                  If (Mydir.ReadLevel(item) - 1) > 0 Then SetTextColor thisHDC, &H666666 ' &H999999
-                 PrintItem thisHDC, Mid$(Mydir.List(item), 2), A
+                 PrintItem thisHDC, Mid$(Mydir.list(item), 2), a
                  Else
-                 A.Left = A.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
-                PrintItem thisHDC, "\" + Mydir.ExtractName(Mydir.List(item)), A
+                 a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
+                PrintItem thisHDC, "\" + Mydir.ExtractName(Mydir.list(item)), a
                 End If
 Else
     If item = glistN.ListIndex Then
@@ -448,9 +448,9 @@ Else
     b.top = b.Bottom - 1
    FillBack thisHDC, b, 0
     End If
-    A.Left = A.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
-     A.top = A.top + topoffsetpixel
-    PrintItem thisHDC, Mydir.ExtractName(Mydir.List(item)), A
+    a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
+     a.top = a.top + topoffsetpixel
+    PrintItem thisHDC, Mydir.ExtractName(Mydir.list(item)), a
 
     
 End If
@@ -470,16 +470,16 @@ If NostateDir Then
 
 Else
 
-If Mydir.List(item - 1) = "..." Then
+If Mydir.list(item - 1) = "..." Then
 
 Else
-If Left$(Mydir.List(item - 1), 1) = Chr$(2) Then
+If Left$(Mydir.list(item - 1), 1) = Chr$(2) Then
 
 Else
     If recnowchecked Then
-  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.List(item - 1))
+  RaiseEvent TraceFile(Mydir.FindFolder(item - 1) + Mydir.list(item - 1))
     Else
-    RaiseEvent TraceFile(Mydir.path + Mydir.List(item - 1))
+    RaiseEvent TraceFile(Mydir.path + Mydir.list(item - 1))
     End If
 End If
 End If
@@ -525,7 +525,7 @@ Sub reload()
  disablemenu
 Dim anystr As String
 
-schedule = Mydir.List(glistN.ListIndex)
+schedule = Mydir.list(glistN.ListIndex)
 Set myDir2 = New recDir ' we get a new...the old is reference by myDir
 myDir2.IncludedFolders = Mydir.IncludedFolders
 myDir2.Nofiles = Mydir.Nofiles
@@ -544,9 +544,9 @@ End If
 End Sub
 
 Public Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long)
-Dim A As RECT
-CopyFromLParamToRect A, thatRect
-FillBack thathDC, A, thatbgcolor
+Dim a As RECT
+CopyFromLParamToRect a, thatRect
+FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub FillBack(thathDC As Long, there As RECT, bgcolor As Long)
 ' create brush
@@ -556,7 +556,7 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 Private Sub myDir2_DirFinished()
-Dim findit As Long, A$(), b$
+Dim findit As Long, a$(), b$
 
 Set Mydir = myDir2
 'glistN.clear  no clear please
@@ -587,6 +587,7 @@ If Mydir.path = "" Then
 TEXT1 = ""
 Else
 TEXT1 = SelectFolderButton
+TEXT1.locked = False
 End If
 Else
 TEXT1 = mselectedFile
@@ -641,18 +642,18 @@ Function DriveType(path$) As String
 End Function
 Function DriveSerial(ByVal path$) As Long
 ' need trailing slash
-    Dim Serial As Long, vname As String, FSName As String
-    vname = String$(255, Chr$(0))
+    Dim Serial As Long, VName As String, FSName As String
+    VName = String$(255, Chr$(0))
     FSName = String$(255, Chr$(0))
-    GetVolumeInformation path$, vname, 255, Serial, 0, 0, FSName, 255
+    GetVolumeInformation path$, VName, 255, Serial, 0, 0, FSName, 255
     DriveSerial = Serial
 End Function
 Function WeCanWrite(ByVal path$) As Boolean
 ' need trailing slash
-    Dim Serial As Long, vname As String, FSName As String, SystemFlags As Long
-    vname = String$(255, Chr$(0))
+    Dim Serial As Long, VName As String, FSName As String, SystemFlags As Long
+    VName = String$(255, Chr$(0))
     FSName = String$(255, Chr$(0))
-    GetVolumeInformation path$, vname, 255, 0, 0, SystemFlags, FSName, 255
+    GetVolumeInformation path$, VName, 255, 0, 0, SystemFlags, FSName, 255
     WeCanWrite = (SystemFlags And &H80000) = 0
 End Function
 

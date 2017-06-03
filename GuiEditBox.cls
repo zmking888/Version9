@@ -47,8 +47,8 @@ Attribute glistN.VB_VarHelpID = -1
 Private blockKeyboard As Boolean
 Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
 Public fState As Long
-Public WithEvents mdoc As Document    ' document
-Attribute mdoc.VB_VarHelpID = -1
+Public WithEvents mDoc As Document    ' document
+Attribute mDoc.VB_VarHelpID = -1
 Dim WithEvents mDoc1 As Document  ' header
 Attribute mDoc1.VB_VarHelpID = -1
 Dim UndoDoc As New Document  ' one level of undo no events ' no break lines
@@ -140,6 +140,7 @@ Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
 Dim oldEditDoc As Boolean
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
+Dim Quit
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
@@ -223,6 +224,7 @@ enabled = True
 SetME
 End Sub
 Sub Show()
+If glistN Is Nothing Then Exit Sub
 TextPixelOffset = Int(glistN.TextHeightOffset)
 'glistN.ShowPan
 glistN.PrepareToShow 5
@@ -238,14 +240,14 @@ PushUndo
 End If
 
 undotext = thisdoc
-undopara = mdoc.MarkParagraphID
-If mdoc.TextParagraphLen(mdoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
+undopara = mDoc.MarkParagraphID
+If mDoc.TextParagraphLen(mDoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
 undopos = 1 + CharPosStart - glistN.SelStart
 Else
 undopos = CharPosStart
 End If
 undomode = 0
-mdoc.InsertDoc mdoc.MarkParagraphID, Charpos, thisdoc
+mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, thisdoc
 'ReColorBlock
 Render
 End Sub
@@ -337,37 +339,37 @@ glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight + addpixelstoo
 glistN.addpixels = 4 * factor ' 'line spacing
 End If
-all = mdoc.DocLines
+all = mDoc.DocLines
 glistN.MultiLineEditBox = True
 glistN.ShowBar = True
 glistN.ShowBar = False  ' now is in autohide mode
 ''glistN.ShowMe
 glistN.StickBar = True
-mdoc.WrapAgain
+mDoc.WrapAgain
 mDoc1.WrapAgain
 glistN.PrepareToShow 10
-all = mdoc.DocLines
+all = mDoc.DocLines
 glistN.CalcAndShowBar
 End Sub
 Public Property Let FileName(ByVal RHS As String)
 myfilename = RHS
 onelineheight = 0
 Dim thisdoc As New Document, header As New Document
-Set mdoc = thisdoc
+Set mDoc = thisdoc
 Set mDoc1 = header
 Dim i As Long
 glistN.NoCaretShow = True
 ClearRedo
 ClearUndo
 If RHS = "" Then
-mdoc.textDoc = ""
+mDoc.textDoc = ""
 Else
-mdoc.textDoc = ReadUnicodeOrANSI(RHS)
+mDoc.textDoc = ReadUnicodeOrANSI(RHS)
 End If
 
 Dim what$, ThatPara As Long, pastchars
-    pastchars = mdoc.TextParagraphLine(1, what$, ThatPara)
-mdoc.MarkParagraphID = ThatPara
+    pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
+mDoc.MarkParagraphID = ThatPara
 NoTitle = TITLE = ""
 nowrap = True
 
@@ -380,17 +382,17 @@ glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight
 End If
 ''glistN.AddPixels = 4  ' use this before  ---- changed for m2000 version 2
-all = mdoc.DocLines
+all = mDoc.DocLines
 glistN.MultiLineEditBox = True
 glistN.ShowBar = True
 glistN.ShowBar = False  ' now is in autohide mode
 glistN.ShowMe
 glistN.StickBar = True
-mdoc.WrapAgain
+mDoc.WrapAgain
 mDoc1.WrapAgain
 glistN.PrepareToShow 10
 'glistN.ShowMe2
-all = mdoc.DocLines
+all = mDoc.DocLines
 glistN.CalcAndShowBar
 'glistN.FloatList = True
 End Property
@@ -402,10 +404,10 @@ End Sub
 
 
 Private Sub Class_Initialize()
-Set mdoc = New Document
+Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mdoc.LCID = cLid
+mDoc.LCID = cLid
 mDoc1.LCID = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
@@ -414,6 +416,7 @@ Redopara = -1
 mIndex = -1
 End Sub
 Private Sub Class_Terminate()
+Quit = True
 Set glistN = Nothing
 End Sub
 
@@ -424,7 +427,7 @@ If Not enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart
 undomode = 2
@@ -439,7 +442,7 @@ undopos = SelStart
 End If
 Else
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart ' always the left side of char - so 0 is inside
 undomode = 1
@@ -451,14 +454,14 @@ If Not enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart
 undomode = 2
 
 Else
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart ' always the left side of char - so 0 is inside
 undomode = 1
@@ -469,15 +472,15 @@ Public Sub RemoveUndo(that As String)
 ClearRedo
 If that = vbCrLf Then
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart
 undomode = 3
 Else
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
-If mdoc.TextParagraphLen(mdoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
+If mDoc.TextParagraphLen(mDoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
 undopos = 1 + SelStart - glistN.SelStart
 Else
 undopos = SelStart
@@ -614,7 +617,7 @@ If Not enabled Then Exit Sub
 ClearRedo
 If that = vbCrLf Then
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
 undopos = SelStart
 undomode = 3
@@ -625,9 +628,9 @@ undotext = undotext + that
 
 Else
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
-If mdoc.TextParagraphLen(mdoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
+If mDoc.TextParagraphLen(mDoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
 undopos = 1 + SelStart - glistN.SelStart
 Else
 If glistN.ListIndex = all Then
@@ -642,9 +645,9 @@ End If
 
 Else
 PushUndo
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undotext = that
-If mdoc.TextParagraphLen(mdoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
+If mDoc.TextParagraphLen(mDoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
 undopos = 1 + SelStart - glistN.SelStart
 Else
 undopos = SelStart
@@ -667,7 +670,7 @@ Dim selstart2 As Long, checklistindex As Long
 If NumberOnly Then
 If Not ValidNum(content, False, NumberIntOnly) Then
 undotext = ""
-content = mdoc.TextLine(item + 1)
+content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
 End If
@@ -678,12 +681,12 @@ glistN.SelStartEventAlways = glistN.SelStart - 1
 Exit Sub
 End If
 End If
-mdoc.TextLine(item + 1) = content
+mDoc.TextLine(item + 1) = content
 WrapMarkedPara
-If all <> mdoc.DocLines Then
+If all <> mDoc.DocLines Then
     Render
 Else
-    checklistindex = mdoc.FirstParagraphLine(mdoc.MarkParagraphID) + mdoc.TextParagraph2Line(mdoc.MarkParagraphID, Charpos, selstart2)
+    checklistindex = mDoc.FirstParagraphLine(mDoc.MarkParagraphID) + mDoc.TextParagraph2Line(mDoc.MarkParagraphID, Charpos, selstart2)
     If (checklistindex - glistN.ScrollFrom) >= glistN.lines + 1 Then
      glistN.ListindexPrivateUse = checklistindex
      glistN.ScrollTo checklistindex - glistN.lines
@@ -706,7 +709,7 @@ End Sub
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If glistN.ListIndex < 0 Then Exit Sub
 Dim what$, ThatPara As Long, pastchars As Long
-pastchars = mdoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)  'showparagraph)
+pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)  'showparagraph)
 Charpos = pastchars + glistN.SelStart
 'If Len(mDoc.TextParagraph(ThatPara)) < Charpos Then Charpos = Len(mDoc.TextParagraph(ThatPara)) + 1
 If Not glistN.enabled Then Exit Sub
@@ -812,7 +815,7 @@ Else
 showparagraphWork = showparagraph
    a.Left = a.Left + 1
     a.top = a.top + glistN.addpixels \ 2
-    pastchars = mdoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
+    pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
         showparagraphWork = True
@@ -825,17 +828,17 @@ showparagraphWork = showparagraph
         
              If BlockEndline < BlockStartLine Then
                  If BlockEndCursor > 1 Then  ' if not leave it as is
-                 b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockEndCursor - 1))
-                 PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
-                final$ = Mid$(glistN.List(item), BlockEndCursor)
+                 b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1))
+                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
+                final$ = Mid$(glistN.list(item), BlockEndCursor)
                 fbypass = True
                  End If
              Else
                   If BlockStartCursor > 1 Then  ' if not leave it as is
-                 b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockStartCursor - 1))
-                 PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
+                 b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1))
+                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
               
-                 final$ = Mid$(glistN.List(item), BlockStartCursor)
+                 final$ = Mid$(glistN.list(item), BlockStartCursor)
                  fbypass = True
                  End If
              End If
@@ -848,27 +851,27 @@ showparagraphWork = showparagraph
      ElseIf item = BlockBottomline And item <> BlockTopline Then
       
              If BlockBottomline = BlockEndline Then
-                 If BlockEndCursor <= Len(glistN.List(item)) Then
+                 If BlockEndCursor <= Len(glistN.list(item)) Then
                  If BlockEndCursor > 1 Then ' if not leave it as is
-                 b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
-                 PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
-                final$ = Mid$(glistN.List(item), 1, BlockEndCursor - 1)
+                 b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
+                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
+                final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
              fbypass = False
                  Else
-                   If ThatPara = mdoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
+                   If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
                   GoTo conthere
                  End If
                  End If
                  
              Else
-                  If BlockStartCursor <= Len(glistN.List(item)) Then  ' if not leave it as is
+                  If BlockStartCursor <= Len(glistN.list(item)) Then  ' if not leave it as is
                If BlockStartCursor > 1 Then
-               b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
-                 PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
-                final$ = Mid$(glistN.List(item), 1, BlockStartCursor - 1)
+               b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
+                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
+                final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
                fbypass = False
                      Else
-                       If ThatPara = mdoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
+                       If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
                       GoTo conthere
                  End If
                  End If
@@ -883,30 +886,30 @@ showparagraphWork = showparagraph
     ElseIf BlockBottomline = item Then ' in one line only
      skipcolor = False
         If BlockEndCursor > BlockStartCursor Then
-         If BlockStartCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockStartCursor - 1))
-          If BlockEndCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
+         If BlockStartCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1))
+          If BlockEndCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
           If BlockStartCursor = 0 Then
-     final$ = Mid$(glistN.List(item), 1, BlockEndCursor - 1)
+     final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
           Else
            skipcolor = False
- final$ = Mid$(glistN.List(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
+ final$ = Mid$(glistN.list(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
  End If
 
- PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
+ PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
           FillBack thisHDC, b, SelectionColor
              a.Right = b.Right + 1
              a.Left = b.Left + 1
          SetTextColor thisHDC, SelectionTextColor
         ElseIf BlockEndCursor < BlockStartCursor Then
-        If BlockEndCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockEndCursor - 1))
-        If BlockStartCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.List(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
+        If BlockEndCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1))
+        If BlockStartCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
  If BlockEndCursor > 0 Then
- final$ = Mid$(glistN.List(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
+ final$ = Mid$(glistN.list(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
  Else
- final$ = Mid$(glistN.List(item), 1, BlockStartCursor - 1)
+ final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
  End If
  
- PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
+ PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
                  FillBack thisHDC, b, SelectionColor
              a.Right = b.Right + 1
              a.Left = b.Left + 1
@@ -916,7 +919,7 @@ showparagraphWork = showparagraph
     End If
  ''  skipcolor = True
 End If
-    If ThatPara = mdoc.MarkParagraphID Then
+    If ThatPara = mDoc.MarkParagraphID Then
             If EditDoc Then
                         ' old patch -- removed here
                       If mNoWrap And (glistN.ListIndex = item) Then
@@ -950,9 +953,9 @@ End If
     Else
 conthere:
 If skipcolor Then
-  PrintItem1 thisHDC, mdoc.TextLine2(item + 1, showparagraph, False), a
+  PrintItem1 thisHDC, mDoc.TextLine2(item + 1, showparagraph, False), a
 Else
-  PrintItem1X thisHDC, mdoc.TextLine2(item + 1, showparagraph, NoColor), a, mdoc.lastcolordata()
+  PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
 End If
   End If
 End If
@@ -968,8 +971,8 @@ Public Sub Render()
 'glistN.NoScroll = True
 'glistN.PanPos = 0
 Dim selstart2 As Long
-all = mdoc.DocLines
-glistN.ListIndex = mdoc.FirstParagraphLine(mdoc.MarkParagraphID) + mdoc.TextParagraph2Line(mdoc.MarkParagraphID, Charpos, selstart2, mNoColor)
+all = mDoc.DocLines
+glistN.ListIndex = mDoc.FirstParagraphLine(mDoc.MarkParagraphID) + mDoc.TextParagraph2Line(mDoc.MarkParagraphID, Charpos, selstart2, mNoColor)
 glistN.SelStart = selstart2
 
 'EditDoc = EditDoc
@@ -989,7 +992,7 @@ End Sub
 
 Public Sub WrapMarkedPara()
 If glistN.ListIndex >= 0 Then
-mdoc.ReWritePara mdoc.MarkParagraphID, mdoc.TextParagraph(mdoc.MarkParagraphID)
+mDoc.ReWritePara mDoc.MarkParagraphID, mDoc.TextParagraph(mDoc.MarkParagraphID)
 End If
 End Sub
 
@@ -1045,7 +1048,7 @@ KeyCode = 0
 ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 Pad$ = GetTextData(13)
 If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
-If ParaSelStart = 2 And glistN.List(glistN.ListIndex) = "" Then
+If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
 SelStart = SelStart - 1
 End If
 AddUndo ""
@@ -1192,7 +1195,7 @@ End If
 KeyCode = 0
 ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
-BlockEndPara = mdoc.MarkParagraphID
+BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 glistN.ShowPan
@@ -1247,42 +1250,42 @@ End Sub
 
 Private Sub glistN_LineDown()
 Dim b$, nline As Long
-mdoc.TextParagraphLine glistN.ListIndex + 1, b$, nline
-mdoc.MarkParagraphID = nline
+mDoc.TextParagraphLine glistN.ListIndex + 1, b$, nline
+mDoc.MarkParagraphID = nline
 
-If mdoc.IsLast(mdoc.MarkParagraphID) Then Exit Sub
+If mDoc.IsLast(mDoc.MarkParagraphID) Then Exit Sub
 
   
  
- If mdoc.TextParagraphLen(nline) = 0 Then
+ If mDoc.TextParagraphLen(nline) = 0 Then
  Charpos = 1
-  mdoc.RemoveEmptyParagraph nline
- mdoc.MarkParagraphID = nline
+  mDoc.RemoveEmptyParagraph nline
+ mDoc.MarkParagraphID = nline
  Else
  Charpos = ParaSelStart
-  mdoc.ReWritePara nline, mdoc.TextParagraph(nline) + mdoc.DeleteNextParagraph(nline)
+  mDoc.ReWritePara nline, mDoc.TextParagraph(nline) + mDoc.DeleteNextParagraph(nline)
 
  End If
  
-  all = mdoc.DocLines
+  all = mDoc.DocLines
  
   ParaSelStart = Charpos
 End Sub
 
 Private Sub glistN_LineUp()
 Dim olID As Long, b$ ', c$
-olID = mdoc.MarkParagraphID
+olID = mDoc.MarkParagraphID
 If ParaSelStart < 2 Then
-If mdoc.ParagraphOrder(mdoc.MarkParagraphID) > 1 Then
+If mDoc.ParagraphOrder(mDoc.MarkParagraphID) > 1 Then
 glistN.PressKey vbKeyLeft, 0
-If olID <> mdoc.MarkParagraphID Then
-b$ = mdoc.DeleteNextParagraph(mdoc.MarkParagraphID)
-mdoc.ReWritePara mdoc.MarkParagraphID, mdoc.TextParagraph(mdoc.MarkParagraphID) + b$
- all = mdoc.DocLines
+If olID <> mDoc.MarkParagraphID Then
+b$ = mDoc.DeleteNextParagraph(mDoc.MarkParagraphID)
+mDoc.ReWritePara mDoc.MarkParagraphID, mDoc.TextParagraph(mDoc.MarkParagraphID) + b$
+ all = mDoc.DocLines
 ClearRedo
 PushUndo
 undotext = vbCrLf
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undopos = SelStart
 undomode = 2
 'End If
@@ -1292,26 +1295,26 @@ End If
 Else
 glistN.PressKey vbKeyLeft, 0
 End If
-all = mdoc.DocLines
+all = mDoc.DocLines
 
 End Sub
 
 Private Sub keyzLineUp()
 Dim olID As Long, b$ ', c$
-olID = mdoc.MarkParagraphID
+olID = mDoc.MarkParagraphID
 If ParaSelStart < 2 Then
-If mdoc.ParagraphOrder(mdoc.MarkParagraphID) > 1 Then
+If mDoc.ParagraphOrder(mDoc.MarkParagraphID) > 1 Then
 glistN.PressKey vbKeyLeft, 0
-If olID <> mdoc.MarkParagraphID Then
-b$ = mdoc.DeleteNextParagraph(mdoc.MarkParagraphID)
-mdoc.ReWritePara mdoc.MarkParagraphID, mdoc.TextParagraph(mdoc.MarkParagraphID) + b$
+If olID <> mDoc.MarkParagraphID Then
+b$ = mDoc.DeleteNextParagraph(mDoc.MarkParagraphID)
+mDoc.ReWritePara mDoc.MarkParagraphID, mDoc.TextParagraph(mDoc.MarkParagraphID) + b$
 Render
 End If
 End If
 Else
 glistN.PressKey vbKeyLeft, 0
 End If
-all = mdoc.DocLines
+all = mDoc.DocLines
 End Sub
 
 Public Sub MarkCut()
@@ -1328,29 +1331,29 @@ On Error GoTo fbl
  Set UndoDoc = New Document
  UndoDoc.CrTail = False
     If BlockStartPara = BlockEndPara Then
-        b$ = mdoc.TextParagraph(BlockStartPara)
+        b$ = mDoc.TextParagraph(BlockStartPara)
         
         UndoDoc.CrTail = False
         If b$ = "" Then
         Else
         If BlockStartPos < BlockEndPos Then
            '' UndoDoc.textDoc = Mid$(b$, BlockStartPos, BlockEndPos - BlockStartPos)
-            UndoDoc.textParagraphPlusColor Mid$(b$, BlockStartPos, BlockEndPos - BlockStartPos), mdoc.Paracolordata(BlockStartPara), BlockStartPos - 1
+            UndoDoc.textParagraphPlusColor Mid$(b$, BlockStartPos, BlockEndPos - BlockStartPos), mDoc.Paracolordata(BlockStartPara), BlockStartPos - 1
             If BlockEndPos > Len(b$) + 1 Then UndoDoc.CrTail = True
         Else
           '' UndoDoc.textDoc = Mid$(b$, BlockEndPos, BlockStartPos - BlockEndPos)
-            UndoDoc.textParagraphPlusColor Mid$(b$, BlockEndPos, BlockStartPos - BlockEndPos), mdoc.Paracolordata(BlockStartPara), BlockEndPos - 1
+            UndoDoc.textParagraphPlusColor Mid$(b$, BlockEndPos, BlockStartPos - BlockEndPos), mDoc.Paracolordata(BlockStartPara), BlockEndPos - 1
             If BlockStartPos > Len(b$) + 1 Then UndoDoc.CrTail = True
         End If
         End If
     Else
-        order1 = mdoc.ParagraphOrder(BlockStartPara)
-        order2 = mdoc.ParagraphOrder(BlockEndPara)
+        order1 = mDoc.ParagraphOrder(BlockStartPara)
+        order2 = mDoc.ParagraphOrder(BlockEndPara)
         If order2 > order1 Then '  normal
-            a$ = mdoc.TextParagraph(BlockStartPara)
+            a$ = mDoc.TextParagraph(BlockStartPara)
             UndoDoc.LfLead = False
          If BlockStartPos < 1 Then
-               UndoDoc.AppendParagraphPlusColor a$, mdoc.Paracolordata(BlockStartPara)
+               UndoDoc.AppendParagraphPlusColor a$, mDoc.Paracolordata(BlockStartPara)
                '' UndoDoc.AppendParagraph a$
             Else
             If Len(a$) + 1 < BlockStartPos Then
@@ -1359,7 +1362,7 @@ On Error GoTo fbl
                Else
             
                 ''UndoDoc.AppendParagraph Mid$(a$, BlockStartPos)
-                UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockStartPos), mdoc.Paracolordata(BlockStartPara), BlockStartPos - 1
+                UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockStartPos), mDoc.Paracolordata(BlockStartPara), BlockStartPos - 1
                 End If
             End If
             UndoDoc.MarkParagraphID = 1
@@ -1368,25 +1371,25 @@ On Error GoTo fbl
             If order2 > order1 Then
                 For i = order1 + 1 To order2
                ' UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mDoc.TextNextParagraph(nn))
-                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraphPlusColor(UndoDoc.MarkParagraphID, mdoc.TextNextParagraph(nn), mdoc.Paracolordata(nn))
+                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraphPlusColor(UndoDoc.MarkParagraphID, mDoc.TextNextParagraph(nn), mDoc.Paracolordata(nn))
                 Next i
             End If
-                b$ = mdoc.TextParagraph(BlockEndPara)
+                b$ = mDoc.TextParagraph(BlockEndPara)
                 UndoDoc.CrTail = False
                 
                If BlockEndPos > 0 Then
                ''UndoDoc.AppendParagraph MyLeft$(b$, BlockEndPos - 1) 'maybe is empty
-               UndoDoc.AppendParagraphPlusColor Myleft$(b$, BlockEndPos - 1), mdoc.Paracolordata(BlockEndPara)
+               UndoDoc.AppendParagraphPlusColor Myleft$(b$, BlockEndPos - 1), mDoc.Paracolordata(BlockEndPara)
                Else
                UndoDoc.CrTail = True
                End If
         Else
-            a$ = mdoc.TextParagraph(BlockEndPara)
+            a$ = mDoc.TextParagraph(BlockEndPara)
         '   If a$ = "" Then UndoDoc.AppendParagraph ""
          UndoDoc.LfLead = False
             If BlockEndPos < 1 Then
         
-              UndoDoc.AppendParagraphPlusColor a$, mdoc.Paracolordata(BlockEndPara)
+              UndoDoc.AppendParagraphPlusColor a$, mDoc.Paracolordata(BlockEndPara)
                ' UndoDoc.AppendParagraph a$
                 
             Else
@@ -1396,9 +1399,9 @@ On Error GoTo fbl
             Else
                 ' UndoDoc.AppendParagraph Mid$(a$, BlockEndPos)
                 If BlockEndPos >= 1 Then
-                  UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockEndPos), mdoc.Paracolordata(BlockEndPara), BlockEndPos - 1
+                  UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockEndPos), mDoc.Paracolordata(BlockEndPara), BlockEndPos - 1
                   Else
-                  UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockEndPos), mdoc.Paracolordata(BlockEndPara)
+                  UndoDoc.AppendParagraphPlusColor Mid$(a$, BlockEndPos), mDoc.Paracolordata(BlockEndPara)
                   End If
                 End If
             End If
@@ -1408,13 +1411,13 @@ On Error GoTo fbl
             If order1 > order2 Then
                 For i = order2 + 1 To order1
                 ''UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mDoc.TextNextParagraph(nn))
-                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraphPlusColor(UndoDoc.MarkParagraphID, mdoc.TextNextParagraph(nn), mdoc.Paracolordata(nn))
+                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraphPlusColor(UndoDoc.MarkParagraphID, mDoc.TextNextParagraph(nn), mDoc.Paracolordata(nn))
                 Next i
             End If
-                b$ = mdoc.TextParagraph(BlockStartPara)
+                b$ = mDoc.TextParagraph(BlockStartPara)
                 If BlockStartPos < 1 Then BlockStartPos = 1
                   'UndoDoc.AppendParagraph MyLeft$(b$, BlockStartPos - 1) 'maybe is empty
-                  UndoDoc.AppendParagraphPlusColor Myleft$(b$, BlockStartPos - 1), mdoc.Paracolordata(BlockStartPara)
+                  UndoDoc.AppendParagraphPlusColor Myleft$(b$, BlockStartPos - 1), mDoc.Paracolordata(BlockStartPara)
         
         End If
 End If
@@ -1493,12 +1496,12 @@ End Function
 Private Sub glistN_MarkDelete(preservecursor As Boolean)
 Dim order1 As Long, order2 As Long, a$, b$, i As Long
 Dim oldid As Long, OLDPOS As Long
-oldid = mdoc.MarkParagraphID
+oldid = mDoc.MarkParagraphID
 OLDPOS = Charpos
  If HaveMarkedText Then
  Set UndoDoc = New Document
     If BlockStartPara = BlockEndPara Then
-        b$ = mdoc.TextParagraph(BlockStartPara)
+        b$ = mDoc.TextParagraph(BlockStartPara)
         If BlockStartPos < BlockEndPos Then
             UndoDoc.textDoc = Mid$(b$, BlockStartPos, BlockEndPos - BlockStartPos)
             b$ = Mid$(b$, 1, BlockStartPos - 1) + Mid$(b$, BlockEndPos)
@@ -1514,17 +1517,17 @@ OLDPOS = Charpos
             End If
             Charpos = BlockEndPos
         End If
-        mdoc.ReWritePara BlockStartPara, b$
+        mDoc.ReWritePara BlockStartPara, b$
     Else
-        order1 = mdoc.ParagraphOrder(BlockStartPara)
-        order2 = mdoc.ParagraphOrder(BlockEndPara)
+        order1 = mDoc.ParagraphOrder(BlockStartPara)
+        order2 = mDoc.ParagraphOrder(BlockEndPara)
   
         If order2 > order1 Then '  normal
             UndoDoc.AppendParagraph "" ' start paragraph no 1
             UndoDoc.MarkParagraphID = 1
         
-            b$ = mdoc.TextParagraph(BlockEndPara)
-            mdoc.RemoveDocParaIndex BlockEndPara
+            b$ = mDoc.TextParagraph(BlockEndPara)
+            mDoc.RemoveDocParaIndex BlockEndPara
             If BlockEndPos < 1 Then
             UndoDoc.AppendParagraph ""
             b$ = ""
@@ -1537,46 +1540,46 @@ OLDPOS = Charpos
             order2 = order2 - 1
             If order2 > order1 Then
                 For i = order1 + 1 To order2
-                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mdoc.DeleteNextParagraph(BlockStartPara))
+                UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mDoc.DeleteNextParagraph(BlockStartPara))
                     
                 Next i
             End If
-            a$ = mdoc.TextParagraph(BlockStartPara)
+            a$ = mDoc.TextParagraph(BlockStartPara)
             UndoDoc.ReWritePara 1, a$, True
             If BlockStartPos = 1 Then
-                mdoc.ReWritePara BlockStartPara, b$
+                mDoc.ReWritePara BlockStartPara, b$
                 UndoDoc.ReWritePara 1, a$, True
             Else
             UndoDoc.ReWritePara 1, Mid$(a$, BlockStartPos), True
-                mdoc.ReWritePara BlockStartPara, Myleft$(a$, BlockStartPos - 1) + b$
+                mDoc.ReWritePara BlockStartPara, Myleft$(a$, BlockStartPos - 1) + b$
             End If
-            mdoc.MarkParagraphID = BlockStartPara
+            mDoc.MarkParagraphID = BlockStartPara
             Charpos = BlockStartPos
         Else
             UndoDoc.AppendParagraph "" ' start paragraph no 1
             UndoDoc.MarkParagraphID = 1
-             b$ = mdoc.TextParagraph(BlockStartPara)
-            mdoc.RemoveDocParaIndex BlockStartPara
+             b$ = mDoc.TextParagraph(BlockStartPara)
+            mDoc.RemoveDocParaIndex BlockStartPara
              UndoDoc.AppendParagraph Myleft$(b$, BlockStartPos - 1) 'maybe is empty
             b$ = Mid$(b$, BlockStartPos)
             order1 = order1 - 1
             If order1 > order2 Then
                 For i = order2 + 1 To order1
                     
-                    UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mdoc.DeleteNextParagraph(BlockEndPara))
+                    UndoDoc.MarkParagraphID = UndoDoc.InsertAfterParagraph(UndoDoc.MarkParagraphID, mDoc.DeleteNextParagraph(BlockEndPara))
                
                 Next i
             End If
-            a$ = mdoc.TextParagraph(BlockEndPara)
+            a$ = mDoc.TextParagraph(BlockEndPara)
             
             If BlockEndPos = 1 Then
-                mdoc.ReWritePara BlockEndPara, b$
+                mDoc.ReWritePara BlockEndPara, b$
                 UndoDoc.ReWritePara 1, a$
             Else
             UndoDoc.ReWritePara 1, Mid$(a$, BlockEndPos)
-                mdoc.ReWritePara BlockEndPara, Myleft$(a$, BlockEndPos - 1) + b$
+                mDoc.ReWritePara BlockEndPara, Myleft$(a$, BlockEndPos - 1) + b$
             End If
-            mdoc.MarkParagraphID = BlockEndPara
+            mDoc.MarkParagraphID = BlockEndPara
             
             Charpos = BlockEndPos
         
@@ -1584,9 +1587,9 @@ OLDPOS = Charpos
         End If
 
 End If
-all = mdoc.DocLines
+all = mDoc.DocLines
 If Not preservecursor Then
-undopara = mdoc.MarkParagraphID
+undopara = mDoc.MarkParagraphID
 undopos = SelStart
 undotext = UndoDoc.textDoc
 undomode = 1 ' insert text at position changed to 1
@@ -1598,9 +1601,9 @@ glistN.MarkNext = 0
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 If preservecursor Then
-If mdoc.ParagraphOrder(oldid) > 0 Then
+If mDoc.ParagraphOrder(oldid) > 0 Then
 
-mdoc.MarkParagraphID = oldid
+mDoc.MarkParagraphID = oldid
 Charpos = OLDPOS
 End If
 End If
@@ -1642,7 +1645,7 @@ End Sub
 
 Private Sub glistN_MarkIn()
 If Not glistN.EditFlag Then glistN.MarkNext = 0: Exit Sub
-BlockStartPara = mdoc.MarkParagraphID
+BlockStartPara = mDoc.MarkParagraphID
 BlockStartPos = ParaSelStart
 'If glistN.SelStart > 1 Then
 BlockStartCursor = glistN.SelStart '- 1
@@ -1715,8 +1718,8 @@ Sub RelocateMarkedText()
 '  BlockStartPara As Long, BlockStartPos As Long
 ' BlockEndPara As Long, BlockEndPos As Long
 '
-BlockStartLine = mdoc.FirstParagraphLine(BlockStartPara) + mdoc.TextParagraph2Line(BlockStartPara, BlockStartPos, BlockStartCursor)
-BlockEndline = mdoc.FirstParagraphLine(BlockEndPara) + mdoc.TextParagraph2Line(BlockEndPara, BlockEndPos, BlockEndCursor)
+BlockStartLine = mDoc.FirstParagraphLine(BlockStartPara) + mDoc.TextParagraph2Line(BlockStartPara, BlockStartPos, BlockStartCursor)
+BlockEndline = mDoc.FirstParagraphLine(BlockEndPara) + mDoc.TextParagraph2Line(BlockEndPara, BlockEndPos, BlockEndCursor)
 If BlockEndline < BlockStartLine Then
     BlockTopline = BlockEndline
     BlockBottomline = BlockStartLine
@@ -1727,7 +1730,7 @@ End If
 End Sub
 Private Sub glistN_MarkOut()
 '
-BlockEndPara = mdoc.MarkParagraphID
+BlockEndPara = mDoc.MarkParagraphID
 BlockEndPos = ParaSelStart
 BlockEndline = glistN.ListIndex
 BlockEndCursor = glistN.SelStart
@@ -1749,7 +1752,7 @@ End Sub
 Private Sub glistN_ReadListItem(item As Long, content As String)
 If item >= 0 Then
 
-content = mdoc.TextLine2(item + 1, showparagraphWork And showparagraph)
+content = mDoc.TextLine2(item + 1, showparagraphWork And showparagraph)
 
 End If
 End Sub
@@ -1761,8 +1764,8 @@ End Sub
 Private Sub glistN_ScrollSelected(item As Long, y As Long)
 If NoMark Then Exit Sub
 Dim what$, ThatPara As Long
-   mdoc.TextParagraphLine item, what$, ThatPara
-   mdoc.MarkParagraphID = ThatPara
+   mDoc.TextParagraphLine item, what$, ThatPara
+   mDoc.MarkParagraphID = ThatPara
 End Sub
 
 Private Sub glistN_Selected(item As Long)
@@ -1770,8 +1773,8 @@ Private Sub glistN_Selected(item As Long)
 If NoMark Then Exit Sub
 If mEditDoc <> glistN.EditFlag Then EditDoc = EditDoc
 Dim what$, ThatPara As Long
-   mdoc.TextParagraphLine2 item, what$, ThatPara, showparagraphWork And showparagraph
-   mdoc.MarkParagraphID = ThatPara
+   mDoc.TextParagraphLine2 item, what$, ThatPara, showparagraphWork And showparagraph
+   mDoc.MarkParagraphID = ThatPara
 End Sub
 
 
@@ -1800,38 +1803,38 @@ Private Sub glistN_SplitLine()
 Dim b$, dummy As Long, a As Long
 
 If glistN.ListIndex >= 0 Then
-    b$ = mdoc.TextParagraph(mdoc.MarkParagraphID)
+    b$ = mDoc.TextParagraph(mDoc.MarkParagraphID)
 If Charpos = 1 And b$ <> "" Then
-    dummy = mdoc.InsertBeforeParagraph(mdoc.MarkParagraphID, "")
-        mdoc.ColorThis (dummy)
-     all = mdoc.DocLines
-    mdoc.MarkParagraphID = dummy
+    dummy = mDoc.InsertBeforeParagraph(mDoc.MarkParagraphID, "")
+        mDoc.ColorThis (dummy)
+     all = mDoc.DocLines
+    mDoc.MarkParagraphID = dummy
     SetRowColumn glistN.ListIndex + 2, 0
 
     
   ''
    
 ElseIf ParaSelStart = 1 Then
-    mdoc.MarkParagraphID = mdoc.InsertAfterParagraph(mdoc.MarkParagraphID, "")
-    all = mdoc.DocLines
+    mDoc.MarkParagraphID = mDoc.InsertAfterParagraph(mDoc.MarkParagraphID, "")
+    all = mDoc.DocLines
     ParaSelStart = 1
 
 ElseIf ParaSelStart > Len(b$) Then
 
-    mdoc.MarkParagraphID = mdoc.InsertAfterParagraph(mdoc.MarkParagraphID, "")
+    mDoc.MarkParagraphID = mDoc.InsertAfterParagraph(mDoc.MarkParagraphID, "")
     
-      all = mdoc.DocLines
+      all = mDoc.DocLines
     ParaSelStart = Len(b$)
 
 Else  ' ANYWHERE
 
 dummy = ParaSelStart
 
-    mdoc.ReWritePara mdoc.MarkParagraphID, Myleft$(b$, ParaSelStart - 1), False ' write and format
+    mDoc.ReWritePara mDoc.MarkParagraphID, Myleft$(b$, ParaSelStart - 1), False ' write and format
     
-    mdoc.MarkParagraphID = mdoc.InsertAfterParagraph(mdoc.MarkParagraphID, Mid$(b$, dummy))
-    mdoc.ColorThis (mdoc.MarkParagraphID)
-    all = mdoc.DocLines
+    mDoc.MarkParagraphID = mDoc.InsertAfterParagraph(mDoc.MarkParagraphID, Mid$(b$, dummy))
+    mDoc.ColorThis (mDoc.MarkParagraphID)
+    all = mDoc.DocLines
     ParaSelStart = 1
 
 End If
@@ -1865,20 +1868,20 @@ End Sub
 
 Private Sub mDoc_BreakLine(data As String, datanext As String)
  ' Nowrap = True mean no Wrap
- Dim data1 As String, datanext1 As String
+ Dim Data1 As String, datanext1 As String
  If nowrap Then
     datanext = data
     data = ""
  Else
     If showparagraph Then
    ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
-         data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
+         Data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
         
-        glistN.BreakLine data1, datanext1, , ChrW(&HB7)
-        If data1 <> "" Then
+        glistN.BreakLine Data1, datanext1, , ChrW(&HB7)
+        If Data1 <> "" Then
         
         datanext = Myleft$(data, Len(datanext1))
-        data = Right$(data, Len(data1))
+        data = Right$(data, Len(Data1))
         Else
             datanext = data
              data = ""
@@ -2796,6 +2799,7 @@ Private Sub mDoc_Lastline()
 If showparagraph Then showparagraphonce = True
 End Sub
 
+
 Private Sub mDoc1_BreakLine(data As String, datanext As String)
 If NoHeadwrap Or (NoTitle) Or UsedAsTextBox Then
     datanext = data
@@ -2853,7 +2857,7 @@ End Property
 Public Property Get ParaSelStart() As Long
 If glistN.ListIndex < 0 Then ParaSelStart = 1: Exit Property
 Dim what$, ThatPara As Long, pastchars
-    pastchars = mdoc.TextParagraphLine(glistN.ListIndex + 1, what$, ThatPara)
+    pastchars = mDoc.TextParagraphLine(glistN.ListIndex + 1, what$, ThatPara)
 Charpos = pastchars + glistN.SelStart
 If Charpos = 0 Then
 ParaSelStart = 1
@@ -2862,7 +2866,8 @@ ParaSelStart = Charpos
 End If
 End Property
 Public Sub WrapAll()
-mdoc.WrapAgain
+If mDoc Is Nothing Then Exit Sub
+mDoc.WrapAgain
 End Sub
 Public Property Let ParaSelStart(ByVal RHS As Long)
 ' we have a new ParaSelStart
@@ -2880,7 +2885,7 @@ Public Property Let nowrap(ByVal RHS As Boolean)
 If Not (mNoWrap = RHS) Then
 mNoWrap = RHS
 glistN.NoScroll = Not mNoWrap
-    If Not mdoc.IsEmpty Then
+    If Not mDoc.IsEmpty Then
     WrapAll
    If HaveMarkedText Then RelocateMarkedText
     
@@ -2930,11 +2935,11 @@ End If
 glistN.ListindexPrivateUse = Row - 1  ' no events
 End If
 Dim a As String, b As Long
-mdoc.TextParagraphLine glistN.ListIndex + 1, a, b
-mdoc.MarkParagraphID = b
-If Len(glistN.List(glistN.ListIndex)) < Column Then
+mDoc.TextParagraphLine glistN.ListIndex + 1, a, b
+mDoc.MarkParagraphID = b
+If Len(glistN.list(glistN.ListIndex)) < Column Then
 If Row = glistN.listcount + 1 Then
-glistN.SelStartEventAlways = Len(glistN.List(glistN.ListIndex))
+glistN.SelStartEventAlways = Len(glistN.list(glistN.ListIndex))
 Else
 glistN.SelStartEventAlways = Column  'Len(glistN.List(glistN.listindex)) + 1
 End If
@@ -2946,11 +2951,12 @@ If Not noShow Then glistN.ShowMe
 End If
 End Sub
 Public Function TextFormatBreak(lineBreaker As String) As String
-Text = mdoc.textFormat(lineBreaker)
+Text = mDoc.textFormat(lineBreaker)
 End Function
 
 Public Property Get Text() As String
-Text = mdoc.textDoc
+If mDoc Is Nothing Then Exit Property
+Text = mDoc.textDoc
 End Property
 Public Property Let Text(RHS As String)
 On Error Resume Next
@@ -2963,22 +2969,22 @@ glistN.MarkNext = 0
 End If
 oldenabled = glistN.enabled
 glistN.enabled = False
-Set mdoc = New Document
-mdoc.final = mMultiLineComment2
-mdoc.textDoc = RHS
-all = mdoc.DocLines
+Set mDoc = New Document
+mDoc.final = mMultiLineComment2
+mDoc.textDoc = RHS
+all = mDoc.DocLines
 ClearRedo
 ClearUndo
 glistN.enabled = oldenabled
 Dim what$, ThatPara As Long, pastchars
-   pastchars = mdoc.TextParagraphLine(1, what$, ThatPara)
-mdoc.MarkParagraphID = ThatPara
+   pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
+mDoc.MarkParagraphID = ThatPara
 End Property
 Public Property Get TextParagraphs() As Long
-TextParagraphs = mdoc.DocParagraphs
+TextParagraphs = mDoc.DocParagraphs
 End Property
 Public Property Get TextLines() As Long
-TextLines = mdoc.DocLines
+TextLines = mDoc.DocLines
 End Property
 Public Property Let LineSpacingSilent(ByVal RHS As Long)
 RHS = Abs(RHS) + 2
@@ -3012,7 +3018,7 @@ End Property
 Public Property Let SelLengthSilent(ByVal RHS As Long)
 If RHS <= 0 Then
     ' a copy of glistN_MarkDestroyAny
-    BlockEndPara = mdoc.MarkParagraphID
+    BlockEndPara = mDoc.MarkParagraphID
     BlockStartPara = BlockEndPara
     BlockStartPos = BlockEndPos
     glistN.MarkNext = 0
@@ -3020,7 +3026,7 @@ If RHS <= 0 Then
 Else
 glistN.MarkNext = 1
    BlockStartCursor = glistN.SelStart
-    BlockStartPara = mdoc.MarkParagraphID
+    BlockStartPara = mDoc.MarkParagraphID
     BlockStartPos = ParaSelStart  ' selstart isn't from start of the doc...
  
     BlockStartLine = glistN.ListIndex
@@ -3029,7 +3035,7 @@ glistN.MarkNext = 1
         BlockEndline = BlockStartLine
     BlockEndCursor = BlockStartCursor + 1
     
-mdoc.FindPos BlockStartLine + 1, BlockStartCursor, RHS, BlockEndline, BlockEndCursor, BlockEndPara, BlockEndPos
+mDoc.FindPos BlockStartLine + 1, BlockStartCursor, RHS, BlockEndline, BlockEndCursor, BlockEndPara, BlockEndPos
 
 BlockEndline = BlockEndline - 1 ' base 0
 
@@ -3045,7 +3051,7 @@ End Property
 Public Property Let SelLength(ByVal RHS As Long)
 If RHS <= 0 Then
     ' a copy of glistN_MarkDestroyAny
-    BlockEndPara = mdoc.MarkParagraphID
+    BlockEndPara = mDoc.MarkParagraphID
     BlockStartPara = BlockEndPara
     BlockStartPos = BlockEndPos
     glistN.MarkNext = 0
@@ -3053,7 +3059,7 @@ If glistN.enabled Then glistN.ShowPan
 Else
 glistN.MarkNext = 1
    BlockStartCursor = glistN.SelStart
-    BlockStartPara = mdoc.MarkParagraphID
+    BlockStartPara = mDoc.MarkParagraphID
     BlockStartPos = ParaSelStart  ' selstart isn't from start of the doc...
  
     BlockStartLine = glistN.ListIndex
@@ -3062,7 +3068,7 @@ glistN.MarkNext = 1
         BlockEndline = BlockStartLine
     BlockEndCursor = BlockStartCursor + 1
     
-mdoc.FindPos BlockStartLine + 1, BlockStartCursor, RHS, BlockEndline, BlockEndCursor, BlockEndPara, BlockEndPos
+mDoc.FindPos BlockStartLine + 1, BlockStartCursor, RHS, BlockEndline, BlockEndCursor, BlockEndPara, BlockEndPos
 
 BlockEndline = BlockEndline - 1 ' base 0
 
@@ -3143,7 +3149,7 @@ glistN.HeightTwips = RHS
 End Property
 Public Sub Dereference()
 Set glistN = Nothing
-Set mdoc = Nothing
+Set mDoc = Nothing
 Set mDoc1 = Nothing
 
 End Sub
@@ -3187,7 +3193,7 @@ kk = SelStart
 SelStart = kk
 glistN_MarkDelete False
 glistN.MarkNext = 1
-BlockStartPara = mdoc.MarkParagraphID
+BlockStartPara = mDoc.MarkParagraphID
 BlockStartPos = ParaSelStart
 BlockStartCursor = glistN.SelStart '- 1
 BlockEndCursor = BlockStartCursor + 1
@@ -3200,21 +3206,21 @@ If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 
 If NumberOnly Then
-Pad$ = Space$(Len(RHS) + Len(glistN.List(0)))
-Mid$(Pad$, 1, Charpos - 1) = Myleft$(glistN.List(0), Charpos - 1)
+Pad$ = Space$(Len(RHS) + Len(glistN.list(0)))
+Mid$(Pad$, 1, Charpos - 1) = Myleft$(glistN.list(0), Charpos - 1)
 Mid$(Pad$, Charpos, Len(RHS)) = RHS
-If Len(glistN.List(0)) > 0 Then
-Mid$(Pad$, Charpos + Len(RHS) - 1) = Mid$(glistN.List(0), Charpos)
+If Len(glistN.list(0)) > 0 Then
+Mid$(Pad$, Charpos + Len(RHS) - 1) = Mid$(glistN.list(0), Charpos)
 End If
-RHS = glistN.List(0)
-glistN.List(0) = Pad$
-If Not glistN.List(0) = Pad$ Then glistN.List(0) = RHS
+RHS = glistN.list(0)
+glistN.list(0) = Pad$
+If Not glistN.list(0) = Pad$ Then glistN.list(0) = RHS
 Else
-mdoc.InsertDoc mdoc.MarkParagraphID, Charpos, RHS, tabwidth
+mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS, tabwidth
 End If
 Render
 End If
-BlockEndPara = mdoc.MarkParagraphID
+BlockEndPara = mDoc.MarkParagraphID
 BlockEndPos = ParaSelStart
 BlockEndline = glistN.ListIndex
 BlockEndCursor = glistN.SelStart
@@ -3248,8 +3254,8 @@ If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 
 
-mdoc.InsertDoc mdoc.MarkParagraphID, Charpos, RHS
-all = mdoc.DocLines
+mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS
+all = mDoc.DocLines
 
 End If
 If b <> enabled Then enabled = b
@@ -3258,8 +3264,8 @@ Private Property Let InsertText2(ByVal RHS As String)
 glistN_MarkDelete True
 glistN.MarkNext = 0
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
-mdoc.ResetColor mdoc.MarkParagraphID
-mdoc.InsertDoc mdoc.MarkParagraphID, Charpos, RHS
+mDoc.ResetColor mDoc.MarkParagraphID
+mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS
 End Property
 Public Property Let InsertText(ByVal RHS As String)
 glistN_MarkDelete False
@@ -3267,8 +3273,8 @@ glistN.MarkNext = 0
 Dim k As Long, l As Long
 If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
-mdoc.ResetColor mdoc.MarkParagraphID
-mdoc.InsertDoc mdoc.MarkParagraphID, Charpos, RHS
+mDoc.ResetColor mDoc.MarkParagraphID
+mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS
 Render
 
 End If
@@ -3277,7 +3283,7 @@ Public Property Get CharPosStart() As Long
 Dim findit As Long
 Dim a As Long, b As Long, c As Long, d As Long
 findit = -1
-mdoc.FindPos glistN.ListIndex + 1, glistN.SelStart, findit, a, b, c, d
+mDoc.FindPos glistN.ListIndex + 1, glistN.SelStart, findit, a, b, c, d
 CharPosStart = findit
 End Property
 Public Property Get SelStart() As Long
@@ -3288,17 +3294,17 @@ findit = -1
 If glistN.MarkNext > 0 Then
 If BlockTopline = BlockBottomline Then
 If BlockStartCursor < BlockEndCursor Then
-mdoc.FindPos BlockTopline + 1, BlockStartCursor, findit, a, b, c, d
+mDoc.FindPos BlockTopline + 1, BlockStartCursor, findit, a, b, c, d
 Else
-mdoc.FindPos BlockTopline + 1, BlockEndCursor, findit, a, b, c, d
+mDoc.FindPos BlockTopline + 1, BlockEndCursor, findit, a, b, c, d
 End If
 ElseIf BlockTopline = BlockStartLine Then
-mdoc.FindPos BlockTopline + 1, BlockStartCursor, findit, a, b, c, d
+mDoc.FindPos BlockTopline + 1, BlockStartCursor, findit, a, b, c, d
 Else
-mdoc.FindPos BlockTopline + 1, BlockEndCursor, findit, a, b, c, d
+mDoc.FindPos BlockTopline + 1, BlockEndCursor, findit, a, b, c, d
 End If
 Else
-mdoc.FindPos glistN.ListIndex + 1, glistN.SelStart, findit, a, b, c, d
+mDoc.FindPos glistN.ListIndex + 1, glistN.SelStart, findit, a, b, c, d
 End If
 If findit <> -1 Then LastSelStart = findit
 SelStart = findit
@@ -3307,13 +3313,13 @@ End Property
 Public Property Let SelStart(ByVal RHS As Long)
 Dim findit As Long, sel1 As Long
 sel1 = SelLength
-    BlockEndPara = mdoc.MarkParagraphID
+    BlockEndPara = mDoc.MarkParagraphID
     BlockStartPara = BlockEndPara
     BlockStartPos = BlockEndPos
     glistN.MarkNext = 0
 Dim a As Long, b As Long, c As Long, d As Long
 findit = RHS
-mdoc.FindPos 1, 0, findit, a, b, c, d
+mDoc.FindPos 1, 0, findit, a, b, c, d
 
 SetRowColumn a, b, sel1 <> 0
 If sel1 <> 0 Then SelLength = sel1: LastSelStart = sel1
@@ -3323,7 +3329,7 @@ Dim findit As Long
 Dim a As Long, b As Long, c As Long, d As Long
 LastSelStart = RHS
 findit = RHS
-mdoc.FindPos 1, 0, findit, a, b, c, d
+mDoc.FindPos 1, 0, findit, a, b, c, d
 SetRowColumn a, b, True
 End Property
 
@@ -3359,7 +3365,7 @@ With MultiUndo(b)
 .undopos = undopos  ' new not charpos but selstart
 undopos = ParaSelStart
 undotext = ""
-undopara = mdoc.MarkParagraphID  ' nod needed maybe for trace errors later
+undopara = mDoc.MarkParagraphID  ' nod needed maybe for trace errors later
 undomode = -1
 undopara = -1
 End With
@@ -3413,7 +3419,7 @@ With MultiRedo(b)
 .undopos = Redopos
 Redopos = ParaSelStart
 Redotext = ""
-Redopara = mdoc.MarkParagraphID
+Redopara = mDoc.MarkParagraphID
 Redomode = -1
 End With
 End Sub
@@ -3441,15 +3447,15 @@ Public Function CurrentParagraph() As String
 'If showparagraphWork And showparagraph Then
 'CurrentParagraph = Replace(Replace(mdoc.TextParagraph(mdoc.MarkParagraphID), " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
 'Else
-CurrentParagraph = mdoc.TextParagraph(mdoc.MarkParagraphID)
+CurrentParagraph = mDoc.TextParagraph(mDoc.MarkParagraphID)
 'End If
 End Function
 Public Function NextParagraph() As String
 Dim dummy As Long
 If showparagraphWork And showparagraph Then
-NextParagraph = Replace(Replace(mdoc.NextTextParagraph(mdoc.MarkParagraphID, dummy), " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
+NextParagraph = Replace(Replace(mDoc.NextTextParagraph(mDoc.MarkParagraphID, dummy), " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
 Else
-NextParagraph = mdoc.NextTextParagraph(mdoc.MarkParagraphID, dummy)
+NextParagraph = mDoc.NextTextParagraph(mDoc.MarkParagraphID, dummy)
 End If
 End Function
 Public Function AutoIntNewLine() As Boolean
@@ -3496,7 +3502,7 @@ showparagraphWork = True
 
 End Function
 Public Property Get Length() As Long
-Length = mdoc.SizeCRLF
+Length = mDoc.SizeCRLF
 End Property
 
 
@@ -3954,7 +3960,7 @@ Public Sub deconstruct()
 If Not glistN Is Nothing Then glistN.Shutdown
 Set Callback = Nothing
 Set glistN = Nothing
-Set mdoc = Nothing
+Set mDoc = Nothing
 Set mDoc1 = Nothing
 End Sub
 Public Sub FontAttr(ThisFontName, Optional ThisMode = -1, Optional ThisBold = True)
@@ -4096,15 +4102,15 @@ KeyCode = 0
 Case vbKeyF9  ' Count Words
 If glistN.lines > 1 Then
 If UserCodePage = 1253 Then
-ReplaceTitle = "Λέξεις στο κείμενο:" + Str(mdoc.WordCount)
+ReplaceTitle = "Λέξεις στο κείμενο:" + Str(mDoc.WordCount)
 Else
-ReplaceTitle = "Words in text:" + Str(mdoc.WordCount)
+ReplaceTitle = "Words in text:" + Str(mDoc.WordCount)
 End If
 End If
 KeyCode = 0
 Case vbKeyF10
 showparagraph = Not showparagraph
-mdoc.WrapAgain
+mDoc.WrapAgain
 Render
 KeyCode = 0
 
@@ -4112,7 +4118,7 @@ Case vbKeyF11
 fState = fState + 1
 SetME
 WrapAll
-mdoc.WrapAgainColor
+mDoc.WrapAgainColor
 ManualInform
 glistN.ShowMe
 KeyCode = 0
@@ -4192,56 +4198,56 @@ noentrance = False
 End Sub
 Sub SearchDown(s$, Optional anystr As Boolean = False)
 Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
-w = mdoc.MarkParagraphID   ' this is the not the order
+w = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos + 1
 
-OldLcid = mdoc.LCID
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mdoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
-  If Not mdoc.FindStrDown(s$, w, l) Then GoTo sdnOut
+  If Not mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
   Else
-    If Not mdoc.FindWord(s$, True, w, l) Then GoTo sdnOut
+    If Not mDoc.FindWord(s$, True, w, l) Then GoTo sdnOut
     End If
 Else
-    If Not mdoc.FindIdentifier(s$, True, w, l) Then GoTo sdnOut
+    If Not mDoc.FindIdentifier(s$, True, w, l) Then GoTo sdnOut
 End If
 SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mdoc.LCID = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
-w = mdoc.MarkParagraphID
+w = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + 1
-OldLcid = mdoc.LCID
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mdoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
-   If Not mdoc.FindStrUp(s$, w, l) Then GoTo sdupOut
+   If Not mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
    Else
-       If Not mdoc.FindWord(s$, False, w, l) Then GoTo sdupOut
+       If Not mDoc.FindWord(s$, False, w, l) Then GoTo sdupOut
     End If
 Else
-    If Not mdoc.FindIdentifier(s$, False, w, l) Then GoTo sdupOut
+    If Not mDoc.FindIdentifier(s$, False, w, l) Then GoTo sdupOut
 End If
 SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mdoc.LCID = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Public Sub helpmeSub()
     If Not abt Then
@@ -4275,25 +4281,25 @@ Public Sub mscatsub()
 Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$
 
-w = mdoc.MarkParagraphID
+w = mDoc.MarkParagraphID
 eW = w
 SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mdoc.LCID
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mdoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 
 l = el + 1
 If EditTextWord Then
 Do
-If mdoc.FindWord(s$, True, w, l) Then
-TT$ = mdoc.TextParagraph(w)
+If mDoc.FindWord(s$, True, w, l) Then
+TT$ = mDoc.TextParagraph(w)
 Mid$(TT$, l, Len(s$)) = s$
-mdoc.ReWritePara w, TT$
-mdoc.WrapAgainBlock w, w
-mdoc.ColorThis (w)
+mDoc.ReWritePara w, TT$
+mDoc.WrapAgainBlock w, w
+mDoc.ColorThis (w)
 Else
 w = 1
 l = 0
@@ -4303,12 +4309,12 @@ Loop Until (w = eW And l = el) Or safety = 2
 
 Else
 Do
-If mdoc.FindIdentifier(s$, True, w, l) Then
-TT$ = mdoc.TextParagraph(w)
+If mDoc.FindIdentifier(s$, True, w, l) Then
+TT$ = mDoc.TextParagraph(w)
 Mid$(TT$, l, Len(s$)) = s$
-mdoc.TextParagraph(w) = TT$
-mdoc.WrapAgainBlock w, w
-mdoc.ColorThis (w)
+mDoc.TextParagraph(w) = TT$
+mDoc.WrapAgainBlock w, w
+mDoc.ColorThis (w)
 
 Else
 w = 1
@@ -4318,7 +4324,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-mdoc.LCID = OldLcid
+mDoc.LCID = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -4327,7 +4333,7 @@ Public Sub rthissub()
 Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long
-w = mdoc.MarkParagraphID
+w = mDoc.MarkParagraphID
 eW = w
 w2 = -1
 SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
@@ -4342,9 +4348,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = "" Then Exit Sub
-OldLcid = mdoc.LCID
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mdoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -4365,14 +4371,14 @@ w1 = w
 If EditTextWord Then
 glistN.dropkey = True
 Do
-If mdoc.FindWord(s$, True, w, l) Then
-If w2 > 0 Then If w2 <> w Then mdoc.WrapAgainBlock w2, w2:  mdoc.ColorThis w2
+If mDoc.FindWord(s$, True, w, l) Then
+If w2 > 0 Then If w2 <> w Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
 w2 = w
 If safety And w = w1 Then
 
 If l = i1 Then
  SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
@@ -4388,7 +4394,7 @@ Else
 End If
 End If
 SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
@@ -4411,13 +4417,13 @@ Else
 ''If l > 0 Then l = l - 1
 glistN.dropkey = True
 Do
-If mdoc.FindIdentifier(s$, True, w, l) Then
-If w2 > 0 Then If w2 <> w Then mdoc.WrapAgainBlock w2, w2:  mdoc.ColorThis w2
+If mDoc.FindIdentifier(s$, True, w, l) Then
+If w2 > 0 Then If w2 <> w Then mDoc.WrapAgainBlock w2, w2:  mDoc.ColorThis w2
 w2 = w
 If safety And w = w1 Then
 If l = i1 Then
  SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
@@ -4433,7 +4439,7 @@ Else
 End If
 End If
 SelLengthSilent = 0
-mdoc.MarkParagraphID = w
+mDoc.MarkParagraphID = w
 glistN.enabled = False
 ParaSelStart = l
 glistN.enabled = True
@@ -4451,9 +4457,9 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.dropkey = False
 End If
-mdoc.LCID = OldLcid
+mDoc.LCID = OldLcid
 'mdoc.WrapAgainColor
-If w2 > 0 Then mdoc.WrapAgainBlock w2, w2:   mdoc.ColorThis w2
+If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -4461,7 +4467,7 @@ Sub MarkSoftButton(para As Long, pospara As Long)
 If glistN.lines = 1 Then Exit Sub
 If ShadowMarks Then Exit Sub
 If para = 0 Then 'set
-    para = mdoc.MarkParagraphID
+    para = mDoc.MarkParagraphID
     pospara = ParaSelStart
     
     If UserCodePage = 1253 Then
@@ -4469,7 +4475,7 @@ If para = 0 Then 'set
     Else
         ReplaceTitle = "Mark now move to this Paragraph and Position"
     End If
-ElseIf para = mdoc.MarkParagraphID And pospara = Charpos Then 'Reset
+ElseIf para = mDoc.MarkParagraphID And pospara = Charpos Then 'Reset
     para = 0
     
     If UserCodePage = 1253 Then
@@ -4478,9 +4484,9 @@ ElseIf para = mdoc.MarkParagraphID And pospara = Charpos Then 'Reset
     ReplaceTitle = "Mark Deleted"
     End If
 Else ' goto that paragraph
-    If Not mdoc.InvalidPara(para) Then
+    If Not mDoc.InvalidPara(para) Then
         SelLengthSilent = 0
-        mdoc.MarkParagraphID = para
+        mDoc.MarkParagraphID = para
         glistN.enabled = False
         ParaSelStart = pospara
         glistN.enabled = True
@@ -4539,7 +4545,7 @@ End Function
 
 Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
-mdoc.final = vNewValue
+mDoc.final = vNewValue
 End Property
 Public Sub PopUpMenu(poptitle$, x As Variant, y As Variant)
 Dim oldModalId As Variant, i As Long
@@ -4584,7 +4590,7 @@ On Error Resume Next
 Dim aa$
 aa$ = GetTextData(13)
 If aa$ = "" Then aa$ = Clipboard.GetText(1)
-If ParaSelStart = 2 And glistN.List(glistN.ListIndex) = "" Then
+If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
 SelStart = SelStart - 1
 End If
 AddUndo ""
@@ -4652,23 +4658,26 @@ On Error Resume Next
 Callback.Controls(CtrlName).SetFocus
 End Sub
 Sub ReColor()
+Set Callback.mDoc = mDoc
 WrapAll
-mdoc.WrapAgainColor
+If mDoc Is Nothing Then Set Callback.mDoc = Nothing: Exit Sub
+mDoc.WrapAgainColor
+Set Callback.mDoc = Nothing
 ManualInform
 End Sub
 Sub ReColorBlock()
 Dim order1, order2
 order1 = 0: order2 = 0
 If BlockEndPara <> BlockStartPara Then
-order1 = mdoc.ParagraphOrder(BlockStartPara)
-order2 = mdoc.ParagraphOrder(BlockEndPara)
+order1 = mDoc.ParagraphOrder(BlockStartPara)
+order2 = mDoc.ParagraphOrder(BlockEndPara)
 End If
 If order1 <= order2 Then
-mdoc.WrapAgainBlock BlockStartPara, BlockEndPara
-mdoc.WrapAgainColorBlock2 BlockStartPara, BlockEndPara
+mDoc.WrapAgainBlock BlockStartPara, BlockEndPara
+mDoc.WrapAgainColorBlock2 BlockStartPara, BlockEndPara
 Else
-mdoc.WrapAgainBlock BlockEndPara, BlockStartPara
-mdoc.WrapAgainColorBlock2 BlockEndPara, BlockStartPara
+mDoc.WrapAgainBlock BlockEndPara, BlockStartPara
+mDoc.WrapAgainColorBlock2 BlockEndPara, BlockStartPara
 
 End If
 ManualInform
@@ -4677,13 +4686,13 @@ Sub ColorBlockOnly()
 Dim order1, order2
 order1 = 0: order2 = 0
 If BlockEndPara <> BlockStartPara Then
-order1 = mdoc.ParagraphOrder(BlockStartPara)
-order2 = mdoc.ParagraphOrder(BlockEndPara)
+order1 = mDoc.ParagraphOrder(BlockStartPara)
+order2 = mDoc.ParagraphOrder(BlockEndPara)
 End If
 If order1 <= order2 Then
-mdoc.WrapAgainColorBlock2 BlockStartPara, BlockEndPara
+mDoc.WrapAgainColorBlock2 BlockStartPara, BlockEndPara
 Else
-mdoc.WrapAgainColorBlock2 BlockEndPara, BlockStartPara
+mDoc.WrapAgainColorBlock2 BlockEndPara, BlockStartPara
 End If
 ''ManualInform
 End Sub
@@ -4742,4 +4751,9 @@ glistN.restrictLines = CLng(vNewValue)
 glistN.CalcNewFont
 TextPixelOffset = Int(glistN.TextHeightOffset)
 End Property
+
+Private Sub mDoc_MayQuit(yes As Variant)
+If Quit Then yes = True
+'MyDoEvents1 Form3
+End Sub
 

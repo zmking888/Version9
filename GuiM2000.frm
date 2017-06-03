@@ -97,6 +97,9 @@ Private mModalId As Double, mModalIdPrev As Double
 Public IamPopUp As Boolean
 Private mEnabled As Boolean
 Private excludeme As New FastCollection
+Public WithEvents mDoc As Document
+Attribute mDoc.VB_VarHelpID = -1
+Dim mQuit
 Public Sub AddGuiControl(widget As Object)
 GuiControls.Add widget
 End Sub
@@ -152,34 +155,42 @@ Set myEvent = aEvent
 End Property
 
 Public Sub Callback(b$)
-
 If ByPassEvent Then
-Dim Mark$
-Mark$ = Split(b$, "(")(0)
-If excludeme.ExistKey(Mark$) Then Exit Sub
-
-If Not CallEventFromGuiOne(Me, myEvent, b$) Then If Visible Then excludeme.AddKey Mark$
+    Dim Mark$
+    Mark$ = Split(b$, "(")(0)
+    If excludeme.ExistKey(Mark$) Then Exit Sub
+    If Not TaskMaster Is Nothing Then TaskMaster.tickdrop = 0
+    If Visible Then
+        excludeme.AddKey2 Mark$
+    If CallEventFromGuiOne(Me, myEvent, b$) Then
+        excludeme.Remove2 Mark$
+    End If
+    Else
+        CallEventFromGuiOne Me, myEvent, b$
+    End If
 Else
-CallEventFromGui Me, myEvent, b$
+    CallEventFromGui Me, myEvent, b$
 End If
 End Sub
 Public Sub CallbackNow(b$, VR())
 Dim Mark$
 Mark$ = Split(b$, "(")(0)
 If excludeme.ExistKey(Mark$) Then Exit Sub
-If Not CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.AddKey Mark$
+If Visible Then excludeme.AddKey2 Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.Remove2 Mark$
+
 End Sub
 
 
 Public Sub ShowmeALL()
 Dim w As Object
+
 If Controls.Count > 0 Then
 For Each w In Controls
 If w.enabled Then w.Visible = True
-    
 Next w
 End If
-Set excludeme = New FastCollection
+
 gList2.PrepareToShow
 End Sub
 Public Sub RefreshALL()
@@ -281,6 +292,7 @@ End Sub
 
 
 Private Sub Form_Initialize()
+excludeme.ResetGui
 mEnabled = True
 End Sub
 
@@ -369,7 +381,7 @@ End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 If mModalId = ModalId And ModalId <> 0 Then
-    If Visible Then Hide
+    If Visible Then Hide: Quit = True
     If mModalId <> 0 Then ModalId = 0
     Cancel = True
     novisible = False
@@ -380,11 +392,12 @@ ElseIf mModalId <> 0 And Visible Then
         Cancel = True
     Else
       '    Set LastGlist = Nothing
-
+        Quit = True
     End If
 Else
 mModalIdPrev = 0
 'Set LastGlist = Nothing
+Quit = True
 End If
 End Sub
 
@@ -408,7 +421,7 @@ End If
 End Sub
 Sub ByeBye()
 Dim var(1) As Variant
-var(1) = CLng(0)
+var(0) = CLng(0)
 If mIndex > -1 Then
 CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload(" + CStr(mIndex) + ")", var()
 Else
@@ -455,11 +468,11 @@ CtrlFont.bold = .bold
 End With
 gList2.FloatLimitTop = ScrY() - 600
 gList2.FloatLimitLeft = ScrX() - 450
-
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
 UNhookMe
+Quit = True
 Set myEvent = Nothing
 
 If prive <> 0 Then
@@ -694,6 +707,14 @@ Public Sub hookme(this As gList)
 Set LastGlist = this
 End Sub
 
+
+
+
+Private Sub mDoc_MayQuit(yes As Variant)
+If mQuit Or Not Visible Then yes = True
+MyDoEvents1 Me
+End Sub
+
 Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 If Sizable And Not dr Then
     x = x + ResizeMark.Left
@@ -784,6 +805,8 @@ End Property
 Public Property Let header(ByVal vNewValue As Variant)
 gList2.Visible = vNewValue
 End Property
+
+
 Sub GetFocus()
 On Error Resume Next
 Me.SetFocus
@@ -792,3 +815,11 @@ Public Sub UNhookMe()
 Set LastGlist = Nothing
 UnHook hWnd
 End Sub
+
+Public Property Get Quit() As Variant
+Quit = mQuit
+End Property
+
+Public Property Let Quit(ByVal vNewValue As Variant)
+mQuit = vNewValue
+End Property

@@ -70,6 +70,7 @@ Public index As Long
 Public StructLen As Long
 Private ParentIndex As Long
 Public NumericSort As Boolean
+Private IamBusy As Boolean
 Private Sub Class_Initialize()
     MaxSpace = 5
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -77,6 +78,13 @@ Private Sub Class_Initialize()
     toplim = -1
     mSortstyle = vbTextCompare
    ' Debug.Print "create one"
+End Sub
+Public Sub ResetGui()
+    MaxSpace = 50
+    ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
+    hashlen = MaxSpace * 2 + 3
+    toplim = -1
+    mSortstyle = vbTextCompare
 End Sub
 Public Sub SetBinaryCompare()
 mSortstyle = vbBinaryCompare
@@ -89,6 +97,28 @@ mSortstyle = vbDatabaseCompare
 End Sub
 
 
+Public Sub AddKey2(RHS, Optional aValue As Variant)
+Do While IamBusy
+Loop
+IamBusy = True
+    index = -1
+    lastkey = RHS
+    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
+    Done = False
+    If Not IsMissing(aValue) Then
+    
+   
+        If IsObject(aValue) Then
+        Value = -1
+        Set ValueObj = aValue
+        Else
+        Value = aValue
+        End If
+    Else
+        Value = aValue
+    End If
+IamBusy = False
+End Sub
 Public Sub AddKey(RHS, Optional aValue As Variant)
     index = -1
     lastkey = RHS
@@ -210,7 +240,63 @@ End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
 Dim k As Long, k1 As Long, vvv As Variant, top1 As Long
-If toplim < 0 Then Exit Sub   ' previus stop
+If toplim < 0 Then Exit Sub  ' previus stop
+top1 = toplim
+cameback:
+Done = Find(RHS)
+If Done Then
+        If ParentIndex > -1 Then
+            PriveSpace(ParentIndex).Pleft = PriveSpace(index).Pleft
+
+        Else
+        
+        Hash(PriveSpace(index).lastpos) = PriveSpace(index).Pleft
+
+        End If
+        SwapVariant vvv, PriveSpace(top1).iValue
+        PriveSpace(index).iValue = -1
+        PriveSpace(index) = PriveSpace(top1)
+        Dim new_item As item
+        PriveSpace(top1) = new_item
+        SwapVariant vvv, PriveSpace(index).iValue
+        If Hash(PriveSpace(index).lastpos) - 1 = top1 Then
+        
+            Hash(PriveSpace(index).lastpos) = index + 1
+        Else
+        
+            k = Hash(PriveSpace(index).lastpos) - 1
+If k >= 0 Then
+   Dim safety
+                Do
+                k1 = k
+                k = PriveSpace(k).Pleft - 1
+                safety = safety + 1
+                Loop Until k = top1 Or k < 0 Or safety > 30
+                If safety > 30 Then
+                    GoTo cameback
+                End If
+                PriveSpace(k1).Pleft = index + 1
+        End If
+
+        End If
+  
+here:
+       toplim = toplim - 1
+      
+        
+       
+        
+  ReduceHash toplim
+
+End If
+End Sub
+Public Sub Remove2(RHS)
+If AllowSameKey Then Exit Sub
+Do While IamBusy
+Loop
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long
+If toplim < 0 Then Exit Sub  ' previus stop
+IamBusy = True
 top1 = toplim
 Done = Find(RHS)
 If Done Then
@@ -235,10 +321,16 @@ If Done Then
         
             k = Hash(PriveSpace(index).lastpos) - 1
 If k >= 0 Then
+   Dim safety
                 Do
                 k1 = k
                 k = PriveSpace(k).Pleft - 1
-                Loop Until k = top1 Or k < 0
+                safety = safety + 1
+                Loop Until k = top1 Or k < 0 Or safety > 30
+                If safety > 0 Then
+                'remove all
+                
+                End If
                 PriveSpace(k1).Pleft = index + 1
         End If
 
@@ -253,7 +345,9 @@ here:
   ReduceHash toplim
 
 End If
+IamBusy = False
 End Sub
+
 Property Let Value(RHS As Variant)
 Done = False
 If index = -1 Then

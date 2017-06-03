@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 7
+Global Const Revision = 8
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1545,7 +1545,26 @@ Case 0, 2
         Case Else
         f = 0
         End Select
+Case -1   '' this is for ?
+Select Case myUcase(s$)
+        Case "ÖÏÍÔÏ", "BACK"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 4
+        Case "ÐÁÍÙ", "OVER"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 1
+        Case "ÕÐÏ", "UNDER"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 2
+        Case "ÌÅÑÏÓ", "PART"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        f = 3
+        Case Else
+        f = 0
         End Select
+        lang = 0
+        End Select
+        
         If f > 0 And .lastprint Then
         .lastprint = False
         
@@ -14058,7 +14077,7 @@ fstr39: '"MENU$(", "ÅÐÉËÏÃÇ$(", "ÅÐÉËÏÃÅÓ$("
     p = Abs(CLng(p))
     With Form1.List1
         If p > 0 And .listcount >= p Then
-            r$ = .List(CLng(p) - 1)
+            r$ = .list(CLng(p) - 1)
             IsString = True
             Else
             MyErMacroStr a$, "index out of limits", "ï äåßêôçò åßíáé åêôüò ïñßùí"
@@ -22009,7 +22028,7 @@ With Form2.testpad
 .SelectionColor = rgb(255, 64, 128)
 .nowrap = True
 .Text = TestShowSub
-.mdoc.WrapAgainColor
+.mDoc.WrapAgainColor
 
 If AscW(Form2.Label1(1)) = 8191 Then
 .SelStartSilent = TestShowStart - 1 ''Len(Mid$(Form2.Label1(1), 7)) - 1
@@ -30653,7 +30672,7 @@ For Each xp In Printers
 Form1.List1.additemFast xp.DeviceName & " (" & xp.port & ")"
 Next xp
 For i = 0 To Form1.List1.listcount - 1
-If pname & " (" & port & ")" = Form1.List1.List(i) Then Form1.List1.ListIndex = i
+If pname & " (" & port & ")" = Form1.List1.list(i) Then Form1.List1.ListIndex = i
 Next i
 Exit Function
 ElseIf FastSymbol(rest$, "?") Then
@@ -30662,7 +30681,7 @@ For Each xp In Printers
 Form1.List1.additemFast xp.DeviceName & " (" & xp.port & ")"
 Next xp
 For i = 0 To Form1.List1.listcount - 1
-If pname & " (" & port & ")" = Form1.List1.List(i) Then Form1.List1.ListIndex = i
+If pname & " (" & port & ")" = Form1.List1.list(i) Then Form1.List1.ListIndex = i
 Next i
 Execute basestack, "menu !", True
 If CDbl(Form1.List1.ListIndex + 1) > 0 Then
@@ -41504,10 +41523,18 @@ End If
 Else
 .curpos = x1
 End If
+.lastprint = False
 Else
-MyCursor = False
+If FastSymbol(rest$, ",") Then
+    If IsExp(bstack, rest$, p) Then
+    y1 = CLng(p) Mod 1000   ''Mod (.my + 1)
+    .currow = y1
+    Else
+    MyCursor = False
+    End If
 End If
 .lastprint = False
+End If
 End With
 LCTbasketCur bstack.Owner, players(prive)
 End Function
@@ -41715,7 +41742,7 @@ prive = GetCode(bstack.Owner)
                         If p <> -1 Then
                             If IsLabelSymbolNew(rest$, "ÙÓ", "AS", lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
                                 If IsStrExp(bstack, rest$, s$) Then
-                                    Form1.List1.List(CLng(p)) = s$
+                                    Form1.List1.list(CLng(p)) = s$
                                 Else
                                    MissStringExpr
                                   MyMenu = False
@@ -41737,7 +41764,7 @@ prive = GetCode(bstack.Owner)
                                 If IsLabelSymbolNew(rest$, "ÙÓ", "AS", lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
                                 ' IN A THREAD OR IN A @ VARIANT
                                     If IsStrExp(bstack, rest$, s$) Then
-                                        Form1.List1.List(CLng(p)) = s$
+                                        Form1.List1.list(CLng(p)) = s$
                                     Else
                                         MissStringExpr
                                         MyMenu = False
@@ -41847,7 +41874,7 @@ ekei:
     With Form1.List1
             
             For it = it - 1 To 0 Step -1
-            If TextWidth(bstack.Owner, .List(it)) > f Then f = TextWidth(bstack.Owner, .List(it))
+            If TextWidth(bstack.Owner, .list(it)) > f Then f = TextWidth(bstack.Owner, .list(it))
             
             Next
     End With
@@ -43329,7 +43356,13 @@ If entrypoint = 1 Then DUM = True
                 var(i).LCID = CLng(p)
                 End If
                 End If
+            If basestack.Owner.name = "GuiM2000" Then
+                Set basestack.Owner.mDoc = var(i)
                 var(i).ReadUnicodeOrANSI ss$, DUM, x1
+                Set basestack.Owner.mDoc = Nothing
+            Else
+                var(i).ReadUnicodeOrANSI ss$, DUM, x1
+                End If
                 If Err.Number > 0 Then Err.Clear: Exit Function
                  var(i).ListLoadedType = x1
                  Exit Function

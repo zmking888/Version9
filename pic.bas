@@ -2625,6 +2625,7 @@ For i = 1 To Len(a$) - 1
 b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
 Next i
 SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
+SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
 End Function
 Public Function ListenUnicode(ParamArray aa() As Variant) As String
 Dim all$, i As Long
@@ -3312,7 +3313,7 @@ p2 = StrPtr(a$): l = l - 1
         End If
         a$ = Mid$(a$, (i - p2) \ 2)
         IsLabelAnew = 1
-        lang = 1 + CLng(gr)
+        lang = -1
               
         Exit Function
 
@@ -3516,7 +3517,8 @@ p2 = StrPtr(a$): l = l - 1
         i = i + 4
         a$ = Mid$(a$, (i - p2) \ 2) ' mid$(a$, 2)
         IsLabelDotSub = 1
-        lang = 1 + CLng(gr)
+        
+        lang = -1
       
         Exit Function
     

@@ -3677,7 +3677,7 @@ ProcTask2 bstack
 Wend
 MOUT = False: NOEXECUTION = False
     If Form1.List1.ListIndex >= 0 Then
-    a$ = Form1.List1.List(Form1.List1.ListIndex)
+    a$ = Form1.List1.list(Form1.List1.ListIndex)
     Else
     a$ = ""
     End If
@@ -3722,7 +3722,8 @@ Do
 
 If TaskMaster.Processing And Not bstack.TaskMain Then
         If Not bstack.toprinter Then bstack.Owner.Refresh
-        TaskMaster.TimerTick
+        'If TaskMaster.tickdrop > 0 Then TaskMaster.tickdrop
+        TaskMaster.TimerTick  'Now
        ' SleepWait 1
        MyDoEvents
        

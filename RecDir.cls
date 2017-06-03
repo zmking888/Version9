@@ -282,15 +282,15 @@ ReDim myfile$(100)
 ReDim myLevel(100) As Integer
 InUseItems = 0
 End Sub
-Public Property Get List(index As Long) As String
+Public Property Get list(index As Long) As String
 If index < 0 Then
-List = ""
+list = ""
 Else
 If Not onetime Then onetime = True: Once
-List = myfile$(index)
+list = myfile$(index)
 End If
 End Property
-Public Property Let List(index As Long, RHS As String)
+Public Property Let list(index As Long, RHS As String)
 myfile$(index) = RHS
 End Property
 
@@ -319,7 +319,7 @@ For i = 1 To NumberofDrives
  'Me.additem DriveName(i) & ":\" & CStr(TotalDiskSpace(DriveName(i)))
  AddAFile Chr$(2) + DriveName(i) & ":", 1 + Abs(TotalDiskSpace(DriveName(i)) < 0) 'use level as not enabled
 Next i
-If listcount > 0 Then Dir2 = List(0)
+If listcount > 0 Then Dir2 = list(0)
 RaiseEvent DirFinished
 Exit Function
 End If
@@ -346,7 +346,7 @@ Else
         
                 If look(1, ff, (NDX), IncludedFolders, Nofiles) > 0 Then
                
-                    Dir2 = List(NDX)
+                    Dir2 = list(NDX)
                     NDX = NDX + 1
      
      
@@ -354,7 +354,7 @@ Else
            
 Else
             If listcount > NDX Then
-            Dir2 = List(NDX)
+            Dir2 = list(NDX)
             NDX = NDX + 1   ' read with auto increment
             Else
             NDX = 0  ' reset
@@ -476,10 +476,10 @@ End If
 
 '' abort = True
 
-If Level Mod 3 = 0 Then mywait basestack1, 5
+If Level = 3 Then mywait basestack1, 5
 
 While lookpath <> ""
- 
+If fff Mod 30 = 29 Then mywait basestack1, 1
     If isdirP(wfd) Or lookpath = ".." Then
        '' If Right$("\" & lookpath, 2) = "\." Or Right$("\" & lookpath, 3) = "\.." Then
          If lookpath = "." Or lookpath = ".." Then
@@ -545,7 +545,7 @@ If maxf > 0 Then
     Next k
     End Select
   
-    RaiseEvent feedback(folder & " (" & CStr(maxf) & ") files")
+  If Level < 3 Then RaiseEvent feedback(folder & " (" & CStr(maxf) & ") files")
 End If
 If Not mrec Then
 If foldersonly Or foldersincluded Then

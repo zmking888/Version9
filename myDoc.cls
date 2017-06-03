@@ -12,6 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Public Event MayQuit(yes)
 Public Event BreakLine(data$, datanext$)
 Public Event Lastline()
 Public Event ColorDataEvent(thispara As Long, data$, col() As Variant, feedback As Long)
@@ -419,7 +420,7 @@ Property Let textDocFast(norawtext As String)
     End If
 End Property
 Property Let textDoc(norawtext As String)
-    Dim where As Long
+    Dim where As Long, ok
     Dim a() As String
     where = 1
     If InStr(norawtext, vbLf) = 0 Then
@@ -434,7 +435,10 @@ Property Let textDoc(norawtext As String)
         Else
       a() = Split(norawtext, vbLf)
       For where = LBound(a()) To UBound(a())
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Property
       AppendParagraph a(where)
+      
       Next where
     End If
     ' colorize at a second stage...(new)
@@ -1462,19 +1466,23 @@ Sub GoTopLineNextParagraph(lineno As Long, thistext As String, ParaNum As Long)
     End If
 End Sub
 Public Sub WrapAgain()
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
+       RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 mycur = DocParaNext(mycur)
 Loop
 
 End Sub
 Public Sub WrapAgainBlock(startblock As Long, endblock As Long)
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = startblock
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
+       RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
  If mycur = endblock Then Exit Do
  mycur = DocParaNext(mycur)
 Loop
@@ -1482,21 +1490,24 @@ End Sub
 
 Public Sub WrapAgainColor()
 Exit Sub
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = DocParaNext(0)
 
 Do While mycur <> 0
-
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 
 ColorThis mycur
 Loop
 
 End Sub
 Public Sub WrapAgainColor2()
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = DocParaNext(0)
 
 Do While mycur <> 0
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 If para(mycur).colordata(0) = Empty Then
 ColorThis mycur
 Else
@@ -1508,12 +1519,14 @@ Loop
 End Sub
 
 Public Sub WrapAgainColorBlock(startblock As Long, endblock As Long)
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
 ColorThis mycur
 Else
 Do While mycur <> 0
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 ColorThis mycur
 If mycur = endblock Then Exit Do
 Loop
@@ -1522,12 +1535,14 @@ If mycur = endblock Then ColorThis mycur
 End If
 End Sub
 Public Sub WrapAgainColorBlock2(startblock As Long, endblock As Long)
-Dim mycur As Long
+Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
 ColorThis mycur
 Else
 Do While mycur <> 0
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 If para(mycur).colordata(0) = Empty Then
 ColorThis mycur
 Else
@@ -1913,7 +1928,7 @@ t12345:
 End Function
 Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long)
 Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte, lbt As Long
-Dim mLof As Long
+Dim mLof As Long, ok
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
@@ -1939,6 +1954,8 @@ On Error GoTo ErrHandler
            mLof = LOF(FNr)
            While Not (mLof < SeekBuf)
            Me.AppendParagraphOneLine getUniStringlINE(FNr, mLof, BOM = &HFEFF, lbt)
+            RaiseEvent MayQuit(ok)
+            If ok Then GoTo ErrHandler
           Wend
           feedback = lbt
         End If
@@ -1952,6 +1969,8 @@ On Error GoTo ErrHandler
            mLof = LOF(FNr)
            While Not (mLof < SeekBuf)
           AppendParagraphOneLine getUniStringLineUtF8(FNr, mLof, lbt)
+            RaiseEvent MayQuit(ok)
+            If ok Then GoTo ErrHandler
           Wend
           End If
          feedback = 2 + lbt
@@ -1960,6 +1979,8 @@ On Error GoTo ErrHandler
        mLof = LOF(FNr)
         While Not (mLof < SeekBuf)
            AppendParagraphOneLine getAnsiStringlINE(FNr, mLof, lbt)
+            RaiseEvent MayQuit(ok)
+            If ok Then GoTo ErrHandler
           Wend
           feedback = 3 + lbt
         End If
@@ -1970,6 +1991,8 @@ On Error GoTo ErrHandler
        mLof = LOF(FNr)
         While Not (mLof < SeekBuf)
            AppendParagraphOneLine getAnsiStringlINE(FNr, mLof, lbt)
+            RaiseEvent MayQuit(ok)
+            If ok Then GoTo ErrHandler
           Wend
           feedback = 3 + lbt
     End Select
@@ -2053,9 +2076,11 @@ pos = -2
 End Function
 
 Public Sub CompactLines(Optional addtimes As Boolean = True)
-Dim mycur As Long, nextCur As Long, s$, many As Long
+Dim mycur As Long, nextCur As Long, s$, many As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
+      RaiseEvent MayQuit(ok)
+      If ok Then Exit Sub
 many = 1
 s$ = TextParagraph(mycur)
 nextCur = DocParaNext(mycur)
