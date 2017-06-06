@@ -237,7 +237,7 @@ StackItemTypeObjectType = ""
 Case "*"
 Set bb = aa.ObjectRef
 If TypeOf bb Is mHandler Then
-Set bb = bb.ObjectRef
+Set bb = bb.objref
 CheckDeepAny bb, v()
 If bb.t1 = 3 Then
 StackItemTypeObjectType = "*[" + Typename(bb) + "]"

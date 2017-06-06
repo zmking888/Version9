@@ -417,7 +417,7 @@ ValueType = True
         Else
             p = 0
             On Error Resume Next
-            p = val("0" + val1)
+            p = val1
         End If
     End If
 End If

@@ -185,10 +185,11 @@ Wend
   Set LibHdls = Nothing
 End Sub
 Function IsWine()
-Static www As Boolean, wwb As Boolean, hLib As Long, ntdll As String
+Static www As Boolean, wwb As Boolean
 If www Then
 Else
 Err.Clear
+Dim hLib As Long, ntdll As String
 On Error Resume Next
 ntdll = "ntdll"
 hLib = LoadLibrary(StrPtr(ntdll))

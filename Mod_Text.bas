@@ -2,7 +2,7 @@ Attribute VB_Name = "Module1"
 Option Explicit
 Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
-Public LastUse As Double
+Public LastUse As Long
 Private simplestack1 As rndvars
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWnd As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
 Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
@@ -55,7 +55,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8305,9 +8305,12 @@ fun61: 'Case "LEN(", "Ã« œ”("
     If IsExp(bstack, a$, p) Then
 len1234:
         If Typename(bstack.lastobj) = "mHandler" Then
-        
+        While Typename$(bstack.lastobj.objref) = "mHandler"
+        Set bstack.lastobj = bstack.lastobj.objref
+        Wend
             With bstack.lastobj
                 If .indirect < 0 Then
+                
                     If .t1 = 1 Then
                             If .objref.StructLen > 0 Then
                                 r = SG * .objref.StructLen
@@ -12297,7 +12300,7 @@ rr$ = ac$
  End Function
 Function GrabFrame() As String
 Dim p As New cDIBSection
-p.CreateFromPicture hDCToPicture(GetDC(0), (AVI.Left + Form1.Left) / DXP, (AVI.top + Form1.top) / DYP, AVI.Width / DXP, AVI.Height / DYP)
+p.CreateFromPicture hDCToPicture(GetDC(0), (AVI.Left) / DXP, (AVI.top) / DYP, AVI.Width / DXP, AVI.Height / DYP - DYP)
 If p.Height > 0 Then
 
 GrabFrame = DIBtoSTR(p)
@@ -25094,7 +25097,7 @@ Sleep 10
 KillFile strTemp & "tmp." & tP$
 myRegister = Trim$(rl$)
 End Function
-Public Function PCall(ByVal sFile As String) As String
+Public Function PCall(ByVal sFile As String, Optional param As String) As String
 Dim s2 As String, i As Long, bsfile As String, rfile As String, MYNULL$
 bsfile = mylcasefILE(sFile)
    s2 = String(MAX_FILENAME_LEN, 32)
@@ -25106,7 +25109,11 @@ bsfile = mylcasefILE(sFile)
    ' it is an executable
    PCall = mylcasefILE(bsfile)
    Else
+   If param <> "" Then
+   PCall = rfile & " " & param & " " & Chr(34) + bsfile + Chr(34)
+   Else
       PCall = rfile & " " & Chr(34) + bsfile + Chr(34)
+      End If
       End If
       Else
       PCall = ""
@@ -25139,30 +25146,31 @@ Exit Function
 1111:
 PathFromApp = ""
 End Function
-Public Function MyShell(ww$, Optional way As VbAppWinStyle = vbNormalFocus) As Long
-Dim frm$, exst As Boolean, pexist As Boolean, PP$, EXE$, param$
+Public Function MyShell(ww$, Optional way As VbAppWinStyle = vbNormalFocus, Optional param As String = "") As Long
+Dim frm$, exst As Boolean, pexist As Boolean, PP$, EXE$
 ' logic
 
 On Error GoTo 11111
 If Is64bit Then Wow64EnableWow64FsRedirection False
+again:
 If ExtractType(ww$) <> "" Then
 
 frm$ = ExtractPath(ww$) + ExtractName(ww$)
-param$ = Mid$(ww$, Len(frm$) + 1)
+param = RTrim$(Mid$(ww$, Len(frm$) + 1) + " " + param)
 ww$ = frm$
 ElseIf ExtractPath(ww$) = "" Then
 Dim i As Long, j As Long
 i = InStr(ww$, Chr(34))
 j = InStrRev(ww$, Chr(34))
 If j > i Then
-param$ = Mid$(ww$, i, j - i + 1)
+param = Mid$(ww$, i, j - i + 1)
 ww$ = Left$(ww$, i - 1)
 End If
 
 End If
 If ww$ = "" Then
-If param$ <> "" Then
-MyShell = Shell(Trim$(param$), way)
+If param <> "" Then
+MyShell = Shell(Trim$(param), way)
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
@@ -25175,16 +25183,19 @@ frm$ = CFname(ww$)
 If ExtractName(frm$) <> ExtractName(ww$) Then
 On Error Resume Next
 
-'MyShell = Shell(Trim$(ww$ & " " & param$), way)
+'MyShell = Shell(Trim$(ww$ & " " & param), way)
 EXE$ = Trim$(ww$)
-MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param$), 0, way)
-If Is64bit Then Wow64EnableWow64FsRedirection True
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param), 0, way)
+'If Is64bit Then Wow64EnableWow64FsRedirection True
 If Err.Number > 0 Then
+
 Err.Clear
 ww$ = PathFromApp(ww$)
 If ww$ <> "" Then
-ww$ = ReplaceStr(Chr(34), "", ww$) & " " & param$
-MyShell = Shell(Trim$(ww$), way)
+'ww$ = ReplaceStr(Chr(34), "", ww$) & " " & param
+'MyShell = Shell(Trim$(ww$), way)
+EXE$ = Trim$(ww$)
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param), 0, way)
 End If
 End If
 If Is64bit Then Wow64EnableWow64FsRedirection True
@@ -25223,14 +25234,29 @@ MyShell = Shell(frm$, way)
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
-MyShell = Shell(Trim$(EXE$ & " " & ww$ & " " & param$), way)
+MyShell = Shell(Trim$(EXE$ & " " & ww$ & " " & param), way)
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 End If
 End If
 Case "exe", "bat", "com" ' can be run immediatly
 If pexist Then
-MyShell = Shell(Trim$(PP$ & EXE$ & " " & ww$), way)
+EXE$ = PP$ + EXE$
+If param <> "" Then
+'MyShell = Shell(Trim$(PP$ & EXE$ & " " & ww$ + " " + param), way)
+If Form1.Visible And way = vbNormalFocus Then
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), StrPtr(param), StrPtr(PP$), way)
+Else
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(param), StrPtr(PP$), way)
+End If
+Else
+If Form1.Visible And way = vbNormalFocus Then
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), 0, StrPtr(PP$), way)
+Else
+MyShell = ShellExecute(0, 0, StrPtr(EXE$), 0, StrPtr(PP$), way)
+End If
+'MyShell = Shell(Trim$(PP$ & EXE$ & " " & ww$), way)
+End If
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
@@ -25248,7 +25274,11 @@ End If
 Case "@@@"
 'MyShell = Shell(RTrim$("explorer " & ww$), way)
 EXE$ = "explorer"
+If Form1.Visible Then
+MyShell = ShellExecute(Form1.hWnd, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
+Else
 MyShell = ShellExecute(0, 0, StrPtr(EXE$), StrPtr(ww$), 0, way)
+End If
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Case Else ' its a document
 PP$ = ReplaceStr("file:", "", PP$)
@@ -25256,15 +25286,20 @@ frm$ = PCall(PP$ & EXE$)
 If frm$ <> "" Then
 If AscW(frm$) = 34 Then
 frm$ = frm$ & "@"
-frm$ = ReplaceStr(Chr(34) & "@", param$ & Chr(34), frm$)
+frm$ = ReplaceStr(Chr(34) & "@", " " + param & Chr(34), frm$)
 frm$ = ReplaceStr("@", "", frm$)
+MyShell = Shell(Trim$(frm$), way)
 Else
+frm$ = PCall(PP$ & EXE$, param)
+
+ww$ = frm$ & " " & ww$
+GoTo again
 End If
-MyShell = Shell(Trim$(frm$ & " " & ww$ & " " & param$), way)
 If Is64bit Then Wow64EnableWow64FsRedirection True
 Exit Function
 Else
 End If
+If Is64bit Then Wow64EnableWow64FsRedirection True
 End Select
 If MyShell <> 0 Then AppActivate MyShell
 11111:
@@ -31477,13 +31512,29 @@ If IsLabelSymbolNew(rest$, "÷œ—‘Ÿ”≈", "LOAD", lang) Then
     ss$ = ""
         If IsLabelSymbolNewExp(rest$, "ƒ≈…Œ≈", "SHOW", lang, ss$) Then
             'If Not AVIRUN Then MediaPlayer1.playMovie: MediaPlayer1.pauseMovie
-                AVI.Show
+            If scr.name = "GuiM2000" Then
+            If scr.Visible Then
+                AVI.Show , scr
+      End If
+                Set scr = Nothing
+                ProcMedia = True
+                Exit Function
+           
+                
+            Else
+                If Form1.Visible Then
+                AVI.Show , Form1
+                Else
+                AVI.Show , Form5
+                End If
+               
+                AVI.ZOrder 0
              AVI.SetFocus
                 MyDoEvents
                 Set scr = Nothing
                 ProcMedia = True
                 Exit Function
-      
+       End If
         ElseIf IsLabelSymbolNewExp(rest$, " —’ÿ≈", "HIDE", lang, ss$) Then
                 AVI.Hide
                 Set scr = Nothing
@@ -31571,7 +31622,7 @@ If IsExp(basestack, rest$, x) Then
                 If FastSymbol(rest$, ",") Then
             If IsExp(basestack, rest$, x) Then AviSizeY = CLng(x) Else rest$ = "," & rest$
                 End If
-                UseAviSize = (AviSizeY + AviSizeX) <> 0 Or (aviX = 0 And aviY = 0)
+                UseAviSize = (Abs(AviSizeY) + Abs(AviSizeX)) <> 0 Or (aviX = 0 And aviY = 0)
                 
             End If
             If Not FastSymbol(rest$, ",") Then
@@ -31581,6 +31632,10 @@ If IsExp(basestack, rest$, x) Then
                    MediaPlayer1.sizeLocateMovie 0, 0, Form1.ScaleX(AviSizeX, vbTwips, vbPixels), Form1.ScaleY(AviSizeY, vbTwips, vbPixels) + 1
                    ElseIf UseAviXY Then
                    AVI.Move aviX, aviY
+                    MediaPlayer1.sizeLocateMovie 0, 0, Form1.ScaleX(AviSizeX, vbTwips, vbPixels), Form1.ScaleY(AviSizeY, vbTwips, vbPixels) + 1
+                    ElseIf UseAviSize Then
+                     AVI.Move AVI.Left, AVI.top, AviSizeX, AviSizeY
+                   MediaPlayer1.sizeLocateMovie 0, 0, Form1.ScaleX(AviSizeX, vbTwips, vbPixels), Form1.ScaleY(AviSizeY, vbTwips, vbPixels) + 1
                     End If
            Else
                    If AVIRUN Or AVIUP Then
@@ -42532,7 +42587,25 @@ On Error Resume Next
 If s$ = ExtractPath$(s$) Then
 MyShell "explorer " & Chr(34) + s$ & Chr(34)
 Else
-MyShell s$
+If IsSymbol(rest$, ",") Then
+x1 = Abs(IsLabelFileName(basestack, rest$, (w$), , w$))
+If x1 = 1 Then
+If ExtractType(w$) = "" Then w$ = w$ + ".gsb"
+If ExtractPath(w$) = "" Then w$ = mcd + w$
+Else
+rest$ = w$ + rest$
+x1 = IsStrExp(basestack, rest$, w$)
+End If
+If x1 Then
+
+MyShell s$, 1 - 5 * (IsSymbol(rest$, ";")), w$
+Else
+MissStringExpr
+Exit Function
+End If
+Else
+MyShell s$, 1 - 5 * (IsSymbol(rest$, ";"))
+End If
 End If
 '***********************************************
 End If
@@ -43016,9 +43089,16 @@ tempList2delete = Sput(strTemp + ss$) + tempList2delete
 s$ = App.path
 AddDirSep s$
 s$ = s$ & "M2000.EXE "
-LastUse = Shell(s$ & Chr(34) + strTemp + ss$ & Chr(34), vbNormalFocus)
+LastUse = MyShell(s$ & Chr(34) + strTemp + ss$ & Chr(34), vbNormalFocus - 4 * (ML <> 0 Or IsSymbol(rest$, ";")))
+Sleep 1
 If LastUse <> 0 Then
-If ML = 0 Then AppActivate LastUse
+
+If ML = 0 Then
+If IsSymbol(rest$, ";") Then
+Else
+'AppActivate LastUse
+End If
+End If
 'killfile strTemp + ss$
 End If
 End If
