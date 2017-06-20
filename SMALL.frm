@@ -107,7 +107,7 @@ End Function
 Public Function NeoASK(bstack As basetask) As Double
 If ASKINUSE Then Exit Function
 Dim oldesc As Boolean
-oldesc = escok
+    oldesc = escok
 'using AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$
 Static Once As Boolean
 If Once Then Exit Function
@@ -125,7 +125,9 @@ MyDoEvents1 Form1
 Sleep 1
 NeoMsgBox.Show , Form1
 Else
-If form5iamloaded Then
+If TypeOf bstack.Owner Is GuiM2000 Then
+NeoMsgBox.Show , bstack.Owner
+ElseIf form5iamloaded Then
 MyDoEvents1 Form5
 Sleep 1
 NeoMsgBox.Show , Form5

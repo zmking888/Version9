@@ -15,7 +15,7 @@ Option Explicit
 
  Private Type item
  Key As String
-  NDX As Long
+  ndx As Long
   KeyType As Long  ' 0 as is , 1, reference/don't delete
  firsthash As Long
  lastpos As Long
@@ -38,10 +38,10 @@ Private Sub Class_Initialize()
 End Sub
 Friend Sub ReadVar(where, name$, num As Long)
     name$ = PriveSpace(where).Key
-    num = PriveSpace(where).NDX
+    num = PriveSpace(where).ndx
 End Sub
 Public Property Get lastNDX() As String
-lastNDX = PriveSpace(index).NDX
+lastNDX = PriveSpace(index).ndx
 End Property
 Public Property Get lastkey() As String
 lastkey = PriveSpace(index).Key
@@ -73,12 +73,12 @@ Friend Sub ReduceHash(newTop As Long, v())
             Hash(.lastpos) = 0
             .Key = ""
         End If
-        If .KeyType = 0 And .NDX >= 0 Then
-            If IsObject(v(.NDX)) Then
+        If .KeyType = 0 And .ndx >= 0 Then
+            If IsObject(v(.ndx)) Then
             GarbageCollector.Done = False
-           If Typename(v(.NDX)) = "mHandler" Then
-            If GarbageCollector.Find(objptr(v(.NDX).objref)) Then
-            ElseIf GarbageCollector.Find(objptr(v(.NDX))) Then
+           If Typename(v(.ndx)) = "mHandler" Then
+            If GarbageCollector.Find(objptr(v(.ndx).objref)) Then
+            ElseIf GarbageCollector.Find(objptr(v(.ndx))) Then
             
             End If
             End If
@@ -88,12 +88,12 @@ Friend Sub ReduceHash(newTop As Long, v())
                 GarbageCollector.RemoveWithNoFind
             End If
             End If
-            Set v(.NDX) = Nothing
+            Set v(.ndx) = Nothing
             End If
-            v(.NDX) = Empty
+            v(.ndx) = Empty
             End If
         .KeyType = 0
-        .NDX = -1
+        .ndx = -1
             
         End With
 
@@ -140,7 +140,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).NDX: Find = True: index = k: Exit Function
+    num = PriveSpace(k).ndx: Find = True: index = k: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -170,11 +170,11 @@ Do
 With PriveSpace(k)
     If .Key = Key Then
     If .KeyType = 0 Then
-        If IsObject(v(.NDX)) Then Set v(.NDX) = Nothing
-        v(.NDX) = Empty
+        If IsObject(v(.ndx)) Then Set v(.ndx) = Nothing
+        v(.ndx) = Empty
         .KeyType = 1
     End If
-    .NDX = newnum
+    .ndx = newnum
      findRebound = True: Exit Function
     End If
     End With
@@ -188,7 +188,7 @@ a = Malloc()
 On Error GoTo exxx
 With PriveSpace(a)
     .Key = Key
-    .NDX = num
+    .ndx = num
     If isref Then
         .KeyType = 1
     Else
@@ -203,11 +203,12 @@ Property Get Percent()
 Percent = Count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
-Dim k As Long
-
+    Dim k As Long
     k = Hash(b)
-    Hash(b) = a + 1
-    PriveSpace(a).Pleft = k
+    If Not Hash(b) = a + 1 Then
+         Hash(b) = a + 1
+         PriveSpace(a).Pleft = k
+    End If
     PriveSpace(a).lastpos = b
 End Sub
 Private Sub ab(ByVal a As Long, b As Long)

@@ -928,7 +928,7 @@ If sel& >= 0 Then
 If Button = 1 Then
 
 
-Select Case q(sel&).Id Mod 100
+Select Case q(sel&).ID Mod 100
 Case Is < 10
 If Not interpret(DisStack, (q(sel&).Comm)) Then Beep
 Case Else
@@ -993,7 +993,7 @@ With players(p)
             If sel& >= 0 Then
                 If Button = 1 Then
                 '' If QRY Then LCTC dSprite(Index), oy&, ox&, ins& Else LCT dSprite(Index), oy&, ox&
-                Select Case q(sel&).Id Mod 100
+                Select Case q(sel&).ID Mod 100
                 Case Is < 10
                 If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
                 Case Else
@@ -1556,7 +1556,7 @@ If sel& >= 0 Then
 If Button = 1 Then
 
 
-Select Case q(sel&).Id Mod 100
+Select Case q(sel&).ID Mod 100
 Case Is < 10
 
 If Not interpret(MeStack, (q(sel&).Comm)) Then Beep
@@ -1973,12 +1973,15 @@ End Sub
 
 Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, noentrance As Boolean, where As Long
-Dim aa$, a$, JJ As Long, ii As Long
+Dim aa$, a$, JJ As Long, ii As Long, gothere As Long
 If KeyCode = vbKeyEscape Then
 KeyCode = 0
  If Not EditTextWord Then
  ' check if { } is ok...
- If Not blockCheck(TEXT1.Text, DialogLang) Then Exit Sub
+ If Not blockCheck(TEXT1.Text, DialogLang, gothere) Then
+ 
+ Exit Sub
+ End If
  End If
  If TEXT1.UsedAsTextBox Then result = 99
 NOEDIT = True: noentrance = False: Exit Sub
@@ -2149,9 +2152,25 @@ End If
 End If
 KeyCode = 0
 Case vbKeyF10
+If shift <> 0 Then
+With TEXT1
+If .UsedAsTextBox Then Exit Sub
+ii = .SelLength
+.Form1mn1Enabled = ii > 1
+.Form1mn2Enabled = ii > 1
+.Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
+.Form1sdnEnabled = ii > 0 And (.Length - .SelStart) > .SelLength
+.Form1supEnabled = ii > 0 And .SelStart > .SelLength
+.Form1mscatEnabled = .Form1sdnEnabled Or .Form1supEnabled
+.Form1rthisEnabled = .Form1mscatEnabled
+End With
+MyPopUp.feedlabels TEXT1, EditTextWord
+MyPopUp.Up
+Else
 TEXT1.showparagraph = Not TEXT1.showparagraph
 TEXT1.mDoc.WrapAgain
 TEXT1.Render
+End If
 KeyCode = 0
 
 Case vbKeyF11
@@ -2826,9 +2845,12 @@ End If
 End With
 End Sub
 Public Sub mn4sub()
+Dim gothere As Long
  If Not EditTextWord Then
  ' check if { } is ok...
- If Not blockCheck(TEXT1.Text, DialogLang) Then Exit Sub
+ If Not blockCheck(TEXT1.Text, DialogLang, gothere) Then
+ Exit Sub
+ End If
  End If
 
 MyDoEvents

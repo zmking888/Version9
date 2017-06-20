@@ -64,7 +64,8 @@ MediaPlayer1.closeMovie
   DisableMidi
  If Not TaskMaster Is Nothing Then TaskMaster.Dispose
   Set TaskMaster = Nothing
-  
+Set basestack1.Owner = Nothing
+Set basestack1 = Nothing
 Dim x As Form
 If IsWine Then
 ModalId = 0

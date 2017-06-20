@@ -217,7 +217,7 @@ r1 = SafeArrayUnlock(m_base)
 End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 If Count > 0 Then
     k.PushDim 1
     k.PushEnd
@@ -270,7 +270,7 @@ Set k = Nothing
 End Sub
 Public Sub Cdr(m As Object)
 Dim k As New mArray
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
 k.StartResize: k.PushDim Me.Count - 1: k.PushEnd
 Else
@@ -283,28 +283,28 @@ Exit Sub
 End If
 k.myarrbase = myarrbase
 k.RevOrder = False
-For i = 1 To Me.UpperMonoLimit
-If IsObject(Me.item(i)) Then
-Select Case Typename(Me.item(i))
+For I = 1 To Me.UpperMonoLimit
+If IsObject(Me.item(I)) Then
+Select Case Typename(Me.item(I))
 Case "Group"
-Set obj = Me.item(i)
+Set obj = Me.item(I)
 CopyGroup obj, obj2
-Set k.item(i - 1) = obj2
+Set k.item(I - 1) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata1()
-With Me.item(i)
+With Me.item(I)
 .CopyTo spare, actualdata1()
 End With
-Set k.item(i - 1) = spare
+Set k.item(I - 1) = spare
 Set spare = Nothing
 Case Else
-Set k.item(i - 1) = Me.item(i)
+Set k.item(I - 1) = Me.item(I)
 End Select
 Else
-k.item(i - 1) = Me.item(i)
+k.item(I - 1) = Me.item(I)
 End If
-Next i
+Next I
 '' new
 Set k.GroupRef = Me.GroupRef
 k.IHaveGui = Me.IHaveGui
@@ -333,53 +333,53 @@ If k.Count = 0 Then
 Me.CopyArray k
 Exit Sub
 End If
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.Count + k.Count + 1, 10
+k.SerialItem v, Me.Count + k.Count, 10
 k.myarrbase = myarrbase
 k.RevOrder = RevOrder
 If Right$(k.arrname, 2) = "%(" Then
-For i = 0 To Me.UpperMonoLimit
-If IsObject(Me.item(i)) Then
-Select Case Typename(Me.item(i))
+For I = 0 To Me.UpperMonoLimit
+If IsObject(Me.item(I)) Then
+Select Case Typename(Me.item(I))
 Case "Group"
-Set obj = Me.item(i)
+Set obj = Me.item(I)
 CopyGroup obj, obj2
-Set k.item(i + fromhere) = obj2
+Set k.item(I + fromhere) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata()
-With Me.item(i)
+With Me.item(I)
 .CopyTo spare, actualdata()
 End With
-Set k.item(i + fromhere) = spare
+Set k.item(I + fromhere) = spare
 Set spare = Nothing
 Case Else
-Set k.item(i + fromhere) = Me.item(i)
+Set k.item(I + fromhere) = Me.item(I)
 End Select
 Else
-k.item(i + fromhere) = Int(Me.item(i))
+k.item(I + fromhere) = Int(Me.item(I))
 End If
-Next i
+Next I
 Else
 ''''''''''****************************
-For i = 0 To Me.UpperMonoLimit
+For I = 0 To Me.UpperMonoLimit
 
-If IsObject(Me.item(i)) Then
-Select Case Typename(Me.item(i))
+If IsObject(Me.item(I)) Then
+Select Case Typename(Me.item(I))
 Case "Group"
-Set obj = Me.item(i)
+Set obj = Me.item(I)
 CopyGroup obj, obj2
-Set k.item(i + fromhere) = obj2
+Set k.item(I + fromhere) = obj2
 Set obj2 = Nothing
 Case Else
-Set k.item(i + fromhere) = Me.item(i)
+Set k.item(I + fromhere) = Me.item(I)
 End Select
 Else
-k.item(i + fromhere) = Me.item(i)
+k.item(I + fromhere) = Me.item(I)
 End If
-Next i
+Next I
 End If
 '' new
 Set k.GroupRef = Me.GroupRef
@@ -391,67 +391,67 @@ End Sub
 
 Public Sub CopyArray(k As mArray)
 'copy this to k
-Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim v As Variant, I As Long, obj As Object, obj2 As Object, spare As lambda
 k.SerialItem v, Me.UpperMonoLimit, 8
 k.myarrbase = myarrbase
 k.RevOrder = False
 k.StartResize
-For i = 0 To dnum - 1
-k.PushDim limit(i)
-Next i
+For I = 0 To dnum - 1
+k.PushDim limit(I)
+Next I
 
 k.PushEnd
 k.RevOrder = RevOrder
 If Right$(k.arrname, 2) = "%(" Then
-For i = 0 To Me.UpperMonoLimit
+For I = 0 To Me.UpperMonoLimit
 
-If IsObject(Me.item(i)) Then
-Select Case Typename(Me.item(i))
+If IsObject(Me.item(I)) Then
+Select Case Typename(Me.item(I))
 Case "Group"
-Set obj = Me.item(i)
+Set obj = Me.item(I)
 CopyGroup obj, obj2
-Set k.item(i) = obj2
+Set k.item(I) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata()
-With Me.item(i)
+With Me.item(I)
 .CopyTo spare, actualdata()
 End With
-Set k.item(i) = spare
+Set k.item(I) = spare
 Set spare = Nothing
 
 Case Else
-Set k.item(i) = Me.item(i)
+Set k.item(I) = Me.item(I)
 End Select
 Else
-k.item(i) = Int(Me.item(i))
+k.item(I) = Int(Me.item(I))
 End If
-Next i
+Next I
 Else
 ''''''''''****************************
-For i = 0 To Me.UpperMonoLimit
+For I = 0 To Me.UpperMonoLimit
 
-If IsObject(Me.item(i)) Then
-Select Case Typename(Me.item(i))
+If IsObject(Me.item(I)) Then
+Select Case Typename(Me.item(I))
 Case "Group"
-Set obj = Me.item(i)
+Set obj = Me.item(I)
 CopyGroup obj, obj2
-Set k.item(i) = obj2
+Set k.item(I) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata1()
-With Me.item(i)
+With Me.item(I)
 .CopyTo spare, actualdata1()
 End With
-Set k.item(i) = spare
+Set k.item(I) = spare
 Set spare = Nothing
 Case Else
-Set k.item(i) = Me.item(i)
+Set k.item(I) = Me.item(I)
 End Select
 Else
-k.item(i) = Me.item(i)
+k.item(I) = Me.item(I)
 End If
-Next i
+Next I
 End If
 '' new
 Set k.GroupRef = Me.GroupRef
@@ -491,8 +491,8 @@ maxitems = 1
 maxitems1 = 0
 ReDim actualdata(maxitems1) As Variant
 Else
-Dim i As Long
-For i = 0 To 9: limit(i) = nlimit(i): Next i
+Dim I As Long
+For I = 0 To 9: limit(I) = nlimit(I): Next I
     dnum = ndnum
     maxitems = nmaxitems
     maxitems1 = nmaxitems1
@@ -504,23 +504,23 @@ Else
 End If
 Dim mx As Long
 mx = maxitems
-i = 0
-If limit(i) > 0 Then
+I = 0
+If limit(I) > 0 Then
 If RevOrder Then
 Dim revlimit()
 ReDim revlimit(UBound(limit()))
-    For i = 0 To dnum - 1
-    revlimit(i) = limit(dnum - i - 1)
-    Next i
-    For i = 0 To dnum - 1
-    limit(i) = revlimit(i)
-    Next i
+    For I = 0 To dnum - 1
+    revlimit(I) = limit(dnum - I - 1)
+    Next I
+    For I = 0 To dnum - 1
+    limit(I) = revlimit(I)
+    Next I
     
 End If
-For i = 0 To dnum - 1
-    dtable(i) = mx / limit(i)
-    mx = dtable(i)
-Next i
+For I = 0 To dnum - 1
+    dtable(I) = mx / limit(I)
+    mx = dtable(I)
+Next I
 Else
 GoTo there11
 End If
@@ -539,34 +539,34 @@ ndnum = 0 ' no actions
 nmaxitems = 1
 nmaxitems1 = 0
 End Sub
-Public Function SerialItem(item As Variant, cursor As Long, command As Long) As Boolean
+Public Function SerialItem(item As Variant, Cursor As Long, command As Long) As Boolean
 If command = 1 Then
 If dnum = 0 Then Exit Function
-If cursor < 0 Or cursor >= maxitems Then Exit Function
+If Cursor < 0 Or Cursor >= maxitems Then Exit Function
 If VarType(item) = vbObject Then
-Set actualdata(cursor) = item
+Set actualdata(Cursor) = item
 Else
-actualdata(cursor) = item
+actualdata(Cursor) = item
 End If
 ElseIf command = 2 Then
 If dnum = 0 Then Exit Function
-If cursor < 0 Or cursor >= maxitems Then Exit Function
-item = actualdata(cursor)
+If Cursor < 0 Or Cursor >= maxitems Then Exit Function
+item = actualdata(Cursor)
 ElseIf command = 3 Then
     Fill item
 ElseIf command = 4 Then
-    cursor = maxitems
+    Cursor = maxitems
 ElseIf command = 5 Then
-cursor = dnum
+Cursor = dnum
 item = dnum
 ElseIf command = 6 Then
-If cursor > 9 Or cursor < 0 Then
+If Cursor > 9 Or Cursor < 0 Then
 item = 0
 Else
 If RevOrder Then
-item = limit(dnum - cursor - 1)
+item = limit(dnum - Cursor - 1)
 Else
-item = limit(cursor)
+item = limit(Cursor)
 End If
 End If
 ElseIf command = 7 Then  'erase all data
@@ -574,7 +574,7 @@ Dim aa As Variant
 Fill aa
 ElseIf command = 8 Then
 If dnum = 1 Then
-If cursor = -1 Then
+If Cursor = -1 Then
 dnum = 0 ' no actions
 maxitems = 1
 maxitems1 = 0
@@ -586,25 +586,25 @@ CodeName = GetAnyName$
 Arr = True
 limit(0) = 0
 Else
-    ReDim Preserve actualdata(cursor) As Variant
+    ReDim Preserve actualdata(Cursor) As Variant
     
-    maxitems = cursor
+    maxitems = Cursor
 End If
     limit(0) = maxitems
 
 End If
 ElseIf command = 9 Then
 If dnum = 1 Then
-    ReDim Preserve actualdata(cursor) As Variant
-    maxitems = cursor - 1
+    ReDim Preserve actualdata(Cursor) As Variant
+    maxitems = Cursor - 1
     limit(0) = maxitems
 End If
 maxitems1 = maxitems - 1
 ElseIf command = 10 Then
    
-    ReDim Preserve actualdata(cursor) As Variant
-    maxitems = cursor - 1
-    limit(0) = maxitems
+    ReDim Preserve actualdata(Cursor) As Variant
+    maxitems = Cursor
+    limit(0) = maxitems - 1
 dnum = 1
 maxitems1 = maxitems - 1
 End If
@@ -738,34 +738,34 @@ End Property
 Private Sub Fill(item As Variant)
 Dim aa As Object
 If dnum > 0 Then
-Dim i As Long
+Dim I As Long
 If IHaveClass Then
-For i = 0 To maxitems - 1
+For I = 0 To maxitems - 1
 CopyGroup GroupRef, aa
-Set actualdata(i) = aa
-Next i
+Set actualdata(I) = aa
+Next I
 Else
 If Typename(item) = "Empty" Then
 ReDim actualdata(maxitems)
 ''maxitems = 0
 
 Else
-For i = 0 To maxitems - 1
-actualdata(i) = item
-Next i
+For I = 0 To maxitems - 1
+actualdata(I) = item
+Next I
 End If
 End If
 End If
 End Sub
 Public Sub FillLambda(bstack As basetask)
-Dim obj As Variant, i As Long
+Dim obj As Variant, I As Long
 Set obj = bstack.lastobj
     Set bstack.lastobj = Nothing
-For i = 0 To maxitems - 1
+For I = 0 To maxitems - 1
  CopyLambda obj, bstack
-Set actualdata(i) = bstack.lastobj
+Set actualdata(I) = bstack.lastobj
 Set bstack.lastobj = Nothing
-Next i
+Next I
 Set obj = Nothing
 End Sub
 Sub MakeitObject2(var As Variant)

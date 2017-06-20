@@ -1015,6 +1015,15 @@ Dim l1 As Long, c1 As Long
 If KeyCode = 18 Then
 Exit Sub
 End If
+If KeyCode = vbKeyF10 And shift <> 0 Then
+KeyCode = 0
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+      End If
+Exit Sub
+End If
 If KeyCode = 16 And shift <> 0 Then
 KeyCode = 0
 If glistN.SelStart = 0 Then
@@ -1868,20 +1877,20 @@ End Sub
 
 Private Sub mDoc_BreakLine(data As String, datanext As String)
  ' Nowrap = True mean no Wrap
- Dim Data1 As String, datanext1 As String
+ Dim data1 As String, datanext1 As String
  If nowrap Then
     datanext = data
     data = ""
  Else
     If showparagraph Then
    ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
-         Data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
+         data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
         
-        glistN.BreakLine Data1, datanext1, , ChrW(&HB7)
-        If Data1 <> "" Then
+        glistN.BreakLine data1, datanext1, , ChrW(&HB7)
+        If data1 <> "" Then
         
         datanext = Myleft$(data, Len(datanext1))
-        data = Right$(data, Len(Data1))
+        data = Right$(data, Len(data1))
         Else
             datanext = data
              data = ""
@@ -2074,7 +2083,7 @@ Select Case Asc(Mid$(s$, i, 1))
 Case 34
 Do While i < c
 i = i + 1
-If Asc(Mid$(s$, i, 1)) = 34 Then Exit Do
+If Asc(Mid$(s$, i, 1)) = 34 Then If Asc(Mid$(s$, i - 1, 1)) <> 92 Then Exit Do
 Loop
 Case 123
 j = j - 1
@@ -4658,12 +4667,14 @@ On Error Resume Next
 Callback.Controls(CtrlName).SetFocus
 End Sub
 Sub ReColor()
+On Error GoTo end1
 Set Callback.mDoc = mDoc
 WrapAll
 If mDoc Is Nothing Then Set Callback.mDoc = Nothing: Exit Sub
 mDoc.WrapAgainColor
 Set Callback.mDoc = Nothing
 ManualInform
+end1:
 End Sub
 Sub ReColorBlock()
 Dim order1, order2

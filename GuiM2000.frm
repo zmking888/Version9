@@ -156,14 +156,16 @@ End Property
 
 Public Sub Callback(b$)
 If ByPassEvent Then
+    If excludeme.IamBusy Then Exit Sub
     Dim Mark$
     Mark$ = Split(b$, "(")(0)
-    If excludeme.ExistKey(Mark$) Then Exit Sub
+    If excludeme.ExistKey3(Mark$) Then Exit Sub
     If Not TaskMaster Is Nothing Then TaskMaster.tickdrop = 0
+    
     If Visible Then
-        excludeme.AddKey2 Mark$
+       excludeme.AddKey2 Mark$
     If CallEventFromGuiOne(Me, myEvent, b$) Then
-        excludeme.Remove2 Mark$
+        excludeme.Remove Mark$
     End If
     Else
         CallEventFromGuiOne Me, myEvent, b$
@@ -173,11 +175,12 @@ Else
 End If
 End Sub
 Public Sub CallbackNow(b$, VR())
+If excludeme.IamBusy Then Exit Sub
 Dim Mark$
 Mark$ = Split(b$, "(")(0)
-If excludeme.ExistKey(Mark$) Then Exit Sub
+If excludeme.ExistKey3(Mark$) Then Exit Sub
 If Visible Then excludeme.AddKey2 Mark$
-If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.Remove2 Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.Remove Mark$
 
 End Sub
 
@@ -439,12 +442,12 @@ If var(0) = 0 Then
 End Sub
 
 Private Sub Form_Load()
-
 If onetime Then
 novisible = True
 Exit Sub
 End If
 onetime = True
+mQuit = False
 ' try0001
 Set LastGlist = Nothing
 scrTwips = Screen.TwipsPerPixelX
@@ -713,6 +716,7 @@ End Sub
 Private Sub mDoc_MayQuit(yes As Variant)
 If mQuit Or Not Visible Then yes = True
 MyDoEvents1 Me
+'ProcTask2 basestack1
 End Sub
 
 Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)

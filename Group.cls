@@ -87,6 +87,7 @@ If mTeam Then
                 LinkToGroup.PeekItem JJ * 2 + 3, item
                         Exit Sub
             ElseIf cursor = bank.item(1) * 2 + 2 Then
+                    
                     LinkToGroup.PeekItem 1, JJ
                     LinkToGroup.PeekItem JJ * 2 + 2, item
                           Exit Sub

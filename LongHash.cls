@@ -131,11 +131,12 @@ place HashFunc1(first), a
 End With
 End Sub
 Private Sub place(ByVal b, ByVal a)
-Dim k As Long
-
+    Dim k As Long
     k = Hash(b)
-    Hash(b) = a + 1
-    PriveSpace(a).Pleft = k
+    If Not Hash(b) = a + 1 Then
+         Hash(b) = a + 1
+         PriveSpace(a).Pleft = k
+    End If
     PriveSpace(a).lastpos = b
 End Sub
 

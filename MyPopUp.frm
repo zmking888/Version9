@@ -387,9 +387,9 @@ Dim content1 As Long
 If item = 0 Then
 content1 = Int(val("0" & Trim$(Mid$(content, Len(part1) + 1))))
 
-        If content1 > myobject.mdoc.DocLines Or content1 < 0 Then
-        content = gList1.List(item)
-              gList1.SelStart = Len(gList1.List(item)) - 1
+        If content1 > myobject.mDoc.DocLines Or content1 < 0 Then
+        content = gList1.list(item)
+              gList1.SelStart = Len(gList1.list(item)) - 1
         Else
         lastgoodnum = content1
         If content1 = 0 Then
@@ -428,10 +428,10 @@ If KeyCode = vbKeyEscape Then Unload Me: Exit Sub
 
 If gList1.ListIndex = -1 Then gList1.ListindexPrivateUse = lastitem
 
-If KeyCode >= vbKey0 And KeyCode <= vbKey9 And gList1.EditFlag = False And gList1.ListIndex = 0 Then
+If ((KeyCode >= vbKey0 And KeyCode <= vbKey9) Or (KeyCode >= vbKeyNumpad0 And KeyCode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
                         lastitem = 0
                     gList1.PromptLineIdent = Len(part1)
-                    gList1.List(0) = ""
+                    gList1.list(0) = ""
                     gList1.SelStart = 3
                     gList1.EditFlag = True
 
@@ -597,9 +597,9 @@ Case 19 - k
 With myobject
 If .glistN.lines > 1 Then
 If UserCodePage = 1253 Then
-.ReplaceTitle = "Λέξεις στο κείμενο:" + CStr(.mdoc.WordCount)
+.ReplaceTitle = "Λέξεις στο κείμενο:" + CStr(.mDoc.WordCount)
 Else
-.ReplaceTitle = "Words in text:" + CStr(.mdoc.WordCount)
+.ReplaceTitle = "Words in text:" + CStr(.mDoc.WordCount)
 End If
 End If
 End With

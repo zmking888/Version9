@@ -1614,9 +1614,9 @@ If Not nocr Then LCTbasket ddd, mb, PY, PX
 End With
 End Sub
 Public Sub wwPlain(bstack As basetask, mybasket As basket, ByVal what As String, ByVal wi As Long, ByVal Hi As Long, Optional scrollme As Boolean = False, Optional nosettext As Boolean = False, Optional frmt As Long = 0, Optional ByVal skip As Long = 0, Optional res As Long, Optional isAcolumn As Boolean = False, Optional collectit As Boolean = False, Optional nonewline As Boolean)
-Dim ddd As Object, mdoc As Object
+Dim ddd As Object, mDoc As Object
     If collectit Then
-                Set mdoc = New Document
+                Set mDoc = New Document
                  End If
 Set ddd = bstack.Owner
 Dim PX As Long, PY As Long, ttt As Long, ruller&, last As Boolean, INTD As Long, nowait As Boolean
@@ -1752,7 +1752,7 @@ kk& = (help1 + help2) < (w2 - kkl)
                     If Not nopr Then fullPlain ddd, mybasket, Trim$(buf$), w2, nowait, nonewline   'DDD.Width ' w2
                  End If
                  If collectit Then
-                 mdoc.AppendParagraphOneLine Trim$(buf$)
+                 mDoc.AppendParagraphOneLine Trim$(buf$)
                  End If
             Else
                 If frmt > 0 Then
@@ -1762,7 +1762,7 @@ kk& = (help1 + help2) < (w2 - kkl)
                     ' npy
                           End If
               If collectit Then
-                 mdoc.AppendParagraphOneLine RTrim$(buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
             End If
         End If
@@ -1834,7 +1834,7 @@ If last Then
         If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(buf$), w2, 3, nowait, nonewline
     End If
         If collectit Then
-                 mdoc.AppendParagraphOneLine Trim$(buf$)
+                 mDoc.AppendParagraphOneLine Trim$(buf$)
                  End If
 Else
 If frmt > 0 Then
@@ -1844,7 +1844,7 @@ Else
 If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(buf$), w2, 3, nowait, nonewline ' rtrim
 End If
     If collectit Then
-                 mdoc.AppendParagraphOneLine RTrim$(buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
 End If
 End If
@@ -1922,7 +1922,7 @@ If Hi >= 0 And buf$ <> "" Then
 If frmt = 2 Then
 If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(buf$), w2, frmt, nowait, nonewline
             If collectit Then
-                 mdoc.AppendParagraphOneLine RTrim$(buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
 Else
 If Hi = 0 And frmt = 0 And Not scrollme Then
@@ -1938,7 +1938,7 @@ res = ddd.CurrentX
         End If
 End If
             If collectit Then
-                 mdoc.AppendParagraphOneLine buf$
+                 mDoc.AppendParagraphOneLine buf$
                  End If
 
 
@@ -1948,7 +1948,7 @@ If Not nopr Then
 fullPlainWhere ddd, mybasket, RTrim(buf$), w2, frmt, nowait, nonewline
 End If
     If collectit Then
-                 mdoc.AppendParagraphOneLine buf$
+                 mDoc.AppendParagraphOneLine buf$
                  End If
 End If
 End If
@@ -2010,8 +2010,8 @@ res = nohi - Hi
 wi = ddd.CurrentX
     If collectit Then
     Dim aa As Document
-   bstack.soros.PushStr mdoc.textDoc
-        Set mdoc = Nothing
+   bstack.soros.PushStr mDoc.textDoc
+        Set mDoc = Nothing
                  End If
 ''GetXYb ddd, mybasket, .curpos, .currow
 End With
@@ -3080,7 +3080,7 @@ If d.ForeColor = tcol Then
 Form1.TEXT1.glistN.RepaintFromOut d.image, d.Left, d.top
 End If
 
-Set .mdoc = AAA
+Set .mDoc = AAA
 .nowrap = False
 
 
@@ -3155,7 +3155,7 @@ Else
 Set AAA = back
 back.LastSelStart = i
 End If
-Set Form1.TEXT1.mdoc = New Document
+Set Form1.TEXT1.mDoc = New Document
 
 Form1.TEXT1.glistN.BackStyle = 0
 Set Form1.Point2Me = Nothing
@@ -3306,7 +3306,7 @@ Else
 .Text = ""
 .LastSelStart = 0
 End If
-If Not Form1.EditTextWord Then .mdoc.WrapAgainColor
+If Not Form1.EditTextWord Then .mDoc.WrapAgainColor
 '.glistN.NoFreeMoveUpDown = True
 With Form1.TEXT1
 .Form1mn1Enabled = False
@@ -3407,9 +3407,10 @@ escok = oldesc
 Set d = Nothing
 End Sub
 
-Function blockCheck(ByVal s$, ByVal lang As Long, Optional ByVal sbname$ = "") As Boolean
+Function blockCheck(ByVal s$, ByVal lang As Long, countlines As Long, Optional ByVal sbname$ = "") As Boolean
 If s$ = "" Then blockCheck = True: Exit Function
-Dim i As Long, j As Long, c As Long, b$, resp&, countlines As Long
+Dim i As Long, j As Long, c As Long, b$, resp&
+Dim openpar As Long, oldi As Long
 countlines = 1
 lang = Not lang
 Dim a1 As Boolean
@@ -3421,16 +3422,32 @@ i = 1
 Do
 Select Case AscW(Mid$(s$, i, 1))
 Case 13
+If openpar <> 0 Then
+If Not lang Then
+        b$ = sbname$ + "Problem in parenthesis in line " + CStr(countlines)
+    Else
+        b$ = sbname$ + "Πρόβλημα με τις παρενθέσεις στη γραμμή " + CStr(countlines)
+    End If
+    resp& = ask(b$, True)
+If resp& <> 1 Then
+blockCheck = True
+End If
+    Exit Function
+
+End If
 If Len(s$) > i + 1 Then countlines = countlines + 1
 Case 32, 160
 ' nothing
 Case 34
+oldi = i
 Do While i < c
 i = i + 1
 Select Case AscW(Mid$(s$, i, 1))
 Case 34
 Exit Do
 Case 13
+
+checkit:
     If Not lang Then
         b$ = sbname$ + "Problem in string in line " + CStr(countlines)
     Else
@@ -3440,15 +3457,32 @@ Case 13
 If resp& <> 1 Then
 blockCheck = True
 End If
-    Exit Function
-'case 10 then
+Exit Function
+
+Case Else
+If i = c Then
+'Stop
+End If
 End Select
+
 Loop
+If oldi <> i Then
+Else
+i = oldi + 1
+GoTo checkit
+End If
+
+Case 40
+openpar = openpar + 1
+Case 41
+openpar = openpar - 1
 Case 39, 92
+If openpar <= 0 Then
 Do While i < c
 i = i + 1
 If Mid$(s$, i, 2) = vbCrLf Then Exit Do
 Loop
+End If
 Case 61
 jump = True
 Case 123
@@ -3470,6 +3504,13 @@ Select Case AscW(Mid$(s$, i, 1))
 Case 34
 Exit Do
 Case 13
+ i = oldi + 1
+ Do While i < c
+ If AscW(Mid$(s$, i, 1)) = 125 Then j = j + 1: Exit Do
+ i = i + 1
+ Loop
+ i = i + 1
+ Exit Do
     If Not lang Then
         b$ = sbname$ + "Problem in string in line " + CStr(countlines)
     Else
@@ -3504,6 +3545,7 @@ jump = False
 End Select
 i = i + 1
 Loop Until i > c
+
 
 If j = 0 Then
 
@@ -4988,6 +5030,7 @@ Case 34
 Do While i < c
 i = i + 1
 If AscW(Mid$(s$, i, 1)) = 34 Then Exit Do
+'If Asc(Mid$(s$, i, 1)) = 34 Then If Asc(Mid$(s$, i - 1, 1)) <> 92 Then Exit Do
 Loop
 Case 123
 j = j - 1
@@ -5006,15 +5049,19 @@ End If
 End Function
 Function BlockParam2(s$, pos As Long) As Boolean
 ' need to be open
-Dim i As Long, j As Long
+Dim i As Long, j As Long, ii As Long
 j = 1
 For i = pos To Len(s$)
 Select Case AscW(Mid$(s$, i, 1))
 Case 0
 Exit For
 Case 34
-i = InStr(i + 1, s$, """")
-If i = 0 Then Exit Function
+again:
+ii = InStr(i + 1, s$, """")
+If ii = 0 Then Exit Function
+ i = ii
+If Mid$(s$, ii - 1, 1) = "`" Then GoTo again
+
 Case 40
 j = j + 1
 Case 41
@@ -5298,6 +5345,7 @@ Case 34
 Do While i < c
 i = i + 1
 If AscW(Mid$(s$, i, 1)) = 34 Then Exit Do
+'If Asc(Mid$(s$, i, 1)) = 34 Then If Asc(Mid$(s$, i - 1, 1)) <> 92 Then Exit Do
 Loop
 Case 123
 j = j - 1
@@ -6410,3 +6458,98 @@ Do
     End If
 Loop
 End Sub
+Public Function StringToEscapeStr(RHS As String, Optional json As Boolean = False) As String
+Dim i As Long, cursor As Long, ch As String
+cursor = 0
+Dim DEL As String
+Dim H9F As String
+DEL = ChrW(127)
+H9F = ChrW(&H9F)
+For i = 1 To Len(RHS)
+                ch = Mid$(RHS, i, 1)
+                cursor = cursor + 1
+                Select Case ch
+                    Case "\":        ch = "\\"
+                   ' Case """":       ch = "\"""
+                    Case """"
+                    If json Then
+                        ch = "\"""
+                    Else
+                        ch = "\u0022"
+                    End If
+                    Case vbLf:       ch = "\n"
+                    Case vbCr:       ch = "\r"
+                    Case vbTab:      ch = "\t"
+                    Case vbBack:     ch = "\b"
+                    Case vbFormFeed: ch = "\f"
+                    Case Is < " ", DEL To H9F
+                        ch = "\u" & Right$("000" & Hex$(AscW(ch)), 4)
+                End Select
+                If cursor + Len(ch) > Len(StringToEscapeStr) Then StringToEscapeStr = StringToEscapeStr + Space$(500)
+                Mid$(StringToEscapeStr, cursor, Len(ch)) = ch
+                cursor = cursor + Len(ch) - 1
+Next
+If cursor > 0 Then StringToEscapeStr = Left$(StringToEscapeStr, cursor)
+
+End Function
+Public Function EscapeStrToString(RHS As String) As String
+Dim i As Long, cursor As Long, ch As String
+     For cursor = 1 To Len(RHS)
+        ch = Mid$(RHS, cursor, 1)
+        i = i + 1
+        Select Case ch
+            Case """": GoTo ok1
+            Case "\":
+                cursor = cursor + 1
+                ch = Mid$(RHS, cursor, 1)
+                Select Case LCase$(ch) 'We'll make this forgiving though lowercase is proper.
+                    Case "\", "/": ch = ch
+                    Case """":      ch = """"
+                    Case "n":      ch = vbLf
+                    Case "r":      ch = vbCr
+                    Case "t":      ch = vbTab
+                    Case "b":      ch = vbBack
+                    Case "f":      ch = vbFormFeed
+                    Case "u":      ch = ParseHexChar(RHS, cursor, Len(RHS))
+                End Select
+        End Select
+                If i + Len(ch) > Len(EscapeStrToString) Then EscapeStrToString = EscapeStrToString + Space$(500)
+                Mid$(EscapeStrToString, i, Len(ch)) = ch
+                i = i + Len(ch) - 1
+    Next
+ok1:
+    If i > 0 Then EscapeStrToString = Left$(EscapeStrToString, i)
+End Function
+
+Private Function ParseHexChar( _
+    ByRef Text As String, _
+    ByRef cursor As Long, _
+    ByVal LenOfText As Long) As String
+    
+    Const ASCW_OF_ZERO As Long = &H30&
+    Dim Length As Long
+    Dim ch As String
+    Dim DigitValue As Long
+    Dim Value As Long
+
+    For cursor = cursor + 1 To LenOfText
+        ch = Mid$(Text, cursor, 1)
+        Select Case ch
+            Case "0" To "9", "A" To "F", "a" To "f"
+                Length = Length + 1
+                If Length > 4 Then Exit For
+                If ch > "9" Then
+                    DigitValue = (AscW(ch) And &HF&) + 9
+                Else
+                    DigitValue = AscW(ch) - ASCW_OF_ZERO
+                End If
+                Value = Value * &H10& + DigitValue
+            Case Else
+                Exit For
+        End Select
+    Next
+    If Length = 0 Then Err.Raise 5 'No hex digits at all.
+    cursor = cursor - 1
+    ParseHexChar = ChrW$(Value)
+End Function
+
