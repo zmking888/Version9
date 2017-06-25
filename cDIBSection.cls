@@ -1318,6 +1318,7 @@ Public Sub ThumbnailPartPaint(DestPic As Object, _
                     Dim ThumbnailDistY As Long, zf As Single, ofsize As Single
    Dim oldSc As Long, mS As Long
       'DestPic.Refresh
+     Dim dr1 As RECT
    oldSc = DestPic.ScaleMode
   ' DestPic.FontName = "Arial"
  '  DestPic.Font.charset = 161
@@ -1357,7 +1358,12 @@ Else
      If ThumbnailDistY <> 0 Then
              DestPic.CurrentX = (ThumbnailSizeX) * xPos + ((ThumbnailSizeX) - DestPic.TextWidth(lText)) / 2 + offsetx
             DestPic.CurrentY = (ThumbnailSizeY) * (yPos + 1) + offsety - ThumbnailDistY
-            DestPic.Print lText
+            dr1.Left = DestPic.CurrentX
+            dr1.top = DestPic.CurrentY
+            dr1.Right = DestPic.scalewith
+            dr1.Bottom = -DestPic.ScaleHeight
+            DrawText DestPic.hDC, StrPtr(lText), Len(lText), dr1, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP
+        
     End If
     End If
      DestPic.ScaleMode = oldSc

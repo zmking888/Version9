@@ -18,6 +18,7 @@ Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As 
 Public nokillvars As Boolean
 Public IFCTRL As Boolean, jump As Boolean
 Public Vars As Long
+Public usestack As Boolean
 Public commnum As Long
 Public connectnow As Boolean
 Public LastExecute As Long

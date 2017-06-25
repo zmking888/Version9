@@ -84,11 +84,13 @@ If mTeam Then
                 
                 
                 LinkToGroup.PeekItem 1, JJ
+               ' If JJ = 0 Then Exit Sub
                 LinkToGroup.PeekItem JJ * 2 + 3, item
                         Exit Sub
             ElseIf cursor = bank.item(1) * 2 + 2 Then
                     
                     LinkToGroup.PeekItem 1, JJ
+                  '  If JJ = 0 Then Exit Sub
                     LinkToGroup.PeekItem JJ * 2 + 2, item
                           Exit Sub
             End If
@@ -120,11 +122,11 @@ flitems = Total
 bank.PushDim Total * 2
 bank.PushEnd
 End Sub
-Public Sub BeginElement(Total As Long)
-FloatGroup = False
-Set bank = New mArray
+
+Public Sub BeginFloat2(Total As Long)
+FloatGroup = True
 flitems = Total
-bank.PushDim Total
+bank.PushDim Total * 2
 bank.PushEnd
 End Sub
 Public Property Get IamFloatGroup()

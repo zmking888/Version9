@@ -664,7 +664,7 @@ End If
 End Function
 
 Private Function ExistKey2(Key As String, nkey As Long) As Boolean
-Dim k As Long
+Dim k As Long, k1 As Long
 If Len(Key) = 0 Then ExistKey2 = True: Exit Function
 k = Hash(HashFunc1(nkey, Key)) - 1
 k1 = -2
