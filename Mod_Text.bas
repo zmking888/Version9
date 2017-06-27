@@ -68,8 +68,8 @@ Public UKEY$
 Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, WaitShow As Long
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
-Global Const VerMinor = 8
-Global Const Revision = 12
+Global Const VerMinor = 9
+Global Const Revision = 0
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -27217,6 +27217,7 @@ If FastSymbol(rest$, "{") Then
                     GoTo errDef
                 End If
                 'frm$ = "(" + frm$ + ")"
+                If frm$ = "" Then frm$ = " "
             End If
         Select Case ss$
             Case "VALUE", "аниа"
@@ -27235,7 +27236,11 @@ If FastSymbol(rest$, "{") Then
             Case "SET", "хесе"
                 If FastSymbol(nm$, "{") Then
                 If frm$ <> "" Then
-                    f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + "," + frm$ + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                If frm$ = " " Then
+                        f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                    Else
+                        f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + "," + frm$ + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                    End If
                 Else
                     f$ = f$ + ss$ + " {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
                 End If
@@ -27273,6 +27278,7 @@ If FastSymbol(rest$, "{") Then
                     GoTo errDef
                 End If
                 'frm$ = "(" + frm$ + ")"
+                If frm$ = "" Then frm$ = " "
             End If
         Select Case ss$
             Case "VALUE", "аниа"
@@ -27290,7 +27296,11 @@ If FastSymbol(rest$, "{") Then
              Case "SET", "хесе"
                 If FastSymbol(nm$, "{") Then
                 If frm$ <> "" Then
+                    If frm$ = " " Then
+                    f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                    Else
                     f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + "," + frm$ + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                    End If
                 Else
                     f$ = f$ + ss$ + " {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
                 End If
