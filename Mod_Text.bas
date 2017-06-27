@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 8
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -27216,15 +27216,15 @@ If FastSymbol(rest$, "{") Then
                 Else
                     GoTo errDef
                 End If
-                frm$ = "(" + frm$ + ")"
+                'frm$ = "(" + frm$ + ")"
             End If
         Select Case ss$
             Case "VALUE", "¡Œ…¡"
                 If FastSymbol(nm$, "{") Then
                 If MaybeIsSymbol(nm$, "}") Then
-                    f$ = f$ + ss$ + " " + frm$ + "{link parent " + hlp + " to " + w$ + ": =" + w$ + "}" + vbCrLf
+                    f$ = f$ + ss$ + " (" + frm$ + "){link parent " + hlp + " to " + w$ + ": =" + w$ + "}" + vbCrLf
                 Else
-                    f$ = f$ + ss$ + " " + frm$ + "{link parent " + hlp + " to " + w$ + ": " + vl + "=" + w$ + vbCrLf + block$(nm$) + vbCrLf + "=" + vl + "}" + vbCrLf
+                    f$ = f$ + ss$ + " (" + frm$ + ") {link parent " + hlp + " to " + w$ + ": " + vl + "=" + w$ + vbCrLf + block$(nm$) + vbCrLf + "=" + vl + "}" + vbCrLf
                     End If
                     FastSymbol nm$, "}"
                     
@@ -27234,7 +27234,11 @@ If FastSymbol(rest$, "{") Then
                 
             Case "SET", "»≈”≈"
                 If FastSymbol(nm$, "{") Then
-                    f$ = f$ + ss$ + " " + frm$ + "{link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                If frm$ <> "" Then
+                    f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + "," + frm$ + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                Else
+                    f$ = f$ + ss$ + " {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                End If
                     FastSymbol nm$, "}"
                 Else
                     f$ = f$ + "set {link parent " + hlp + " to " + w$ + ": read " + w$ + "}" + vbCrLf
@@ -27268,15 +27272,15 @@ If FastSymbol(rest$, "{") Then
                 Else
                     GoTo errDef
                 End If
-                frm$ = "(" + frm$ + ")"
+                'frm$ = "(" + frm$ + ")"
             End If
         Select Case ss$
             Case "VALUE", "¡Œ…¡"
               If FastSymbol(nm$, "{") Then
                 If MaybeIsSymbol(nm$, "}") Then
-                    f$ = f$ + ss$ + " " + frm$ + "{link parent " + hlp + " to " + w$ + ": =" + w$ + "}" + vbCrLf
+                    f$ = f$ + ss$ + " (" + frm$ + "){link parent " + hlp + " to " + w$ + ": =" + w$ + "}" + vbCrLf
                 Else
-                    f$ = f$ + ss$ + " " + frm$ + "{link parent " + hlp + " to " + w$ + ": " + vl + "=" + w$ + vbCrLf + block$(nm$) + vbCrLf + "=" + vl + "}" + vbCrLf
+                    f$ = f$ + ss$ + " (" + frm$ + "){link parent " + hlp + " to " + w$ + ": " + vl + "=" + w$ + vbCrLf + block$(nm$) + vbCrLf + "=" + vl + "}" + vbCrLf
                     End If
                     FastSymbol nm$, "}"
                     
@@ -27285,7 +27289,11 @@ If FastSymbol(rest$, "{") Then
                 End If
              Case "SET", "»≈”≈"
                 If FastSymbol(nm$, "{") Then
-                    f$ = f$ + ss$ + " " + frm$ + " {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                If frm$ <> "" Then
+                    f$ = f$ + ss$ + " () {link parent " + hlp + " to " + w$ + ": read " + vl + "," + frm$ + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                Else
+                    f$ = f$ + ss$ + " {link parent " + hlp + " to " + w$ + ": read " + vl + vbCrLf + block$(nm$) + vbCrLf + w$ + "=" + vl + "}" + vbCrLf
+                End If
                     FastSymbol nm$, "}"
                 Else
                     f$ = f$ + "set {link parent " + hlp + " to " + w$ + ": read " + w$ + "}" + vbCrLf
@@ -27377,7 +27385,11 @@ ss$ = BlockParam(rest$)
 'If ss$ = "" Then GoTo errBlock
 var(vvv).HasParametersSet = True
 If FastOperator(rest$, "{", Len(ss$) + 2) Then
-If ss$ <> "" Then rest$ = "{Read " + ss$ + vbCrLf + Mid$(rest$, Len(ss$) + 2) Else rest$ = "{If Stack.Size>1 then Shift Stack.Size " + vbCrLf + Mid$(rest$, Len(ss$) + 2)
+    If ss$ <> "" Then
+        rest$ = "{Read " + ss$ + ":If Stack.Size>1 then Shift Stack.Size" + vbCrLf + Mid$(rest$, Len(ss$) + 2)
+    Else
+        rest$ = "{If Stack.Size>1 then Shift Stack.Size " + vbCrLf + Mid$(rest$, 2)
+    End If
 Else
 GoTo errDef
 End If
@@ -27406,7 +27418,12 @@ ss$ = BlockParam(rest$)
 'End If
 var(vvv).HasParameters = True
 If FastOperator(rest$, "{", Len(ss$) + 2) Then
-If ss$ <> "" Then rest$ = "{Read " + ss$ + vbCrLf + Mid$(rest$, Len(ss$) + 2) Else rest$ = "{If Stack.Size>1 then Shift Stack.Size " + vbCrLf + Mid$(rest$, Len(ss$) + 2)
+If ss$ <> "" Then
+    rest$ = "{Read " + ss$ + vbCrLf + Mid$(rest$, Len(ss$) + 2)
+Else
+    Mid$(rest$, 1, 1) = "{"
+End If
+
 Else
 errDef:
 MyEr "Missing Definition in { }", "ÀÂﬂÂÈ ÔÒÈÛÏ¸Ú ÛÂ { }"
