@@ -6312,7 +6312,6 @@ End Sub
 Public Sub NoAssignThere()
 MyEr "Use Return Object to change items", "Χρησιμοποίησε την Επιστροφή αντικείμενο για να επιστρέψεις τιμές"
 End Sub
-
 Public Sub NoObjectpAssignTolong()
 MyEr "Can't assign object to long", "Δεν μπορώ να δώσω αντικείμενο στον μακρυ"
 End Sub

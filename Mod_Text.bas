@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2665,7 +2665,15 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         End If
         Set safegroup = pppp.item(v)
         ' check for iamglobal ??
+        If Not safegroup.IamFloatGroup Then
+   
+        CopyGroup safegroup, bstack
+        Set safegroup = bstack.lastobj
+        Set bstack.lastobj = Nothing
+        End If
         UnFloatGroup bstack, w$, y1, safegroup, , True
+        Set safegroup = pppp.item(v)
+        
         
         var(y1).FloatGroupName = ec$
         
@@ -2761,15 +2769,16 @@ conthere:
            
         End If
      SpeedGroup = Execute(bstack, b$, True)
-   ' CopyGroup var(y1), bstack
+        ' CopyGroup var(y1), bstack
    
-    CopyGroup0 var(y1), bs, pppp.item(v)
+        CopyGroup0 var(y1), bs, pppp.item(v)
        Set tempRef = pppp.GroupRef  ''  .item(v).Link
-      Set pppp.item(v) = bstack.lastobj
-      Set pppp.item(v).LinkRef = tempRef
-    Set bstack.lastobj = Nothing
-  
-        bstack.LastValue = CStr(var(i))
+        Set pppp.item(v) = bstack.lastobj
+        Set pppp.item(v).LinkRef = tempRef
+        Set bstack.lastobj = Nothing
+        If SpeedGroup <> 0 Then
+            bstack.LastValue = CStr(var(i))
+        End If
         GoTo fastexit
 ElseIf Prefix = "FOR" Then
 RetStackSize = bstack.RetStackTotal
@@ -9895,11 +9904,18 @@ conthereGroupValue:
                     End If
                     
                 Else
+                    If Typename(var(VR)) = "Group" Then
+                    
                     If var(VR).HasStrValue Then
                         r = 0
                         CopyGroup var(VR), bstack
                     Else
                         r = 0
+                        InternalEror
+                        IsNumber = False
+                    End If
+                    Else
+                    r = 0
                         InternalEror
                         IsNumber = False
                     End If
@@ -12640,7 +12656,62 @@ rvalObjectstring:
                 End If
                 End If
                 End If
+                ElseIf pppp.item(w).IamFloatGroup Then
+               ' If IsNumber(bstackstr, q$, p) Then
+                
+                'End If
+                Else
+                    If Typename(pppp.item(w)) = "Group" Then
+                    
+                        If Len(q$) > Len(pppp.GroupRef.GroupName) Then
+        q1$ = Left$(q$, Len(q$) - 1) + "." + ChrW(&H1FFF) + ";()"
+    Else
+            q1$ = pppp.GroupRef.GroupName + ChrW(&H1FFF) + ";()"
+    End If
+                    q$ = BlockParam(a$)
+                    a$ = Mid$(a$, Len(q$) + 2)
+                    If GetSub(q1$, w1) Then
+                        Set nBstack = New basetask
+                        nBstack.reflimit = varhash.Count
+                        Set nBstack.Parent = bstackstr
+                        If bstackstr.IamThread Then Set nBstack.Process = bstackstr.Process
+                        Set nBstack.Owner = bstackstr.Owner
+                        nBstack.OriginalCode = w1
+                        nBstack.UseGroupname = sbf(w1).sbgroup
+                            If GoFunc(nBstack, q1$, q$ + ")", r$) Then
+                                    If Not nBstack.StaticCollection Is Nothing Then
+                                        bstackstr.Parent.SetVarobJ "%_" + nBstack.StaticInUse, nBstack.StaticCollection
+                                    End If
+                                    'Set bstackstr.lastobj = nBstack.lastobj
+                                    If IsOperator(a$, "(") Then
+                                        Set pppp = New mArray
+                                        Set pppp.GroupRef = bstackstr.lastobj
+                                        Set bstackstr.lastobj = Nothing
+                                        pppp.Arr = False
+                                        w2 = -2
+                                    Set nBstack = Nothing
+                                        GoTo contrightstrpar
+                                    ElseIf Left$(a$, 1) = "." Then
+                                     Set pppp = New mArray
+                                     Set pppp.GroupRef = bstackstr.lastobj
+                                         Set bstackstr.lastobj = Nothing
+                                         pppp.Arr = False
+                                         w2 = -2
+                                     Set nBstack = Nothing
+                                     GoTo groupstrvalue
+                                     End If
+                            End If
+                                    Set nBstack = Nothing
+                                    IsStr1 = True
+                                Else
+                                    IsStr1 = False
+                                End If
+                   Else
+                        IsStr1 = False
+                    End If
+                        Exit Function
                 End If
+groupstrvalue:
                         If Typename(pppp.item(w)) = "Group" Then
                         IsStr1 = SpeedGroup(bstackstr, pppp, "VAL$", q$, a$, w) = 1
                         r$ = bstackstr.LastValue
@@ -14639,7 +14710,8 @@ fstr60: '"STR$(", "ΓΡΑΦΗ$("
         If TypeOf bstackstr.lastobj Is Group Then
             If bstackstr.lastobj.HasValue Then
             Else
-            Stop
+            MyErMacro a$, "Group has no value", "Η ομάδα δεν έχει αξία"
+            Exit Function
             End If
         End If
         End If
@@ -14952,6 +15024,7 @@ contlambdastr:
             IsStr1 = True
         Exit Function
         Else
+contrightstrpar:
         If Typename(pppp.GroupRef) = "mHandler" Then
             If pppp.GroupRef.t1 <> 1 Then
                 SyntaxError
@@ -21229,7 +21302,12 @@ GoTo loopcontinue
 ElseIf FastSymbol(b$, ":=", , 2) Then
 
     If IsExp(bstack, b$, p) Then
+    If bstack.lastobj Is Nothing Then
         .item(v) = p
+        Else
+        .item(v) = -1
+        Set .item(v) = bstack.lastobj
+        End If
     ElseIf IsStrExp(bstack, b$, ss$) Then
       If Not MyIsObject(.item(v)) Then
           .item(v) = ss$
@@ -21559,7 +21637,14 @@ contarr:
         ss$ = Trim$(Str$(p))
         End If
              If Not MyIsObject(pppp.item(v)) Then
+             If bstack.lastobj Is Nothing Then
           pppp.item(v) = ss$
+          Else
+          If Typename(bstack.lastobj) = "Group" Then
+          
+          End If
+          Set pppp.item(v) = bstack.lastobj
+          End If
           Else
         CheckVar pppp.item(v), ss$
         
@@ -21630,9 +21715,7 @@ contarr:
         Execute = 0: Exit Function
     End If
 Else
-If Not IsStrExp(bstack, b$, ss$) Then
-     Execute = 0: Exit Function
-     End If
+    If Not IsStrExp(bstack, b$, ss$) Then Execute = 0: Exit Function
     If Not MyIsObject(pppp.item(v)) Then
     If pppp.Arr Then
     If bstack.lastobj Is Nothing Then
@@ -29640,7 +29723,8 @@ Set vvl = Nothing
 End If
 BI = BI + 1
 Next j
-With mgroup
+'If Not mgroup Is k Then
+'With mgroup
 'k.PokeItem j, mgroup.LocalList
 'k.PokeItem j + 1, GetFunctionList(.FuncList)
 'k.HasStrValue = .HasStrValue
@@ -29648,7 +29732,8 @@ With mgroup
 'k.HasSet = .HasSet
 'k.HasParameters = .HasParameters
 'k.HasParametersSet = .HasParametersSet
-End With
+'End With
+'End If
 Set bstack.lastobj = k
 End Sub
 Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False, Optional Temp As Boolean = False)
