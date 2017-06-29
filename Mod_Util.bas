@@ -1578,7 +1578,7 @@ End Sub
 
 Public Sub wPlain(ddd As Object, mb As basket, ByVal what As String, ByVal wi&, ByVal Hi&, Optional nocr As Boolean = False)
 Dim PX As Long, PY As Long, ttt As Long, ruller&
-Dim Buf$, b$, npy As Long ', npx As long
+Dim buf$, b$, npy As Long ', npx As long
 With mb
 PlaceBasket ddd, mb
 If what = "" Then Exit Sub
@@ -1593,15 +1593,15 @@ For ttt = 1 To Len(what)
     b$ = Mid$(what, ttt, 1)
     Select Case AscW(b$)
     Case Is > 31
-    If TextWidth(ddd, Buf$ & b$) <= (wi& * .Xt) Then
-    Buf$ = Buf$ & b$
+    If TextWidth(ddd, buf$ & b$) <= (wi& * .Xt) Then
+    buf$ = buf$ & b$
     End If
     Case Is = 13
     If nocr Then Exit For
-    MyPrintNew ddd, mb.uMineLineSpace, Buf$, Not nocr
+    MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
     
     
-    Buf$ = ""
+    buf$ = ""
     Hi& = Hi& - 1
     npy = npy + 1
     LCTbasket ddd, mb, npy, PX
@@ -1609,7 +1609,7 @@ For ttt = 1 To Len(what)
     End Select
     If Hi& < 0 Then Exit For
 Next ttt
-If Hi& >= 0 And Buf$ <> "" Then MyPrintNew ddd, mb.uMineLineSpace, Buf$, Not nocr
+If Hi& >= 0 And buf$ <> "" Then MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
 If Not nocr Then LCTbasket ddd, mb, PY, PX
 End With
 End Sub
@@ -1621,7 +1621,7 @@ Dim ddd As Object, mDoc As Object
 Set ddd = bstack.Owner
 Dim PX As Long, PY As Long, ttt As Long, ruller&, last As Boolean, INTD As Long, nowait As Boolean
 Dim nopage As Boolean
-Dim Buf$, b$, npy As Long, kk&, lCount As Long, SCRnum2stop As Long, itnd As Long
+Dim buf$, b$, npy As Long, kk&, lCount As Long, SCRnum2stop As Long, itnd As Long
 Dim nopr As Boolean, nohi As Long, spcc As Long
 Dim dv2x15 As Long
 dv2x15 = dv15 * 2
@@ -1687,57 +1687,57 @@ If bstack.IamThread Then nopage = True
 For ttt = 1 To Len(what)
 If NOEXECUTION Then Exit For
 b$ = Mid$(what, ttt, 1)
-If paragr Then INTD = Len(Buf$ & b$) - Len(NLtrim$(Buf$ & b$))
+If paragr Then INTD = Len(buf$ & b$) - Len(NLtrim$(buf$ & b$))
 Select Case AscW(b$)
 Case Is > 31
-spcc = (Len(Buf$ & b$) - Len(ReplaceStr(" ", "", Trim$(Buf$ & b$))))
+spcc = (Len(buf$ & b$) - Len(ReplaceStr(" ", "", Trim$(buf$ & b$))))
 
 kkl = spcc * OverDispl
-hstr$ = ReplaceStr(" ", "", Buf$ & b$)
+hstr$ = ReplaceStr(" ", "", buf$ & b$)
 help1 = TextWidth(ddd, Space(INTD) + hstr$)
 kk& = (help1 + help2) < (w2 - kkl)
     If kk& Then '- 15 * Len(buf$) Then
-        Buf$ = Buf$ & b$
+        buf$ = buf$ & b$
     Else
-         kk& = rinstr(Mid$(Buf$, INTD + 1), " ") + INTD
-         kku& = rinstr(Mid$(Buf$, INTD + 1), "_") + INTD
+         kk& = rinstr(Mid$(buf$, INTD + 1), " ") + INTD
+         kku& = rinstr(Mid$(buf$, INTD + 1), "_") + INTD
          If kku& > kk& Then kk& = kku&
-         If kk& = INTD Then kk& = Len(Buf$) + 1
-         If CDbl((Len(Buf$) - INTD)) > 0 Then
-         If (kk& - INTD) / CDbl((Len(Buf$) - INTD)) > 0.5 And kkl / wi > 0.2 Then
-         If InStr(Mid$(what, ttt), " ") < (Len(Buf$) - kk&) Then
-                                kk& = Len(Buf$) + 1
+         If kk& = INTD Then kk& = Len(buf$) + 1
+         If CDbl((Len(buf$) - INTD)) > 0 Then
+         If (kk& - INTD) / CDbl((Len(buf$) - INTD)) > 0.5 And kkl / wi > 0.2 Then
+         If InStr(Mid$(what, ttt), " ") < (Len(buf$) - kk&) Then
+                                kk& = Len(buf$) + 1
                             If OverDispl > 5 * DXP Then
                                    OverDispl = MinDispl - 2 * DXP
                    
                               End If
-                      Buf$ = Buf$ & b$
+                      buf$ = buf$ & b$
                       GoTo thmagic
-                       ElseIf InStr(Mid$(what, ttt), "_") < (Len(Buf$) - kk&) And InStr(Mid$(what, ttt), "_") <> 0 Then
-      kk& = Len(Buf$) + 1
+                       ElseIf InStr(Mid$(what, ttt), "_") < (Len(buf$) - kk&) And InStr(Mid$(what, ttt), "_") <> 0 Then
+      kk& = Len(buf$) + 1
                     If OverDispl > 5 * DXP Then
                          OverDispl = MinDispl - 2 * DXP
                    
                     End If
-                      Buf$ = Buf$ & b$
+                      buf$ = buf$ & b$
                        GoTo thmagic
                        
                End If
          End If
          paragr = False: INTD = 0
          If b$ = "." Or b$ = "_" Or b$ = "," Then
-         kk& = Len(Buf$) + 1
-       Buf$ = Buf$ & b$
+         kk& = Len(buf$) + 1
+       buf$ = buf$ & b$
        b$ = ""
          End If
        End If
-        If kk& > 0 And kk& < Len(Buf$) Then
-            b$ = Mid$(Buf$, kk& + 1) + b$
+        If kk& > 0 And kk& < Len(buf$) Then
+            b$ = Mid$(buf$, kk& + 1) + b$
                 If last Then
-                Buf$ = Trim$(Left$(Buf$, kk&))
+                buf$ = Trim$(Left$(buf$, kk&))
                 Else
             
-                Buf$ = Left$(Buf$, kk&)
+                buf$ = Left$(buf$, kk&)
                 
                 End If
                 End If
@@ -1747,28 +1747,28 @@ kk& = (help1 + help2) < (w2 - kkl)
         
             If last Then
              If frmt > 0 Then
-                    If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(Buf$), w2, frmt, nowait, nonewline
+                    If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(buf$), w2, frmt, nowait, nonewline
                Else
-                    If Not nopr Then fullPlain ddd, mybasket, Trim$(Buf$), w2, nowait, nonewline   'DDD.Width ' w2
+                    If Not nopr Then fullPlain ddd, mybasket, Trim$(buf$), w2, nowait, nonewline   'DDD.Width ' w2
                  End If
                  If collectit Then
-                 mDoc.AppendParagraphOneLine Trim$(Buf$)
+                 mDoc.AppendParagraphOneLine Trim$(buf$)
                  End If
             Else
                 If frmt > 0 Then
-                    If Not nopr Then fullPlainWhere ddd, mybasket, RTrim$(Buf$), w2, frmt, nowait, nonewline ' rtrim
+                    If Not nopr Then fullPlainWhere ddd, mybasket, RTrim$(buf$), w2, frmt, nowait, nonewline ' rtrim
                 Else
-                    If Not nopr Then fullPlain ddd, mybasket, RTrim$(Buf$), w2, nowait, nonewline
+                    If Not nopr Then fullPlain ddd, mybasket, RTrim$(buf$), w2, nowait, nonewline
                     ' npy
                           End If
               If collectit Then
-                 mDoc.AppendParagraphOneLine RTrim$(Buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
             End If
         End If
         If isAcolumn Then Exit Sub
         last = True
-        Buf$ = b$
+        buf$ = b$
         If skip < 0 Or scrollme Then
             Hi = Hi - 1
             lCount = lCount + 1
@@ -1828,29 +1828,29 @@ paragr = True
         
 If last Then
     If frmt > 0 Then
-        If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(Buf$), w2, frmt, nowait, nonewline
+        If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(buf$), w2, frmt, nowait, nonewline
     Else
     
-        If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(Buf$), w2, 3, nowait, nonewline
+        If Not nopr Then fullPlainWhere ddd, mybasket, Trim$(buf$), w2, 3, nowait, nonewline
     End If
         If collectit Then
-                 mDoc.AppendParagraphOneLine Trim$(Buf$)
+                 mDoc.AppendParagraphOneLine Trim$(buf$)
                  End If
 Else
 If frmt > 0 Then
-If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(Buf$), w2, frmt, nowait, nonewline 'rtrim
+If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(buf$), w2, frmt, nowait, nonewline 'rtrim
 Else
 
-If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(Buf$), w2, 3, nowait, nonewline ' rtrim
+If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(buf$), w2, 3, nowait, nonewline ' rtrim
 End If
     If collectit Then
-                 mDoc.AppendParagraphOneLine RTrim$(Buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
 End If
 End If
 last = False
 
-Buf$ = ""
+buf$ = ""
 '''''''''''''''''''''''''
 If isAcolumn Then Exit Sub
 If skip < 0 Or scrollme Then
@@ -1916,39 +1916,39 @@ End If
  OverDispl = MinDispl
 thmagic:
 Next ttt
-If Hi >= 0 And Buf$ <> "" Then
+If Hi >= 0 And buf$ <> "" Then
  skip = skip - 1
         If skip < 0 Then
 If frmt = 2 Then
-If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(Buf$), w2, frmt, nowait, nonewline
+If Not nopr Then fullPlainWhere ddd, mybasket, RTrim(buf$), w2, frmt, nowait, nonewline
             If collectit Then
-                 mDoc.AppendParagraphOneLine RTrim$(Buf$)
+                 mDoc.AppendParagraphOneLine RTrim$(buf$)
                  End If
 Else
 If Hi = 0 And frmt = 0 And Not scrollme Then
 If Not nopr Then
 
-MyPrintNew ddd, mybasket.uMineLineSpace, Buf$, , nowait     ';   '************************************************************************************
+MyPrintNew ddd, mybasket.uMineLineSpace, buf$, , nowait     ';   '************************************************************************************
 
 res = ddd.CurrentX
-        If Trim$(Buf$) = "" Then
+        If Trim$(buf$) = "" Then
         ddd.CurrentX = ((ddd.CurrentX + .Xt \ 2) \ .Xt) * .Xt
         Else
         ddd.CurrentX = ((ddd.CurrentX + .Xt \ 1.2) \ .Xt) * .Xt
         End If
 End If
             If collectit Then
-                 mDoc.AppendParagraphOneLine Buf$
+                 mDoc.AppendParagraphOneLine buf$
                  End If
 
 
 Exit Sub
 Else
 If Not nopr Then
-fullPlainWhere ddd, mybasket, RTrim(Buf$), w2, frmt, nowait, nonewline
+fullPlainWhere ddd, mybasket, RTrim(buf$), w2, frmt, nowait, nonewline
 End If
     If collectit Then
-                 mDoc.AppendParagraphOneLine Buf$
+                 mDoc.AppendParagraphOneLine buf$
                  End If
 End If
 End If
@@ -3403,6 +3403,7 @@ If maxchar > 0 Then Form1.TEXT1.glistN.DragEnabled = ot
 
 UnHook Form1.hWnd
 INK$ = ""
+
 escok = oldesc
 Set d = Nothing
 End Sub
@@ -5502,10 +5503,93 @@ DoEvents
 If TaskMaster Is Nothing Then Exit Function
 TaskMaster.RestEnd
 End Function
+Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
+  Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
+  Dim CurByte As Byte
+    lUBound = UBound(Source)
+    lUBound2 = lUBound - 2
+    lUBound3 = lUBound - 3
+    If lUBound > 2 Then
+    
+    For i = 0 To lUBound - 1
+      CurByte = Source(i)
+        If (CurByte And &HE0) = &HC0 Then
+        If (Source(i + 1) And &HC0) = &H80 Then
+            ContainsUTF8 = ContainsUTF8 Or True
+             i = i + 1
+             Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        
 
+        ElseIf (CurByte And &HF0) = &HE0 Then
+        ' 2 bytes
+        If (Source(i + 1) And &HC0) = &H80 Then
+            i = i + 1
+            If i < lUBound2 Then
+            If (Source(i + 1) And &HC0) = &H80 Then
+                ContainsUTF8 = ContainsUTF8 Or True
+                i = i + 1
+            Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+                Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        Else
+            ContainsUTF8 = False
+            Exit For
+        End If
+        ElseIf (CurByte And &HF8) = &HF0 Then
+        ' 2 bytes
+        If (Source(i + 1) And &HC0) = &H80 Then
+            i = i + 1
+            If i < lUBound2 Then
+               If (Source(i + 1) And &HC0) = &H80 Then
+                    ContainsUTF8 = ContainsUTF8 Or True
+                    i = i + 1
+                    If i < lUBound3 Then
+                       If (Source(i + 1) And &HC0) = &H80 Then
+                            ContainsUTF8 = ContainsUTF8 Or True
+                            i = i + 1
+                        Else
+                            ContainsUTF8 = False
+                            Exit For
+                        End If
+                        
+                    Else
+                        ContainsUTF8 = False
+                        Exit For
+                    End If
+                Else
+                    ContainsUTF8 = False
+                    Exit For
+                End If
+                
+            Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        Else
+            ContainsUTF8 = False
+            Exit For
+        End If
+        
+        
+        End If
+        
+    Next i
+    End If
+    
 
+End Function
 Function ReadUnicodeOrANSI(FileName As String, Optional ByVal EnsureWinLFs As Boolean, Optional feedback As Long) As String
 Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte
+Dim mLof As Long, nobom As Long
+nobom = 1
 ' code from Schmidt, member of vbforums
 If FileName = "" Then Exit Function
 On Error GoTo ErrHandler
@@ -5534,7 +5618,6 @@ On Error GoTo ErrHandler
         feedback = 2
           If BLen >= 4 Then
             ReDim b(0 To BLen - 4): Get FNr, 4, b 'read the Bytes
-            
             WChars = MultiByteToWideChar(65001, 0, b(0), BLen - 3, 0, 0)
             ReadUnicodeOrANSI = Space$(WChars)
             MultiByteToWideChar 65001, 0, b(0), BLen - 3, StrPtr(ReadUnicodeOrANSI), WChars
@@ -5547,8 +5630,26 @@ On Error GoTo ErrHandler
         
       Case Else 'no BOM was detected, so read the whole Text as ANSI
         feedback = 3
+       mLof = LOF(FNr)
+       Dim buf() As Byte
+       If mLof > 1000 Then
+       ReDim buf(1000)
+       Else
+       ReDim buf(mLof)
+       End If
+       Get FNr, 1, buf()
+       Seek FNr, 1
+      If ContainsUTF8(buf()) Then 'maybe is utf-8
+      feedback = 2
+      nobom = -1
+        ReDim b(0 To BLen - 1): Get FNr, 1, b
+            WChars = MultiByteToWideChar(65001, 0, b(0), BLen, 0, 0)
+            ReadUnicodeOrANSI = Space$(WChars)
+            MultiByteToWideChar 65001, 0, b(0), BLen, StrPtr(ReadUnicodeOrANSI), WChars
+        Else
         ReadUnicodeOrANSI = Space$(BLen)
         Get FNr, 1, ReadUnicodeOrANSI
+        End If
     End Select
     
     If InStr(ReadUnicodeOrANSI, vbCrLf) = 0 Then
@@ -5561,13 +5662,15 @@ On Error GoTo ErrHandler
     If EnsureWinLFs Then ReadUnicodeOrANSI = Replace(ReadUnicodeOrANSI, vbCr, vbCrLf)
       End If
     End If
-    
+    feedback = nobom * feedback
 ErrHandler:
 If FNr Then Close FNr
-If Err Then Err.Raise Err.Number, Err.Source & ".ReadUnicodeOrANSI", Err.Description
+If Err Then
+Err.Raise Err.Number, Err.Source & ".ReadUnicodeOrANSI", Err.Description
+End If
 End Function
 
-Public Function SaveUnicode(ByVal FileName As String, ByVal Buf As String, mode2save As Long, Optional Append As Boolean = False) As Boolean
+Public Function SaveUnicode(ByVal FileName As String, ByVal buf As String, mode2save As Long, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
 Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean
@@ -5594,18 +5697,19 @@ ElseIf mode2save = 1 Then
 a() = ChrW(&HFFFE) ' big endian...need swap
 If Not Append Then Put #w, , a()
 yesswap = True
-ElseIf mode2save = 2 Then  'utf8
-If Not Append Then
+ElseIf Abs(mode2save) = 2 Then  'utf8
+If mode2save > 0 And Not Append Then
+
         Put #w, , CByte(&HEF)
         Put #w, , CByte(&HBB)
         Put #w, , CByte(&HBF)
         End If
-        Put #w, , Utf16toUtf8(Buf)
+        Put #w, , Utf16toUtf8(buf)
         Close w
     SaveUnicode = True
         Exit Function
 ElseIf mode2save = 3 Then ' ascii
-Put #w, , Buf
+Put #w, , buf
       Close w
     SaveUnicode = True
         Exit Function
@@ -5615,16 +5719,16 @@ Dim maxmw As Long, iPos As Long
 iPos = 1
 maxmw = 32000 ' check it with maxmw 20 OR 1
 If yesswap Then
-For iPos = 1 To Len(Buf) Step maxmw
-a() = Mid$(Buf, iPos, maxmw)
+For iPos = 1 To Len(buf) Step maxmw
+a() = Mid$(buf, iPos, maxmw)
 For i = 0 To UBound(a()) - 1 Step 2
 bb = a(i): a(i) = a(i + 1): a(i + 1) = bb
 Next i
 Put #w, 3, a()
 Next iPos
 Else
-For iPos = 1 To Len(Buf) Step maxmw
-a() = Mid$(Buf, iPos, maxmw)
+For iPos = 1 To Len(buf) Step maxmw
+a() = Mid$(buf, iPos, maxmw)
 Put #w, , a()
 Next iPos
 End If

@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 1
+Global Const Revision = 2
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11054,15 +11054,15 @@ Case Is >= "A"
 
 End Function
 Function IsLabel(bstack As basetask, a$, rrr$, Optional skipdot As Boolean) As Long
-Dim Buf$
+Dim buf$
 If Len(a$) < 257 Then IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot): Exit Function
 
  
     
-    Buf$ = Space$(256)
-    Mid$(Buf$, 1, 256) = Left$(a$, 256)
-    IsLabel = innerIsLabel(bstack, Buf$, rrr$, , , skipdot)
-    a$ = Buf$ + Mid$(a$, 257)
+    buf$ = Space$(256)
+    Mid$(buf$, 1, 256) = Left$(a$, 256)
+    IsLabel = innerIsLabel(bstack, buf$, rrr$, , , skipdot)
+    a$ = buf$ + Mid$(a$, 257)
 
     
     
@@ -25237,7 +25237,7 @@ textDel = (chk <> "")
 If chk <> "" Then KillFile chk
 End Function
 Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
-Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, Buf$, i As Long
+Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, buf$, i As Long
 ThisFile = strTemp + ThisFile
 chk = GetDosPath(ThisFile)
 If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
@@ -25254,13 +25254,13 @@ If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 '
 If IsExp(bstack, VR$, v) Then
-Buf$ = Trim$(Str$(v))
+buf$ = Trim$(Str$(v))
 ElseIf IsStrExp(bstack, VR$, s$) Then
-Buf$ = s$
+buf$ = s$
 Else
-Buf$ = VR$
+buf$ = VR$
 End If
-PREPARE$ = PREPARE$ & Buf$
+PREPARE$ = PREPARE$ & buf$
 Loop
            If Not WeCanWrite(ThisFile) Then GoTo HM
 
@@ -32511,7 +32511,8 @@ If Left$(s$, 1) = "S" Then
              Set scr = Nothing
              Exit Function
              End If
-            par = Len(frm$) = FileLen(GetDosPath(s$)) ' not unicode
+           ' par = Len(frm$) = FileLen(GetDosPath(s$)) ' not unicode
+            par = x1 = 3
      
             Else
             frm$ = ""
@@ -32519,7 +32520,7 @@ If Left$(s$, 1) = "S" Then
             End If
             Form1.EditTextWord = LCase(ExtractType(s$)) <> "gsb"
                 Form1.TEXT1.TITLE = ExtractName(s$) + " "
-            If x1 = 0 Then x1 = -1
+            If x1 = 0 Then x1 = -5
             Form1.ResetMarks
             If o < 1 Then o = 0
             If o > Len(frm$) Then o = Len(frm$) + 1
@@ -32527,7 +32528,7 @@ If Left$(s$, 1) = "S" Then
             ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1, o, x1
             End With
             Form1.ResetMarks
-            If frm$ <> "" And x1 >= 0 Then
+            If frm$ <> "" And Abs(x1) >= 0 And Not CancelEDIT Then
             If par Then
                             i = FreeFile
                                             If Not WeCanWrite(s$) Then Set scr = Nothing: Exit Function
@@ -42862,14 +42863,18 @@ If entrypoint = 1 Then DUM = True
         Exit Function
         End If
         x1 = CLng(p)
+        If x1 > 500 Then
+        
+        x1 = 0
+        End If
      Else
-        x1 = -1 ' ' 2 = utf-8 standard save mode
+        x1 = -5 ' ' 2 = utf-8 standard save mode
     End If
     
         If y1 = 3 Then
             If GetVar(basestack, s$, i) Then
                 If Typename(var(i)) = doc Then
-                         If x1 = -1 Then
+                         If x1 = -5 Then
                     If var(i).ListLoadedType <> 0 Then
                     x1 = var(i).ListLoadedType
                     Else
@@ -42877,6 +42882,10 @@ If entrypoint = 1 Then DUM = True
                     End If
                     End If
                     If CanKillFile(ss$) Then
+                    If x1 = 0 And p <> 0 Then
+                    var(i).LCID = CLng(p)
+                    x1 = 3
+                    End If
                      If Not var(i).SaveUnicodeOrAnsi(ss$, x1, DUM) Then
                        MyEr "can't save " + ss$, "δεν μπορώ να σώσω " + ss$
                       End If
@@ -42894,7 +42903,7 @@ If entrypoint = 1 Then DUM = True
             End If
         ElseIf y1 = 6 Then
                     If Typename(pppp.item(i)) = doc Then
-                    If x1 = -1 Then
+                    If x1 = -5 Then
                     If pppp.item(i).ListLoadedType <> 0 Then
                     x1 = pppp.item(i).ListLoadedType
                     Else
@@ -42902,6 +42911,10 @@ If entrypoint = 1 Then DUM = True
                     End If
                     End If
                     If CanKillFile(ss$) Then
+                    If x1 = 0 And p <> 0 Then
+                    pppp.item(i).LCID = CLng(p)
+                    x1 = 3
+                    End If
                      If Not pppp.item(i).SaveUnicodeOrAnsi(ss$, x1, DUM) Then
                        MyEr "can't save " + ss$, "δεν μπορώ να σώσω " + ss$
                        Exit Function

@@ -1757,37 +1757,37 @@ End Sub
 
 
 Sub SortDoc(KeyStart As Long, order1 As Long, order2 As Long)
-Dim NDX() As Long, i As Long
-ReDim NDX(DocParagraphs) As Long
+Dim ndx() As Long, i As Long
+ReDim ndx(DocParagraphs) As Long
 If KeyStart < 0 Then
 mKeystart = 1
 Else
 mKeystart = KeyStart
 End If
-NDX(0) = 0
-For i = 1 To UBound(NDX())
-NDX(i) = DocParaNext(NDX(i - 1))
+ndx(0) = 0
+For i = 1 To UBound(ndx())
+ndx(i) = DocParaNext(ndx(i - 1))
 Next i
 If order1 <= 0 Then order1 = 1
 If order2 <= 0 Then order2 = i - 1
-QuickSortExtended NDX, order1, order2
+QuickSortExtended ndx, order1, order2
 
 End Sub
 Sub SortDocDes(KeyStart As Long, order1 As Long, order2 As Long)
-Dim NDX() As Long, i As Long
-ReDim NDX(DocParagraphs) As Long
+Dim ndx() As Long, i As Long
+ReDim ndx(DocParagraphs) As Long
 If KeyStart < 0 Then
 mKeystart = 1
 Else
 mKeystart = KeyStart
 End If
-NDX(0) = 0
-For i = 1 To UBound(NDX())
-NDX(i) = DocParaNext(NDX(i - 1))
+ndx(0) = 0
+For i = 1 To UBound(ndx())
+ndx(i) = DocParaNext(ndx(i - 1))
 Next i
 If order1 <= 0 Then order1 = 1
 If order2 <= 0 Then order2 = i - 1
-QuickSortExtendedDes NDX, order1, order2
+QuickSortExtendedDes ndx, order1, order2
 
 End Sub
 Public Function Advance(cursor As Long)
@@ -1843,7 +1843,7 @@ Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
 lf$ = choose(ListLoadedType \ 10 + 1, vbCrLf, vbLf, vbCr)
-If mode2save \ 10 > 0 Then
+If Abs(mode2save \ 10) > 0 Then
 ' overide loaded status
 lf$ = choose(mode2save \ 10 + 1, vbCrLf, vbLf, vbCr)
 End If
@@ -1868,12 +1868,12 @@ If mode2save = 0 Then
  a() = ChrW(&HFEFF)
 If Not Append Then Put #w, , a()
 
-ElseIf mode2save = 1 Then
+ElseIf Abs(mode2save) = 1 Then
 a() = ChrW(&HFFFE) ' big endian...need swap
 If Not Append Then Put #w, , a()
 yesswap = True
-ElseIf mode2save = 2 Then  'utf8
-If Not Append Then
+ElseIf Abs(mode2save) = 2 Then  'utf8
+If mode2save > 0 And Not Append Then
         Put #w, , CByte(&HEF)
         Put #w, , CByte(&HBB)
         Put #w, , CByte(&HBF)
@@ -1893,7 +1893,7 @@ If Not Append Then
         Close w
     SaveUnicodeOrAnsi = True
         Exit Function
-ElseIf mode2save = 3 Then ' ascii
+ElseIf Abs(mode2save) = 3 Then ' ascii
             iPos = DocParaNext(0)
             maxmw = 327680
             While iPos <> 0
@@ -1926,9 +1926,93 @@ Close w
 SaveUnicodeOrAnsi = True
 t12345:
 End Function
+Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
+  Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
+  Dim CurByte As Byte
+    lUBound = UBound(Source)
+    lUBound2 = lUBound - 2
+    lUBound3 = lUBound - 3
+    If lUBound > 2 Then
+    
+    For i = 0 To lUBound - 1
+      CurByte = Source(i)
+        If (CurByte And &HE0) = &HC0 Then
+        If (Source(i + 1) And &HC0) = &H80 Then
+            ContainsUTF8 = ContainsUTF8 Or True
+             i = i + 1
+             Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        
+
+        ElseIf (CurByte And &HF0) = &HE0 Then
+        ' 2 bytes
+        If (Source(i + 1) And &HC0) = &H80 Then
+            i = i + 1
+            If i < lUBound2 Then
+            If (Source(i + 1) And &HC0) = &H80 Then
+                ContainsUTF8 = ContainsUTF8 Or True
+                i = i + 1
+            Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+                Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        Else
+            ContainsUTF8 = False
+            Exit For
+        End If
+        ElseIf (CurByte And &HF8) = &HF0 Then
+        ' 2 bytes
+        If (Source(i + 1) And &HC0) = &H80 Then
+            i = i + 1
+            If i < lUBound2 Then
+               If (Source(i + 1) And &HC0) = &H80 Then
+                    ContainsUTF8 = ContainsUTF8 Or True
+                    i = i + 1
+                    If i < lUBound3 Then
+                       If (Source(i + 1) And &HC0) = &H80 Then
+                            ContainsUTF8 = ContainsUTF8 Or True
+                            i = i + 1
+                        Else
+                            ContainsUTF8 = False
+                            Exit For
+                        End If
+                        
+                    Else
+                        ContainsUTF8 = False
+                        Exit For
+                    End If
+                Else
+                    ContainsUTF8 = False
+                    Exit For
+                End If
+                
+            Else
+                ContainsUTF8 = False
+                Exit For
+            End If
+        Else
+            ContainsUTF8 = False
+            Exit For
+        End If
+        
+        
+        End If
+        
+    Next i
+    End If
+    
+
+End Function
 Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long)
 Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte, lbt As Long
-Dim mLof As Long, ok
+Dim mLof As Long, ok, nobom As Long
+nobom = 1
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
@@ -1945,7 +2029,6 @@ On Error GoTo ErrHandler
   FNr = FreeFile
   Open GetDosPath(FileName) For Binary Access Read As FNr
   
-    Get FNr, , BOM
     Select Case BOM
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
         If BLen >= 3 Then
@@ -1967,13 +2050,15 @@ On Error GoTo ErrHandler
            NewSeek FNr, 4
           ' now we can read line by line
            mLof = LOF(FNr)
+utf8cont:
+           
            While Not (mLof < SeekBuf)
           AppendParagraphOneLine getUniStringLineUtF8(FNr, mLof, lbt)
             RaiseEvent MayQuit(ok)
             If ok Then GoTo ErrHandler
           Wend
           End If
-         feedback = 2 + lbt
+         feedback = nobom * (2 + lbt)
         Else
        NewSeek FNr, 1
        mLof = LOF(FNr)
@@ -1988,7 +2073,18 @@ On Error GoTo ErrHandler
       Case Else
       
        NewSeek FNr, 1
+       
        mLof = LOF(FNr)
+       Dim buf() As Byte
+       If mLof > 1000 Then
+       ReDim buf(1000)
+       Else
+       ReDim buf(mLof)
+       End If
+       Get FNr, 1, buf()
+       NewSeek FNr, 1
+      If ContainsUTF8(buf()) Then nobom = -1: GoTo utf8cont
+       
         While Not (mLof < SeekBuf)
            AppendParagraphOneLine getAnsiStringlINE(FNr, mLof, lbt)
             RaiseEvent MayQuit(ok)
