@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -18217,14 +18217,19 @@ cont10456:
 eos:
         If IsLabelSymbolNew(b$, "ลูำ", "TO", lang) Then
         If IsExp(bstack, b$, sp) Then
+        If nd& = 4 Then
+        sp = MyRound(sp, 0)
+        p = MyRound(p, 0)
+        Else
        sp = MyRound(sp, 13)
         p = MyRound(p, 13)
-            If x1 > 1 Then sp = Int(sp)
+        End If
+            If x1 > 1 Then sp = Round(sp, 0)
                 st = Sgn(sp - p)
                 
         If IsLabelSymbolNew(b$, "มอม", "STEP", lang) Then
         If IsExp(bstack, b$, st) Then
-         If x1 > 1 Then st = Int(st)
+         If x1 > 1 Then st = Round(st)
          If Sgn(sp - p) = 0 Or st = 0 Then
         
          Else
