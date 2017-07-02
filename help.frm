@@ -118,13 +118,13 @@ Label1.glistN.FloatList = True
 Label1.glistN.MoveParent = True
 With Label1.glistN
 If Not abt Then
-.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^")
-.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^")
-.WordCharRightButIncluded = "(" ' so aaa(sdd) give aaa( as word
+.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
+.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
+.WordCharRightButIncluded = "(" + ChrW(160) ' so aaa(sdd) give aaa( as word
 Else
-.WordCharLeft = "["
-.WordCharRight = "]"
-.WordCharRightButIncluded = ""
+.WordCharLeft = "['"
+.WordCharRight = "']"
+.WordCharRightButIncluded = "(" + ChrW(160)
 End If
 End With
 mt = DXP
@@ -180,8 +180,8 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -210,7 +210,7 @@ Else
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / vH_y > 0.4 And ((Width + addX) / vH_x) > 0.4 Then
@@ -249,7 +249,7 @@ Else
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -303,12 +303,12 @@ End Sub
 
 Private Sub glist1_WordMarked(ThisWord As String)
 If abt Then
-feedback$ = ThisWord
+feedback$ = Trim$(Replace(ThisWord, ChrW(160), " "))
 feednow$ = FeedbackExec$
 CallGlobal feednow$
 Else
 
-ffhelp ThisWord
+ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
 
 End If
 ThisWord = ""

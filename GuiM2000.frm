@@ -96,7 +96,6 @@ Dim novisible As Boolean
 Private mModalId As Double, mModalIdPrev As Double
 Public IamPopUp As Boolean
 Private mEnabled As Boolean
-Private excludeme As New FastCollection
 Public WithEvents mDoc As Document
 Attribute mDoc.VB_VarHelpID = -1
 Dim mQuit
@@ -152,20 +151,21 @@ NeverShow = Not novisible
 End Property
 Friend Property Set EventObj(aEvent As Object)
 Set myEvent = aEvent
+Set myEvent.excludeme = New FastCollection
 End Property
 
 Public Sub Callback(b$)
 If ByPassEvent Then
-    If excludeme.IamBusy Then Exit Sub
+    If myEvent.excludeme.IamBusy Then Exit Sub
     Dim Mark$
     Mark$ = Split(b$, "(")(0)
-    If excludeme.ExistKey3(Mark$) Then Exit Sub
+    If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
     If Not TaskMaster Is Nothing Then TaskMaster.tickdrop = 0
     
     If Visible Then
-       excludeme.AddKey2 Mark$
+       myEvent.excludeme.AddKey2 Mark$
     If CallEventFromGuiOne(Me, myEvent, b$) Then
-        excludeme.Remove Mark$
+        myEvent.excludeme.Remove Mark$
     End If
     Else
         CallEventFromGuiOne Me, myEvent, b$
@@ -175,12 +175,12 @@ Else
 End If
 End Sub
 Public Sub CallbackNow(b$, VR())
-If excludeme.IamBusy Then Exit Sub
+If myEvent.excludeme.IamBusy Then Exit Sub
 Dim Mark$
 Mark$ = Split(b$, "(")(0)
-If excludeme.ExistKey3(Mark$) Then Exit Sub
-If Visible Then excludeme.AddKey2 Mark$
-If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then excludeme.Remove Mark$
+If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
+If Visible Then myEvent.excludeme.AddKey2 Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then myEvent.excludeme.Remove Mark$
 
 End Sub
 
@@ -220,7 +220,9 @@ End Sub
 Private Sub Form_Activate()
 
 On Error Resume Next
-
+If Not myEvent.excludeme.IamBusy Then
+Set myEvent.excludeme = New FastCollection
+End If
 If PopupOn Then PopupOn = False
 If novisible Then Hide: Unload Me
 If gList2.HeadLine <> "" Then If ttl Then Form3.CaptionW = gList2.HeadLine: Form3.Refresh
@@ -295,7 +297,7 @@ End Sub
 
 
 Private Sub Form_Initialize()
-excludeme.ResetGui
+'myEvent.excludeme.ResetGui
 mEnabled = True
 End Sub
 
@@ -320,7 +322,7 @@ Dim w As Object
     If Typename(ActiveControl) = "gList" Then ActiveControl.SetFocus
 End If
 Else
-Debug.Print MyName$
+'Debug.Print MyName$
 choosenext
 End If
 End Sub

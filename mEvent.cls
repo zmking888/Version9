@@ -24,6 +24,7 @@ Dim StartPoint As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private mParamBlock As String, mParams As Long
 Private Hash() As Long
+Public excludeme As Object
 Public NoHere$
 Public exclude As LongHash
 Public Function Extern(ParamArray a()) As Long
@@ -130,11 +131,11 @@ End Sub
 
 Friend Sub ReadVar(where, name$, func As String)
     name$ = PriveSpace(where).Key
-    func = PriveSpace(where).NDX
+    func = PriveSpace(where).ndx
 End Sub
 Friend Sub ReadVarEx(where, name$, func As String, Extra As Long)
     name$ = PriveSpace(where).Key
-    func = PriveSpace(where).NDX
+    func = PriveSpace(where).ndx
     Extra = PriveSpace(where).firsthash
 End Sub
 
@@ -163,7 +164,7 @@ Friend Sub ReduceHash(newTop As Long)
             .Key = ""
         End If
 
-        .NDX = ""
+        .ndx = ""
             
         End With
 
@@ -231,7 +232,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    func = PriveSpace(k).NDX: Find = True: Exit Function
+    func = PriveSpace(k).ndx: Find = True: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -246,7 +247,7 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    PriveSpace(k).NDX = func
+    PriveSpace(k).ndx = func
     PriveSpace(k).Key = NewKey
     PriveSpace(k).firsthash = HashFunc0(NewKey)
                 ReDim Hash(MaxSpace * 2 + 3)
@@ -285,7 +286,7 @@ Dim a As Long
 a = Malloc()
 With PriveSpace(a)
     .Key = Key
-    .NDX = func
+    .ndx = func
     .firsthash = HashFunc0(Key)
 End With
 place HashFunc(Key), a
@@ -356,13 +357,13 @@ End Function
 Public Sub Upgrade(usethis$)
 Dim i As Long, a$
 For i = 0 To toplim
-a$ = PriveSpace(i).NDX
+a$ = PriveSpace(i).ndx
 Dim b$
 If a$ <> "" Then
 b$ = Left$(a$, rinstr(a$, "}", 0))
 a$ = Mid$(a$, Len(b$) + 1)
 If b$ <> "" And NoHere = a$ Then
-PriveSpace(i).NDX = b$ + usethis$
+PriveSpace(i).ndx = b$ + usethis$
 End If
 End If
 Next i

@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -669,7 +669,6 @@ Loop Until (w = eW And l = el) Or safety = 2
 
 End If
 TEXT1.mDoc.LCID = OldLcid
-'TEXT1.mdoc.WrapAgainColor
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -803,8 +802,6 @@ TEXT1.glistN.dropkey = False
 End If
 TEXT1.mDoc.LCID = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
-
-'TEXT1.mdoc.WrapAgainColor
 TEXT1.Render
 
 End Sub
@@ -928,7 +925,7 @@ If sel& >= 0 Then
 If Button = 1 Then
 
 
-Select Case q(sel&).ID Mod 100
+Select Case q(sel&).Id Mod 100
 Case Is < 10
 If Not interpret(DisStack, (q(sel&).Comm)) Then Beep
 Case Else
@@ -993,7 +990,7 @@ With players(p)
             If sel& >= 0 Then
                 If Button = 1 Then
                 '' If QRY Then LCTC dSprite(Index), oy&, ox&, ins& Else LCT dSprite(Index), oy&, ox&
-                Select Case q(sel&).ID Mod 100
+                Select Case q(sel&).Id Mod 100
                 Case Is < 10
                 If Not interpret(DisStack, "LAYER " & dSprite(index).Tag + " {" + vbCrLf + q(sel&).Comm + vbCrLf & "}") Then Beep
                 Case Else
@@ -1044,6 +1041,13 @@ clickMe = HighLow(CLng(shift), CLng(KeyCode))
 If clickMe2 = -2 Then clickMe2 = clickMe
 If clickMe = 27 And escok Then
 NOEXECUTION = True
+If Not TaskMaster Is Nothing Then
+If TaskMaster.Processing Then
+TaskMaster.StopProcess
+
+End If
+TaskMaster.Dispose
+End If
 If exWnd <> 0 Then
 MyDoEvents
     nnn$ = "bye bye"
@@ -1521,7 +1525,7 @@ End If
 
 
 
-Switches para$
+Switches para$  ' ,TRUE CHECK THIS
     
     l_complete = True
   
@@ -1556,7 +1560,7 @@ If sel& >= 0 Then
 If Button = 1 Then
 
 
-Select Case q(sel&).ID Mod 100
+Select Case q(sel&).Id Mod 100
 Case Is < 10
 
 If Not interpret(MeStack, (q(sel&).Comm)) Then Beep
@@ -1621,7 +1625,7 @@ AutoRedraw = True
  If App.StartMode = vbSModeStandalone Then If OneOnly Then Exit Sub
 OneOnly = True
 
-If m_bInIDE Then funcdeep = 128 Else funcdeep = 3375 ' need stack 102440960 bytes
+If m_bInIDE Then funcdeep = 128 Else funcdeep = 3270 ' need stack 102440960 bytes
 
 escok = False
 Sleep 10
@@ -2177,7 +2181,6 @@ Case vbKeyF11
 fState = fState + 1
 SetText1
 TEXT1.WrapAll
-TEXT1.mDoc.WrapAgainColor
 TEXT1.ManualInform
 KeyCode = 0
 Case vbKeyF12
@@ -2408,9 +2411,9 @@ MyDoEvents
 End If
 End Sub
 Public Sub IEUP(ThisFile As String)
-Static Once As Boolean
-If Once Then Exit Sub
-Once = True
+Static once As Boolean
+If once Then Exit Sub
+once = True
 If ThisFile = "" Then
 
 If exWnd <> 0 Then
@@ -2430,7 +2433,7 @@ Sleep 50
 view1.Visible = False
 
  End If
- Once = False
+ once = False
     Exit Sub
 End If
    
@@ -2479,7 +2482,7 @@ End If
 
 'follow IEX, IEY
 cnt = False
-Once = False
+once = False
 End Sub
 Public Sub follow(ByVal nx As Long, ByVal ny As Long)
 Exit Sub
@@ -2762,6 +2765,11 @@ End If
         cc.ValueType = REG_DWORD
         If Not m_bInIDE Then
             If Not cc.Value = 0 Then funcdeep = cc.Value
+            If funcdeep > 3270 Then
+            ' fix it
+            cc.Value = 3270
+            funcdeep = 3270
+            End If
             
         Else
             funcdeep = 300
@@ -2781,7 +2789,7 @@ End If
         End If
             cc.ValueKey = "PRIORITY-OR"
             cc.ValueType = REG_DWORD
-            cc.Value = priorityOr
+             priorityOr = CLng(cc.Value) = True
         Set cc = Nothing
         End If
        DIS.ForeColor = mycolor(PenOne) ' NOW PEN IS RGB VALUE
@@ -2840,8 +2848,6 @@ End If
 .AddUndo ""
 .SelText = aa$
 .RemoveUndo aa$
-'.mdoc.WrapAgainColor
-'.ReColorBlock
 End With
 End Sub
 Public Sub mn4sub()

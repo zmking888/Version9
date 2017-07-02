@@ -3306,7 +3306,6 @@ Else
 .Text = ""
 .LastSelStart = 0
 End If
-If Not Form1.EditTextWord Then .mDoc.WrapAgainColor
 '.glistN.NoFreeMoveUpDown = True
 With Form1.TEXT1
 .Form1mn1Enabled = False
@@ -4068,7 +4067,7 @@ Dim dX As Long, dy As Long, safe$
 
 If excludechars = "" Then excludechars = Chr$(0)
 If QUERYLIST = "" Then QUERYLIST = Chr$(13): LASTQUERYLIST = 1
-Dim q1 As Long, sp$, Once As Boolean, dq As Object
+Dim q1 As Long, sp$, once As Boolean, dq As Object
  
 Set dq = bstack.Owner
 SetText dq
@@ -4118,7 +4117,7 @@ Dim a$
 s$ = ""
 oldLCTCB dq, prive, 0
 Do
-If Not Once Then
+If Not once Then
 If USELIST Then
  DoEvents
   If Not iamactive Then
@@ -4150,8 +4149,8 @@ If Not QRY Then HideCaret dq.hWnd:   Exit Do
  BLOCKkey = False
  If USELIST Then
 
- If Not Once Then
- Once = True
+ If Not once Then
+ once = True
 
  If QUERYLIST <> "" Then  ' up down
  
@@ -4191,7 +4190,7 @@ If clickMe = 38 Then
  MKEY$ = ""
  Else
  clickMe = 0
- Once = False
+ once = False
  End If
  End If
 
@@ -4732,6 +4731,7 @@ End If
 myLcase = a$
 End Function
 Function MesTitle$()
+On Error Resume Next
 If ttl Then
 If Form1.Caption = "" Then
 If here$ = "" Then
@@ -4748,10 +4748,14 @@ Else
 MesTitle$ = Form1.Caption
 End If
 Else
+If Typename$(Screen.ActiveForm) = "GuiM2000" Then
+MesTitle$ = Screen.ActiveForm.TITLE
+Else
 If here$ = "" Or LASTPROG$ = "" Then
 MesTitle$ = "M2000"
 Else
 MesTitle$ = ExtractNameOnly(LASTPROG$) & " " & here$
+End If
 End If
 End If
 End Function
@@ -4884,7 +4888,7 @@ If s$ <> "" Then
             ElseIf d$ = "PRI" Then
             cc.ValueKey = "PRIORITY-OR"
             cc.ValueType = REG_DWORD
-            cc.Value = False
+            cc.Value = CLng(0)  ' FALSE IS WRONG VALUE HERE
             priorityOr = False
             ElseIf d$ = "REG" Then
             gsb_file False
@@ -5003,8 +5007,8 @@ If IsLabel(basestack1, s$, d$) > 0 Then
         ElseIf d$ = "REC" Then
                cc.ValueKey = "FUNCDEEP"  ' RESET
              cc.ValueType = REG_DWORD
-             funcdeep = 3375
-                    cc.Value = 3375 ' SET REVISION DEFAULT
+             funcdeep = 3270
+                    cc.Value = 3270 ' SET REVISION DEFAULT
         Else
             s$ = "+" & d$ & s$
             Exit Do
@@ -5416,7 +5420,7 @@ If TaskMaster.Processing Then
                  k1 = 0
                 TaskMaster.rest
                 UpdateWindow obj.hWnd
-                DoEvents
+                         DoEvents
                 TaskMaster.RestEnd
         Else
         MyDoEvents1 obj
@@ -5448,17 +5452,17 @@ Else
 
         
         If QRY Then
-            DoEvents
+             DoEvents
         Else
         If Kform Then
         Kform = False
             TaskMaster.rest
-     DoEvents
+      DoEvents
             TaskMaster.RestEnd
         Else
         
      ''  If Not extreme Then If Not obj Is Nothing Then If obj.Visible Then GdiFlush: obj.refresh
-            DoEvents
+             DoEvents
         End If
       
         End If
@@ -5474,7 +5478,7 @@ End If
 End If
 Exit Sub
 endevents:
-DoEvents
+ DoEvents
 End Sub
 
 Public Function CheckStackObj(bstack As basetask, anything As Object, vvv() As Variant, Optional counter As Long) As Boolean
@@ -5489,19 +5493,27 @@ End If
 End Function
 
 Public Function MyDoEvents()
-
+On Error GoTo there
 If TaskMaster Is Nothing Then
 DoEvents
 Exit Function
-ElseIf TaskMaster.PlayMusic Then
+ElseIf Not TaskMaster.Processing Then
+DoEvents
+Exit Function
+Else
+If TaskMaster.PlayMusic Then
                   TaskMaster.OnlyMusic = True
                       TaskMaster.TimerTick
                     TaskMaster.OnlyMusic = False
                  End If
-TaskMaster.rest
-DoEvents
+        TaskMaster.StopProcess
+         DoEvents
+         TaskMaster.StartProcess
 If TaskMaster Is Nothing Then Exit Function
-TaskMaster.RestEnd
+End If
+Exit Function
+there:
+If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
 End Function
 Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
   Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
@@ -6424,6 +6436,9 @@ MyEr "Can't assign object", "Δεν μπορώ να δώσω αντικείμενο"
 End Sub
 Public Sub NoNewStatFor(w1$, w2$)
 MyEr "No New statement for " + w1$, "Όχι δήλωση νέου για " + w2$
+End Sub
+Public Sub NoThatOperator(ss$)
+    MyEr ss$ + " operator not allowed in group definition", " Ο τελεστής " + ss$ + " δεν επιτρεπεται σε ορισμό ομάδας"
 End Sub
 Public Sub MissingObjRef()
 MyEr "invalid object pointer", "μη έγκυρος δείκτης αντικειμένου"

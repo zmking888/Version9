@@ -261,7 +261,7 @@ Public Sub Dispose()
 End Sub
 
 Public Sub TimerTick()
-If tickdrop > 0 Then Exit Sub
+If tickdrop > 0 Then Exit Sub ' tickdrop = myMasterList.Count: Exit Sub
 Dim this As TaskInterface
   If myMasterList.Count = 0 Then Exit Sub
   
@@ -321,7 +321,7 @@ End If
   If LastErNum <> 0 Then Dispose
 End Sub
 Public Sub TimerTickOne()
-If tickdrop > 0 Then Exit Sub
+If tickdrop > 0 Then Exit Sub 'tickdrop = myMasterList.Count: Exit Sub
 tickdrop = 1000
 Dim this As TaskInterface
   If myMasterList.Count = 0 Then tickdrop = 0: Exit Sub

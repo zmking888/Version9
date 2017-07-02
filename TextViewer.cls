@@ -3772,7 +3772,6 @@ End If
 End Function
 Sub ReColor()
 WrapAll
-mDoc.WrapAgainColor
 ManualInform
 End Sub
 Sub ReColorBlock()

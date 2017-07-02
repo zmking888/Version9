@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 2
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1475,7 +1475,7 @@ End If
        
 End Sub
 Public Sub PopStage(basestack As basetask)
-Dim kolpo As Boolean, bb$, Once As Boolean, dd As Variant
+Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant
         With basestack.RetStack
         If .LookTopVal = -1 Then
         basestack.SubLevel = basestack.SubLevel - 1
@@ -2647,7 +2647,7 @@ Private Function SpeedGroup(bstack As basetask, pppp As mArray, Prefix$, ByVal w
 Dim Vars As Long, VName As Long, y1 As Long, subs As Long, snames As Long, i As Long, ec$, ohere$, p As Double
 Dim depth As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, S3 As Long
 Dim safegroup As Object
-Dim kolpo As Boolean, bb$, Once As Boolean, dd As Variant, subsfc As FastCollection
+Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant, subsfc As FastCollection
 Vars = var2used: VName = varhash.Count
 subs = sb2used: snames = subHash.Count
 Dim mm As mStiva, tempRef As Object, bs As New basetask
@@ -2881,7 +2881,7 @@ If FastSymbol(b$, "{") Then
         If Len(ec$) > 2 Then
                 SpeedGroup = 1
                 kolpo = False
-                Once = True
+                once = True
                 i = 1
                 ohere$ = here$
                 Do
@@ -2900,7 +2900,7 @@ subsentry10:
                     End If
 
                                   If FastSymbol(b$, "}") Then
-                                   If Once Then Exit Do
+                                   If once Then Exit Do
                                    Else
                                    b$ = Right$(ec$, Len(bb$)) + b$
                                 ''   MyDoEvents
@@ -3015,7 +3015,7 @@ jump1234:
                             End If
                                                Else
                                                If kolpo Then b$ = "BREAK"
-                                  Once = kolpo
+                                  once = kolpo
                                 
                                 SpeedGroup = 2: Set bstack.lastobj = Nothing
                                   GoTo breakexit
@@ -3024,7 +3024,7 @@ jump1234:
                             Case Else
                                     If FastSymbol(b$, "}") Then
       
-                                   If Once Then Exit Do
+                                   If once Then Exit Do
                                      Else
                                    b$ = Right$(ec$, Len(bb$)) + b$
                                    End If
@@ -3447,9 +3447,11 @@ MkDir userfiles
 End If
 
 mcd = userfiles
+If NowDec$ <> "" Then
+Else
 NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
 NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
-
+End If
 CheckDec
 
 End Sub
@@ -4208,7 +4210,7 @@ Do
                 po = r1 * po
             Case 4, 44
             '' check for **, ^, /, *
-                If Fix(po) = 0 Then
+                If Round(po, 13) = 0 Then
                     'DIVISION BY ZERO
                     DevZeroMacro aa$
                     IsExpA = False
@@ -4225,16 +4227,16 @@ Do
                     End If
                    End If
             Case 40 ' Old version use switches "+DIV"
-                If Int(po) = 0 Then
+                If Round(po, 13) = 0 Then
                     'DIVISION BY ZERO
                     DevZeroMacro aa$
                     IsExpA = False
                     Exit Function
                 Else
-                    po = Int(Fix(r1) / Fix(po))
+                    po = Int(r1 / po)
                 End If
             Case 5, 55
-                If Fix(po) = 0 Then
+                If Round(po, 13) = 0 Then
                     'DIVISION BY ZERO
                     DevZeroMacro aa$
                     IsExpA = False
@@ -4245,7 +4247,7 @@ Do
                         po = Abs(r1 - Abs(po) * Int(r1 / Abs(po)))
                   End If
             Case 50 ' Old version use switches "+DIV"
-              If Int(po) = 0 Then
+              If Round(po, 13) = 0 Then
                     'DIVISION BY ZERO
                     DevZeroMacro aa$
             
@@ -4253,7 +4255,7 @@ Do
                     Exit Function
                 Else
                    ' po = Sgn(r1) * (Int(Abs(r1)) - Int(Int(Abs(r1) / Abs(Int(po))) * Abs(Int(po))))
-                   po = r1 - Round(Int(r1 / po) * po, 13)
+                   po = r1 - Int(r1 / po) * po
                 End If
             End Select
             r1 = 1
@@ -4699,7 +4701,7 @@ If FastSymbol(aa$, "(") Then
             If po = 0 Then
                 po = True
             Else
-                po = MyRound(po, 10) = 0
+                po = MyRound(po, 13) = 0
             End If
     Else
   po = MyRound((((ac + po) - r) / r), 10) = 0
@@ -4717,7 +4719,7 @@ If FastSymbol(aa$, "(") Then
             If po = 0 Then
                 po = True
             Else
-                po = MyRound(po, 10) = 0
+                po = MyRound(po, 13) = 0
             End If
     Else
   po = MyRound((((ac + po) - r) / r), 10) = 0
@@ -6247,9 +6249,44 @@ Case 5
 'On Error Resume Next
 If Not funid.Find(v$, w1) Then GoTo LOOKFORSUBNUM
 'Select Case v$
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97
 IsNumber = False
 Exit Function
+fun97: 'Case "READY(", "≈‘œ…Ãœ("
+IsNumber = False
+    w1 = Abs(IsLabel(bstack, a$, s$))
+        If w1 = 3 Then
+            If GetVar(bstack, s$, w1) Then
+                If Typename(var(w1)) = doc Then
+                    r = SG * Not var(w1).Busy
+                Else
+                    r = SG * True
+                End If
+                
+                IsNumber = FastSymbol(a$, ")", True)
+            Else
+                    
+                    MissFuncParameterStringVarMacro a$
+                    
+            End If
+        ElseIf w1 = 6 Then
+                If neoGetArray(bstack, s$, pppp) Then
+                 If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                    If Typename(pppp.item(w2)) = doc Then
+                      r = SG * Not pppp.item(w2).Busy
+                      Else
+                      r = SG * True
+                      End If
+                Else
+                
+                End If
+                    
+                IsNumber = FastSymbol(a$, ")", True)
+    Else
+                    
+                MissParam a$
+    End If
+    Exit Function
 fun1: 'Case "PARAM(", "–¡—¡Ã("
 v$ = ""
 If IsStrExp(bstack, a$, s1$) Then
@@ -9127,8 +9164,8 @@ ElseIf IsExp(bstack, a$, r) Then
     r = Int(r)
         If FastSymbol(a$, ",") Then
         If Not IsExp(bstack, a$, p) Then IsNumber = False: Exit Function
-        p = Int(p)
-        If p > r Then p = p + r: r = p - r: p = p - r
+        p = MyRound(p)
+        If p > r Then PP = p: p = r: r = PP ' p = p + r: r = p - r: p = p - r
         Else
         p = 0
         
@@ -9509,7 +9546,7 @@ Else
     'Set nBstack = Nothing
         If InStr(v$, "%") > 0 Then
         
-        r = SG * Int(p)
+        r = SG * MyRound(p)
         Else
         r = SG * p
         End If
@@ -9672,7 +9709,7 @@ contlambdahere:
                                  IsNumber = IsNumber(bstack, a$, p)
                                  Set var(w1) = Nothing
                                  If Right$(pppp.arrname, 2) = "%(" Then
-                                 r = SG * Int(p)
+                                 r = SG * MyRound(p)
                                  Else
                                  r = SG * p
                                  End If
@@ -9745,13 +9782,13 @@ contrightpar:
                 If Not FastSymbol(a$, "!") Then s$ = CStr(p): GoTo contlabel
                  With pppp.GroupRef.objref
                     
-                    p = Int(p)
+                    p = MyRound(p)
                     
                     If Abs(p) < .Count Then
                         If p < 0 Then
-                          .index = .Count + Int(p)
+                          .index = .Count + MyRound(p)
                         Else
-                          .index = Int(p)
+                          .index = MyRound(p)
                         End If
                        .Done = True
                        '' what??? here here here
@@ -9760,7 +9797,7 @@ contrightpar:
                        If Fast2NoSpace(a$, ".¡Œ…¡", 5, ".VALUE", 6, 6) Then
                        w2 = -100
                        Else
-                       w2 = -Int(p) - 100
+                       w2 = -MyRound(p) - 100
                        End If
                        GoTo contgroup
                        ElseIf FastSymbol(a$, "(") Then
@@ -13120,12 +13157,12 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
             If .t1 = 1 Then
             If FastSymbol(a$, ",") Then
                 If IsExp(bstackstr, a$, p) Then
-                p = Int(p)
+                p = MyRound(p)
                If Abs(p) < .objref.Count Then
               If p < 0 Then
-                .objref.index = .objref.Count + Int(p)
+                .objref.index = .objref.Count + MyRound(p)
               Else
-                .objref.index = Int(p)
+                .objref.index = MyRound(p)
                 End If
              
                 .objref.Done = True
@@ -13169,7 +13206,7 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
                                     If FastSymbol(a$, "!") Then
                                      If IsExp(bstackstr, a$, p) Then
                                       ' w2 = w2 + Int(p) * PP
-                                     w2 = cUlng(uintnew(w2) + Int(p) * PP)
+                                     w2 = cUlng(uintnew(w2) + MyRound(p) * PP)
                                      End If
                                     End If
                                 Else
@@ -13195,7 +13232,7 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
                         If FastSymbol(a$, ",") Then
                             If IsExp(bstackstr, a$, p) Then
                             ' NOW WE KNOW HOW MANY BYTES WE TAKE (ALWAYS BYTES)
-                                p = Int(p)
+                                p = MyRound(p)
                                 If .objref.ValidArea(w2, p) Then
                                     r$ = String$((p + 1) \ 2, Chr(0))
                                     CopyBytes CLng(p), StrPtr(r$), w2
@@ -14338,7 +14375,7 @@ fstr37: '"HEX$(", "ƒ≈ ¡≈Œ$("
     If Not IsExp(bstackstr, a$, p) Then
       MyErMacroStr a$, "missing parameter 1 to 4 (bytes)", "ÎÂﬂÂÈ Ò‹ÏÂÙÒÔÚ 1 ›˘Ú 4"
         IsStr1 = False: Exit Function
-    ElseIf Int(p) < 1 Or Int(p) > 4 Then
+    ElseIf MyRound(p) < 1 Or MyRound(p) > 4 Then
          MyErMacroStr a$, "parameter 1 to 4 (bytes)", "Ò‹ÏÂÙÒÔÚ 1 ›˘Ú 4"
         IsStr1 = False: Exit Function
 Else
@@ -15037,9 +15074,9 @@ contrightstrpar:
                If FastSymbol(a$, "!") Then
                  If Abs(p) < .Count Then
                  If p < 0 Then
-                   .index = .Count + Int(p)
+                   .index = .Count + MyRound(p)
                  Else
-                   .index = Int(p)
+                   .index = MyRound(p)
                    End If
                    Else
                
@@ -16480,6 +16517,13 @@ err123456:
                     wwPlain bstack, prive, "Current directory", bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, mcd, bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, "Setting for Function Recursion " + CStr(funcdeep), bstack.Owner.Width, 1000, True
+                    If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
+                    If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
+                    If NoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
+                    wwPlain bstack, prive, "Switches " + ss$, bstack.Owner.Width, 1000, True
+                    wwPlain bstack, prive, "About Switches: use command Help Switches", bstack.Owner.Width, 1000, True
+                    
+                    
                     players(GetCode(di)) = prive
                     Else
                     BadCommand
@@ -16735,7 +16779,7 @@ If FastSymbol(b$, "=") Then '................................
                            ExpectedObj Typename(var(v))
                            Exit Function
                         Else
-                        var(v) = Int(p)
+                        var(v) = MyRound(p)
                         End If
                 Else
                   MissNumExpr
@@ -16802,19 +16846,19 @@ If FastSymbol(b$, "=") Then '................................
                             On Error Resume Next
                             Select Case ss$
                             Case "="
-                            var(v) = Int(p)
+                            var(v) = MyRound(p)
                                 Case "+"
-                                var(v) = Int(p) + var(v)
+                                var(v) = MyRound(p) + var(v)
                                 Case "*"
-                                 var(v) = Int(Int(p) * var(v))
+                                 var(v) = MyRound(MyRound(p) * var(v))
                                 Case "-"
-                                var(v) = var(v) - Int(p)
+                                var(v) = var(v) - MyRound(p)
                                 Case "/"
-                                If p = 0 Then
+                                If MyRound(p) = 0 Then
                                    interpret = False
                                  Exit Function
                                 End If
-                                 var(v) = var(v) \ Int(p)
+                                 var(v) = var(v) \ MyRound(p)
                                  Case "!"
                                  var(v) = -1 - (var(v) <> 0)
                             End Select
@@ -17184,19 +17228,19 @@ ElseIf IsOperator0(b$, "--", 2) Then
 pppp.item(v) = pppp.itemnumeric(v) - 1
 ElseIf IsOperator0(b$, "+=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: Exit Function
-pppp.item(v) = pppp.itemnumeric(v) + Int(p)
+pppp.item(v) = pppp.itemnumeric(v) + MyRound(p)
 ElseIf IsOperator0(b$, "-=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: Exit Function
-pppp.item(v) = pppp.itemnumeric(v) - Int(p)
+pppp.item(v) = pppp.itemnumeric(v) - MyRound(p)
 ElseIf IsOperator0(b$, "*=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: Exit Function
-pppp.item(v) = pppp.itemnumeric(v) * Int(p)
+pppp.item(v) = pppp.itemnumeric(v) * MyRound(p)
 ElseIf IsOperator0(b$, "/=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: Exit Function
-If p = 0 Then
+If MyRound(p) = 0 Then
  DevZero
  Else
- pppp.item(v) = Int(pppp.itemnumeric(v) / Int(p))
+ pppp.item(v) = Int(pppp.itemnumeric(v) / MyRound(p))
 End If
 ElseIf IsOperator0(b$, "-!", 2) Then
 pppp.item(v) = -pppp.itemnumeric(v)
@@ -17225,7 +17269,7 @@ If Not bstack.lastobj Is Nothing Then
                                   If TypeOf bstack.lastobj Is Group Then Set pppp.item(v).LinkRef = myobject
                           End If
 Else
-p = Int(p)
+p = MyRound(p)
 
 If Err.Number > 0 Then interpret = False: here$ = ohere$: Exit Function
 pppp.item(v) = p
@@ -17235,7 +17279,7 @@ Do While FastSymbol(b$, ",")
 If pppp.UpperMonoLimit > v Then
 v = v + 1
 If Not IsExp(bstack, b$, p) Then here$ = ohere$: Exit Function
-pppp.item(v) = p
+pppp.item(v) = MyRound(p)
 Else
 Exit Do
 End If
@@ -17319,7 +17363,7 @@ Do
     Case 4
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-            bstack.SetVar w$, Int(p)
+            bstack.SetVar w$, MyRound(p)
         ElseIf FastSymbol(b$, "=") Then
  ii = 1
             ss$ = aheadstatus(b$, False, ii)
@@ -17351,7 +17395,7 @@ Set Parent = Parent.Parent
 Loop
 Set Parent = Nothing
 End Sub
-Function Execute(bstack As basetask, b$, Once As Boolean, Optional linebyline As Boolean, Optional loopthis As Boolean = False) As Long
+Function Execute(bstack As basetask, b$, once As Boolean, Optional linebyline As Boolean, Optional loopthis As Boolean = False) As Long
 Dim di As Object, nchr As Integer
 If Not bstack.IamAnEvent Then
 If mybreakkey Then
@@ -17363,7 +17407,7 @@ If mybreakkey Then
             
            b$ = "@Start : error {}"
            
-           Once = False
+           once = False
            k1 = 0
                 MyDoEvents0 bstack.Owner
                MyEr "", ""
@@ -17400,17 +17444,17 @@ Do While Len(b$) <> LLL
                         MOUT = False
                         
                         b$ = "@Start : error {}"
-                        Once = False
+                        once = False
                         MyDoEvents0 bstack.Owner
                         MyEr "", ""
                         LLL = 0
                 Else
                         MyErMacro b$, "Escape", "ƒÈ·ÍÔﬁ ÂÍÙ›ÎÂÛÁÚ"
-                        If Once Then
+                        If once Then
                                     b$ = vbCrLf + b$   ' this cause troubles...
                                     Execute = 0
                         Else
-                                    Once = True
+                                    once = True
                                     Execute = 1
                         End If
                         Exit Function
@@ -17447,7 +17491,7 @@ Do
                         Exit Do
                     End If
                 End If
-             If Right$(bstack.OriginalName$, 3) = "%()" Then p = Int(p)
+             If Right$(bstack.OriginalName$, 3) = "%()" Then p = MyRound(p)
              Set bstack.FuncObj = bstack.lastobj
              Set bstack.lastobj = Nothing
              bstack.FuncValue = p
@@ -17508,7 +17552,7 @@ Do
      End If
     End If
     x1 = 0
-    If Once Then Exit Function
+    If once Then Exit Function
 End If
 ElseIf MaybeIsSymbol(b$, "{") Then
 b$ = Mid$(Trim$(b$), 2)
@@ -17519,7 +17563,7 @@ sss = Len(b$)
 ''GoTo loopcontinue
 End If
 
-If executeblock(Execute, bstack, b$, Once, kolpo) Then Exit Function
+If executeblock(Execute, bstack, b$, once, kolpo) Then Exit Function
 If Execute = 4 Then b$ = "{" + b$: Exit Function
 If kolpo Then ec$ = block(b$)
 If Execute = 2 And b$ <> "" Then Exit Function
@@ -17571,7 +17615,7 @@ Else
     
      If IFCTRL = 2 Then
      
-      Once = False
+      once = False
                 b$ = w$
                 Execute = 2
                 Exit Function
@@ -17900,16 +17944,16 @@ dothesame:
                 b$ = ""
                 NoThisInThread
                 Execute = 0: Exit Function
-                Once = False
+                once = False
             ElseIf IsLabelSymbolNewExp(b$, "”¬«”≈", "ERASE", lang, Us$) Then
          Set bstack.Process.Process = Nothing
 
                 b$ = "" ' get lost now
             ElseIf IsLabelSymbolNewExp(b$, " —¡‘¡", "HOLD", lang, Us$) Then
-                bstack.Process.busy = True
+                bstack.Process.Busy = True
          
             ElseIf IsLabelSymbolNewExp(b$, "Œ≈ …Õ¡", "RESTART", lang, Us$) Then
-                bstack.Process.busy = False
+                bstack.Process.Busy = False
                 b$ = ""
             ElseIf IsLabelSymbolNewExp(b$, " ¡»≈", "INTERVAL", lang, Us$) Then
                                  If IsExp(bstack, b$, p) Then
@@ -17931,7 +17975,7 @@ dothesame:
             Else
                        If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
             If Not MyThread(bstack, b$, lang) Then Execute = 0: Exit Function
@@ -17940,7 +17984,7 @@ dothesame:
         Case "LOOP", " ’ À… ¡"
 contLoop:
     
-        If Once = True Then Execute = 0: Exit Function
+        If once = True Then Execute = 0: Exit Function
             loopthis = True
             Execute = 2
         If myexit(bstack) Then Execute = 1: b$ = "": Exit Function
@@ -17948,7 +17992,7 @@ contLoop:
 contBreak:
      
                   b$ = "BREAK"
-           Once = True
+           once = True
         Execute = 2
         Exit Function
      If myexit(bstack) Then Execute = 1: b$ = ""
@@ -17957,7 +18001,7 @@ ContContinue:
 
            If Execute <> 2 Then
               b$ = "CONTINUE"
-           Once = True
+           once = True
            Execute = 3
          
            Else
@@ -18005,7 +18049,7 @@ ContReturn:
         
         LLL = Len(b$) - 1
         Else
-                Once = False
+                once = False
                 b$ = Chr$(0)
                 Execute = 2
                 
@@ -18016,7 +18060,7 @@ ContReturn:
 ContEnd:
     WaitShow = 0
                If IsLabelSymbolNew(b$, "—œ’‘…Õ¡”", "SUB", lang) Then
-                Once = False
+                once = False
                 b$ = Chr$(0)
                 Execute = 2
                 Exit Function
@@ -18037,13 +18081,13 @@ ContExit:
         Us$ = ""
         If IsLabelSymbolNewExp(b$, "—œ’‘…Õ¡”", "SUB", lang, Us$) Then
         WaitShow = 0
-                Once = False
+                once = False
                 b$ = Chr$(0)
                 Execute = 2
                 Exit Function
         ElseIf IsLabelSymbolNewExp(b$, "√…¡", "FOR", lang, Us$) Then
         
-         Once = False
+         once = False
                 
             i = Abs(IsLabelOnly(b$, w$))
             If i = 0 Then
@@ -18079,11 +18123,11 @@ ContExit:
         
         End If
                     b$ = ""
-           Once = True
+           once = True
              Else
  If Execute <> 2 Then Execute = 1 Else Execute = 3
             b$ = ""
-           Once = True
+           once = True
            Exit Function
            End If
            
@@ -18097,11 +18141,11 @@ ForCont:
           Else
           b$ = w$ + b$
           End If
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
         
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
                If IsStrExp(bstack, b$, w$) Then
                  b$ = w$ + " " + b$
                End If
@@ -18123,7 +18167,7 @@ nd& = x1
             x1 = nd&
             If IsExp(bstack, b$, p) Then
             
-                If nd& = 4 Then p = Int(p) Else p = MyRound(p, 13)
+                If nd& = 4 Then p = MyRound(p) Else p = MyRound(p, 13)
                 bstack.SetVar w$, p
                 GoTo eos
             Else
@@ -18158,11 +18202,11 @@ cont10456:
              End If
             Else
              If IsExp(bstack, b$, p) Then
-             If x1 = 1 Then var(x2) = MyRound(p, 13) Else var(x2) = Int(p)
+             If x1 = 1 Then var(x2) = MyRound(p, 13) Else var(x2) = MyRound(p)
              End If
              End If
             ElseIf IsExp(bstack, b$, p) Then
-            If nd& > 1 Then p = Int(p)
+            If nd& > 1 Then p = MyRound(p)
               x2 = GlobalVar(w$, p, , VarStat, temphere$)
                 x1 = nd&
         Else
@@ -18253,7 +18297,7 @@ contfor:
 If x1 = 1 Then
         Do
             TraceRestore bstack, slct
-            If executeblock(Execute, bstack, ss$, Once, ok) Then
+            If executeblock(Execute, bstack, ss$, once, ok) Then
                     TraceRestore bstack, nd&
                     If Execute <> 1 Then
                         
@@ -18330,7 +18374,7 @@ sss = st
 sp = sss
 Do
             TraceRestore bstack, slct
-            If executeblock(Execute, bstack, ss$, Once, ok) Then
+            If executeblock(Execute, bstack, ss$, once, ok) Then
             TraceRestore bstack, nd&
             If Execute <> 1 Then
             
@@ -18402,7 +18446,7 @@ sss = sp
 Else
 Do
             TraceRestore bstack, slct
-            If executeblock(Execute, bstack, ss$, Once, ok) Then
+            If executeblock(Execute, bstack, ss$, once, ok) Then
             TraceRestore bstack, nd&
             If Execute <> 1 Then
             
@@ -18509,7 +18553,7 @@ startwithgroup:
                                       If Execute = 0 Then
                                       Exit Function
                                       ElseIf Execute <> 1 And b$ <> "" Then
-                                     Once = False
+                                     once = False
                                       Exit Function
                                      End If
                                         sss = Len(b$)
@@ -18563,7 +18607,7 @@ contNext:
         
         Case "INLINE", "≈Õ»≈”«"
 ContInline:
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
         If IsLabelSymbolNew(b$, " Ÿƒ… ¡", "CODE", lang) Then
         If IsLabelDot(here$, b$, sw$) = 1 Then
                 If GetSub(myUcase(sw$, True), nd&) Then
@@ -18611,10 +18655,10 @@ contUpdate:
 contAfter:
                  If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
         If IsExp(bstack, b$, p) Then
         If FastSymbol(b$, "{") Then
         ss$ = block(b$) + vbCrLf & "thread this erase"
@@ -18641,11 +18685,11 @@ contAfter:
 contPart:
                  If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
 
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
         Execute = 0
         If FastSymbol(b$, "{") Then
         ss$ = block(b$)
@@ -18683,11 +18727,11 @@ ContRepeat:
                    If linebyline Then
           b$ = w$ + " " + b$
           sw$ = here$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
         here$ = sw$
          Exit Do
         End If
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
                sw$ = here$
         If FastSymbol(b$, "{") Then
         v = Len(b$)
@@ -18702,7 +18746,7 @@ ContRepeat:
                       Execute = 1
                       TraceRestore bstack, y1
                         
-           Call executeblock(Execute, bstack, ss$, Once, ok)
+           Call executeblock(Execute, bstack, ss$, once, ok)
            
            TraceRestore bstack, x1
                          If Execute = 0 Then
@@ -18746,7 +18790,7 @@ ContRepeat:
                  ss$ = ec$
                  w$ = bb$
                  
-                      Call executeblock(Execute, bstack, ss$, Once, ok)
+                      Call executeblock(Execute, bstack, ss$, once, ok)
                     
                          If Execute = 0 Then
                     b$ = Space$(v - (Len(ec$) - Len(ss$)))
@@ -18773,7 +18817,7 @@ ContRepeat:
                       Do
                  ss$ = ec$
                  
-                        Call executeblock(Execute, bstack, ss$, Once, ok)
+                        Call executeblock(Execute, bstack, ss$, once, ok)
                          If Execute = 0 Then
                     b$ = Space$(v - (Len(ec$) - Len(ss$)))
                  Execute = 0: Exit Function
@@ -18799,11 +18843,11 @@ contWhile:
                    If linebyline Then
           b$ = w$ + " " + b$
           sw$ = here$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
         here$ = sw$
          Exit Do
         End If
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
         w$ = b$
         If IsExp(bstack, b$, p) Then
         With bstack
@@ -18868,7 +18912,7 @@ contWhile:
 
                  TraceRestore bstack, y1
                  
-           If executeblock(Execute, bstack, ss$, Once, ok) Then
+           If executeblock(Execute, bstack, ss$, once, ok) Then
            here$ = sw$
               TraceRestore bstack, x1
             b$ = ss$ & b$
@@ -18927,10 +18971,10 @@ contWhile:
         End If
         Case " ¡»≈", "EVERY"
 contEvery:
-        If Once = True Then Execute = 0: Exit Function
+        If once = True Then Execute = 0: Exit Function
                    If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
         If IsExp(bstack, b$, p) Then
@@ -18957,7 +19001,7 @@ contEvery:
                  Do
                  ss$ = ec$
                ''''''''''  w$ = bb$
-                 Call executeblock(Execute, bstack, ss$, Once, ok)
+                 Call executeblock(Execute, bstack, ss$, once, ok)
                  If Execute = 0 Then   '''Execute(bstack, ss$, ok) = 0
                             If NOEXECUTION Then
                                             b$ = "START"
@@ -18999,10 +19043,10 @@ contEvery:
         End If
         Case " ’—…œ.≈—√œ", "MAIN.TASK", "TASK.MAIN"
 contTask:
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
               If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
         ' only one task main
@@ -19047,7 +19091,7 @@ contTask:
         
         Case "ELSE", "¡ÀÀ…Ÿ”"
 ContElse:
-        If Once = True Then Execute = 0: Exit Function
+        If once = True Then Execute = 0: Exit Function
         If IFCTRL = 0 Then
         SyntaxError
         Execute = 0
@@ -19064,7 +19108,7 @@ ContElse:
                 jump = False
                 Else
                 If IsNumberLabel(b$, w$) Then
-                  Once = False
+                  once = False
                 b$ = w$
                 Execute = 2
                 Exit Function
@@ -19108,10 +19152,10 @@ ContTry:
                
                
                
-               If Once = True Then Execute = 0: Exit Function
+               If once = True Then Execute = 0: Exit Function
                  If linebyline Then
           b$ = w$ + " " + b$
-        Execute = Execute(bstack, b$, Once, False)
+        Execute = Execute(bstack, b$, once, False)
         bstack.nokillvars = False
          Exit Do
         End If
@@ -19131,10 +19175,10 @@ ContTry:
          
          b$ = NLtrim$(Mid$(b$, 2))
                 'On Error Resume Next
-                     Call executeblock(Execute, bstack, ss$, Once, ok)
+                     Call executeblock(Execute, bstack, ss$, once, ok)
           TraceRestore bstack, x1
    bstack.nokillvars = False
-         Once = False
+         once = False
          MOUT = False
          NOEXECUTION = False
          NERR = False
@@ -19157,7 +19201,7 @@ ContTry:
          Execute = 1
          ss$ = "{" & block(b$) & "}"
           b$ = NLtrim$(Mid$(b$, 2))
-                     Call executeblock(Execute, bstack, ss$, Once, ok)
+                     Call executeblock(Execute, bstack, ss$, once, ok)
      var(v) = Execute = 1
         MOUT = False
          NOEXECUTION = False
@@ -19170,7 +19214,7 @@ ContTry:
         Execute = 1
          Case "ELSE.IF", "¡ÀÀ…Ÿ”.¡Õ"
 contElseIf:
-        If Once = True Then Execute = 0: Exit Function
+        If once = True Then Execute = 0: Exit Function
         If IFCTRL = 0 Then
         SyntaxError
         Else
@@ -19198,7 +19242,7 @@ contElseIf:
             Select Case w$
                 Case "THEN", "‘œ‘≈"
                 'If VarStat Or NewStat Then GoTo errstat
-                       If Once = True Then Execute = 0: Exit Function
+                       If once = True Then Execute = 0: Exit Function
                              If jump Then
                     If FastSymbol(b$, "{") Then
                     w$ = block(b$)
@@ -19214,7 +19258,7 @@ contElseIf:
                 
                Case "ELSE", "¡ÀÀ…Ÿ”"
               ' If VarStat Or NewStat Then GoTo errstat
-                      If Once = True Then Execute = 0: Exit Function
+                      If once = True Then Execute = 0: Exit Function
                    '  IFCTRL = 1
                 If Not jump Then      ' JUMP FALSE SKIP ELSE
                 If FastSymbol(b$, "{") Then
@@ -19230,7 +19274,7 @@ contElseIf:
                             Case "ELSE.IF", "¡ÀÀ…Ÿ”.¡Õ"
                             
                           
-                                   If Once = True Then Execute = 0: Exit Function
+                                   If once = True Then Execute = 0: Exit Function
                    '  IFCTRL = 1
                 b$ = w$ & b$
                      
@@ -19264,12 +19308,12 @@ contif:
               
                 If jump Then
                     If FastSymbol(b$, "{") Then
-                     If Once = True Then Execute = 0: Exit Function
+                     If once = True Then Execute = 0: Exit Function
                     w$ = block(b$)
                     b$ = NLtrim$(Mid$(b$, 2))
                     
                     Else
-                    If Once Then
+                    If once Then
                     w$ = GetStrUntil(vbCrLf, b$, False)
                     Exit Function
                     Else
@@ -19284,7 +19328,7 @@ If MaybeIsSymbol(b$, "0123456789") Then
 GoTo ContGoto
 End If
                     IFCTRL = 2 ' NONEED ANYTHING BUT NOT ERROR FOR IF.ELSE AND ELSE
-                    If Once Then
+                    If once Then
                     sss = Len(b$): GoTo AGAIN1
            
                     End If
@@ -19296,7 +19340,7 @@ End If
                    '  IFCTRL = 1
                 If Not jump Then      ' JUMP FALSE SKIP ELSE
                 If FastSymbol(b$, "{") Then
-                 If Once = True Then Execute = 0: Exit Function
+                 If once = True Then Execute = 0: Exit Function
                 w$ = block(b$)
                 b$ = NLtrim$(Mid$(b$, 2))
                 Else
@@ -19336,7 +19380,7 @@ End If
         sss = Len(b$)
         Case "SELECT", "≈–≈À≈Œ≈", "≈–…À≈Œ≈"  '*************************************** SELECT CASE
 contSelect:
-         If Once = True Then Execute = 0: Exit Function
+         If once = True Then Execute = 0: Exit Function
         x1 = 0 ' mode numbers using p, sp and st
                 ' x1=2 using sw$ w$ ss$
                 Us$ = ""
@@ -19416,11 +19460,11 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
                                                                         Execute = i
-                                                                         Once = True
+                                                                         once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19482,11 +19526,11 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
                                                                         Execute = i
-                                                                         Once = True
+                                                                         once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19549,11 +19593,11 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
                                                                             Execute = i
-                                                                            Once = True
+                                                                            once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19625,11 +19669,11 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
                                                                             Execute = i
-                                                                            Once = True
+                                                                            once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19665,10 +19709,10 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
-                                                                            Once = True
+                                                                            once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19694,11 +19738,11 @@ contSelect:
                                                                             slct = -1
                                                                           ElseIf b$ <> "" Then
                                                                             Execute = 2
-                                                                            Once = False
+                                                                            once = False
                                                                              Exit Function
                                                                           Else
                                                                           Execute = i
-                                                                            Once = True
+                                                                            once = True
                                                                             Exit Function
                                                                         End If
                                                             ElseIf i = 3 Then
@@ -19760,7 +19804,7 @@ ContOn:
                 SetNextLine b$
                 If Execute <> 2 Then Execute = 1 Else Execute = 3
             b$ = ""
-           Once = True
+           once = True
            Exit Function
           '' SetNextLine B$
                 '' sss = Len(B$)
@@ -19846,10 +19890,10 @@ End If
           
         Case "SUB", "—œ’‘…Õ¡"
 contSub:
-           If Once = True Then Execute = 0: Exit Function
+           If once = True Then Execute = 0: Exit Function
    If Execute <> 2 Then
               b$ = w$
-           Once = True
+           once = True
            Execute = 3
          
            Else
@@ -19883,7 +19927,7 @@ End If
         i = Abs(IsLabelOnly(b$, w$))
 contHereFromOn:
                 If i = 5 Then
-                Once = False
+                once = False
                 
                 PushParamGeneral bstack, b$
                 If FastSymbol(b$, ")") Then
@@ -19907,7 +19951,7 @@ contHereFromOn:
                 Exit Function
                 End If
                 ElseIf i = 1 Then
-                Once = False
+                once = False
         
                 PushStage bstack, True
                 bstack.RetStack.PushVal Len(b$)
@@ -19920,7 +19964,7 @@ contHereFromOn:
                 
                 If IsNumberLabel(b$, w$) Then
 contHere2FromOn:
-                      Once = False
+                      once = False
                               PushStage bstack, True  ' CORRECT FROM REV 45 - VER 8
                       bstack.RetStack.PushVal Len(b$)
                      bstack.RetStack.PushStr "* " + w$
@@ -19951,13 +19995,13 @@ ContGoto:
 
                 If i = 1 Then
                 
-                Once = False
+                once = False
                 b$ = w$
                 Execute = 2
                 Exit Function
                 ElseIf i = 0 Then
                 If IsNumberLabel(b$, w$) Then
-                      Once = False
+                      once = False
                 b$ = w$
                 Execute = 2
                 Exit Function
@@ -20954,7 +20998,7 @@ If MaybeIsSymbol(b$, "=-+*/<~") Then
                         End If
                          var(v).UseIndex = True
                         End If
-                        var(v).Value = Int(p)
+                        var(v).Value = MyRound(p)
                 ElseIf Not bstack.lastobj Is Nothing Then
                         If TypeOf bstack.lastobj Is lambda Then
                             If Typename(var(v)) = "lambda" Then
@@ -20975,7 +21019,7 @@ If MaybeIsSymbol(b$, "=-+*/<~") Then
                                     Execute = 0
                                     Exit Function
                 Else
-                     var(v) = Int(p)
+                     var(v) = MyRound(p)
                 End If
  
                 If Err.Number = 6 Then Execute = 0: Exit Do
@@ -20983,7 +21027,7 @@ If MaybeIsSymbol(b$, "=-+*/<~") Then
                 End If
             ElseIf Not bstack.StaticCollection Is Nothing Then
             If bstack.ExistVar(w$) Then
-            If IsExp(bstack, b$, p) Then bstack.SetVar w$, Int(p) Else GoTo aproblem1
+            If IsExp(bstack, b$, p) Then bstack.SetVar w$, MyRound(p) Else GoTo aproblem1
             
             ElseIf IsExp(bstack, b$, p) Then
             GoTo abc2345
@@ -21012,7 +21056,7 @@ abc2345:
                             Exit Function
                                 End If
            Else
-            p = Int(p)
+            p = MyRound(p)
             
             GlobalVar w$, p, , VarStat, temphere$
     End If
@@ -21060,16 +21104,16 @@ again1234567:
                                 On Error Resume Next
                                 Select Case ss$
                                 Case "=", "g"
-                                    var(v) = Int(p)
+                                    var(v) = MyRound(p)
                                 Case "+"
-                                    var(v) = Int(p) + var(v)
+                                    var(v) = MyRound(p) + var(v)
                                 Case "*"
-                                    var(v) = Int(Int(p) * var(v))
+                                    var(v) = MyRound(MyRound(p) * var(v))
                                 Case "-"
-                                    var(v) = var(v) - Int(p)
+                                    var(v) = var(v) - MyRound(p)
                                 Case "/"
-                                    If p = 0 Then Execute = 0: Exit Do
-                                    var(v) = Int(var(v) / Int(p))
+                                    If MyRound(p) = 0 Then Execute = 0: Exit Do
+                                    var(v) = MyRound(var(v) / MyRound(p))
                                     
          
                    
@@ -21813,19 +21857,19 @@ ElseIf IsOperator0(b$, "--", 2) Then
 .item(v) = .itemnumeric(v) - 1
 ElseIf FastSymbol(b$, "+=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-.item(v) = .itemnumeric(v) + Int(p)
+.item(v) = .itemnumeric(v) + MyRound(p)
 ElseIf FastSymbol(b$, "-=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-.item(v) = .itemnumeric(v) - Int(p)
+.item(v) = .itemnumeric(v) - MyRound(p)
 ElseIf FastSymbol(b$, "*=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-.item(v) = .itemnumeric(v) * Int(p)
+.item(v) = .itemnumeric(v) * MyRound(p)
 ElseIf FastSymbol(b$, "/=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-If Int(p) = 0 Then
+If MyRound(p) = 0 Then
  DevZero
  Else
- .item(v) = Int(.itemnumeric(v) / Int(p))
+ .item(v) = MyRound(.itemnumeric(v) / MyRound(p))
 End If
 ElseIf IsOperator0(b$, "-!", 2) Then
 .item(v) = -.itemnumeric(v)
@@ -21855,7 +21899,7 @@ If Not bstack.lastobj Is Nothing Then
                                   If TypeOf bstack.lastobj Is Group Then Set pppp.item(v).LinkRef = myobject
                           End If
 Else
-p = Int(p)
+p = MyRound(p)
 If Err.Number > 0 Then Execute = 0: Exit Function
 pppp.item(v) = p
 Do While FastSymbol(b$, ",")
@@ -21891,7 +21935,7 @@ Exit Function
 End If
 End Select
 loopcontinue:
-If Once And Not jump Then Exit Do
+If once And Not jump Then Exit Do
 loopagain:
 If linebyline Then Exit Do
 Loop
@@ -22235,16 +22279,15 @@ End If
 End Function
 Sub stackshow(b As basetask)
 Dim p As Double, r$, AL$, s$, dl$, dl2$  ', X As Index
-Static Once As Boolean, ok As Boolean
-If Once Then Exit Sub
-Once = True
+Static once As Boolean, ok As Boolean
+If once Then Exit Sub
+once = True
 If TestShowCode Then
 With Form2.testpad
 .enabled = True
 .SelectionColor = rgb(255, 64, 128)
 .nowrap = True
 .Text = TestShowSub
-.mDoc.WrapAgainColor
 
 If AscW(Form2.Label1(1)) = 8191 Then
 .SelStartSilent = TestShowStart - 1 ''Len(Mid$(Form2.Label1(1), 7)) - 1
@@ -22272,7 +22315,7 @@ End If
 'MyDoEvents
 End With
 
-Once = False
+once = False
 Exit Sub
 Else
 Form2.testpad.nowrap = False
@@ -22382,7 +22425,7 @@ With Form2
         .testpad.SetRowColumn 1, 1
         .testpad.enabled = False
 End With
-Once = False
+once = False
 End Sub
 Function RepPara(basestack As basetask, rest$) As Boolean
 Dim x1 As Long, y1 As Long, i As Long, j As Long
@@ -23572,7 +23615,7 @@ End If
 ohere$ = ""
  If Right$(name$, 1) = "%" Then
                 On Error Resume Next
-                q = Int(q)
+                q = MyRound(q)
                 If Err.Number = 6 Then q = 0
                 On Error GoTo 0
             End If
@@ -23587,7 +23630,7 @@ End If
 j = AllocVar()
             If Right$(name$, 1) = "%" Then
                 On Error Resume Next
-                q = Int(q)
+                q = MyRound(q)
                 If Err.Number = 6 Then q = 0
                 On Error GoTo 0
             End If
@@ -25881,7 +25924,7 @@ Dim ppp$
     If TypeOf PP.GroupRef Is mHandler Then
         If PP.GroupRef.t1 <> 1 Then
             If IsExp(bstack, rst$, p) Then
-                p = Int(p)
+                p = MyRound(p)
                 If PP.GroupRef.indirect >= 0 Then
                     If Typename(var(PP.GroupRef.indirect)) = "mArray" Then Exit Function
                         If p >= 0 Or p < var(PP.GroupRef.indirect).objref.items Then
@@ -25899,7 +25942,7 @@ Dim ppp$
             If IsExp(bstack, rst$, p) Then
                 With PP.GroupRef.objref
                     If Not FastSymbol(rst$, "!") Then ppp$ = CStr(p): GoTo contlabel1
-                    p = Int(p)
+                    p = MyRound(p)
                     If Abs(p) < .Count Then
                         If p < 0 Then
                             .index = .Count + Int(p)
@@ -26315,13 +26358,13 @@ End Sub
 Public Sub TaskMasterTick()
 ' This is the TimerFunction that will be
 ' called when SetTimer times out.
-
+Static once As Boolean
+If once Then Exit Sub
   If Not TaskMaster Is Nothing Then
-     ''MasterTimer + CDbl(TaskMaster.Interval)
-    '' CDbl(timeGetTime)
+
     If Abs(MasterTimer - CDbl(timeGetTime)) > 50 Then
-  If Not extreme Then Sleep 1: MyDoEvents1 Form1
-    MasterTimer = CDbl(timeGetTime)
+        If Not extreme Then once = True: DoEvents: once = False
+        MasterTimer = CDbl(timeGetTime)
     End If
    ' Form1.Caption = MasterTimer
     TaskMaster.TimerTick
@@ -26810,7 +26853,7 @@ SleepWaitEdit 1
 TaskMaster.RestEnd
 Exit Sub
 procbliah:
-DoEvents
+ DoEvents
 Sleep 1
 End Sub
 Sub ProcTask2(bstack As basetask)
@@ -28180,102 +28223,39 @@ againgroup:
         End If
     Else
         ss$ = ""
-        If MaybeIsSymbol(rest$, "=-+*/<!") Then
-            If FastSymbol(rest$, "+=") Then
-                ss$ = "+"
-            ElseIf FastSymbol(rest$, "/=", , 2) Then
-                ss$ = "/"
-            ElseIf FastSymbol(rest$, "-=", , 2) Then
-                ss$ = "-"
-            ElseIf FastSymbol(rest$, "*=", , 2) Then
-                ss$ = "*"
-            ElseIf IsOperator0(rest$, "++", 2) Then
-                ss$ = "++"
-            ElseIf IsOperator0(rest$, "--", 2) Then
-                ss$ = "--"
-            ElseIf IsOperator0(rest$, "-!", 2) Then
-                ss$ = "-!"
-            ElseIf IsOperator0(rest$, "~") Then
-                ss$ = "!"
-            ElseIf FastSymbol(rest$, "<=", , 2) Then
-                ss$ = "="
-            End If
-        End If
-        If Len(ss$) > 0 Then
-            If GetVar(bstack, w$, v) Then
-                If Len(ss$) = 1 Then
-                    If IsExp(stripstack1, rest$, p) Then
-                        On Error Resume Next
-                        If VarType(var(v)) = vbLong Then
-                            Select Case ss$
-                                Case "="
-                                    var(v) = CLng(p)
-                                Case "+"
-                                    var(v) = CLng(p) + var(v)
-                                Case "*"
-                                    var(v) = CLng(p) * var(v)
-                                Case "-"
-                                    var(v) = var(v) - CLng(p)
-                                Case "/"
-                                    If p = 0 Then
-                                        ExecuteVarOnly = 0
-                                        Exit Do
-                                    End If
-                                    var(v) = var(v) \ CLng(p)
-                                Case "!"
-                                    var(v) = -1 - (var(v) <> 0)
-                            End Select
+        i = MyTrimL(rest$)
+                If InStr("/*-+=~^&|<>", Mid$(rest$, i, 1)) > 0 Then
+                    If InStr("/*-+=~^&|<>!", Mid$(rest$, i + 1, 1)) > 0 Then
+                        ss$ = Mid$(rest$, i, 2)
+                        If ss$ = "=&" Then
+                        ss$ = "="
+                        Mid$(rest$, i, 1) = " "
                         Else
-                            Select Case ss$
-                                Case "="
-                                    var(v) = p
-                                Case "+"
-                                    var(v) = p + var(v)
-                                Case "*"
-                                    var(v) = p * var(v)
-                                Case "-"
-                                    var(v) = var(v) - p
-                                Case "/"
-                                    If p = 0 Then
-                                        ExecuteVarOnly = 0
-                                        Exit Function
-                                    End If
-                                    var(v) = var(v) / p
-                                Case "!"
-                                    var(v) = -1 - (var(v) <> 0)
-                            End Select
+                        Mid$(rest$, i, 2) = "  "
                         End If
-                        If Err.Number = 6 Then
-                            ExecuteVarOnly = 0
-                            Exit Function   'why ?
-                        End If
-                        On Error GoTo 0
                     Else
-                        If LastErNum <> -2 Then NoValueForVar w$
-                            ExecuteVarOnly = 0
-                            Exit Function
-                        End If
+                        ss$ = Mid$(rest$, i, 1)
+                        Mid$(rest$, i, 1) = " "
                     End If
-                Else
-                    If ss$ = "++" Then
-                        var(v) = 1 + var(v)
-                    ElseIf ss$ = "--" Then
-                        var(v) = var(v) - 1
-                    Else
-                        var(v) = -var(v)
-                    End If
+                If ss$ <> "" Then
+                    NoThatOperator ss$
+                    ExecuteVarOnly = 0
+                    Exit Function
                 End If
-         '   Else
-         '  we can make variable without a value to assign to it.
-            End If
+                Else
+                    
+                End If
     End If
+    GoTo continuehere
 Case 2
     rest$ = w$ & rest$: Exit Function
 Case 3
         ss$ = ""
          If MaybeIsSymbol(rest$, "=<") Then
             If FastSymbol(rest$, "<=", , 2) Then
-                ss$ = "g"  'global
+                    NoThatOperator "<="
+                    ExecuteVarOnly = 0
+                    Exit Function
             ElseIf FastSymbol(rest$, "=") Then
             ss$ = "="
             End If
@@ -28370,40 +28350,52 @@ againgroupstr:
             End If
             End If
             End If
-        Else    ' g
-          If GetVar(bstack, w$, v) Then
-          
-               If IsStrExp(stripstack1, rest$, ss$) Then
-
-               CheckVar var(v), ss$
-
-               Else
-               NoValueForVar w$
-               End If
-            Else
-            Nosuchvariable w$
-          End If
     End If
 Else
 ' NO VALUE IS OK
 If Not GetlocalVar(w$, v) Then
                 v = GlobalVar(w$, ss$)
-                ''GetlocalVar W$, v
                 var(v) = ""
 
             End If
 End If
 Case 4
+    p = 0
 If glob Then
- v = GlobalVar(w$, p, , True)
+     v = GlobalVar(w$, p, , True)
 ElseIf here$ = "" Then
 If Not GetVar(bstack, w$, v) Then v = GlobalVar(w$, p) '': GetVar bstack, W$, v
 Else
 If Not GetlocalVar(w$, v) Then v = GlobalVar(w$, p) '': GetlocalVar W$, v
 End If
-        If FastSymbol(rest$, "=") Then
+ss$ = ""
+        i = MyTrimL(rest$)
+                If InStr("/*-+=~^&|<>", Mid$(rest$, i, 1)) > 0 Then
+                    If InStr("/*-+=~^&|<>!", Mid$(rest$, i + 1, 1)) > 0 Then
+                        ss$ = Mid$(rest$, i, 2)
+                        If ss$ = "=&" Then
+                        ss$ = "="
+                        Mid$(rest$, i, 1) = " "
+                        Else
+                        Mid$(rest$, i, 2) = "  "
+                        End If
+                    Else
+                        ss$ = Mid$(rest$, i, 1)
+                        Mid$(rest$, i, 1) = " "
+                    End If
+                If ss$ <> "=" And ss$ <> "" Then
+                    NoThatOperator ss$
+                    ExecuteVarOnly = 0
+                    Exit Function
+                End If
+                Else
+                    
+                End If
+
+
+            If ss$ = "=" Then
                 If IsExp(stripstack1, rest$, p) Then
-                 var(v) = Int(p)
+                 var(v) = MyRound(p)
                 If Err.Number = 6 Then ExecuteVarOnly = 0:   Exit Function
 
                 Else
@@ -28413,69 +28405,8 @@ End If
 
             
             End If
-Else
-    If FastSymbol(rest$, "+=", , 2) Then
-    ss$ = "+"
-    ElseIf FastSymbol(rest$, "/=", , 2) Then
-    ss$ = "/"
-    ElseIf FastSymbol(rest$, "-=", , 2) Then
-    ss$ = "-"
-    ElseIf FastSymbol(rest$, "*=", , 2) Then
-    ss$ = "*"
-    ElseIf IsOperator0(rest$, "++", 2) Then
-    ss$ = "++"
-    ElseIf IsOperator0(rest$, "--", 2) Then
-    ss$ = "--"
-    ElseIf IsOperator0(rest$, "-!", 2) Then
-    ss$ = "-!"
-                ElseIf IsOperator0(rest$, "~") Then
-            ss$ = "!"
-    ElseIf FastSymbol(rest$, "<=", , 2) Then
-    ss$ = "="
-    End If
-    If ss$ = "" Then
-              GoTo continuehere
-                 
-    End If
-    If GetVar(bstack, w$, v) Then
-        If Len(ss$) = 1 Then
-                    If IsExp(stripstack1, rest$, p) Then
-                            On Error Resume Next
-                            Select Case ss$
-                            Case "="
-                            var(v) = Int(p)
-                            Case "+"
-                                var(v) = Int(p) + var(v)
-                                Case "*"
-                                 var(v) = Int(Int(p) * var(v))
-                                Case "-"
-                                var(v) = var(v) - Int(p)
-                                Case "/"
-                                     If p = 0 Then
-                                ExecuteVarOnly = 0:   Exit Function
-                                End If
-                                 var(v) = var(v) \ Int(p)
-                                                     Case "!"
-                                 var(v) = -1 - (var(v) <> 0)
-                            End Select
-                            If Err.Number = 6 Then ExecuteVarOnly = 0:   Exit Function
-                                On Error GoTo 0
-                    Else
-                                ExecuteVarOnly = 0:   Exit Function
-                    End If
-        Else
-        If ss$ = "++" Then
-          var(v) = 1 + var(v)
-          ElseIf ss$ = "--" Then
-          var(v) = var(v) - 1
-          Else
-          var(v) = -var(v)
-          End If
-        End If
-    Else
-            ExecuteVarOnly = 0:   Exit Function
-    End If
 End If
+GoTo continuehere
 Case 5
     If neoGetArray(stripstack1, w$, pppp, , glob) Then
         If Not NeoGetArrayItem(pppp, stripstack1, w$, v, rest$) Then ExecuteVarOnly = 0:  Exit Function
@@ -28506,8 +28437,9 @@ Case 5
         MyEr "Can't find array " & w$ & ")", "ƒÂÌ ‚ÒﬂÛÍ˘ ﬂÌ·Í· " & w$ & ")"
         ExecuteVarOnly = 0:   Exit Function
     End If
+GoTo continuehere
 Case 6
-If neoGetArray(stripstack1, w$, pppp) Then
+If neoGetArray(stripstack1, w$, pppp, , glob) Then
 If Not NeoGetArrayItem(pppp, stripstack1, w$, v, rest$) Then ExecuteVarOnly = 0:   Exit Function
 On Error Resume Next
 
@@ -28581,19 +28513,19 @@ Else
 ExecuteVarOnly = 0:   Exit Function
 End If
 Case 7
-If neoGetArray(bstack, w$, pppp) Then
+If neoGetArray(stripstack1, w$, pppp, , glob) Then
 If Not NeoGetArrayItem(pppp, stripstack1, w$, v, rest$) Then ExecuteVarOnly = 0:   Exit Function
 On Error Resume Next
 If Not FastSymbol(rest$, "=") Then ExecuteVarOnly = 0: Exit Function
 If Not IsExp(stripstack1, rest$, p) Then ExecuteVarOnly = 0: Exit Function
-p = Int(p)
+p = MyRound(p)
 If Err.Number > 0 Then ExecuteVarOnly = 0: Exit Function
 pppp.item(v) = p
 Do While FastSymbol(rest$, ",")
 If pppp.UpperMonoLimit > v Then
 v = v + 1
 If Not IsExp(stripstack1, rest$, p) Then ExecuteVarOnly = 0: Exit Function
-pppp.item(v) = p
+pppp.item(v) = MyRound(p)
 Else
 Exit Do
 End If
@@ -28601,6 +28533,7 @@ Loop
 Else
 ExecuteVarOnly = 0: Exit Function
 End If
+GoTo continuehere
 Case Else
 
 If MaybeIsSymbol(rest$, ",-+*/_!@()[];<>|~`") Then
@@ -28699,7 +28632,7 @@ For k = 1 To Up
                     If Not bstack.IsInStackLong(ii) Then Exit For
                     final(k - 1) = ii
                     Else
-                    final(k - 1) = Int(p)
+                    final(k - 1) = MyRound(p)
                     End If
                 Case Else
                     If Not bstack.IsInStackString(s$) Then Exit For
@@ -31751,7 +31684,7 @@ If FastSymbol(rest$, ",") Then
     If IsExp(basestack, rest$, p) Then
     If Not basestack.toprinter Then
     If p < 0 Then p = .My + p
-        .mysplit = Int(p)
+        .mysplit = MyRound(p)
         If .mysplit >= .My Then .mysplit = 0: .pageframe = 0
         .pageframe = Int((.My - .mysplit) * 2 / 3)
 
@@ -32324,7 +32257,7 @@ ProcField = True
         If Not IsExp(bstack, rest$, y) Then y = .currow
         If FastSymbol(rest$, ",") Then
         If Not IsExp(bstack, rest$, p) Then Exit Function
-        p = Int(p)
+        p = MyRound(p)
         End If
         If Not IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then Exit Function
         Select Case Abs(IsLabel(bstack, rest$, what$))
@@ -33321,7 +33254,7 @@ End With
 
 End Function
 
-Function executeblock(Exec As Long, bstack As basetask, b$, Once As Boolean, kolpo As Boolean, Optional stepbystep As Boolean = False) As Boolean
+Function executeblock(Exec As Long, bstack As basetask, b$, once As Boolean, kolpo As Boolean, Optional stepbystep As Boolean = False) As Boolean
 executeblock = True
 'bstack.LastComm = ""
 Dim i As Long, ec$, ec1$, LL As Long, oldLL As Long, bb$, p As Double, x2 As Long, y2 As Long, monce As Long, W3 As Long, removebracket As Boolean
@@ -33331,7 +33264,7 @@ If Exec = 0 Then Exec = 1
 oldexec = Exec
 myLevel = bstack.SubLevel
 i = 1
-monce = Once
+monce = once
 If FastSymbol(b$, "}") Then ''MyDoEvents
 executeblock = False
  If myexit(bstack) Then Exec = 1 Else Exec = Abs(NOEXECUTION = False) * oldexec
@@ -33360,7 +33293,7 @@ ec1$ = ""
                 bb$ = Mid$(ec$, i)
 fromfirst0:
         
-                kolpo = Once: Once = False
+                kolpo = once: once = False
                 bstack.addlen = LL
               '  WaitShow = 0 ' for trace
                 W3 = Execute(bstack, bb$, kolpo, stepbystep, loopthis)
@@ -33402,7 +33335,7 @@ ALFA12:
                         Exec = oldexec ''1
                         If kolpo And monce And Exec = 1 Then
                                 b$ = bb$
-                                Once = True
+                                once = True
                                 Exit Function
                         ElseIf kolpo And NocharsInLine(bb$) Then
                                 ' exit
@@ -33412,7 +33345,7 @@ ALFA12:
                         If removebracket Then
                                 b$ = Right$(b$, Len(b$) - Len(ec$))
                                 If IsSymbol(b$, "}") Then Exec = oldexec: Exit Do
-                                If Once Then Exit Do
+                                If once Then Exit Do
                         ElseIf NocharsInLine(bb$) And kolpo Then
                                 b$ = ""
                         Else
@@ -33429,7 +33362,7 @@ ALFA12:
                         If bb$ = "BREAK" Then
                                 Exec = 2
                                 b$ = ""
-                                Once = True
+                                once = True
                                 kolpo = True
                                 Exit Function
                         End If
@@ -33648,7 +33581,7 @@ subsub02:
                                         i = 1
                                 End If
                         Else
-                               Once = kolpo
+                               once = kolpo
                                Exec = 2: b$ = bb$: Exit Function
                         End If
 
@@ -33674,7 +33607,7 @@ subsub02:
                         End If
                         If IsSymbol(b$, "}") Then
                                 Exec = 1: Exit Do
-                                If Once Then Exit Do
+                                If once Then Exit Do
                         Else
                                 b$ = Right$(b$, Len(b$) - Len(bb$))
                         End If
@@ -33798,7 +33731,7 @@ againhere:
                                                     ' no copy of objects...only pointers...to objects
                                                     
                                                     If IsExp(bstack, b$, p) Then
-                                                            If p <> Int(p) Or p < 0 Then
+                                                            If p <> MyRound(p) Or p < 0 Then
                                                                         MyEr "Invalid index", "ÃÁ ›„ÍıÒÔÚ ‰ÂﬂÍÙÁÚ"
                                                                         Exit Function
                                                             End If
@@ -33899,7 +33832,7 @@ againhere:
                                                     ElseIf IsLabelSymbolNew(b$, "»≈”≈", "SWEEP", lang) Then
                                                     If what$ = "" Then Exit Function   ' no for no named array
                                                             If IsExp(bstack, b$, p) Then
-                                                                            If p <> Int(p) Or p < 0 Then
+                                                                            If p <> MyRound(p) Or p < 0 Then
                                                                                    MyEr "Invalid index", "ÃÁ ›„ÍıÒÔÚ ‰ÂﬂÍÙÁÚ"
                                                                                    Exit Function
                                                                             End If
@@ -35169,7 +35102,9 @@ If a.enabled Then
             End If
             End If
             If F1$ <> "" Then f$ = myUcase(F1$ + "." + f$ + ")", True) Else f$ = myUcase(f$ + ")", True)
-            If Not GetSub(f$, klm) Then PopStage bstack: CallEventFromGuiOne = False: GoTo conthere
+            If Not GetSub(f$, klm) Then
+            PopStage bstack: CallEventFromGuiOne = False: GoTo conthere
+            End If
             s1$ = sbf(klm).sb
             If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
@@ -36656,7 +36591,7 @@ comehere:
            MissNumExpr
         Exit Function
     Else
-    p = Int(p)
+    p = MyRound(p)
     If p * offset1 + offset > &H1FFFFFFF Then  ' half gigabyte for struct (is very big too)
         MyEr "Too big number for struct", "ÃÂ„‹ÎÔ ÌÔ˝ÏÂÒÔ „È· ‰ÔÏﬁ"
         Exit Function
@@ -38134,13 +38069,13 @@ Case 4
     If bs.IsNumber(p) Then
         MyRead = True
         If flag2 Then
-            GlobalVar what$, Int(p)
+            GlobalVar what$, MyRound(p)
         ElseIf GetVar(bstack, what$, i, , , flag) Then
-            var(i) = Int(p)
+            var(i) = MyRound(p)
         ElseIf i = -1 Then
             bstack.SetVar what$, p
         Else
-            GlobalVar what$, Int(p)
+            GlobalVar what$, MyRound(p)
         End If
     ElseIf bs.IsOptional Then
         MyRead = True
@@ -38152,7 +38087,7 @@ Case 4
         ElseIf i = -1 Then
             
         Else
-            GlobalVar what$, Int(p)
+            GlobalVar what$, MyRound(p)
         End If
     Else
         MissStackNumber
@@ -38269,7 +38204,7 @@ Case 7
             Exit Do
         End If
         MyRead = True
-        pppp.item(it) = Int(p)
+        pppp.item(it) = MyRound(p)
     End If
 End Select
 End If
@@ -39202,7 +39137,7 @@ If FastSymbol(rest$, "!") Then
                              If IsLabelSymbolNew(rest$, "Ã« œ”", "LEN", lang, , , , False) Then
                                      If FastSymbol(rest$, "=") Then
                                              If IsExp(bstack, rest$, p) Then
-                                                     x1 = Abs(Int(p))
+                                                     x1 = Abs(MyRound(p))
                                              Else
                                                      MissNumExpr
                                                      Exit Function
@@ -39265,7 +39200,7 @@ If y < 1 And x1 = 0 Then y = 1
                               
            
            If f = 4 Then
-                        pppp.item(it) = Int(p)
+                        pppp.item(it) = MyRound(p)
            Else
                         pppp.item(it) = p
                         End If
@@ -39286,7 +39221,7 @@ If y < 1 And x1 = 0 Then y = 1
                         If IsLabelSymbolNew(rest$, "Ã« œ”", "LEN", lang, , , , False) Then
                                 If FastSymbol(rest$, "=") Then
                                         If IsExp(bstack, rest$, p) Then
-                                            x1 = Abs(Int(p))
+                                            x1 = Abs(MyRound(p))
                                         Else
                                             MissNumExpr
                                             Exit Function
@@ -39427,12 +39362,12 @@ Do
                         If Trim(s$) <> "," And Trim(s$) <> "" Then ErrNum: MyInput = False: Exit Function
                 End If
                 If GetVar(bstack, what$, i) Then
-                        var(i) = Int(p)
+                        var(i) = MyRound(p)
                 Else
                         If i = -1 Then
-                        bstack.SetVar what$, Int(p)
+                        bstack.SetVar what$, MyRound(p)
                         Else
-                        GlobalVar what$, Int(p)
+                        GlobalVar what$, MyRound(p)
                         End If
                 End If
                  MyInput = True
@@ -39514,7 +39449,7 @@ Do
                          If Not IsNumber(bstack, s$, p) Then ErrNum: MyInput = False: Exit Function
                         If Trim(s$) <> "," And Trim(s$) <> "" Then ErrNum: MyInput = False: Exit Function
                 End If
-                pppp.item(it) = Int(p)
+                pppp.item(it) = MyRound(p)
                 MyInput = True
     End Select
     
@@ -41231,7 +41166,7 @@ Dim prive As Long, x1 As Long, s$
  ProcFont = True
 End Function
 Function ProcStack(bstack As basetask, rest$, lang As Long) As Boolean
-Dim ss$, frm$, ps As mStiva, it As Long, x As Double, s$, Once As Boolean, prive As Boolean
+Dim ss$, frm$, ps As mStiva, it As Long, x As Double, s$, once As Boolean, prive As Boolean
 Dim x1 As Long, pa$, what$, i As Long, pppp As mArray, f As Long, myobject As Object
 ProcStack = True
    If IsLabelSymbolNew(rest$, "Õ≈œ”", "NEW", lang) Then
@@ -41241,7 +41176,7 @@ frm$ = rest$
 If FastSymbol(rest$, "}") Then
 Set ps = bstack.soros
 Set bstack.Sorosref = New mStiva
-Call executeblock(it, bstack, ss$, False, Once)
+Call executeblock(it, bstack, ss$, False, once)
 Set bstack.Sorosref = ps
 Set ps = Nothing
 If it = 0 Then ProcStack = False
@@ -41425,7 +41360,7 @@ conthere:
                 If FastSymbol(rest$, "}") Then
                     Set ps = bstack.soros
                     Set bstack.Sorosref = myobject
-                    Call executeblock(it, bstack, ss$, False, Once)
+                    Call executeblock(it, bstack, ss$, False, once)
                     Set bstack.Sorosref = ps
                     Set ps = Nothing
                     If it = 0 Then ProcStack = False
@@ -43620,7 +43555,7 @@ End Function
 Function ProcJoypad(basestack As basetask, rest$) As Boolean
 Dim p As Double
         If IsExp(basestack, rest$, p) Then
-        If Not StartJoypadk(Int(p)) Then
+        If Not StartJoypadk(MyRound(p)) Then
         ' ERROR
         MyEr "Joypad " & CStr(p) & " not exist", "Á Î·‚ﬁ " & CStr(p) & " ‰ÂÌ ı‹Ò˜ÂÈ"
         
@@ -43629,7 +43564,7 @@ Dim p As Double
         While FastSymbol(rest$, ",")
         
          If IsExp(basestack, rest$, p) Then
-        If Not StartJoypadk(Int(p)) Then
+        If Not StartJoypadk(MyRound(p)) Then
         MyEr "Joypad " & CStr(p) & " not exist", "Á Î·‚ﬁ " & CStr(p) & " ‰ÂÌ ı‹Ò˜ÂÈ"
         
         Exit Function
@@ -43657,7 +43592,7 @@ Else
     Do
         If par = False Then Exit Do
         If IsExp(basestack, rest$, p) Then
-            MKEY$ = MKEY$ & ChrW$(Int(p) And &HFFFF)
+            MKEY$ = MKEY$ & ChrW$(MyRound(p) And &HFFFF)
             par = False
         ElseIf IsStrExp(basestack, rest$, s$) Then
         MKEY$ = MKEY$ & s$
@@ -43839,12 +43774,12 @@ Function ProcRecursionLimit(basestack As basetask, rest$, lang As Long) As Boole
 Dim p As Double, prive As Long
 ProcRecursionLimit = True
 If IsExp(basestack, rest$, p) Then
-deep = Abs(Int(p))
+deep = Abs(MyRound(p))
 If IsSymbol(rest$, ",") Then
-If IsExp(basestack, rest$, p) Then funcdeep = Abs(Int(p))
+If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p))
 End If
 ElseIf IsSymbol(rest$, ",") Then
-If IsExp(basestack, rest$, p) Then funcdeep = Abs(Int(p))
+If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p))
 Else
 prive = GetCode(basestack.Owner)
     If deep = 0 Then
@@ -43869,7 +43804,7 @@ prive = GetCode(basestack.Owner)
     crNew basestack, players(prive)
 End If
 If funcdeep < 128 Then funcdeep = 128
-If funcdeep > 3375 Then funcdeep = 3375
+If funcdeep > 3270 Then funcdeep = 3270
 End Function
 Function ProcSalata(entrypoint As Long, basestack As basetask, rest$) As Boolean
 Dim p As Double, scr As Object, prive As Long

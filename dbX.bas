@@ -76,7 +76,7 @@ On Error GoTo E5
 'ON ERROR GoTo 0
 If HelpLastWidth > ScrX() Then HelpLastWidth = -1
 doriginal$ = d$
-
+d$ = Replace(d$, "'", "")
 If d$ <> "" Then If Right$(d$, 1) = "(" Then d$ = d$ + ")"
 If d$ = "" Or d$ = "F12" Then
 d$ = ""
@@ -678,6 +678,7 @@ End If
 If IsStrExp(bstackstr, r$, par$) Then
     rec.FIELDS(i&) = par$
 ElseIf IsExp(bstackstr, r$, t) Then
+
     rec.FIELDS(i&) = CStr(t)   '??? convert to a standard format
 End If
 
@@ -1684,7 +1685,7 @@ Dim i As Long
 Err.Clear
 For i = conCollection.Count - 1 To 0 Step -1
 On Error Resume Next
-conCollection.Index = i
+conCollection.index = i
 If conCollection.IsObj Then
 With conCollection.ValueObj
 bb = .connectionstring <> ""

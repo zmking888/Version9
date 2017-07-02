@@ -156,7 +156,7 @@ End Sub
 Public Sub MyDoEvents0(some As Object)
    On Error GoTo procbliah3
 
-If Not TaskMaster Is Nothing Then TaskMaster.rest
+
 
             If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
             
@@ -165,8 +165,14 @@ If Not TaskMaster Is Nothing Then TaskMaster.rest
                  If some.Visible Then some.Refresh
                   End If
                   
- DoEvents
-If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
+ 
+If Not TaskMaster Is Nothing Then
+        TaskMaster.StopProcess
+         DoEvents
+         TaskMaster.StartProcess
+Else
+    DoEvents
+End If
    Exit Sub
 procbliah3:
 DoEvents
@@ -174,9 +180,15 @@ End Sub
 
 Public Sub MyDoEvents1(some As Object)
 On Error Resume Next
-
-If Not TaskMaster Is Nothing Then TaskMaster.rest
-
+If TaskMaster Is Nothing Then
+    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+            
+            If RRCOUNTER = 0 Then
+            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+            If Not some Is Nothing Then If some.Visible Then some.Refresh
+            End If
+Else
+    TaskMaster.rest
     If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
             
             If RRCOUNTER = 0 Then
@@ -186,18 +198,16 @@ If Not TaskMaster Is Nothing Then TaskMaster.rest
             Else
          If some.Visible Then some.Refresh
          End If
-        ' If TaskMaster.tickdrop < 5 Then
+        TaskMaster.StopProcess
          DoEvents
-         ' Else
-          'TaskMaster.tickdrop = 1
-          'End If
+         TaskMaster.StartProcess
                   
                   
                   End If
                   
 
- If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
-   
+TaskMaster.RestEnd
+End If
 End Sub
 Public Sub MyRefresh(some As Object)
 
@@ -250,7 +260,7 @@ Public Sub SleepWaitEdit(lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
 If Forms.Count < 3 Then
 Sleep 1
-DoEvents
+ DoEvents
 Exit Sub
 End If
 If TaskMaster Is Nothing Then
@@ -316,7 +326,13 @@ TaskMaster.rest
             
             If RRCOUNTER = 0 Then
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-     DoEvents
+          If TaskMaster Is Nothing Then
+            DoEvents
+           Else
+             TaskMaster.StopProcess
+             DoEvents
+         TaskMaster.StartProcess
+         End If
                   End If
   Loop Until lBusy = WAIT_OBJECT_0
     ' Close the handles when you are done with them.
@@ -395,7 +411,7 @@ End If
         lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
             INFINITE, QS_ALLINPUT&)
            
-                 DoEvents
+                  DoEvents
 
   Loop Until lBusy = WAIT_OBJECT_0
     ' Close the handles when you are done with them.

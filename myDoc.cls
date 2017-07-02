@@ -54,6 +54,7 @@ Private p3 As Long
 Dim mlcid As Long
 Private pos() As Long, SLen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
+Public Busy As Boolean
 Function IsLast(ByVal ParaNum As Long) As Boolean
 ' for MarkParagraphID
 IsLast = (DocParaNext(ParaNum) = 0)
@@ -420,6 +421,7 @@ Property Let textDocFast(norawtext As String)
     End If
 End Property
 Property Let textDoc(norawtext As String)
+    Busy = True
     Dim where As Long, ok
     Dim a() As String
     where = 1
@@ -436,13 +438,14 @@ Property Let textDoc(norawtext As String)
       a() = Split(norawtext, vbLf)
       For where = LBound(a()) To UBound(a())
       RaiseEvent MayQuit(ok)
-      If ok Then Exit Property
+      If ok Then Busy = False: Exit Property
       AppendParagraph a(where)
       
       Next where
     End If
     ' colorize at a second stage...(new)
 WrapAgain
+Busy = False
 End Property
 Property Let textDocColor(norawtext As String)
     Dim where As Long
@@ -671,10 +674,10 @@ cur = cur + Len(NeoData)
 End Sub
 
 Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String, Optional tabwidth As Long = 0)
-    Dim t_text As String, Once As Boolean
+    Dim t_text As String, once As Boolean
     Dim a() As String, t() As String
     Dim b$
-    Once = True
+    once = True
       a() = Split(norawtext, vbCrLf)
         norawtext = Join(a(), vbLf)
      a() = Split(norawtext + vbLf, vbLf)
@@ -715,8 +718,8 @@ Dim i As Long, k As Long, j As Long, ii As Long
     End If
     Exit Do
     End If
-    If Once Then
-    Once = False
+    If once Then
+    once = False
         b$ = TextParagraph(ParaNum)
         If fromPos = 1 Then
           ReWritePara ParaNum, t_text, True
@@ -1466,48 +1469,39 @@ Sub GoTopLineNextParagraph(lineno As Long, thistext As String, ParaNum As Long)
     End If
 End Sub
 Public Sub WrapAgain()
+Busy = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
+      If ok Then Busy = False: Exit Sub
 mycur = DocParaNext(mycur)
 Loop
-
+Busy = False
 End Sub
 Public Sub WrapAgainBlock(startblock As Long, endblock As Long)
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
+      If ok Then Busy = False: Exit Sub
  If mycur = endblock Then Exit Do
  mycur = DocParaNext(mycur)
 Loop
+Busy = False
 End Sub
 
-Public Sub WrapAgainColor()
-Exit Sub
-Dim mycur As Long, ok
-mycur = DocParaNext(0)
-
-Do While mycur <> 0
-      RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
-
-ColorThis mycur
-Loop
-
-End Sub
 Public Sub WrapAgainColor2()
+Busy = False = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
+      If ok Then Busy = False: Exit Sub
 If para(mycur).colordata(0) = Empty Then
 ColorThis mycur
 Else
@@ -1515,10 +1509,11 @@ mycur = DocParaNext(mycur)
 End If
 
 Loop
-
+Busy = False
 End Sub
 
 Public Sub WrapAgainColorBlock(startblock As Long, endblock As Long)
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1526,15 +1521,17 @@ ColorThis mycur
 Else
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
+      If ok Then Busy = False: Exit Sub
 ColorThis mycur
 If mycur = endblock Then Exit Do
 Loop
 
 If mycur = endblock Then ColorThis mycur
 End If
+Busy = False
 End Sub
 Public Sub WrapAgainColorBlock2(startblock As Long, endblock As Long)
+Busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1553,6 +1550,7 @@ Loop
 
 If mycur = endblock Then ColorThis mycur
 End If
+Busy = False
 End Sub
 Private Sub Class_Initialize()
 ' from this version paramax= docmax
@@ -2010,6 +2008,7 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
 
 End Function
 Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long)
+Busy = True
 Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
 nobom = 1
@@ -2095,6 +2094,7 @@ utf8cont:
     
     
 ErrHandler:
+Busy = False
 If FNr Then Close FNr
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
@@ -2172,11 +2172,12 @@ pos = -2
 End Function
 
 Public Sub CompactLines(Optional addtimes As Boolean = True)
+Busy = True
 Dim mycur As Long, nextCur As Long, s$, many As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Exit Sub
+      If ok Then Busy = False: Exit Sub
 many = 1
 s$ = TextParagraph(mycur)
 nextCur = DocParaNext(mycur)
@@ -2192,7 +2193,7 @@ Loop
 If addtimes Then TextParagraph(mycur) = TextParagraph(mycur) & " - " & CStr(many)
 mycur = nextCur
 Loop
-
+Busy = False
 End Sub
 Public Function UniqueWords(Optional uLCID As Long = -1, Optional nowrap As Boolean = True) As Long
 If uLCID = -1 Then uLCID = mlcid

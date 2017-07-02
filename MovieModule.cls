@@ -334,7 +334,7 @@ End Function
 Public Function openMovie()
 
     'Open a m"+cstr(myID)+" in the default window style(Popup)
-    Dim A As Long, LASTF As String
+    Dim a As Long, LASTF As String
     LASTF = """" & FileName & """"
   '  error = mciSendString("close all", 0, 0, 0)
     'Decide which way you want the mci device to work below
@@ -416,15 +416,15 @@ End Function
 Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As Long, wHeight As Long)
     'Returns the size parameters of the m"+cstr(myID)+"
     On Error Resume Next
-    Dim A As String
+    Dim a As String
     Dim b As String
     Dim c As String
     Dim f As String
     Dim g As String
-    A = getCurrentSize
-    b = InStr(1, A, " ")
-    c = InStr(b + 1, A, " ")
-    f = Mid(A, c + 1)
+    a = getCurrentSize
+    b = InStr(1, a, " ")
+    c = InStr(b + 1, a, " ")
+    f = Mid(a, c + 1)
     g = InStr(1, f, " ")
     wWidth = val(Left(f, g)) 'width
     wHeight = val(Mid(f, g)) 'height
@@ -432,15 +432,15 @@ End Function
 Public Function MovieHeight() As Long
     'Returns the size parameters of the m"+cstr(myID)+"
     On Error Resume Next
-    Dim A As String
+    Dim a As String
     Dim b As String
     Dim c As String
     Dim f As String
     Dim g As String
-    A = getCurrentSize
-    b = InStr(1, A, " ")
-    c = InStr(b + 1, A, " ")
-    f = Mid(A, c + 1)
+    a = getCurrentSize
+    b = InStr(1, a, " ")
+    c = InStr(b + 1, a, " ")
+    f = Mid(a, c + 1)
     g = InStr(1, f, " ")
        MovieHeight = val(Mid(f, g)) 'height
 End Function
@@ -448,15 +448,15 @@ Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     'Returns the default size of the m"+cstr(myID)+" even if the size
     'of the m"+cstr(myID)+" has been changed
     On Error Resume Next
-    Dim A As String
+    Dim a As String
     Dim b As String
     Dim c As String
     Dim f As String
     Dim g As String
-    A = getDefaultSize
-    b = InStr(1, A, " ") '2
-    c = InStr(b + 1, A, " ") '4
-    f = Mid(A, c + 1) '9
+    a = getDefaultSize
+    b = InStr(1, a, " ") '2
+    c = InStr(b + 1, a, " ") '4
+    f = Mid(a, c + 1) '9
     g = InStr(1, f, " ")
     wWidth = val(Left(f, g)) 'width
     wHeight = val(Mid(f, g)) 'height

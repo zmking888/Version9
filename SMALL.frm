@@ -109,9 +109,9 @@ If ASKINUSE Then Exit Function
 Dim oldesc As Boolean
     oldesc = escok
 'using AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$
-Static Once As Boolean
-If Once Then Exit Function
-Once = True
+Static once As Boolean
+If once Then Exit Function
+once = True
 ASKINUSE = True
 If TypeOf Screen.ActiveForm Is GuiM2000 Then Screen.ActiveForm.UNhookMe
 
@@ -180,8 +180,20 @@ NeoMsgBox.command1(0).SetFocus
 End If
 ModalId = mycode
 Do
+If TaskMaster Is Nothing Then
         mywaitOld bstack, 5
       Sleep 1
+      Else
+    
+      If Not TaskMaster.Processing Then
+        DoEvents
+      Else
+       TaskMaster.TimerTickNow
+       TaskMaster.StopProcess
+       DoEvents
+       TaskMaster.StartProcess
+       End If
+      End If
 Loop Until NOEXECUTION Or Not ASKINUSE
  ModalId = mycode
 k1 = 0
@@ -220,7 +232,7 @@ bstack.soros.PushStr AskStrInput$
 End If
 End If
 AskCancel$ = ""
-Once = False
+once = False
 ASKINUSE = False
 INK$ = ""
 On Error Resume Next
@@ -316,10 +328,13 @@ If TaskMaster.Processing And Not bstack.TaskMain Then
         If Not bstack.toprinter Then bstack.Owner.Refresh
         TaskMaster.TimerTick
        ' SleepWait 1
-       MyDoEvents
+       TaskMaster.StopProcess
+       DoEvents
+       TaskMaster.StartProcess
        
 Else
         ' SleepWait 1
+        
         MyDoEvents
         End If
         Else

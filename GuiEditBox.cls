@@ -4127,7 +4127,6 @@ Case vbKeyF11
 fState = fState + 1
 SetME
 WrapAll
-mDoc.WrapAgainColor
 ManualInform
 glistN.ShowMe
 KeyCode = 0
@@ -4467,7 +4466,6 @@ Loop Until safety = 2 Or KeyPressed(16)
 glistN.dropkey = False
 End If
 mDoc.LCID = OldLcid
-'mdoc.WrapAgainColor
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus
@@ -4671,7 +4669,6 @@ On Error GoTo end1
 Set Callback.mDoc = mDoc
 WrapAll
 If mDoc Is Nothing Then Set Callback.mDoc = Nothing: Exit Sub
-mDoc.WrapAgainColor
 Set Callback.mDoc = Nothing
 ManualInform
 end1:
