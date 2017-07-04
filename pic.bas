@@ -3044,7 +3044,14 @@ Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False)
 Dim r As Long
 Dim r1 As Long
 r1 = 1
-If "." <> NowDec$ Then a$ = Replace(a$, NowDec$, ".")
+          If Not NoUseDec Then
+                                If OverideDec Then
+                                    a$ = Replace(a$, NowDec$, ".")
+                                 End If
+                            Else
+                                a$ = Replace(a$, QueryDecString, ".")
+                            End If
+              
 Dim v As Double, b$
 If final Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
@@ -3066,7 +3073,13 @@ Else
  End If
  End If
  End If
-If "." <> NowDec$ Then a$ = Replace(a$, ".", NowDec$)
+  If Not NoUseDec Then
+                                If OverideDec Then
+                                    a$ = Replace(a$, ".", NowDec$)
+                                 End If
+                            Else
+                                a$ = Replace(a$, ".", QueryDecString)
+                            End If
 ValidNum = r1
 End Function
 Function ValidNumberOnly(a$, r As Double, skipdec As Boolean) As Boolean

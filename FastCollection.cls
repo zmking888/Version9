@@ -15,6 +15,7 @@ Option Explicit
 ' George's FastCollection
 ' Only Add, and Find.
 ' Key as string may be a hex number (used for enumarates)
+Private Declare Function CompareString Lib "KERNEL32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 
 ' No same key. --- this is changed
 Private AllowSameKey As Boolean
@@ -71,6 +72,7 @@ Public StructLen As Long
 Private ParentIndex As Long
 Public NumericSort As Boolean
 Public IamBusy As Boolean
+Public useclid As Long
 Private Sub Class_Initialize()
     MaxSpace = 5
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
@@ -97,11 +99,11 @@ mSortstyle = vbDatabaseCompare
 End Sub
 
 
-Public Sub AddKey2(RHS, Optional aValue As Variant)
+Public Sub AddKey2(Rhs, Optional aValue As Variant)
 IamBusy = True
     index = -1
-    lastkey = RHS
-    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
+    lastkey = Rhs
+    If Len(lastkey) = 0 Then Rhs = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = Rhs
     Done = False
     
     If Not IsMissing(aValue) Then
@@ -119,10 +121,10 @@ IamBusy = True
     
 IamBusy = False
 End Sub
-Public Sub AddKey(RHS, Optional aValue As Variant)
+Public Sub AddKey(Rhs, Optional aValue As Variant)
     index = -1
-    lastkey = RHS
-    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
+    lastkey = Rhs
+    If Len(lastkey) = 0 Then Rhs = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = Rhs
     Done = False
     If Not IsMissing(aValue) Then
     
@@ -159,9 +161,9 @@ ReHash
 End Sub
 
 
-Public Sub ToKey(RHS)
-    Done = Find(RHS)
-    If Done Then lastkey = RHS
+Public Sub ToKey(Rhs)
+    Done = Find(Rhs)
+    If Done Then lastkey = Rhs
 End Sub
 Public Sub RemoveWithNoFind()
 If AllowSameKey Then Exit Sub
@@ -208,12 +210,12 @@ here:
   ReduceHash toplim
 End If
 End Sub
-Public Sub drop(RHS)
+Public Sub drop(Rhs)
 If Not AllowSameKey Then Exit Sub
-RHS = RHS - 1
-If (toplim - RHS) >= 0 And (RHS >= 0) Then
+Rhs = Rhs - 1
+If (toplim - Rhs) >= 0 And (Rhs >= 0) Then
 Dim i As Long
-For i = toplim To RHS Step -1
+For i = toplim To Rhs Step -1
        With PriveSpace(i)
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
@@ -225,7 +227,7 @@ For i = toplim To RHS Step -1
             .Key = ""
         End If
         End With
-toplim = RHS - 1
+toplim = Rhs - 1
   ReduceHash toplim
 Next i
 Else
@@ -237,12 +239,12 @@ Else
 End If
 
 End Sub
-Public Sub Remove(RHS)
+Public Sub Remove(Rhs)
 If AllowSameKey Then Exit Sub
 Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub  ' previus stop
 top1 = toplim
-If Find2(RHS, Parndx, ndx) Then
+If Find2(Rhs, Parndx, ndx) Then
         Done = True
         index = ndx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
@@ -294,22 +296,22 @@ Done = False
 End If
 End Sub
 
-Property Let Value(RHS As Variant)
+Property Let Value(Rhs As Variant)
 Done = False
 If index = -1 Then
-ItemCreator lastkey, RHS
+ItemCreator lastkey, Rhs
 
 Else
-    PriveSpace(index).iValue = RHS
+    PriveSpace(index).iValue = Rhs
 End If
 Done = True
 End Property
-Property Set ValueObj(RHS As Variant)
+Property Set ValueObj(Rhs As Variant)
 Done = False
 If index = -1 Then
-    ItemCreator lastkey, RHS
+    ItemCreator lastkey, Rhs
 Else
-    Set PriveSpace(index).iValue = RHS
+    Set PriveSpace(index).iValue = Rhs
 End If
 Done = True
 End Property
@@ -321,11 +323,11 @@ Else
     sValue = PriveSpace(index).sValue
 End If
 End Property
-Property Let sValue(RHS As Long)
+Property Let sValue(Rhs As Long)
 If index = -1 Then
 Else
     Done = True
-    PriveSpace(index).sValue = RHS
+    PriveSpace(index).sValue = Rhs
 End If
 End Property
 Property Get Value() As Variant
@@ -488,11 +490,11 @@ If Done Then
     End If
 End If
 End Sub
-Sub SwapByIndex(RHS As Long)
+Sub SwapByIndex(Rhs As Long)
 On Error Resume Next
 If Done Then
-    SwapVariant PriveSpace(RHS).iValue, PriveSpace(index).iValue
-    index = RHS
+    SwapVariant PriveSpace(Rhs).iValue, PriveSpace(index).iValue
+    index = Rhs
 End If
 End Sub
 
@@ -522,9 +524,9 @@ IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 
-Function Find(RHS) As Boolean
+Function Find(Rhs) As Boolean
 Dim k As Long, Key As String, k1 As Long
-Key = RHS
+Key = Rhs
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
@@ -554,9 +556,9 @@ End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
+Private Function Find2(Rhs, Parndx As Long, ndx As Long) As Boolean
 Dim k As Long, Key As String, k1 As Long
-Key = RHS
+Key = Rhs
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 Parndx = -1
 k = Hash(HashFunc(Key)) - 1
@@ -584,10 +586,10 @@ End If
 End If
 End Function
 
-Function ExistKey0(RHS) As Boolean
+Function ExistKey0(Rhs) As Boolean
 If AllowSameKey Then Exit Function
 Dim k As Long, Key As String, k1 As Long
-Key = RHS
+Key = Rhs
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 k1 = -2
@@ -611,9 +613,9 @@ If k >= 0 Then
     End If
 End If
 End Function
-Function ExistKey(RHS) As Boolean
+Function ExistKey(Rhs) As Boolean
 Dim k As Long, k1 As Long, Key As String
-Key = RHS
+Key = Rhs
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 k1 = -2
@@ -637,9 +639,9 @@ If k >= 0 Then
     End If
 End If
 End Function
-Function ExistKey3(RHS) As Boolean
+Function ExistKey3(Rhs) As Boolean
 Dim k As Long, k1 As Long, Key As String
-Key = RHS
+Key = Rhs
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k1 = -2
 k = Hash(HashFunc(Key)) - 1
@@ -880,20 +882,20 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
   If UB - LB = 1 Then
      M1 = LB
 
-     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+     If CompareStr2(Arr(M1).Key, Arr(UB).Key, mSortstyle) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
      Exit Sub
   Else
   ' we have unique names
     M1 = (LB + UB) \ 2
     Piv = Arr(M1)
     M1 = LB
-   Do While StrComp(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+   Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
     
   End If
   
   M2 = UB
   Do
-    Do While StrComp(Arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
+    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
 
     If M1 <= M2 Then
       Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp 'swap
@@ -901,7 +903,7 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While StrComp(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
+    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = -1: M1 = M1 + 1: Loop
 
   Loop
   If LB < M2 Then QuickSortItems Arr, LB, M2
@@ -982,20 +984,20 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
   If UB - LB = 1 Then
      M1 = LB
 
-     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = -1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+     If CompareStr2(Arr(M1).Key, Arr(UB).Key, mSortstyle) = -1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
      Exit Sub
   Else
   ' we have unique names
     M1 = (LB + UB) \ 2
     Piv = Arr(M1)
     M1 = LB
-   Do While StrComp(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+   Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
     
   End If
   
   M2 = UB
   Do
-    Do While StrComp(Arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
+    Do While CompareStr2(Arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
 
     If M1 <= M2 Then
       Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp 'swap
@@ -1003,7 +1005,7 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
       M2 = M2 - 1
     End If
     If M1 > M2 Then Exit Do
-    Do While StrComp(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
+    Do While CompareStr2(Arr(M1).Key, Piv.Key, mSortstyle) = 1: M1 = M1 + 1: Loop
 
   Loop
   If LB < M2 Then QuickSortItemsRev Arr, LB, M2
@@ -1070,5 +1072,23 @@ End Function
 
 Public Function AllowAnyKey()
 AllowSameKey = True
+
+End Function
+Function CompareStr2(a$, b$, what As Long) As Long
+On Error GoTo comperr
+Select Case what
+Case 1 To 2
+CompareStr2 = StrComp(a$, b$, what)
+Case Else
+If useclid = 0 Then
+CompareStr2 = StrComp(a$, b$)
+Else
+' we cant use something that give "equal" keys
+CompareStr2 = -2 + CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
+End If
+End Select
+Exit Function
+comperr:
+CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 
 End Function

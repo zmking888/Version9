@@ -4354,7 +4354,15 @@ cont12345:
                             If fr2 - 1 = RealLen(s$) + 1 Or (s$ = "" And a$ = "-") Then
    If ShowCaret(dq.hWnd) <> 0 Then DestroyCaret
                 If a$ = "." Then
-                PlainBaSket dq, prive, NowDec$, , , 0
+                If Not NoUseDec Then
+                    If OverideDec Then
+                    PlainBaSket dq, prive, NowDec$, , , 0
+                    Else
+                    PlainBaSket dq, prive, ".", , , 0
+                    End If
+                Else
+                    PlainBaSket dq, prive, QueryDecString, , , 0
+                End If
                 Else
                    PlainBaSket dq, prive, a$, , , 0
                    End If
@@ -5515,6 +5523,42 @@ Exit Function
 there:
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd1
 End Function
+Public Function ContainsUTF16(ByRef Source() As Byte) As Long
+  Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
+  Dim CurByte As Byte, CurByte1 As Byte
+  Dim CurBytes As Long, CurBytes1 As Long
+    lUBound = UBound(Source)
+    If lUBound > 4 Then
+    CurByte = Source(0)
+    CurByte1 = Source(1)
+    For i = 2 To lUBound - 1 Step 2
+        If CurByte1 = 0 And CurByte < 31 Then CurBytes1 = CurBytes1 + 1
+        If CurByte = 0 And CurByte1 < 31 Then CurBytes = CurBytes + 1
+        If Source(i) = CurByte Then
+            CurBytes = CurBytes + 1
+        Else
+            CurByte = Source(i)
+        End If
+        If Source(i + 1) = CurByte1 Then
+            CurBytes1 = CurBytes1 + 1
+        Else
+            CurByte1 = Source(i + 1)
+        End If
+        
+    Next i
+    End If
+    If CurBytes1 = CurBytes And CurBytes1 * 3 >= lUBound Then
+    ContainsUTF16 = 0
+    Else
+    If CurBytes1 * 3 >= lUBound Then
+    ContainsUTF16 = 1
+    ElseIf CurBytes * 3 >= lUBound Then
+    ContainsUTF16 = 2
+    Else
+    ContainsUTF16 = 0
+    End If
+    End If
+End Function
 Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
   Dim i As Long, lUBound As Long, lUBound2 As Long, lUBound3 As Long
   Dim CurByte As Byte
@@ -5615,6 +5659,7 @@ On Error GoTo ErrHandler
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
         If BLen >= 3 Then
           ReDim b(0 To BLen - 3): Get FNr, 3, b 'read the Bytes
+utf16conthere:
           feedback = 0
           If BOM = &HFFFE Then 'big endian, so lets swap the byte-pairs
           feedback = 1
@@ -5662,6 +5707,19 @@ On Error GoTo ErrHandler
         ReadUnicodeOrANSI = Space$(BLen)
         Get FNr, 1, ReadUnicodeOrANSI
         End If
+            Select Case ContainsUTF16(buf())
+        Case 1
+            nobom = -1
+            BOM = &HFEFF
+            ReDim b(0 To BLen - 1): Get FNr, 1, b 'read the Bytes
+            GoTo utf16conthere
+        Case 2
+            nobom = -1
+            BOM = &HFEFF
+            ReDim b(0 To BLen - 1): Get FNr, 1, b 'read the Bytes
+            GoTo utf16conthere
+        End Select
+
     End Select
     
     If InStr(ReadUnicodeOrANSI, vbCrLf) = 0 Then

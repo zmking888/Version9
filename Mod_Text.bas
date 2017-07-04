@@ -57,7 +57,7 @@ Public UseEsc As Boolean
 ' 0 for DIS
 Public NowDec$, NowThou$
 Public priorityOr As Boolean, NoUseDec As Boolean, mNoUseDec As Boolean, UseIntDiv As Boolean
-Public csvsep$, csvDec$
+Public csvsep$, csvDec$, csvuseescape As Boolean
 Public Const DisForm = 0
 Public Const BackForm = -1
 Public Const PrinterPage = -2
@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -272,6 +272,7 @@ Public Declare Function GetLocaleInfoW Lib "KERNEL32" (ByVal Locale As Long, ByV
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
+Public OverideDec As Boolean
 'Valid dwCmpFlags
 Private Declare Function LCMapStringW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwMapFlags As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, Optional ByVal lpDestStr As Long, Optional ByVal cchDest As Long) As Long
 Private Declare Function SysReAllocStringLen Lib "OleAut32.dll" (ByVal pBSTR As Long, Optional ByVal pszStrPtr As Long, Optional ByVal Length As Long) As Long
@@ -838,24 +839,37 @@ AGAIN1:
       pd$ = LTrim(Str(p))
       
       If InStr(pd$, "E") > 0 Or InStr(pd$, "e") > 0 Then '' we can change e to greek Â
-      pd$ = Format$(p, "#." + String$(p1, "0") + "E+####")
+      pd$ = Format$(p, "0." + String$(p1, "0") + "E+####")
            If Not NoUseDec Then
-            If InStr(pd$, NowDec$) > 0 Then
+                   If OverideDec Then
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                    
+                ElseIf InStr(pd$, NowDec$) > 0 Then
                 pd$ = Replace$(pd$, NowDec$, Chr(2))
-                pd$ = Replace$(pd$, NowThou$, ",")
+                pd$ = Replace$(pd$, NowThou$, Chr(3))
                 pd$ = Replace$(pd$, Chr(2), ".")
-            
-            End If
+                pd$ = Replace$(pd$, Chr(3), ",")
+                
+                End If
             End If
       ElseIf p1 <> 0 Then
-       pd$ = Format$(p, "#." + String$(p1, "0"))
+       pd$ = Format$(p, "0." + String$(p1, "0"))
                If Not NoUseDec Then
-            If InStr(pd$, NowDec$) > 0 Then
+                If OverideDec Then
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                ElseIf InStr(pd$, NowDec$) > 0 Then
                 pd$ = Replace$(pd$, NowDec$, Chr(2))
-                pd$ = Replace$(pd$, NowThou$, ",")
+                pd$ = Replace$(pd$, NowThou$, Chr(3))
                 pd$ = Replace$(pd$, Chr(2), ".")
-            
-            End If
+                pd$ = Replace$(pd$, Chr(3), ",")
+                
+                End If
             End If
       End If
    
@@ -869,10 +883,20 @@ AGAIN1:
             final$ = Replace$(final$, Mid$(final$, pl2, pl1 - pl2 + 1), pd$)
             GoTo AGAIN1
         Else
+        
         If NoUseDec Then
             final$ = Replace$(final$, pat$, CStr(p))
         Else
-        final$ = Replace$(final$, pat$, LTrim(Str(p)))
+        pd$ = LTrim(Str$(p))
+         If Left$(pd$, 1) = "." Then
+        pd$ = "0" + pd$
+        ElseIf Left$(pd$, 2) = "-." Then pd$ = "-0" + Mid$(pd$, 2)
+        End If
+        If OverideDec Then
+        final$ = Replace$(final$, pat$, Replace(pd$, ".", NowDec$))
+        Else
+        final$ = Replace$(final$, pat$, pd$)
+        End If
         End If
         
         
@@ -1496,7 +1520,7 @@ Dim scr As Object, oldCol As Long, oldFTEXT As Long, oldFTXT As String, oldpen A
 Dim par As Boolean, i As Long, f As Long, p As Double, W4 As Boolean, pn&, s$, dlen As Long
 Dim o As Long, W3 As Long, x1 As Long, y1 As Long, x As Double, ColOffset As Long
 Dim work As Boolean, work2 As Long, skiplast As Boolean, ss$, ls As Long, myobject As Object, counter As Long, Counterend As Long, countDir As Long
-Dim bck$, clearline As Boolean
+Dim bck$, clearline As Boolean, ihavecoma As Boolean
 Set scr = basestack.Owner
 W3 = -1
 Dim basketcode As Long, prive As basket
@@ -1508,15 +1532,40 @@ scr.FontTransparent = True
 On Error GoTo 0
 Dim opn&
 par = True
-If IsSymbol(rest$, "#") Then
-   If IsExp(basestack, "#" + Left$(rest$, 6), p) Then
-   rest$ = "#" + rest$
+If MaybeIsSymbol2(rest$, "#", f) Then
+   If Mid$(rest$, f + 1, 6) Like "[0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef]" Then
+   
    Else
+  Mid$(rest$, 1, f) = Space$(f)
         If IsExp(basestack, rest$, p) Then
-                     f = CLng(MyMod(p, 512))
-                     If Not FastSymbol(rest$, ",") Then Set scr = Nothing: Exit Function
+        If p < 0 Then
+        If p < -1 Then
+        
+                     .lastprint = False
                      par = False
-             End If
+        End If
+        f = p
+                     If Not FastSymbol(rest$, ",") Then
+                     s$ = ""
+                     pn& = 2
+                     GoTo isastring
+                     End If
+        Else
+                     f = CLng(MyMod(p, 512))
+                     .lastprint = False
+                     par = False
+                     If Not FastSymbol(rest$, ",") Then
+                     s$ = ""
+                     pn& = 2
+                     GoTo isastring
+                     End If
+                     
+                     
+            End If
+             
+       Else
+       MyEr "expected file number", "ÂÒﬂÏÂÌ· ·ÒÈËÏ¸ ·Ò˜ÂﬂÔı"
+       End If
     End If
 Else
 ss$ = Left$(rest$, MyTrimL(rest$) + 5)
@@ -1725,18 +1774,18 @@ Do
     ElseIf FastSymbol(rest$, "@(", , 2) Then
     clearline = False
     W3 = -1
-               If Not par Then RevisionPrint = False: Set scr = Nothing: Exit Function
+               'If Not par Then RevisionPrint = False: Set scr = Nothing: Exit Function
                 If IsExp(basestack, rest$, p) Then
 
-                .curpos = CLng(p)
+                If par Then .curpos = CLng(p)
                 End If
                 
                 If FastSymbol(rest$, ",") Then
                 If IsExp(basestack, rest$, p) Then
                 If CLng(p) >= .My Then
-                .currow = .My - 1
+                If par Then .currow = .My - 1
                 Else
-                .currow = CLng(p)
+                If par Then .currow = CLng(p)
                 End If
                 End If
                 End If
@@ -1757,7 +1806,8 @@ Do
                 If FastSymbol(rest$, ",") Then
              '   On Error Resume Next
 pthere:
-                   LCTbasketCur scr, prive
+                   
+                If par Then LCTbasketCur scr, prive
                 If IsStrExp(basestack, rest$, s$) Then
                 p = 0
                     If FastSymbol(rest$, ",") Then
@@ -1771,14 +1821,14 @@ pthere:
                     x1 = Abs(x1 - .curpos)
                     y1 = Abs(y1 - .currow)
                     
-                    BoxImage scr, prive, x1, y1, s$, 0, (p)
+                    If par Then BoxImage scr, prive, x1, y1, s$, 0, (p)
                     'If P <> 0 Then .currow = y1 + .currow
                 ElseIf IsExp(basestack, rest$, p) Then
          
-                    BoxColorNew scr, prive, x1 - 1, y1 - 1, (p)
+                    If par Then BoxColorNew scr, prive, x1 - 1, y1 - 1, (p)
                     If FastSymbol(rest$, ",") Then
                         If IsExp(basestack, rest$, x) Then
-                            BoxBigNew scr, prive, x1 - 1, y1 - 1, (x)
+                            If par Then BoxBigNew scr, prive, x1 - 1, y1 - 1, (x)
                             
                             
                             
@@ -1796,7 +1846,7 @@ pthere:
                 End If
 
                 End If
-             LCTbasket scr, prive, .currow, .curpos
+             If par Then LCTbasket scr, prive, .currow, .curpos
                 
         If Not FastSymbol(rest$, ")") Then
         RevisionPrint = False
@@ -1814,7 +1864,7 @@ pthere:
 conthere:
 W3 = -1
         If IsExp(basestack, rest$, p) Then
-        
+        If Not par Then p = 0
             .FTEXT = Abs(p) Mod 10
             ' 0 STANDARD LEFT chars before typed beyond the line are directed to the next line
             ' 1  RIGHT
@@ -1830,29 +1880,31 @@ W3 = -1
             .FTXT = s$
         End If
         
-        If par Then
+        
         If FastSymbol(rest$, ",") Then
                 If IsExp(basestack, rest$, p) Then
-                p = p - 1
-                If Abs(Int(p Mod (.mx + 1))) < 2 Then
-                MyEr ".Column minimum width is 4 chars", "ÃÈÍÒ¸ÙÂÒÔ Ï›„ÂËÔÚ ÛÙﬁÎÁÚ ÂﬂÌ·È ÔÈ Ù›ÛÛÂÒÈÚ ˜·Ò·ÍÙﬁÒÂÚ"
-                Else
-                 If W4 Or Not work Then
-                   LCTbasketCur scr, prive
-                   Else
-                   GetXYb scr, prive, .curpos, .currow
-                   End If
-                 If W4 Then ColOffset = .curpos    ' now we have columns from offset ColOffset
-                    .Column = Abs(Int(p Mod (.mx + 1)))
+                    If par Then
+                        p = p - 1
+                        If Abs(Int(p Mod (.mx + 1))) < 2 Then
+                            MyEr ".Column minimum width is 4 chars", "ÃÈÍÒ¸ÙÂÒÔ Ï›„ÂËÔÚ ÛÙﬁÎÁÚ ÂﬂÌ·È ÔÈ Ù›ÛÛÂÒÈÚ ˜·Ò·ÍÙﬁÒÂÚ"
+                        Else
+                            If W4 Or Not work Then
+                                LCTbasketCur scr, prive
+                            Else
+                                GetXYb scr, prive, .curpos, .currow
+                            End If
+                            If W4 Then ColOffset = .curpos    ' now we have columns from offset ColOffset
+                                .Column = Abs(Int(p Mod (.mx + 1)))
+                            End If
                     End If
-                   
+                    
                 Else
                     RevisionPrint = False
                     Set scr = Nothing
                     Exit Function
                 End If
          End If
-         End If
+      
             If Not FastSymbol(rest$, ")") Then
             RevisionPrint = False
             Set scr = Nothing
@@ -1860,7 +1912,7 @@ W3 = -1
             End If
         
         
-        pn& = 99
+        If par Then pn& = 99
         ElseIf LastErNum <> 0 Then
        RevisionPrint = LastErNum <> -2
        Set scr = Nothing
@@ -1956,6 +2008,7 @@ Else
                 
             End If
 isanumber:
+        If par Then
             If .lastprint Then opn& = 5
 
             pn& = 1
@@ -1963,7 +2016,10 @@ isanumber:
             
             pn& = 6
             End If
-            
+            Else
+            .lastprint = False
+            pn& = 1
+           End If
     ElseIf LastErNum <> 0 Then
             .lastprint = False
             RevisionPrint = LastErNum = -2
@@ -1986,11 +2042,18 @@ isanumber:
                 
             End If
 isastring:
+If par Then
+
     If .lastprint Then opn& = 5
             pn& = 2
+            
       If .Column = 1 Then
             
             pn& = 7
+            End If
+            Else
+             .lastprint = False
+            pn& = 2
             End If
     ElseIf LastErNum <> 0 Then
              RevisionPrint = LastErNum = -2
@@ -2021,7 +2084,9 @@ End If
 
             End If
         Else
-            If Uni(f) Then
+        If f < 0 Then
+            crNew basestack, prive
+        ElseIf Uni(f) Then
             putUniString f, vbCrLf
             Else
             putANSIString f, vbCrLf
@@ -2033,7 +2098,7 @@ End If
         Exit Do
     End If
 conthere2:
-If par Then If .lastprint And opn& > 4 Then .lastprint = False
+If .lastprint And opn& > 4 Then .lastprint = False
     If FastSymbol(rest$, ";") Then
 '' LEAVE W3
 If par Then
@@ -2041,12 +2106,13 @@ If par Then
 
    LCTbasket scr, prive, .currow, .curpos
    End If
-   End If
+  
    ' IF  WORK THEN opn&=5
    opn& = 5
+  End If
 newntrance:
 work = True
-If par Then .lastprint = True
+.lastprint = True
         
          Do While FastSymbol(rest$, ";")
          Loop
@@ -2055,17 +2121,12 @@ If par Then .lastprint = True
     pn& = pn& + opn&
   opn& = 0
   rest$ = NLtrim$(rest$)
-  If rest$ <> "" Then
-    
-  If Not MaybeIsSymbol(rest$, " : }\'" + vbCr) Then
-  
-    Exit Function
- ''rest$ = "@{}" + Mid$(rest$, 3)
-   End If
-   End If
-    Else
+ If Len(rest$) > 0 Then If Not MaybeIsSymbol(rest$, " : }\'" + vbCr) Then Exit Function
 
-    rest$ = "," & rest$
+    Else
+If par Then
+ihavecoma = True ' 'rest$ = "," & rest$
+End If
     End If
     pn& = pn& + opn&
     Select Case pn&
@@ -2080,7 +2141,13 @@ If NoUseDec Then
    s$ = CStr(p)
    
 Else
- s$ = Trim$(Str(p))
+ s$ = LTrim$(Str(p))
+ If Left$(s$, 1) = "." Then
+ s$ = "0" + s$
+ ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+ End If
+ If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+ 
 End If
       If .FTEXT < 4 Then
             If InStr(s$, ".") > 0 Then
@@ -2097,10 +2164,18 @@ End If
         Else
         s$ = Format$(p, .FTXT)
         If Not NoUseDec Then
-            If InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+            If OverideDec Then
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                s$ = Replace$(s$, Chr(2), NowDec$)
+                s$ = Replace$(s$, Chr(3), NowThou$)
+                
+            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+                ElseIf InStr(s$, NowDec$) > 0 Then
                 s$ = Replace$(s$, NowDec$, Chr(2))
-                s$ = Replace$(s$, NowThou$, ",")
+                s$ = Replace$(s$, NowThou$, Chr(3))
                 s$ = Replace$(s$, Chr(2), ".")
+                s$ = Replace$(s$, Chr(3), ",")
             
             End If
             End If
@@ -2247,7 +2322,9 @@ End If
         End If
  
         Else
-         If Uni(f) Then
+          If f < 0 Then
+            PlainBaSket scr, prive, s$
+        ElseIf Uni(f) Then
             putUniString f, s$
             Else
             putANSIString f, s$
@@ -2383,7 +2460,9 @@ End If
         
         End If
         Else
-             If Uni(f) Then
+              If f < 0 Then
+            PlainBaSket scr, prive, s$
+        ElseIf Uni(f) Then
             putUniString f, s$
             Else
             putANSIString f, s$
@@ -2399,10 +2478,17 @@ End If
                         If .FTXT <> "" Then
                                        s$ = Format$(p, .FTXT)
             If Not NoUseDec Then
-            If InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+               If OverideDec Then
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                s$ = Replace$(s$, Chr(2), NowDec$)
+                s$ = Replace$(s$, Chr(3), NowThou$)
+                
+            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
                 s$ = Replace$(s$, NowDec$, Chr(2))
-                s$ = Replace$(s$, NowThou$, ",")
+                s$ = Replace$(s$, NowThou$, Chr(3))
                 s$ = Replace$(s$, Chr(2), ".")
+                s$ = Replace$(s$, Chr(3), ",")
             
             End If
             End If
@@ -2421,7 +2507,12 @@ End If
                                 If NoUseDec Then
                                        s$ = CStr(p)
                                     Else
-                                     s$ = Trim$(Str(p))
+                                     s$ = LTrim$(Str(p))
+                                      If Left$(s$, 1) = "." Then
+                                        s$ = "0" + s$
+                                        ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+                                        End If
+                                     If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
                                     End If
                                 End If
 
@@ -2447,26 +2538,39 @@ End If
                                   If NoUseDec Then
                                     s$ = CStr(p)
                                         Else
-                                            s$ = Trim$(Str(p))
+                                            s$ = LTrim$(Str(p))
+                                                If Left$(s$, 1) = "." Then
+                                                s$ = "0" + s$
+                                                ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+                                                End If
+                                            If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
                                         End If
                                     PlainBaSket scr, prive, s$
                                 End If
                         Else
                       s$ = Format$(p, .FTXT)
             If Not NoUseDec Then
-            If InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
-                s$ = Replace$(s$, NowDec$, Chr(2))
-                s$ = Replace$(s$, NowThou$, ",")
-                s$ = Replace$(s$, Chr(2), ".")
-            
-            End If
+                If OverideDec Then
+                    s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    s$ = Replace$(s$, Chr(2), NowDec$)
+                    s$ = Replace$(s$, Chr(3), NowThou$)
+                ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+                    s$ = Replace$(s$, NowDec$, Chr(2))
+                    s$ = Replace$(s$, NowThou$, Chr(3))
+                    s$ = Replace$(s$, Chr(2), ".")
+                    s$ = Replace$(s$, Chr(3), ",")
+                
+                End If
             End If
       
                             PlainBaSket scr, prive, s$
                         End If
                 End If
         Else
-             If Uni(f) Then
+              If f < 0 Then
+            PlainBaSket scr, prive, s$
+        ElseIf Uni(f) Then
             putUniString f, s$
             Else
             putANSIString f, s$
@@ -2500,7 +2604,9 @@ End If
         End If
    
         Else
-             If Uni(f) Then
+              If f < 0 Then
+            PlainBaSket scr, prive, s$
+        ElseIf Uni(f) Then
             putUniString f, s$
             Else
             putANSIString f, s$
@@ -2509,7 +2615,11 @@ End If
         End If
     End Select
 taketwo:
-    If FastSymbol(rest$, ",") Then
+If ihavecoma Then
+ihavecoma = False
+GoTo cont12344
+    ElseIf FastSymbol(rest$, ",") Then
+cont12344:
 W3 = 1
         pn& = 0
       ''  skiplast = False
@@ -2543,7 +2653,9 @@ W3 = 1
             End If
             End If
             Else
-                 If Uni(f) Then
+                  If f < 0 Then
+             crNew basestack, prive
+        ElseIf Uni(f) Then
             putUniString f, vbCrLf
             Else
             putANSIString f, vbCrLf
@@ -2561,12 +2673,12 @@ Loop
 ''If Not extreme Then If Not basestack.toprinter Then MyDoEvents2 scr
 ''If scr.CurrentX <> 0 Then scr.CurrentX = ((scr.CurrentX \ .Xt) + 1) * .Xt
 
-If W4 <> 0 Then
+If W4 <> 0 And par Then
         .FTEXT = oldFTEXT
         .FTXT = oldFTXT
         .Column = oldCol
         If .mypen <> oldpen Then .mypen = oldpen: TextColor scr, oldpen
-        Else
+        ElseIf par Then
         If pn& > 4 And opn& = 0 Then
         
                  If pn& < 99 Then
@@ -2586,15 +2698,15 @@ End If
 EXITNOW:
 If basestack.IamThread Then
 ' let thread do the refresh
-Else
+ElseIf par Then
 If Not extreme Then
     If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-            
+      
             If RRCOUNTER = 0 Then
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
          If scr.Visible Then scr.Refresh
                   End If
-End If
+                  End If
 End If
 RevisionPrint = True
 players(basketcode) = prive
@@ -3409,7 +3521,7 @@ If fr < 0 Or fr > i Then fr = i + 1
 If i > 0 Then rinstr = InStrRev(a, b, fr)
 End Function
 Function rinstrTxt(a As String, b As String, Optional ByVal fr As Long) As Long
-' NOT USED....INSTRREV IS THE SANE...WITH VBTEXTCOMPARE
+' NOT USED....INSTRREV IS THE SAME...WITH VBTEXTCOMPARE
 Dim i As Long, j As Long
 fr = fr - Len(b) + 1
 If fr < 0 Then fr = Len(a) + 1
@@ -3448,16 +3560,20 @@ End If
 
 mcd = userfiles
 If NowDec$ <> "" Then
-Else
+ElseIf OverideDec Then
 NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
 NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+Else
+NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
 End If
 CheckDec
 
 End Sub
 Public Sub CheckDec()
-
-
+OverideDec = False
+NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
 If NowDec$ = "." Then
 NoUseDec = False
 Else
@@ -4106,6 +4222,10 @@ again2:
                  End If
             If Not bstack.lastobj Is Nothing Then GoTo again2
             Set park = Nothing
+            Else
+            MyEr "Wrong Operator", "À‹ËÔÚ ‘ÂÎÂÛÙﬁÚ"
+            IsExpA = False
+            Exit Function
                End If
                Else
                
@@ -7596,6 +7716,18 @@ fun42: 'Case "VAL(", "‘…Ã«(", "¡Œ…¡("
       Else
           dd = AscW(ex$)
           End If
+       If InStr(s$, ".") > 0 And dd <> 46 Then
+        s$ = Replace(s$, ".", "*")
+        End If
+        s$ = Replace(s$, ChrW(dd), ".")
+        dd = 46
+    ElseIf IsExp(bstack, a$, PP) Then
+        dd = AscW(GetlocaleString2(14, CLng(PP)))
+        If InStr(s$, ".") > 0 And dd <> 46 Then
+        s$ = Replace(s$, ".", "*")
+        End If
+        s$ = Replace(s$, ChrW(dd), ".")
+        dd = 46
     Else
     
     MyErMacro a$, "Expected decimal separator char", "–ÂÒﬂÏÂÌ· ˜·Ò·ÍÙﬁÒ· ‰È·˜˘ÒÈÛÏÔ˝ ‰ÂÍ·‰ÈÍ˛Ì"
@@ -8286,6 +8418,7 @@ IsNumber = False
                 MissParam a$
     End If
     Exit Function
+
 fun57: 'Case "DOC.UNIQUE.WORDS(", "≈√√—¡÷œ’.ÃœÕ¡ƒ… ≈”.À≈Œ≈…”("
  IsNumber = False
     w1 = Abs(IsLabel(bstack, a$, s$))
@@ -14753,16 +14886,31 @@ fstr60: '"STR$(", "√—¡÷«$("
         End If
         End If
         If FastSymbol(a$, ",") Then
-            If IsStrExp(bstackstr, a$, q$) Then
-            r$ = Format(p, q$)
-            If Not NoUseDec Then
-            If InStr(r$, NowDec$) > 0 And InStr(q$, ".") > 0 Then
-                r$ = Replace$(r$, NowDec$, Chr(2))
-                r$ = Replace$(r$, NowThou$, ",")
-                r$ = Replace$(r$, Chr(2), ".")
-            
+            If IsExp(bstackstr, a$, PP) Then
+            If PP = 0 Then
+                r$ = CStr(p)
+            Else
+                q$ = GetlocaleString2(14, PP)
+                r$ = Replace(LTrim(Str$(p)), ".", q$)
             End If
-            End If
+            GoTo contstrhere
+            ElseIf IsStrExp(bstackstr, a$, q$) Then
+                r$ = Format(p, q$)
+                If Not NoUseDec Then
+                    If OverideDec Then
+                        r$ = Replace$(r$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                        r$ = Replace$(r$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                        r$ = Replace$(r$, Chr(2), NowDec$)
+                        r$ = Replace$(r$, Chr(3), NowThou$)
+                        
+                    ElseIf InStr(r$, NowDec$) > 0 Then
+                        r$ = Replace$(r$, NowDec$, Chr(2))
+                        r$ = Replace$(r$, NowThou$, ",")
+                        r$ = Replace$(r$, Chr(2), ".")
+        
+                End If
+                    End If
+contstrhere:
             If FastSymbol(a$, ",") Then
             If IsExp(bstackstr, a$, PP) Then
             If PP > 0 Then
@@ -16517,6 +16665,7 @@ err123456:
                     wwPlain bstack, prive, "Current directory", bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, mcd, bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, "Setting for Function Recursion " + CStr(funcdeep), bstack.Owner.Width, 1000, True
+                    If OverideDec Then wwPlain bstack, prive, "Locale Overide " + CStr(cLid), bstack.Owner.Width, 1000, True
                     If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
                     If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
                     If NoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
@@ -24866,7 +25015,7 @@ If FastSymbol(s$, "=") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ = s2$ Then d = -1 Else d = 0
+    d = b$ = s2$
     Exit Function
     Else
     If LastErNum = -2 Then logical = True
@@ -24876,7 +25025,7 @@ ElseIf FastSymbol(s$, "<>", , 2) Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ <> s2$ Then d = -1 Else d = 0
+    d = b$ <> s2$
     Exit Function
         Else
     If LastErNum = -2 Then logical = True
@@ -24886,7 +25035,7 @@ ElseIf FastSymbol(s$, "<=", , 2) Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ <= s2$ Then d = -1 Else d = 0
+    d = b$ <= s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -24896,7 +25045,7 @@ ElseIf FastSymbol(s$, "<") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ < s2$ Then d = -1 Else d = 0
+    d = b$ < s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -24906,7 +25055,7 @@ ElseIf FastSymbol(s$, ">=", , 2) Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ >= s2$ Then d = -1 Else d = 0
+    d = b$ >= s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -24916,7 +25065,7 @@ ElseIf FastSymbol(s$, ">") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ > s2$ Then d = -1 Else d = 0
+    d = b$ > s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -24926,7 +25075,7 @@ ElseIf FastSymbol(s$, "~") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
     logical = True
-    If b$ Like s2$ Then d = -1 Else d = 0
+    d = b$ Like s2$
     Exit Function
             Else
     If LastErNum = -2 Then logical = True
@@ -24947,6 +25096,7 @@ Else
 End If
 End If
 End Function
+
 Function BlockParam(s$) As String
 ' need to be open
 Dim i As Long, j As Long
@@ -27213,6 +27363,22 @@ On Error GoTo 1234
 1234:
     
 End Function
+Private Function GetlocaleString2(ByVal this As Long, ByVal McLid As Long) As String
+On Error GoTo 1234
+    Dim Buffer As String, ret&, r&
+    Buffer = String$(514, 0)
+      
+        ret = GetLocaleInfoW(McLid, this, StrPtr(Buffer), Len(Buffer))
+    GetlocaleString2 = Left$(Buffer, ret - 1)
+    
+1234:
+    
+End Function
+
+Public Function QueryDecString() As String
+QueryDecString = GetDeflocaleString(14)
+End Function
+
 Private Function GetDeflocaleString(ByVal this As Long) As String
 On Error GoTo 1234
     Dim Buffer As String, ret&, r&
@@ -38840,7 +39006,7 @@ Function MyWith(bstack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, ss$, s$, pppp As mArray, pa$, x1 As Long
 MyWith = True
 x1 = Abs(IsLabel(bstack, rest$, s$))
-If x1 = 1 Then
+If x1 = 1 Or x1 = 3 Then
     If GetVar(bstack, s$, i) Then
             If Not MyIsObject(var(i)) Then BadObjectDecl:  Exit Function
             If Not var(i) Is Nothing Then  ''???
@@ -38892,7 +39058,7 @@ Dim i As Long, s$, pppp As mArray, pa$, ok As Boolean
 i = Abs(IsLabel(bstack, rest$, s$))
 MyMethod = True
 ok = True
-If i = 1 Then
+If i = 1 Or i = 3 Then
  If GetVar(bstack, s$, i) Then
         If MyIsObject(var(i)) Then
             If var(i) Is Nothing Then
@@ -38913,7 +39079,7 @@ If i = 1 Then
         Else
   Nosuchvariable s$
  End If
- ElseIf i = 5 Then
+ ElseIf i = 5 Or i = 6 Then
   If neoGetArray(bstack, s$, pppp) Then
 again11:
     If NeoGetArrayItem(pppp, bstack, s$, i, rest$) Then
@@ -39099,11 +39265,25 @@ If FastSymbol(rest$, "!") Then
                     If y < 1 And x1 = 0 Then y = 1
                      If GetVar(bstack, what$, i) Then
                      s$ = LTrim(Str(var(i)))
-                     If "." <> NowDec$ Then s$ = Replace(s$, ".", NowDec$)
+                       If Not NoUseDec Then
+                                If OverideDec Then
+                                    s$ = Replace(s$, ".", NowDec$)
+                                 End If
+                            Else
+                                s$ = Replace(s$, ".", QueryDecString)
+                            End If
+       
+                     
                      Do
                      s$ = iText(bstack, s$, (x), (y), "", x1, True, f = 4)
                      Loop Until ValidNum(s$, True, f = 4)
-                      If "." <> NowDec$ Then s$ = Replace(s$, NowDec$, ".")
+                         If Not NoUseDec Then
+                                If OverideDec Then
+                                   s$ = Replace(s$, NowDec$, ".")
+                                 End If
+                            Else
+                                s$ = Replace(s$, QueryDecString, ".")
+                            End If
                                ValidNumberOnly s$, p, f = 4
                              var(i) = p
                      Else
@@ -39113,11 +39293,23 @@ If FastSymbol(rest$, "!") Then
                      Else
                       s$ = LTrim(Str(ReadVarDouble(bstack, what$)))
                       End If
-                       If "." <> NowDec$ Then s$ = Replace(s$, ".", NowDec$)
+                                       If Not NoUseDec Then
+                                If OverideDec Then
+                                    s$ = Replace(s$, ".", NowDec$)
+                                 End If
+                            Else
+                                s$ = Replace(s$, ".", QueryDecString)
+                            End If
                       Do
                      s$ = iText(bstack, s$, (x), (y), "", x1, True, f = 4)
                      Loop Until ValidNum(s$, True, f = 4)
-                     If "." <> NowDec$ Then s$ = Replace(s$, NowDec$, ".")
+                           If Not NoUseDec Then
+                                If OverideDec Then
+                                   s$ = Replace(s$, NowDec$, ".")
+                                 End If
+                            Else
+                                s$ = Replace(s$, QueryDecString, ".")
+                            End If
                               ValidNumberOnly s$, p, f = 4
                              bstack.SetVar what$, p
                      Else
@@ -39125,7 +39317,13 @@ If FastSymbol(rest$, "!") Then
                       Do
                      s$ = iText(bstack, s$, (x), (y), "", x1, True, f = 4)
                      Loop Until ValidNum(s$, True, f = 4)
-                     If "." <> NowDec$ Then s$ = Replace(s$, NowDec$, ".")
+                           If Not NoUseDec Then
+                                If OverideDec Then
+                                   s$ = Replace(s$, NowDec$, ".")
+                                 End If
+                            Else
+                                s$ = Replace(s$, QueryDecString, ".")
+                            End If
                               ValidNumberOnly s$, p, f = 4
                              GlobalVar what$, (p)
                      End If
@@ -39200,7 +39398,14 @@ If y < 1 And x1 = 0 Then y = 1
                       Do
                      s$ = iText(bstack, s$, (x), (y), "", x1, True, f = 7)
                      Loop Until ValidNum(s$, True, f = 7)
-                     If "." <> NowDec$ Then s$ = Replace(s$, NowDec$, ".")
+                    
+                           If Not NoUseDec Then
+                                If OverideDec Then
+                                   s$ = Replace(s$, NowDec$, ".")
+                                 End If
+                            Else
+                                s$ = Replace(s$, QueryDecString, ".")
+                            End If
                               ValidNumberOnly s$, p, f = 7
                               
            
@@ -40716,25 +40921,33 @@ Exit Function
 End If
 End Function
 Function ProcOpen(bstack As basetask, rest$, lang As Long) As Boolean
-Dim s$, what$, it As Long, p As Double, x1 As Long, i As Long
+Dim s$, what$, it As Long, p As Double, x1 As Long, i As Long, skip As Boolean
 If IsStrExp(bstack, rest$, s$) Then
 If s$ <> "" Then
 FixPath s$
 Else
-BadFilename
-Exit Function
+skip = True
+i = -2
 End If
     If IsLabelSymbolNew(rest$, "√…¡", "FOR", lang) Then
-    
+    If skip Then
+    If Not IsLabelSymbolNew(rest$, "≈’—…¡", "WIDE", lang) Then
+    IsLabelSymbolNew rest$, "≈’—≈…¡", "WCHAR", lang
+    End If
+    Else
     i = FreeFile
    Uni(i) = IsLabelSymbolNew(rest$, "≈’—…¡", "WIDE", lang)
+   
    'SPELLING CORRECTION FOR GREEK WORD..
    If Not Uni(i) Then Uni(i) = IsLabelSymbolNew(rest$, "≈’—≈…¡", "WCHAR", lang)
+   End If
     If IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "INPUT", lang) Then
+    If skip Then BadFilename: Exit Function
             If IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then
                     If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                         If GetVar(bstack, what$, it) Then
                             var(it) = i
+                            
                         Else
                             GlobalVar what$, i
                         End If
@@ -40748,7 +40961,7 @@ End If
                 End If
                 End If
         ElseIf IsLabelSymbolNew(rest$, "”’Ã–À«—Ÿ”«", "APPEND", lang) Then
-         If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
+        If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
             If IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then
                 If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                     If GetVar(bstack, what$, it) Then
@@ -40756,6 +40969,7 @@ End If
                     Else
                         GlobalVar what$, i
                     End If
+                    If Not skip Then
                     If CFname(GetDosPath(s$)) <> "" Then
                         FLEN(i) = 1
                         On Error Resume Next
@@ -40765,10 +40979,11 @@ End If
                         If Err.Number > 0 Then Exit Function
 
                     End If
+                    End If
                 End If
             End If
         ElseIf IsLabelSymbolNew(rest$, "≈Œ¡√Ÿ√«", "OUTPUT", lang) Then
-        If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
+        If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
         If IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then
             If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                 If GetVar(bstack, what$, it) Then
@@ -40777,6 +40992,7 @@ End If
                 GlobalVar what$, i
                 End If
                 On Error Resume Next
+                If Not skip Then
                 FLEN(i) = 1
                 If Not NeoUnicodeFile(s$) Then Exit Function
 
@@ -40784,10 +41000,11 @@ End If
                  Open GetDosPath(s$) For Binary Access Write As i
  
                     If Err.Number > 0 Then Exit Function
-
+                End If
                End If
        End If
         ElseIf IsLabelSymbolNew(rest$, "–≈ƒ…¡", "RANDOM", lang) Then
+        If skip Then BadFilename: Exit Function
         If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
       If IsLabelSymbolNew(rest$, "Ÿ”", "AS", lang) Then
             If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
@@ -42493,9 +42710,14 @@ If Not IsExp(basestack, rest$, x) Then x = 1
 End Function
 Function ProcSort(basestack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, s$, sx As Double, sy As Double, pppp As mArray
-Dim x1 As Long, y1 As Long, p As Double, ML As Long, desc As Boolean, numb As Boolean
+Dim x1 As Long, y1 As Long, p As Double, ML As Long, desc As Boolean, numb As Boolean, useclid As Boolean
 ProcSort = False
 desc = IsLabelSymbolNew(rest$, "÷»…Õœ’”¡", "DESCENDING", lang)
+If Not desc Then
+    useclid = IsLabelSymbolNew(rest$, "¡’Œœ’”¡", "ASCENDING", lang)
+Else
+    useclid = True
+End If
     y1 = Abs(IsLabel(basestack, rest$, s$))
     If y1 = 1 Then
          If GetVar(basestack, s$, i) Then
@@ -42518,23 +42740,42 @@ desc = IsLabelSymbolNew(rest$, "÷»…Õœ’”¡", "DESCENDING", lang)
                             End If
                             If FastSymbol(rest$, ",") Then
                                 If IsExp(basestack, rest$, p) Then
+                                With var(i).objref
+                                    If useclid Then
+                                        .SetBinaryCompare
+                                        .useclid = CLng(p)
                                     
-                                    If p <> 0 Then
-                                        var(i).objref.Sort
+                                            If desc Then
+                                                .SortDes
+                                            Else
+                                                .Sort
+                                            End If
+                                    
+                                    ElseIf p <> 0 Then
+                                        .useclid = 0
+                                        .Sort
                                     Else
-                                        var(i).objref.SortDes
+                                        .useclid = 0
+                                        .SortDes
                                     End If
+                                 End With
                                 Else
                                     MissPar
                                     Exit Function
                                 End If
+                                
                             Else
+                            With var(i).objref
                                 If desc Then
-                                 var(i).objref.SortDes
+                                 .useclid = 0
+                                 .objref.SortDes
                                 Else
-                                    var(i).objref.Sort
+                                .useclid = 0
+                                    .Sort
                                 End If
+                            End With
                             End If
+                            
                             ProcSort = True
                             Else
                             MyEr "Expected Inventory", "–ÂÒﬂÏÂÌ·  ·Ù‹ÛÙ·ÛÁ"
@@ -43846,6 +44087,10 @@ Locale:
     On Error Resume Next
     If IsExp(basestack, rest$, p) Then
     cLid = CLng(p)
+    OverideDec = True
+    NoUseDec = False
+    NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+    NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
     p = GetCodePage(CLng(p))
     GoTo CHR222
     End If
@@ -44266,11 +44511,13 @@ End If
 ProcTitle = True
 End Function
 Function MyWrite(basestack As basetask, rest$, lang As Long) As Boolean
-Dim p As Double, s$, it As Long, par As Boolean, i As Long
+Dim p As Double, s$, it As Long, par As Boolean, i As Long, skip As Boolean
 If IsLabelSymbolNew(rest$, "Ã≈", "WITH", lang) Then
     If IsStrExp(basestack, rest$, s$) Then
         csvsep$ = Left$(s$, 1)
         If FastSymbol(rest$, ",") Then If IsStrExp(basestack, rest$, s$) Then csvDec$ = Left$(s$, 1): MyWrite = True
+        csvuseescape = False
+        If FastSymbol(rest$, ",") Then MyWrite = False: If IsExp(basestack, rest$, p) Then csvuseescape = CBool(p): MyWrite = True
     End If
     Exit Function
 End If
@@ -44281,65 +44528,98 @@ If FastSymbol(rest$, "#") Then
 
     MyWrite = False
     If IsExp(basestack, rest$, p) Then
-
+    skip = p < 0
         On Error Resume Next
-        i = CLng(MyMod(p, 512))
+    If skip Then
+    Dim scr As Object, prive As basket, basketcode As Long
+    Set scr = basestack.Owner
+    basketcode = GetCode(scr)
+    prive = players(GetCode(scr))
+    Else
+    i = CLng(MyMod(p, 512))
+    End If
         
         par = False
         Do While FastSymbol(rest$, ",")
 
             If IsExp(basestack, rest$, p) Then
-                If par Then
-                        If Uni(i) Then
-                                putUniString i, csvsep$
-                        Else
-                                putANSIString i, csvsep$
-                               ' Print #i, ",";
-                        End If
+            s$ = LTrim(Str$(p))
+            If it Then
+            Else
+             If Left$(s$, 1) = "." Then
+                s$ = "0" + s$
+                ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
                 End If
-                If Uni(i) Then
-                If it Then
-                putUniString i, PACKLNG2$(p)
-                Else
-                    If Len(csvDec$) = 0 Then
-                    putUniString i, NLtrim$(Str$(p))
+            End If
+                If par Then
+                    If skip Then
+                        PlainBaSket scr, prive, csvsep$
+                    ElseIf Uni(i) Then
+                            putUniString i, csvsep$
                     Else
-                    putUniString i, NLtrim$(Replace(Str$(p), ".", csvDec$))
+                            putANSIString i, csvsep$
+                           ' Print #i, ",";
                     End If
                 End If
-                Else
-                    If Len(csvDec$) = 0 Then
-                        putANSIString i, NLtrim$(Str$(p))
-                    Else
-                    putANSIString i, NLtrim$(Replace(Str$(p), ".", csvDec$))
-                    End If
-                End If
-                If Err.Number > 0 Then Exit Function
-                ElseIf IsStrExp(basestack, rest$, s$) Then
-                If par Then
-                        If Uni(i) Then
-                                putUniString i, csvsep$
+                If skip Then
+                        If it Then
+                            PlainBaSket scr, prive, PACKLNG2$(p)
                         Else
-                                putANSIString i, csvsep$
-                        '       Print #i, ",";
+                            If Len(csvDec$) = 0 Then
+                                PlainBaSket scr, prive, s$
+                            Else
+                                PlainBaSket scr, prive, Replace(Str$(p), ".", csvDec$)
+                            End If
                         End If
+                ElseIf Uni(i) Then
+                        If it Then
+                            putUniString i, PACKLNG2$(p)
+                        ElseIf Len(csvDec$) = 0 Then
+                            putUniString i, s$
+                        Else
+                            putUniString i, Replace(s$, ".", csvDec$)
                         End If
-                         s$ = Replace$(s$, Chr(34), Chr(34) + Chr(34))
-                         If Uni(i) Then
+                Else
+                        If Len(csvDec$) = 0 Then
+                            putANSIString i, s$
+                        Else
+                            putANSIString i, Replace(s$, ".", csvDec$)
+                        End If
                         
+                        If Err.Number > 0 Then Exit Function
+                End If
+            ElseIf IsStrExp(basestack, rest$, s$) Then
+            If csvuseescape Then s$ = StringToEscapeStr(s$, False)
+                If par Then
+                    If skip Then
+                        PlainBaSket scr, prive, csvsep$
+                    ElseIf Uni(i) Then
+                        putUniString i, csvsep$
+                    Else
+                        putANSIString i, csvsep$
+                        '       Print #i, ",";
+                    End If
+                End If
+                s$ = Replace$(s$, Chr(34), Chr(34) + Chr(34))
+                If skip Then
+                    PlainBaSket scr, prive, Chr(34) + s$ & Chr(34)
+                ElseIf Uni(i) Then
                     putUniString i, Chr(34) + s$ & Chr(34)
                 Else
                     putANSIString i, Chr(34) + s$ & Chr(34)
 '                    Print #i, chr(34) + S$ & chr(34);
                     End If
                     If Err.Number > 0 Then Exit Function
-                Else
+            Else
                 
                     Exit Function
-                End If
-                par = True
+            End If
+            par = True
+            If skip Then players(basketcode) = prive
         Loop
-        If Uni(i) Then
+        If skip Then
+            crNew basestack, prive
+        ElseIf Uni(i) Then
             putUniString i, vbCrLf
         Else
             putANSIString i, vbCrLf
@@ -44349,6 +44629,7 @@ If FastSymbol(rest$, "#") Then
 
     End If
 End If
+If skip Then players(basketcode) = prive
 
 End Function
 Function MyPut(basestack As basetask, rest$) As Boolean
@@ -45607,9 +45888,12 @@ If Not IsLabelSymbolNew(rest$, "¬¡”«", "BASE", lang) Then
     Do
         IsSymbol3 rest$, "#" ' optional
         If IsExp(basestack, rest$, p) Then
+            If p < 0 Then
+            Else
             p = CLng(MyMod(Abs(p), 512))
             Close Abs(p)
             FLEN(p) = 0
+            End If
         Else
             If par Then
                 MyClose = False
@@ -46616,3 +46900,4 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, w$, SBB$) As Boo
         Exit Function
     End If
 End Function
+
