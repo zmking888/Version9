@@ -179,6 +179,7 @@ DoEvents
 End Sub
 
 Public Sub MyDoEvents1(some As Object)
+Static once As Boolean
 On Error Resume Next
 If TaskMaster Is Nothing Then
     If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
@@ -196,12 +197,15 @@ Else
             If some Is Nothing Then
             TaskMaster.Dispose
             Else
-         If some.Visible Then some.Refresh
+         If some.Visible Then some.Refresh ': TaskMaster.RestEnd: Exit Sub
          End If
+         If Not once Then
+        once = True
         TaskMaster.StopProcess
          DoEvents
          TaskMaster.StartProcess
-                  
+         once = False
+        End If
                   
                   End If
                   

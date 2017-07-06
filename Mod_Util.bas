@@ -3740,12 +3740,12 @@ UnHook Form1.hWnd
 Form1.KeyPreview = True
 Targets = ot
 End Sub
-Private Sub mywait11(bstack As basetask, PP As Double)
+Private Sub mywait11(bstack As basetask, pp As Double)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If PP = 0 Then Exit Sub
+If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3757,7 +3757,7 @@ Exit Sub
 End If
 End If
 End If
-PP = PP + CDbl(timeGetTime)
+pp = pp + CDbl(timeGetTime)
 
 Do
 
@@ -3781,7 +3781,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -6435,8 +6435,39 @@ End Sub
 Public Sub ErrNum()
 MyEr "Error in number", "Λάθος στον αριθμό"
 End Sub
+Public Sub CantAssignValue()
+MyEr "Can't assign value to constant", "Δεν μπορώ να βάλω τιμή σε σταθερά"
+End Sub
 Public Sub Expected(w1$, w2$)
  MyEr "Expected object type " + w1$, "Περίμενα αντικείμενο τύπου " + w2$
+End Sub
+Public Sub ExpectedCaseorElseorEnd2()
+MyEr "Expected Case or Else or End Select", "Περίμενα Με ή Αλλιώς ή Τέλος Επιλογής"
+End Sub
+Public Sub ExpectedCaseorElseorEnd()
+ MyEr "Expected Case or Else or End Select, for two or more commands use {}", "Περίμενα Με ή Αλλιώς ή Τέλος Επιλογής, για δυο ή περισσότερες εντολές χρησιμοποίησε { }"
+End Sub
+Public Sub ExpectedCommentsOnly()
+ MyEr "Expected comments (using ' or \) or new line", "Περίμενα σημειώσεις (με ' ή \) ή αλλαγή γραμής"
+End Sub
+
+Public Sub ExpectedEndSelect()
+ MyEr "Expected Εnd Select", "Περίμενα Τέλος Επιλογής"
+End Sub
+Public Sub ExpectedEndSelect2()
+ MyEr "Expected Εnd Select, for two or more commands use {}", "Περίμενα Τέλος Επιλογής, για δυο ή περισσότερες εντολές χρησιμοποίησε { }"
+End Sub
+Public Sub LocaleAndGlobal()
+MyEr "Global and local together;", "Γενική και τοπική μαζί!"
+End Sub
+Public Sub UnknownProperty(w$)
+MyEr "Unknown Property " & w$, "’γνωστη ιδιότητα " & w$
+End Sub
+Public Sub UnknownVariable(w$)
+MyEr "Unknown Variable " & w$, "’γνωστη μεταβλητή " & w$
+End Sub
+Public Sub UnKnownWeak(w$)
+ MyEr "Unknown Weak " & w$, "’γνωστη ισχνή " & w$
 End Sub
 Public Sub InternalEror()
 MyEr "Internal error", "Εσωτερικό λάθος"
@@ -6647,15 +6678,15 @@ Do
     End If
 Loop
 End Sub
-Public Function StringToEscapeStr(RHS As String, Optional json As Boolean = False) As String
+Public Function StringToEscapeStr(rhs As String, Optional json As Boolean = False) As String
 Dim i As Long, cursor As Long, ch As String
 cursor = 0
 Dim DEL As String
 Dim H9F As String
 DEL = ChrW(127)
 H9F = ChrW(&H9F)
-For i = 1 To Len(RHS)
-                ch = Mid$(RHS, i, 1)
+For i = 1 To Len(rhs)
+                ch = Mid$(rhs, i, 1)
                 cursor = cursor + 1
                 Select Case ch
                     Case "\":        ch = "\\"
@@ -6681,16 +6712,16 @@ Next
 If cursor > 0 Then StringToEscapeStr = Left$(StringToEscapeStr, cursor)
 
 End Function
-Public Function EscapeStrToString(RHS As String) As String
+Public Function EscapeStrToString(rhs As String) As String
 Dim i As Long, cursor As Long, ch As String
-     For cursor = 1 To Len(RHS)
-        ch = Mid$(RHS, cursor, 1)
+     For cursor = 1 To Len(rhs)
+        ch = Mid$(rhs, cursor, 1)
         i = i + 1
         Select Case ch
             Case """": GoTo ok1
             Case "\":
                 cursor = cursor + 1
-                ch = Mid$(RHS, cursor, 1)
+                ch = Mid$(rhs, cursor, 1)
                 Select Case LCase$(ch) 'We'll make this forgiving though lowercase is proper.
                     Case "\", "/": ch = ch
                     Case """":      ch = """"
@@ -6699,7 +6730,7 @@ Dim i As Long, cursor As Long, ch As String
                     Case "t":      ch = vbTab
                     Case "b":      ch = vbBack
                     Case "f":      ch = vbFormFeed
-                    Case "u":      ch = ParseHexChar(RHS, cursor, Len(RHS))
+                    Case "u":      ch = ParseHexChar(rhs, cursor, Len(rhs))
                 End Select
         End Select
                 If i + Len(ch) > Len(EscapeStrToString) Then EscapeStrToString = EscapeStrToString + Space$(500)
@@ -6742,3 +6773,22 @@ Private Function ParseHexChar( _
     ParseHexChar = ChrW$(Value)
 End Function
 
+Public Function ReplaceSpace(a$) As String
+Dim i As Long, j As Long
+i = 1
+Do
+i = InStr(i, a$, "[")
+If i > 0 Then
+    i = i + 1
+    j = InStr(i, a$, "]")
+    If j > 0 Then
+    j = j - i
+    Mid$(a$, i, j) = Replace(Mid$(a$, i, j), " ", ChrW(160))
+    i = i + j
+    End If
+Else
+    Exit Do
+End If
+Loop
+ReplaceSpace = a$
+End Function
