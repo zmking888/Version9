@@ -2766,8 +2766,8 @@ Function ismine2(ByVal a$) As Boolean  ' CAN START A BLOCK OR DO SOMETHING
 ismine2 = True
 a$ = myUcase(a$, True)
 Select Case a$
-Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "ELSE", "EVENT", "EVERY", "GLOBAL", "FOR", "FUNCTION", "GROUP", "INVENTORY", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VALUE", "WHILE"
-Case "ÁÑ×Ç", "ÁËËÉÙÓ", "ÁÎÉÁ", "ÁÎÉÁ(", "ÃÅÃÏÍÏÓ", "ÃÅÍÉÊÏ", "ÃÅÍÉÊÇ", "ÃÅÍÉÊÅÓ", "ÃÉÁ", "ÄÅÓ", "ÄÏÌÇ", "ÅÊÔÕĞÙÔÇÓ", "ÅÊÔÕĞÙÓÇ", "ÅÍÙ", "ÅĞÉĞÅÄÏ", "ÈÅÓÅ", "ÈÅÓÅ(", "ÉÄÉÏÔÇÔÅÓ", "É×ÍÏÓ", "ÉÄÉÏÔÇÔÁ", "ÊÁÈÅ", "ÊÁÔÁÓÔÁÓÇ", "ÊËÁÓÇ", "ÊÕÑÉÏ.ÅÑÃÏ", "ÌÅÔÁ", "ÍÇÌÁ", "ÏÌÁÄÁ", "ÏÑÉÓÅ", "ĞÁ×ÏÓ", "ĞÅÍÁ", "ĞÅÑÉ", "ĞÅÑÉÈÙÑÉÏ", "ÓÕÍÁÑÔÇÓÇ", "ÓÙÑÏÓ", "ÔÅËÅÓÔÇÓ", "ÔÌÇÌÁ", "ÔÏĞÉÊÁ", "ÔÏĞÉÊÇ", "ÔÏĞÉÊÅÓ", "ÔÏÔÅ", "×ÑÙÌÁ"
+Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "ELSE", "EVENT", "EVERY", "GLOBAL", "FOR", "FKEY", "FUNCTION", "GROUP", "INVENTORY", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VALUE", "WHILE"
+Case "ÁÑ×Ç", "ÁËËÉÙÓ", "ÁÎÉÁ", "ÁÎÉÁ(", "ÃÅÃÏÍÏÓ", "ÃÅÍÉÊÏ", "ÃÅÍÉÊÇ", "ÃÅÍÉÊÅÓ", "ÃÉÁ", "ÄÅÓ", "ÄÏÌÇ", "ÅÊÔÕĞÙÔÇÓ", "ÅÊÔÕĞÙÓÇ", "ÅÍÙ", "ÅĞÉĞÅÄÏ", "ÈÅÓÅ", "ÈÅÓÅ(", "ÉÄÉÏÔÇÔÅÓ", "É×ÍÏÓ", "ÉÄÉÏÔÇÔÁ", "ÊÁÈÅ", "ÊÁÔÁÓÔÁÓÇ", "ÊËÁÓÇ", "ÊËÅÉÄÉ", "ÊÕÑÉÏ.ÅÑÃÏ", "ÌÅÔÁ", "ÍÇÌÁ", "ÏÌÁÄÁ", "ÏÑÉÓÅ", "ĞÁ×ÏÓ", "ĞÅÍÁ", "ĞÅÑÉ", "ĞÅÑÉÈÙÑÉÏ", "ÓÕÍÁÑÔÇÓÇ", "ÓÙÑÏÓ", "ÔÅËÅÓÔÇÓ", "ÔÌÇÌÁ", "ÔÏĞÉÊÁ", "ÔÏĞÉÊÇ", "ÔÏĞÉÊÅÓ", "ÔÏÔÅ", "×ÑÙÌÁ"
 Case "->"
 Case Else
 ismine2 = False

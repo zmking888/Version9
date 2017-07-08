@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -928,6 +928,7 @@ If Button = 1 Then
 Select Case q(sel&).Id Mod 100
 Case Is < 10
 If Not interpret(DisStack, (q(sel&).Comm)) Then Beep
+MyEr "", ""
 Case Else
 INK$ = q(sel&).Comm
 End Select
@@ -1625,7 +1626,7 @@ AutoRedraw = True
  If App.StartMode = vbSModeStandalone Then If OneOnly Then Exit Sub
 OneOnly = True
 
-If m_bInIDE Then funcdeep = 128 Else funcdeep = 3270 ' need stack 102440960 bytes
+If m_bInIDE Then funcdeep = 128 Else funcdeep = 3260 ' need stack 102440960 bytes
 
 escok = False
 Sleep 10
@@ -2765,10 +2766,10 @@ End If
         cc.ValueType = REG_DWORD
         If Not m_bInIDE Then
             If Not cc.Value = 0 Then funcdeep = cc.Value
-            If funcdeep > 3270 Then
+            If funcdeep > 3260 Then
             ' fix it
-            cc.Value = 3270
-            funcdeep = 3270
+            cc.Value = 3260
+            funcdeep = 3260
             End If
             
         Else

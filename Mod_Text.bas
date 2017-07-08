@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2841,7 +2841,12 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         ElseIf var(y1).HasValue Then
             If var(y1).HasParameters Then
             If pppp.Arr Then
+            If Left$(b$, 1) = "(" Then
+            b$ = w$ + "$" + b$
+            Else
                 b$ = w$ + "$(" + b$
+                End If
+                 If IsStrExp(bstack, b$, bb$) Then GoTo conthere
                 ElseIf FastSymbol(b$, ")(", , 2) Then
                 b$ = w$ + "(" + b$
                 If IsStrExp(bstack, b$, bb$) Then GoTo conthere
@@ -5546,6 +5551,7 @@ V1& = Abs(V1&)
  GoTo LOOKFORSUBNUM
  Else
  IsNumber = False
+  a$ = v$ + a$
     Exit Function
  End If
  ''
@@ -9798,7 +9804,7 @@ PP = 0
                     Loop
                     ' here here here
     If Typename(pppp.item(w2)) = "Group" Then
-    
+
             If Left$(a$, 1) = "." Then
 contgroup:
                                
@@ -9806,13 +9812,13 @@ contgroup:
           
                                  r = SG * bstack.LastValue
             ElseIf Left$(a$, 1) = "(" Then
-          
+contgroup3:
                             IsNumber = SpeedGroup(bstack, pppp, "VAL", v$, a$, w2) = 1
                                  r = SG * bstack.LastValue
             
             
             Else
-                        
+contgroup2:
                         If pppp.item(w2).HasValue Then
                        
                         IsNumber = SpeedGroup(bstack, pppp, "VAL", v$, "", w2) = 1
@@ -9835,13 +9841,82 @@ contlambdahere:
                          w1 = GlobalVar("A_" + CStr(Abs(w2)), 0)
                        
                          Set var(w1) = pppp.item(w2)
+                         
                                     If here$ = "" Then
                                             GlobalSub "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
                                         Else
                                             GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
                                     End If
+againlambda:
                                     a$ = "A_" + CStr(Abs(w2)) + "(" + a$
                                  IsNumber = IsNumber(bstack, a$, p)
+                                 If Not bstack.lastobj Is Nothing Then
+                                 If TypeOf bstack.lastobj Is lambda Then
+                                 If IsOperator(a$, "(") Then
+                                 Set var(w1) = bstack.lastobj
+                                 GoTo againlambda
+                                 End If
+                                 ElseIf IsOperator(a$, "(") Then
+                                 If TypeOf bstack.lastobj Is mArray Then
+                                 PopStage bstack
+                                           PopStage bstack
+                                        Set pppp = bstack.lastobj
+                                        Set bstack.lastobj = Nothing
+                                        GoTo contAr2
+                                 ElseIf TypeOf bstack.lastobj Is mHandler Then
+                                 PopStage bstack
+                                 If bstack.lastobj.t1 = 3 Then
+                                        Set anything = bstack.lastobj
+                                        If CheckIsmArray(anything, var()) Then
+                                        Set pppp = anything
+                                        Else
+                                        Set pppp = New mArray
+                                        pppp.Arr = False
+                                        Set pppp.GroupRef = bstack.lastobj
+                                        End If
+                                        Set anything = Nothing
+                                ElseIf bstack.lastobj.t1 = 1 Then
+                                     Set pppp = New mArray
+                                        pppp.Arr = False
+                                        Set pppp.GroupRef = bstack.lastobj
+                                        w2 = -2
+                                      '  Mid$(b$, 1, 1) = " "
+                                        GoTo contrightpar
+                                    Else
+                                        Set pppp = New mArray
+                                        pppp.Arr = False
+                                        Set pppp.GroupRef = bstack.lastobj
+                                    End If
+                                      ElseIf TypeOf bstack.lastobj Is mArray Then
+                       
+                                
+                                    ElseIf TypeOf bstack.lastobj Is Group Then
+                                             Set pppp = New mArray
+                                        pppp.Arr = False
+                                        Set pppp.GroupRef = bstack.lastobj
+                                        w2 = -2
+                                        GoTo contgroup3
+                                                     End If
+
+                                ElseIf TypeOf bstack.lastobj Is mArray Then
+                                    PopStage bstack
+                                        Set pppp = bstack.lastobj
+                                        Set bstack.lastobj = Nothing
+                                        GoTo contAr2
+                                ElseIf TypeOf bstack.lastobj Is Group Then
+                               PopStage bstack
+                                                  Set pppp = New mArray
+                                        pppp.Arr = False
+                                        Set pppp.GroupRef = bstack.lastobj
+                                        w2 = -2
+                                If Left$(a$, 1) = "." Then
+             
+                                GoTo contgroup
+                                Else
+                                 GoTo contgroup2
+                                End If
+                                End If
+                                End If
                                  Set var(w1) = Nothing
                                  If Right$(pppp.arrname, 2) = "%(" Then
                                  r = SG * MyRound(p)
@@ -9849,6 +9924,9 @@ contlambdahere:
                                  r = SG * p
                                  End If
                         PopStage bstack
+                        IsNumber = True
+                        Exit Function
+                        
                 ElseIf Typename(pppp.item(w2)) = "mArray" Then
                 Set pppp = pppp.item(w2)
                 GoTo contAr2
@@ -16037,10 +16115,10 @@ Case 1
 
     If sss = LLL Then
   If comhash.Find2(w$, i, v) Then
-  GoTo PROCESSCOMMAND
+  If v <> 0 Then GoTo PROCESSCOMMAND
   End If
     ss$ = ""
-    If MaybeIsSymbol(b$, "/*-+=~^&|<>") Then
+    If MaybeIsSymbol(b$, "/*-+=~^|<>") Then
         If FastOperator(b$, "<=", i, 2, False) Then
         ' LOOK GLOBAL
         If GetVar(bstack, w$, v, True) Then
@@ -17987,7 +18065,9 @@ contherecom:
       '
       v = 0
     ' If Not comhash.Find(w$, i) Then
-If Not comhash.Find2(w$, i, v) Then
+If MaybeIsSymbol(b$, "<=+-/*~") Then
+GoTo varonly
+ElseIf Not comhash.Find2(w$, i, v) Then
                 iscom = True
                 lbl = False
                 GoTo varonly
@@ -18009,7 +18089,7 @@ myerr1:
               GoTo parsecommand
                End If
         ElseIf v <> 0 Then
-                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst
+                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, varonly
                 Execute = 0: Exit Function
                 
 BypassGlobalComm:
@@ -18025,8 +18105,9 @@ BypassComm:
                 End If
                 GoTo parsecommand
              Else
-                If lbl And MaybeIsSymbol(b$, "<=") Then GoTo varonly
-                If GetlocalVar(w$, nd&) Then GoTo varonly
+               ' If lbl And MaybeIsSymbol(b$, "<=") Then GoTo varonly
+                'If GetlocalVar(w$, nd&) Then GoTo varonly
+                'If GetGlobalVar(w$, nd&) Then GoTo varonly
                GoTo parsecommand
              End If
 
@@ -18100,6 +18181,18 @@ ContScan:
             If IsExp(bstack, b$, p) Then
             End If
             Sleep 10: MyDoEvents0 di
+            If FKey > 0 Then
+                If FK$(FKey) <> "" Then
+                ss$ = FK$(FKey)
+                FKey = 0
+                If Not interpret(basestack1, ss$) Then
+                Execute = 0
+                Exit Function
+                End If
+                End If
+                FKey = 0
+            End If
+            
             Else
                 If di.Visible = False Then di.Visible = True
                 NoAction = False
@@ -19915,12 +20008,22 @@ contNegLocal:
 contNegGlobal:
                 If NewStat Then LocaleAndGlobal: Execute = 0: Exit Function
                 If Not VarStat Then
-             
                 If IsLabelSymbolNew(b$, "œÃ¡ƒ¡", "GROUP", lang) Then
                If Not ProcGroup(1, bstack, b$, lang) Then Execute = 0: Exit Function
                ElseIf IsLabelSymbolNew(b$, "√≈√œÕœ”", "EVENT", lang) Then
                 If Not GlobalEVENT(bstack, b$, lang) Then Execute = 0: Exit Function
                 ElseIf IsLabelSymbolNew(b$, " ¡‘¡”‘¡”«", "INVENTORY", lang) Then
+                If MaybeIsSymbol(b$, "=") Then
+                
+                VarStat = True
+                    If lang = 0 Then
+                    w$ = " ¡‘¡”‘¡”«"
+                       Else
+                    w$ = "INVENTORY"
+                    End If
+                    sss = Len(b$)
+                    GoTo varonly
+                End If
                 If IsLabelSymbolNew(b$, "œ’—¡", "QUEUE", lang) Then
                     If Not GlobalHandler(bstack, b$, lang, 3) Then Execute = 0: Exit Function
                 Else
@@ -19928,9 +20031,14 @@ contNegGlobal:
                 End If
                 ElseIf IsLabelSymbolNew(b$, "ƒ…¡—»—Ÿ”«", "BUFFER", lang) Then
                 If Not GlobalHandler(bstack, b$, lang, 2) Then Execute = 0: Exit Function
-               End If
                 Else
-                End If
+                GoTo CONT12212
+               End If
+                VarStat = True
+                sss = Len(b$)
+               
+                Else
+CONT12212:
                 VarStat = True
                 sss = Len(b$)
                 
@@ -19973,6 +20081,7 @@ contNegGlobal:
                     GoTo contcase7
                     End Select
                   GoTo errstat
+                  End If
         Case "CONST", "”‘¡»≈—«", "”‘¡»≈—≈”"
 makeconst:
         ConstNew bstack, b$, w$, here$ = ""
@@ -24246,6 +24355,7 @@ End Function
 Function GlobalSub(name$, q As String, Optional sbgroupname As String = "", Optional ByVal nameonly$) As Long
 Dim j As Long, n$, where As Long
 n$ = myUcase(name$, True)
+
 j = AllocSub()
 With sbf(j)
     .sb = q
@@ -24783,11 +24893,8 @@ ah = aheadstatus(s$, False)    '
 If InStr(ah, "l") = 0 Then
 If InStr(ah, "N") > 0 Then
 
-''If MaybeIsSymbol(s$, "#0123456789") Then
-'logical = IsNumberCheck(s$, d)
-''Else
 logical = IsNumber(basestack, s$, d)
-''End If
+
 Else
 If par > 0 Then
 logical = GetArr(basestack, s$, d, s2$, 0)
@@ -40585,7 +40692,6 @@ End Function
 Function ProcInventory(bstack As basetask, rest$, lang As Long) As Boolean
 ProcInventory = True
 Dim s$, what$, i As Long, p As Double, queue As Boolean
-
     queue = IsLabelSymbolNew(rest$, "œ’—¡", "QUEUE", lang)
      Do While Abs(IsLabel(bstack, rest$, what$)) = 1
      If bstack.priveflag Then what$ = ChrW(&HFFBF) + what$
@@ -41018,7 +41124,14 @@ If IsLabelSymbolNew(rest$, " ¡»¡—œ", "CLEAR", lang) Then
 ElseIf IsExp(bstack, rest$, p) Then
 
     i = ((CLng(p) + 11) Mod 12) + 1
-    If FastSymbol(rest$, ",") Then
+    If MaybeIsSymbol(rest$, "{") Then
+         If IsStrExp(bstack, rest$, s$) Then
+            FK$(i) = s$
+        Else
+            MissPar
+            Exit Function
+        End If
+    ElseIf FastSymbol(rest$, ",") Then
         If IsStrExp(bstack, rest$, s$) Then
             FK$(i) = s$
         Else
@@ -43886,7 +43999,7 @@ prive = GetCode(basestack.Owner)
     crNew basestack, players(prive)
 End If
 If funcdeep < 128 Then funcdeep = 128
-If funcdeep > 3270 Then funcdeep = 3270
+If funcdeep > 3260 Then funcdeep = 3260
 End Function
 Function ProcSalata(entrypoint As Long, basestack As basetask, rest$) As Boolean
 Dim p As Double, scr As Object, prive As Long
@@ -44239,7 +44352,11 @@ jumpheretoo:
                                 s$ = s$ + vbCrLf + "ƒÈ‹‚·ÛÂ " + frm$ + vbCrLf
                                 End If
                                 End If
-                                basestack.IndexSub = GlobalSub(here$ & "." & basestack.GroupName & what$, s$ + ss$, , what$)
+                                If basestack.GroupName = "" Then
+                                basestack.IndexSub = GlobalSub(here$ & "." & what$, s$ + ss$, , what$)
+                                Else
+                                basestack.IndexSub = GlobalSub(here$ & "." & basestack.GroupName & what$, s$ + ss$, , "")
+                                End If
                         End If
                         If Not FastSymbol(rest$, "}") Then MyModule = False
                         Exit Function
@@ -45656,11 +45773,28 @@ End If
 
 End Function
 Function MyScan(basestack As basetask, rest$) As Boolean
-Dim p As Double, y As Double
-If Not Targets Then MyDoEvents: Exit Function
+Dim p As Double, y As Double, s$
+ClearJoyAll
+PollJoypadk
+If Not Targets Then
+If IsExp(basestack, rest$, p) Then
+
+End If
+MyScan = True
+MyDoEvents
+If FKey > 0 Then
+If FK$(FKey) <> "" Then
+    s$ = FK$(FKey)
+    MyScan = interpret(basestack1, s$)
+FKey = 0
+End If
+End If
+
+
+ Exit Function
+End If
 If basestack.Owner.Visible = False Then basestack.Owner.Visible = True
 basestack.Owner.SetFocus
-
 NoAction = False
 
 nomore = True

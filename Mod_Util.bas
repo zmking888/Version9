@@ -3740,12 +3740,12 @@ UnHook Form1.hWnd
 Form1.KeyPreview = True
 Targets = ot
 End Sub
-Private Sub mywait11(bstack As basetask, pp As Double)
+Private Sub mywait11(bstack As basetask, PP As Double)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If pp = 0 Then Exit Sub
+If PP = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3757,7 +3757,7 @@ Exit Sub
 End If
 End If
 End If
-pp = pp + CDbl(timeGetTime)
+PP = PP + CDbl(timeGetTime)
 
 Do
 
@@ -3781,7 +3781,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -5015,8 +5015,8 @@ If IsLabel(basestack1, s$, d$) > 0 Then
         ElseIf d$ = "REC" Then
                cc.ValueKey = "FUNCDEEP"  ' RESET
              cc.ValueType = REG_DWORD
-             funcdeep = 3270
-                    cc.Value = 3270 ' SET REVISION DEFAULT
+             funcdeep = 3260
+                    cc.Value = 3260 ' SET REVISION DEFAULT
         Else
             s$ = "+" & d$ & s$
             Exit Do
@@ -5153,11 +5153,12 @@ again:
             part$ = "N"
               
         End If
+again22:
       pos = pos + 1
 
         If Not BlockParam2(a$, pos) Then Exit Do
         If Mid$(a$, pos + 1, 1) = "(" Then
-        pos = pos + 1: GoTo again
+        pos = pos + 1: GoTo again22
         End If
        If Mid$(a$, pos + 1, 1) <> "." Then b$ = b$ & part$
         part$ = ""
@@ -6678,15 +6679,15 @@ Do
     End If
 Loop
 End Sub
-Public Function StringToEscapeStr(rhs As String, Optional json As Boolean = False) As String
+Public Function StringToEscapeStr(RHS As String, Optional json As Boolean = False) As String
 Dim i As Long, cursor As Long, ch As String
 cursor = 0
 Dim DEL As String
 Dim H9F As String
 DEL = ChrW(127)
 H9F = ChrW(&H9F)
-For i = 1 To Len(rhs)
-                ch = Mid$(rhs, i, 1)
+For i = 1 To Len(RHS)
+                ch = Mid$(RHS, i, 1)
                 cursor = cursor + 1
                 Select Case ch
                     Case "\":        ch = "\\"
@@ -6712,16 +6713,16 @@ Next
 If cursor > 0 Then StringToEscapeStr = Left$(StringToEscapeStr, cursor)
 
 End Function
-Public Function EscapeStrToString(rhs As String) As String
+Public Function EscapeStrToString(RHS As String) As String
 Dim i As Long, cursor As Long, ch As String
-     For cursor = 1 To Len(rhs)
-        ch = Mid$(rhs, cursor, 1)
+     For cursor = 1 To Len(RHS)
+        ch = Mid$(RHS, cursor, 1)
         i = i + 1
         Select Case ch
             Case """": GoTo ok1
             Case "\":
                 cursor = cursor + 1
-                ch = Mid$(rhs, cursor, 1)
+                ch = Mid$(RHS, cursor, 1)
                 Select Case LCase$(ch) 'We'll make this forgiving though lowercase is proper.
                     Case "\", "/": ch = ch
                     Case """":      ch = """"
@@ -6730,7 +6731,7 @@ Dim i As Long, cursor As Long, ch As String
                     Case "t":      ch = vbTab
                     Case "b":      ch = vbBack
                     Case "f":      ch = vbFormFeed
-                    Case "u":      ch = ParseHexChar(rhs, cursor, Len(rhs))
+                    Case "u":      ch = ParseHexChar(RHS, cursor, Len(RHS))
                 End Select
         End Select
                 If i + Len(ch) > Len(EscapeStrToString) Then EscapeStrToString = EscapeStrToString + Space$(500)
