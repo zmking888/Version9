@@ -151,7 +151,31 @@ Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
         VirtualFree Ptr, nBytes, MEM_DECOMMIT
         VirtualFree Ptr, 0, MEM_RELEASE
 End Sub
+Public Sub MyDoEvents0new(some As Object)
+   On Error GoTo procbliah3
 
+
+
+            If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+            
+                If RRCOUNTER = 0 Then
+                    k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                    If some.Visible Then some.Refresh
+                  
+                   
+ 
+                    If Not TaskMaster Is Nothing Then
+                            TaskMaster.StopProcess
+                             DoEvents
+                             TaskMaster.StartProcess
+                    Else
+                        DoEvents
+                    End If
+           End If
+   Exit Sub
+procbliah3:
+DoEvents
+End Sub
 
 Public Sub MyDoEvents0(some As Object)
    On Error GoTo procbliah3
@@ -162,17 +186,18 @@ Public Sub MyDoEvents0(some As Object)
             
                 If RRCOUNTER = 0 Then
                     k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-                 If some.Visible Then some.Refresh
-                  End If
+                    If some.Visible Then some.Refresh
                   
+                   End If
  
-If Not TaskMaster Is Nothing Then
-        TaskMaster.StopProcess
-         DoEvents
-         TaskMaster.StartProcess
-Else
-    DoEvents
-End If
+                    If Not TaskMaster Is Nothing Then
+                            TaskMaster.StopProcess
+                             DoEvents
+                             TaskMaster.StartProcess
+                    Else
+                        DoEvents
+                    End If
+           
    Exit Sub
 procbliah3:
 DoEvents
@@ -205,6 +230,9 @@ Else
          DoEvents
          TaskMaster.StartProcess
          once = False
+         Else
+         TaskMaster.StopProcess
+         DoEvents
         End If
                   
                   End If

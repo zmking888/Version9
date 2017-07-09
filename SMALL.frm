@@ -270,19 +270,15 @@ PP = PP + CDbl(timeGetTime)
 Do
 
 
-'If TaskMaster.Processing And Not bstack.TaskMain Then
-        'If Not bstack.toprinter Then bstack.Owner.Refresh
-      
-      '  If Not TaskMaster Is Nothing Then TaskMaster.TimerTickNow
+
+
+
         If Form1.DIS.Visible And Not bstack.toprinter Then
         MyDoEvents0 Form1.DIS
    
         Else
         MyDoEvents0 Me
         End If
-'Els
-        'MyDoEvents
-'End If
 If SLEEPSHORT Then Sleep 1
 If e Then
 p = bstack.Process.Done

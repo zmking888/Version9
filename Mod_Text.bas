@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 9
+Global Const Revision = 10
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2706,6 +2706,13 @@ If Not extreme Then
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
          If scr.Visible Then scr.Refresh
                   End If
+                   If Not TaskMaster Is Nothing Then
+                            TaskMaster.StopProcess
+                             DoEvents
+                             TaskMaster.StartProcess
+                    Else
+                        DoEvents
+                    End If
                   End If
 End If
 RevisionPrint = True
@@ -17792,7 +17799,7 @@ WaitShow = 0
 refreshGui
 If trace Then
 ''Sleep 10
-MyDoEvents0 di   ' change from simple to version 2\ change to mydoevents0
+MyDoEvents0new di   ' change from simple to version 2\ change to mydoevents0
 
 
 Else
@@ -18180,7 +18187,7 @@ ContScan:
             If Not Targets Then
             If IsExp(bstack, b$, p) Then
             End If
-            Sleep 10: MyDoEvents0 di
+            MyDoEvents0new di
             If FKey > 0 Then
                 If FK$(FKey) <> "" Then
                 ss$ = FK$(FKey)
