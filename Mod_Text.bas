@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 10
+Global Const Revision = 11
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -154,6 +154,7 @@ Public comhash As New sbHash, numid As New sbHash, funid As New sbHash
 Public strid  As New sbHash, strfunid As New sbHash
 Public cLid As Long 'current id for app id
 Public GarbageCollector As New GarbageClass
+Public lastAboutHTitle As String, LastAboutText As String
 ''
 Public basestack1 As New basetask ' this is the global stack
 Public sb2used As Long
@@ -211,7 +212,7 @@ Private Const LOCALE_STHOUSAND = &HF
 Private Const LOCALE_SMONDECIMALSEP = &H16
 Private Const LOCALE_SMONTHOUSANDSEP = &H17
 Private Const LOCALE_SMONGROUPING = &H18
-Public trace As Boolean
+Public trace As Boolean, tracecounter As Long
 Const CSIDL_DESKTOP = &H0
 Const CSIDL_PROGRAMS = &H2
 Const CSIDL_CONTROLS = &H3
@@ -18190,11 +18191,17 @@ ContScan:
             MyDoEvents0new di
             If FKey > 0 Then
                 If FK$(FKey) <> "" Then
-                ss$ = FK$(FKey)
+                If bstack.IamChild And FKey = 13 And lastAboutHTitle <> "" Then
+                        abt = True
+                        FKey = 0
+                        vHelp
+                Else
+                    ss$ = FK$(FKey)
                 FKey = 0
                 If Not interpret(basestack1, ss$) Then
                 Execute = 0
                 Exit Function
+                End If
                 End If
                 End If
                 FKey = 0
@@ -20674,7 +20681,7 @@ checkobject1:
                             Mid$(b$, i, 1) = " "
                         End If
                     End If
-                    If Left$(ss$, 1) = "=" Then
+                    If Right$(ss$, 1) = "=" Then
                     If IsExp(bstack, b$, p) Then
                  If Not bstack.AlterVar(w$, p, ss$, False) Then Execute = 0: Exit Function
                  Else
@@ -26903,10 +26910,10 @@ If TaskMaster.Processing And Not bstack.TaskMain Then
         If Not bstack.toprinter Then bstack.Owner.Refresh
         TaskMaster.TimerTick
        ' SleepWait 1
-        MyDoEvents1 Form1
+        MyDoEvents1 Form1   'bstack.Owner '
 Else
         ' SleepWait 1
-        MyDoEvents1 Form1
+        MyDoEvents1 Form1   'bstack.Owner '
 End If
 If SLEEPSHORT Then Sleep 1
 If e Then
@@ -26958,7 +26965,6 @@ If TaskMaster.Processing Then
 
 ElseIf SLOW Then
 Sleep 1
-
 End If
 TaskMaster.rest
 
@@ -31595,6 +31601,7 @@ If par Then
 If s$ = "" Then
 abt = False
 sHelp "", "", 0, 0
+GoTo conthere
 Else
 par = par And FastSymbol(rest$, ",")
 par = par And IsExp(basestack, rest$, x)
@@ -31612,7 +31619,10 @@ kk.textDoc = ReplaceSpace(s$)
 s$ = kk.TextParagraph(1)
 kk.EmptyDoc
 kk.textDoc = ReplaceSpace(ss$)
-sHelp s$, kk.textFormat(vbCrLf), CLng(x), CLng(y)
+' save to
+lastAboutHTitle = s$
+LastAboutText = kk.textFormat(vbCrLf)
+sHelp lastAboutHTitle, LastAboutText, CLng(x), CLng(y)
 End If
 End If
 End If
@@ -31626,6 +31636,16 @@ FeedbackExec$ = kk.textFormat(vbCrLf)
 End If
 Else
 If IsStrExp(basestack, rest$, s$) Then
+If s$ = "" Then
+If lang = 0 Then
+lastAboutHTitle = "Βοήθεια Εφαρμογής"
+LastAboutText = ""
+Else
+lastAboutHTitle = "Application Help"
+LastAboutText = ""
+End If
+GoTo conthere
+End If
 kk.EmptyDoc
 kk.textDoc = ReplaceSpace(s$)
 s$ = kk.textFormat(vbCrLf)
@@ -31688,13 +31708,16 @@ With Form4.Label1
 .glistN.WordCharRightButIncluded = ""
 End With
 Else
+conthere:
 vH_title$ = ""
 If Form4.Visible Then
 Form4.Visible = False
+If Form1.Visible Then
     If Form1.TEXT1.Visible Then
         Form1.TEXT1.SetFocus
     Else
         Form1.SetFocus
+    End If
     End If
 End If
 
@@ -38580,7 +38603,11 @@ again1234:
    End With
    
 Set curbstack = curbstack.Parent
-GoTo again1234
+If here$ = "" Then GoTo again1234
+varhash.ReduceHash curbstack.Vars, var()
+var2used = curbstack.Vars
+
+Exit Function
 End If
 GarbageFlush
 Set curbstack = Nothing
@@ -46869,6 +46896,9 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, w$, SBB$) As Boo
             TraceThis = False
             Exit Function
         End If
+    Else
+If tracecounter > 0 Then MyDoEvents1 Form2, True
+
     End If
     If STEXIT Then
         trace = False

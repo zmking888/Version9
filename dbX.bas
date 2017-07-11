@@ -838,6 +838,7 @@ Id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
 Dim LL$
    Set rec = CreateObject("ADODB.Recordset")
  Err.Clear
+ 
   rec.Open Id$, myBase, 3, 4
 If Err.Number <> 0 Then
 LL$ = myBase ' AS A STRING

@@ -106,14 +106,14 @@ If Not StaticCollection.Find(name$) Then Exit Function
         Dim mm As mArray
             Set mm = .ValueObj.objref
             If mm.Arr Then
-                mm.Compute p, ss$
+                mm.Compute0 p, ss$
             End If
             Set mm = Nothing
         End If
     End If
   Else
             Select Case ss$
-            Case "!!"
+            Case "!!", "~"
             .Value = -1 - (.Value <> 0)
             Case "++"
             .Value = .Value + 1
@@ -185,6 +185,10 @@ End Select
 End Function
 Public Function ExistVar(ByVal name$) As Boolean
         ExistVar = StaticCollection.ExistKey(name$)
+End Function
+Public Function ExistVar2(ByVal name$) As Boolean
+        If StaticCollection Is Nothing Then Exit Function
+        ExistVar2 = StaticCollection.ExistKey(name$)
 End Function
 Public Sub ReadVar(ByVal name$, var As Variant)
     Dim i As Long, vv As Variant

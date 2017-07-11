@@ -66,6 +66,52 @@ Private Type SAFEARRAY1D
     lLBound As Long
 End Type
 Public index As Long
+Public Sub Compute0(p As Double, ss$)
+Dim v As Long
+On Error Resume Next
+v = 0
+Do While v <= Me.UpperMonoLimit
+If MyIsNumeric(actualdata(v)) Then
+                    Select Case ss$
+                                Case "=", "g"
+                                actualdata(v) = p
+                                Case "+"
+                                actualdata(v) = p + actualdata(v)
+                                Case "*"
+                                 actualdata(v) = p * actualdata(v)
+                                Case "-"
+                                actualdata(v) = actualdata(v) - p
+                                Case "/"
+                                If p = 0 Then Exit Do
+                                 actualdata(v) = actualdata(v) / p
+                                  Case "~", "!!"
+                                 actualdata(v) = -1 - (actualdata(v) <> 0)
+                                 Case "++"
+                                actualdata(v) = 1 + actualdata(v)
+                                Case "--"
+                                actualdata(v) = actualdata(v) - 1
+                                  Case "-!"
+                                actualdata(v) = -actualdata(v)
+                                Case "+="
+                                actualdata(v) = p + actualdata(v)
+                                Case "*="
+                                 actualdata(v) = p * actualdata(v)
+                                Case "-="
+                                actualdata(v) = actualdata(v) - p
+                                Case "/="
+                                If p = 0 Then Exit Do
+                                 actualdata(v) = actualdata(v) / p
+                                 
+                                  
+                                 End Select
+                                 actualdata(v) = MyRound(actualdata(v), 13)
+                            
+End If
+                           v = v + 1
+                           Err.Clear
+Loop
+
+End Sub
 Public Sub Compute(p As Double, ss$)
 Dim v As Long
 On Error Resume Next
@@ -815,6 +861,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                 myobject2.HasValue = myobject.HasValue
                 myobject2.HasSet = myobject.HasSet
                 myobject2.HasParameters = myobject.HasParameters
+                myobject2.HasParametersSet = myobject.HasParametersSet
                 Set myobject2.LinkRef = myobject
                 End If
             End With

@@ -117,7 +117,7 @@ Label1.enabled = False    '' true before
 Label1.glistN.FloatList = True
 Label1.glistN.MoveParent = True
 With Label1.glistN
-If Not abt Then
+If FeedbackExec$ = "" Or Not abt Then
 .WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
 .WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
 .WordCharRightButIncluded = "(" + ChrW(160) ' so aaa(sdd) give aaa( as word

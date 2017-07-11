@@ -4573,13 +4573,22 @@ End Sub
 Sub vHelp(Optional ByVal bypassshow As Boolean = False)
 Dim huedif As Long
 Dim UAddPixelsTop As Long
+If abt Then
+'If vH_title$ = lastAboutHTitle Then Exit Sub
+vH_title$ = lastAboutHTitle
+vH_doc$ = LastAboutText
+Else
 If vH_title$ = "" Then Exit Sub
-
+End If
 If Not Form4.Visible Then Form4.Show , Form1: bypassshow = True
 If bypassshow Then
 MyForm Form4, ScrX() - vH_x * Helplastfactor, ScrY() - vH_y * Helplastfactor, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 Else
+If Screen.Width <= Form4.Left Then
+MyForm Form4, Screen.Width - vH_x * Helplastfactor, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+Else
 MyForm Form4, Form4.Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+End If
 End If
 Form4.MoveMe
 
@@ -5516,6 +5525,7 @@ If TaskMaster.PlayMusic Then
                     TaskMaster.OnlyMusic = False
                  End If
         TaskMaster.StopProcess
+         TaskMaster.TimerTick
          DoEvents
          TaskMaster.StartProcess
 If TaskMaster Is Nothing Then Exit Function

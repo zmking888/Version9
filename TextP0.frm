@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -1313,6 +1313,8 @@ End If
 Case vbKeyF1 To vbKeyF12
 If FKey >= 0 Then FKey = KeyCode - vbKeyF1 + 1
 If Abs(FKey) = 1 And ctrl And (shift And &H2) = 2 Then
+If lastAboutHTitle <> "" Then abt = True
+
 FKey = 0: KeyCode = 0: vHelp
 ElseIf FKey = 1 And (shift And 1) Then
 FKey = 13

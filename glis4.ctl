@@ -200,6 +200,7 @@ Event DropOk(ok As Boolean)
 Event DropFront(ok As Boolean)
 Event ScrollMove(item As Long)
 Event RefreshDesktop()
+Event NeedDoEvents()
 Event OutPopUp(x As Single, y As Single, myButton As Integer)
 Event SplitLine()
 Event LineUp()
@@ -2244,7 +2245,9 @@ mousepointer = 0
 doubleclick = 0
 Else
 If mo.Visible Then
+
 mousepointer = 5
+RaiseEvent NeedDoEvents
 If MoveParent Then
 If (mo.Parent.top + (y - preY) < 0) Then preY = y + mo.Parent.top
 If (mo.Parent.Left + (x - preX) < 0) Then preX = x + mo.Parent.Left

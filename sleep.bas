@@ -203,18 +203,38 @@ procbliah3:
 DoEvents
 End Sub
 
-Public Sub MyDoEvents1(some As Object)
+Public Sub MyDoEvents1(some As Object, Optional DOeVONLY As Boolean = False)
 Static once As Boolean
 On Error Resume Next
 If TaskMaster Is Nothing Then
+If DOeVONLY Then
+            DoEvents
+            Else
     If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
             
             If RRCOUNTER = 0 Then
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
             If Not some Is Nothing Then If some.Visible Then some.Refresh
             End If
+            End If
 Else
+
+
     TaskMaster.rest
+    If DOeVONLY Then
+     If Not once Then
+        once = True
+        TaskMaster.TimerTickNow
+        TaskMaster.StopProcess
+         DoEvents
+         TaskMaster.StartProcess
+         once = False
+         Else
+        TaskMaster.TimerTickNow
+         TaskMaster.StopProcess
+         DoEvents
+        End If
+    Else
     If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
             
             If RRCOUNTER = 0 Then
@@ -226,17 +246,19 @@ Else
          End If
          If Not once Then
         once = True
+        TaskMaster.TimerTickNow
         TaskMaster.StopProcess
          DoEvents
          TaskMaster.StartProcess
          once = False
          Else
+        TaskMaster.TimerTickNow
          TaskMaster.StopProcess
          DoEvents
         End If
                   
                   End If
-                  
+        End If
 
 TaskMaster.RestEnd
 End If

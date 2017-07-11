@@ -430,9 +430,28 @@ FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
 
+Private Sub gList2_GotFocus()
+tracecounter = 100
+End Sub
+
 Private Sub gList2_LostFocus()
 doubleclick = 0
+
 End Sub
+
+Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+If Button <> 0 Then tracecounter = 100
+End Sub
+
+Private Sub gList2_MouseUp(x As Single, y As Single)
+tracecounter = 0
+End Sub
+
+Private Sub gList2_NeedDoEvents()
+'
+
+End Sub
+
 
 Private Sub glist3_CheckGotFocus(index As Integer)
 Dim s$
@@ -442,8 +461,42 @@ abt = False
 
 vH_title$ = ""
 s$ = Label(index)
-
-If MyBaseTask.IamLambda Then
+If index = 1 Then
+   
+        Dim i As Long
+        If MyBaseTask.ExistVar2(s$) Then
+            If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
+                sHelp "Static Variable", s$, vH_x, vH_y
+            Else
+                sHelp "Στατική Μεταβλητή", s$, vH_x, vH_y
+            End If
+        
+        ElseIf GetlocalVar(s$, i) Then
+            If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
+                sHelp "Local Identifier", s$, vH_x, vH_y
+            Else
+                sHelp "Τοπικό Αναγνωριστικό", s$, vH_x, vH_y
+            End If
+        ElseIf GetGlobalVar(s$, i) Then
+        If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
+            sHelp "Global Identifier", s$, vH_x, vH_y
+            
+            Else
+            sHelp "Γενικό Αναγνωριστικό", s$, vH_x, vH_y
+            
+            End If
+        ElseIf GetSub(s$, i) Then
+            If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
+                sHelp "Μοdule", s$, vH_x, vH_y
+            Else
+                sHelp "Τμήμα", s$, vH_x, vH_y
+            End If
+        ElseIf ismine(s$) Then
+            fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
+        End If
+    
+    vHelp
+ElseIf MyBaseTask.IamLambda Then
 sHelp s$, LambdaList(MyBaseTask), vH_x, vH_y
 vHelp
 ElseIf MyBaseTask.IamThread Then
@@ -508,7 +561,7 @@ b.Right = gList4.WidthPixels
   End If
    
    
-   PrintItem thisHDC, gList4.List(item), a
+   PrintItem thisHDC, gList4.list(item), a
     skip = True
 End Sub
  
@@ -567,6 +620,7 @@ If Button = 1 Then
     If bordertop < 150 Then
     If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
+    tracecounter = 100
     mousepointer = vbSizeNWSE
     Lx = x
     ly = y
@@ -575,6 +629,7 @@ If Button = 1 Then
     Else
     If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
+    tracecounter = 100
     mousepointer = vbSizeNWSE
     Lx = x
     ly = y
@@ -584,8 +639,8 @@ If Button = 1 Then
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -614,7 +669,7 @@ Else
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
@@ -652,12 +707,13 @@ Else
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If dr Then Me.mousepointer = 0
+tracecounter = 0
 dr = False
 End Sub
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
