@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2953,6 +2953,7 @@ conthere145:
 Set mm = New mStiva
 mm.DataVal CDbl(y1)
 mm.DataVal CDbl(v)
+mm.DataObj pppp
 Do While FastSymbol(b$, ",")
 i = IsLabelDot("", b$, w$)
 If i = 5 Then
@@ -2970,6 +2971,7 @@ w$ = myUcase(w$)
                                                 depth = depth + 1
                                                 mm.DataVal CDbl(y1)
                                                 mm.DataVal CDbl(v)
+                                                mm.DataObj pppp
                                     Else
                                                 MissingGroup
                                                 GoTo normalexit
@@ -2987,6 +2989,7 @@ w$ = myUcase(w$)
 
 mm.DataVal CDbl(0)
 mm.DataVal CDbl(-1)
+mm.DataObj pppp
         If w$ = "THIS" Or w$ = "ауто" Then
         If bstack.GroupName = "" Then w$ = ""
         End If
@@ -3168,6 +3171,7 @@ breakexit:
         While mm.Total > 0
         y1 = mm.PopVal
         v = mm.PopVal
+        Set pppp = mm.PopObj
         If v <> -1 Then
                         CopyGroup var(y1), bstack
                       '  CopyGroup0 var(y1), bs, pppp.item(v)
@@ -17902,10 +17906,19 @@ If kolpo Then ec$ = block(b$)
 If Execute = 2 And b$ <> "" Then Exit Function
 
 If Not FastSymbol(b$, "}") Then Execute = 0: Exit Function
-
 If NocharsInLine(b$) Then Exit Function
-sss = LLL  'basic...
 
+sss = LLL  'basic...
+If jump Or IFCTRL = 2 Then
+    '   IFCTRL = 1
+               jump = False
+       i = 1
+            While FastOperator(b$, vbCrLf, i, 2)
+            Wend
+
+If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+End If
 
     
     End If
@@ -17916,6 +17929,11 @@ If MaybeIsSymbol(b$, "\'") Then
 SetNextLine b$
  sss = Len(b$)
 lbl = True
+If jump Or IFCTRL = 2 Then
+If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+End If
+
 If sss > 0 Then GoTo AGAIN1
 GoTo jumphere
 
@@ -17927,7 +17945,6 @@ If sss > 0 Then GoTo AGAIN1
 GoTo jumphere
 End If
 jumpforCR:
-
 If FastSymbol(b$, vbCrLf, , 2) Then
 i = 1
         While FastOperator(b$, vbCrLf, i, 2)
@@ -19597,11 +19614,23 @@ contElseIf:
                    If FastSymbol(b$, "{") Then
                w$ = block(b$)
              b$ = NLtrim$(Mid$(b$, 2))
+             'If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+'If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+             IFCTRL = 1
+            
               Else
                 SetNextLine b$
                 lbl = True
                 End If
+                IFCTRL = 1
                jump = False
+       i = 1
+            While FastOperator(b$, vbCrLf, i, 2)
+            Wend
+            
+            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+            
           
         Else   ' ONLY FOR NOT JUMP
         If IsExp(bstack, b$, p) Then
@@ -19623,9 +19652,11 @@ contElseIf:
                     lbl = True
                     End If
                     Else
-                    IFCTRL = 2 ' NONEED ANYTHING BUT NOT ERROR FOR IF.ELSE AND ELSE
-              End If
-                
+                    IFCTRL = 2 ' NONEED ANYTHING BUT NOT ERROR FOR ELSE.IF AND ELSE
+            End If
+            
+                     
+   
                Case "ELSE", "аккиыс"
               ' If VarStat Or NewStat Then GoTo errstat
                       If once = True Then Execute = 0: Exit Function
@@ -19638,7 +19669,8 @@ contElseIf:
                  SetNextLine b$
                 lbl = True
                 End If
-                IFCTRL = 0 ' NONEED ANYTHING AND ERROR FOR IF.ELSE AND ELSE
+                jump = True
+                IFCTRL = 1 ' NONEED ANYTHING AND ERROR FOR IF.ELSE AND ELSE
                 End If
                 sss = Len(b$)
                             Case "ELSE.IF", "аккиыс.ам"
@@ -19653,6 +19685,13 @@ contElseIf:
            Execute = 0
            Exit Function
             End Select
+            If jump Or IFCTRL = 2 Then
+                                  i = 1
+            While FastOperator(b$, vbCrLf, i, 2)
+            Wend
+        If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+        If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+        End If
            Case Else
            Execute = 0
            Exit Function
@@ -19735,6 +19774,14 @@ End If
            Execute = 0
            Exit Function
         End Select
+  
+            If jump Or IFCTRL = 2 Then
+                      i = 1
+            While FastOperator(b$, vbCrLf, i, 2)
+            Wend
+            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
+            End If
         Else
         ' error
         If LastErNum = -2 Then
