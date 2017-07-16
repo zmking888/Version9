@@ -72,6 +72,7 @@ End Function
 Public Sub fHelp(bstack As basetask, d$, Optional Eng As Boolean = False)
 Dim sql$, b$, p$, c$, gp$, r As Double, bb As Long, i As Long
 Dim cd As String, doriginal$
+d$ = Replace(d$, " ", ChrW(160))
 On Error GoTo E5
 'ON ERROR GoTo 0
 If HelpLastWidth > ScrX() Then HelpLastWidth = -1
@@ -160,23 +161,35 @@ If bstack.IsNumber(r) Then
 If bstack.IsNumber(r) Then
 If bstack.IsString(c$) Then
 ' nothing
-        If Eng Then gp$ = p$
+Dim sec$
+        If Right$(gp$, 1) = "(" Then gp$ = gp$ + ")": p$ = p$ + ")"
+        
+        If Eng Then
+        sec$ = "Identifier: " + p$ + ", Gr: " + gp$ + vbCrLf
+        gp$ = p$
+        
+        Else
+        gp$ = gp$
+        sec$ = "Αναγνωριστικό: " + gp$ + ", En: " + p$ + vbCrLf
+        End If
         If vH_title$ <> "" Then
             If vH_title$ = gp$ And Form4.Visible = True Then GoTo E5
         End If
         bb = InStr(b$, "__<ENG>__")
         If bb > 0 Then
             If Eng Then
-            c$ = "[" & Trim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
+            c$ = "List [" & NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
                 b$ = Mid$(b$, bb + 11)
             Else
-            c$ = "[" & Mid$(c$, 1, InStr(c$, ",") - 1) & "]"
+            c$ = "Λίστα [" & Mid$(c$, 1, InStr(c$, ",") - 1) & "]"
                 b$ = Left$(b$, bb - 1)
             End If
+            Else
+             c$ = "Λίστα [" & Mid$(c$, 1, InStr(c$, ",") - 1) & "], List [" & NLtrim$(Mid$(c$, InStr(c$, ",") + 1)) & "]"
         End If
         If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf & b$ Else b$ = vbCrLf & b$
         
-        sHelp gp$, c$ & "  " & b$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+        sHelp gp$, sec$ + c$ & "  " & b$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
     
         vHelp Not Form4.Visible
         End If

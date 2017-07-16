@@ -337,6 +337,7 @@ IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 Function Find(RHS) As Boolean
+If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
 Key = CLng(RHS)
 ParentIndex = -1
@@ -368,7 +369,9 @@ End If
 End If
 End Function
 Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
+If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
+
 Key = CLng(RHS)
 Parndx = -1
 k = Hash(HashFunc(Key)) - 1
@@ -401,6 +404,7 @@ End If
 End Function
 
 Function ExistKey(RHS) As Boolean
+If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
 Key = CLng(RHS)
 If Len(Key) = 0 Then Exit Function

@@ -155,6 +155,7 @@ Set myEvent.excludeme = New FastCollection
 End Property
 
 Public Sub Callback(b$)
+If Quit Then Exit Sub
 If ByPassEvent Then
     If myEvent.excludeme.IamBusy Then Exit Sub
     Dim Mark$
@@ -165,7 +166,7 @@ If ByPassEvent Then
     If Visible Then
        myEvent.excludeme.AddKey2 Mark$
     If CallEventFromGuiOne(Me, myEvent, b$) Then
-        myEvent.excludeme.Remove Mark$
+       If Not Quit Then myEvent.excludeme.Remove Mark$
     End If
     Else
         CallEventFromGuiOne Me, myEvent, b$
@@ -175,6 +176,7 @@ Else
 End If
 End Sub
 Public Sub CallbackNow(b$, VR())
+If Quit Then Exit Sub
 If myEvent.excludeme.IamBusy Then Exit Sub
 Dim Mark$
 Mark$ = Split(b$, "(")(0)
@@ -220,8 +222,10 @@ End Sub
 Private Sub Form_Activate()
 
 On Error Resume Next
+If Not Quit Then
 If Not myEvent.excludeme.IamBusy Then
 Set myEvent.excludeme = New FastCollection
+End If
 End If
 If PopupOn Then PopupOn = False
 If novisible Then Hide: Unload Me
@@ -428,9 +432,9 @@ Sub ByeBye()
 Dim var(1) As Variant
 var(0) = CLng(0)
 If mIndex > -1 Then
-CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload(" + CStr(mIndex) + ")", var()
+If Not Quit Then CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload(" + CStr(mIndex) + ")", var()
 Else
-CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload()", var()
+If Not Quit Then CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload()", var()
 End If
 If var(0) = 0 Then
                      If ttl Then

@@ -772,7 +772,7 @@ Pch = raster.Height \ 2
 With players(GetCode(d1))
 raster.PaintPicture d1.hDC, Int(d1.ScaleX(.XGRAPH, 1, 3) - Pcw), Int(d1.ScaleX(.YGRAPH, 1, 3) - Pch)
 End With
-MyDoEvents1 d1.Owner
+'MyDoEvents1 d1
 Set raster = Nothing
 Set d1 = Nothing
 Exit Sub
@@ -2313,7 +2313,6 @@ Public Sub SetTextSZ(dq As Object, mSz As Single, Optional factor As Single = 1,
 ' Used for making specific basket
 On Error Resume Next
 With players(GetCode(dq))
-
 If AddTwipsTop < 0 Then
     If .double And factor = 1 Then
     .mysplit = .osplit
@@ -2342,7 +2341,20 @@ mSz = mSz * factor
 .double = factor <> 1
 End If
 dq.FontSize = mSz
+
 StoreFont dq.Font.name, mSz, dq.Font.charset
+If .double Then
+    Dim nowtextheight As Long
+    nowtextheight = fonttest.TextHeight("fj")
+    If .MineLineSpace = 0 Then
+    Else
+    If (.Yt - .MineLineSpace * 2) * 2 <> nowtextheight Then
+  '  Stop
+    .uMineLineSpace = Int((.MAXYGRAPH - nowtextheight * .My / 2) / .My)
+    End If
+    
+    End If
+End If
 SetText dq
 
 
@@ -4919,7 +4931,7 @@ If s$ <> "" Then
                cc.ValueKey = "FUNCDEEP"  ' RESET
              cc.ValueType = REG_DWORD
                     cc.Value = 300
-                    funcdeep = 300
+                    If m_bInIDE Then funcdeep = 128
             Else
             s$ = "-" & d$ & s$
             Exit Do
@@ -6384,6 +6396,9 @@ End Sub
 Public Sub MissStringExpr()
 MyEr "Missing string expression", "Λείπει αλφαριθμητική παράσταση"
 End Sub
+Public Sub NoCreateFile()
+    MyEr "Can't create file", "Δεν μπορώ να φτιάξω αρχείο"
+End Sub
 Public Sub BadFilename()
 MyEr "Bad filename", "Λάθος στο όνομα αρχείου"
 End Sub
@@ -6449,6 +6464,10 @@ End Sub
 Public Sub CantAssignValue()
 MyEr "Can't assign value to constant", "Δεν μπορώ να βάλω τιμή σε σταθερά"
 End Sub
+Public Sub ExpectedVariable()
+ MyEr "Expected variable", "Περίμενα μεταβλητή"
+End Sub
+
 Public Sub Expected(w1$, w2$)
  MyEr "Expected object type " + w1$, "Περίμενα αντικείμενο τύπου " + w2$
 End Sub
@@ -6475,7 +6494,14 @@ Public Sub UnknownProperty(w$)
 MyEr "Unknown Property " & w$, "’γνωστη ιδιότητα " & w$
 End Sub
 Public Sub UnknownVariable(w$)
+Dim i As Long
+i = rinstr(w$, "." + ChrW(8191))
+If i > 0 Then
+i = rinstr(w$, ".")
+MyEr "Unknown Variable " & Mid$(w$, i), "’γνωστη μεταβλητή " & Mid$(w$, i)
+Else
 MyEr "Unknown Variable " & w$, "’γνωστη μεταβλητή " & w$
+End If
 End Sub
 Public Sub UnKnownWeak(w$)
  MyEr "Unknown Weak " & w$, "’γνωστη ισχνή " & w$

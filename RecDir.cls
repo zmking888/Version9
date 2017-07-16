@@ -42,9 +42,9 @@ dwReserved1 As Long
 cFileName(MAX_PATH * 2 - 1) As Byte
 cAlternate(14 * 2 - 1) As Byte
 End Type
-Private Declare Function FindFirstFile Lib "KERNEL32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindFirstFile Lib "kernel32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 
-Private Declare Function FindNextFile Lib "KERNEL32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindNextFile Lib "kernel32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) As Long
 
 Dim myfile$(), myLevel() As Integer
@@ -61,34 +61,39 @@ Private mTopFolder As String
 Dim InUseItems As Long
 Public LevelStop As Long
 
-Private Declare Function GetDiskFreeSpace Lib "KERNEL32" _
+Private Declare Function GetDiskFreeSpace Lib "kernel32" _
  Alias "GetDiskFreeSpaceA" (ByVal lpRootPathName As String, _
  lpSectorsPerCluster As Long, lpBytesPerSector As Long, _
  lpNumberOfFreeClusters As Long, lpTtoalNumberOfClusters As Long) _
  As Long
-Private Declare Function GetLogicalDriveStrings Lib "KERNEL32" _
+Private Declare Function GetLogicalDriveStrings Lib "kernel32" _
   Alias "GetLogicalDriveStringsA" (ByVal nBufferLength As Long, _
   ByVal lpBuffer As String) As Long
 
 
-Private Declare Function GetLongPathName Lib "KERNEL32" _
+Private Declare Function GetLongPathName Lib "kernel32" _
    Alias "GetLongPathNameW" _
   (ByVal lpszShortPath As Long, _
    ByVal lpszLongPath As Long, _
    ByVal cchBuffer As Long) As Long
 Public lastTimeStamp As Date
-Private Declare Function FileTimeToSystemTime Lib "KERNEL32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
+Public lastTimeStamp2 As Date
+Private Declare Function FileTimeToSystemTime Lib "kernel32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
+Private Declare Function FileTimeToLocalFileTime Lib "kernel32" (lpFileTime As FILETIME, lpLocalFileTime As FILETIME) As Long
+Public UseUTC As Boolean
 Private Function FileTimeToDate(File_Time As FILETIME) As Date
 Dim System_Time As SYSTEMTIME
- 
+Dim local_Time As FILETIME
     ' post from JasonC in vbforums
     ' Convert the FILETIME structure into a Date.
-    '
+    ' changed to convert from UTC to Local Time
+    If UseUTC Then
+    Call FileTimeToLocalFileTime(File_Time, local_Time)
     
-    ' Convert the FILETIME into a SYSTEMTIME.
+    Call FileTimeToSystemTime(local_Time, System_Time)
+    Else
     Call FileTimeToSystemTime(File_Time, System_Time)
- 
-    ' Convert the SYSTEMTIME into a Date.
+    End If
     FileTimeToDate = SystemTimeToDate(System_Time)
     
 End Function
@@ -98,16 +103,18 @@ Private Function SystemTimeToDate(System_Time As SYSTEMTIME) As Date
     '
     ' Convert a SYSTEMTIME into a Date.
     '
-    
-    With System_Time
-        SystemTimeToDate = CDate( _
+     With System_Time
+     SystemTimeToDate = DateSerial(.wYear, .wMonth, .wDay) + _
+                   TimeSerial(.wHour, .wMinute, .wSecond)
+    End With
+      ' SystemTimeToDate = CDate( _
             Format$(.wMonth) & "/" & _
             Format$(.wDay) & "/" & _
             Format$(.wYear) & " " & _
             Format$(.wHour) & ":" & _
             Format$(.wMinute, "00") & ":" & _
             Format$(.wSecond, "00"))
-    End With
+   
     
 End Function
 
@@ -266,7 +273,7 @@ End If
 End Function
 
 Public Sub AddAFile(file$, Level As Integer)
-If Not onetime Then onetime = True: Once
+If Not onetime Then onetime = True: once
 If InUseItems >= UBound(myfile$()) Then
 ReDim Preserve myfile$(UBound(myfile$()) * 2)
 ReDim Preserve myLevel(UBound(myLevel()) * 2) As Integer
@@ -286,7 +293,7 @@ Public Property Get list(index As Long) As String
 If index < 0 Then
 list = ""
 Else
-If Not onetime Then onetime = True: Once
+If Not onetime Then onetime = True: once
 list = myfile$(index)
 End If
 End Property
@@ -310,11 +317,11 @@ If LastPath <> "" And ff = "" Then
 Else
 LastPath = ff
 
-Static NDX As Long
+Static ndx As Long
 If ff = "" Then
 ClearList
 
-NDX = 0
+ndx = 0
 For i = 1 To NumberofDrives
  'Me.additem DriveName(i) & ":\" & CStr(TotalDiskSpace(DriveName(i)))
  AddAFile Chr$(2) + DriveName(i) & ":", 1 + Abs(TotalDiskSpace(DriveName(i)) < 0) 'use level as not enabled
@@ -334,30 +341,30 @@ Dim s As String
 
 If ff <> "" Then
 If Append Then
-NDX = listcount
+ndx = listcount
 Else
             ClearList ' CHANGE THIS TO APPEND...
-           NDX = 0
+           ndx = 0
     End If
                 abort = False
 ' ff must be a path
 ' so strip \
             If Right$(ff, 1) = "\" Then ff = Left$(ff, Len(ff) - 1)
         
-                If look(1, ff, (NDX), IncludedFolders, Nofiles) > 0 Then
+                If look(1, ff, (ndx), IncludedFolders, Nofiles) > 0 Then
                
-                    Dir2 = list(NDX)
-                    NDX = NDX + 1
+                    Dir2 = list(ndx)
+                    ndx = ndx + 1
      
      
                     End If
            
 Else
-            If listcount > NDX Then
-            Dir2 = list(NDX)
-            NDX = NDX + 1   ' read with auto increment
+            If listcount > ndx Then
+            Dir2 = list(ndx)
+            ndx = ndx + 1   ' read with auto increment
             Else
-            NDX = 0  ' reset
+            ndx = 0  ' reset
                 Dir2 = "" ' this is the end
             End If
 End If
@@ -407,7 +414,7 @@ On Error GoTo there2
 Dim fhandle As Long
 fhandle = FindFirstFile(StrPtr(a$), wfd)
 ExistFile = (fhandle > 0)
-If ExistFile Then FindClose fhandle: lastTimeStamp = FileTimeToDate(wfd.ftLastWriteTime)
+If ExistFile Then FindClose fhandle: lastTimeStamp = FileTimeToDate(wfd.ftLastWriteTime): lastTimeStamp2 = FileTimeToDate(wfd.ftCreationTime)
 Exit Function
 there2:
 End Function
@@ -808,7 +815,7 @@ End Function
 Private Sub Class_Initialize()
 ''
 End Sub
-Sub Once()
+Sub once()
 ReDim myfile$(100)
 ReDim myLevel(100) As Integer
 End Sub

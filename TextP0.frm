@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -1784,6 +1784,7 @@ End If
     QUERY basestack1, Prompt$, qq$, (mybasket.mx * 4), True
     If ExTarget = True Then Exit Sub
       mybasket = players(DisForm)
+
       If basestack1.Owner Is Nothing Then Exit Sub
 If basestack1.Owner.Visible = True Then basestack1.Owner.Refresh Else basestack1.Owner.Visible = True
 
@@ -2775,7 +2776,7 @@ End If
             End If
             
         Else
-            funcdeep = 300
+        If m_bInIDE Then funcdeep = 128 Else funcdeep = 300
         End If
              cc.ValueKey = "DEC"
              cc.ValueType = REG_DWORD
