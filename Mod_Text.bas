@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 14
+Global Const Revision = 15
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3235,15 +3235,11 @@ If FK$(13) = "" Then FK$(13) = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     End If
                       ' CopyGroup var(y1), bstack
                        Set safegroup.LinkRef = Nothing
-                '    CopyGroup0 var(y1), bstack, safegroup
-                    CopyGroup var(y1), bstack
-                        Set tempRef = pppp.GroupRef '' pppp.item(v).Link
+                        CopyGroup var(y1), bstack
+                        Set tempRef = pppp.GroupRef
                         Set pppp.item(v) = bstack.lastobj
                         Set safegroup.LinkRef = tempRef
-
-   
-                        
-                          '    Set bstack.lastobj = Nothing
+                        Set bstack.lastobj = Nothing
 
 Set var(y1) = New Group
 End If
