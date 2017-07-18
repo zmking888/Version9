@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -46127,7 +46127,7 @@ If IsStrExp(basestack, rest$, ss$) Then
 On Error Resume Next
 If (ss$ Like "*.mdb") Or (ss$ Like "*:\*") Then ss$ = mylcasefILE(ss$)
 
-RemoveOneConn ss$
+ RemoveOneConn ss$
 End If
 Loop Until Not FastSymbol(rest$, ",")
 End If
