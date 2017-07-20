@@ -69,7 +69,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2889,16 +2889,22 @@ conthere:
         b$ = vbCrLf + w$ + "$=" + w$ + b$
            
         End If
-     SpeedGroup = Execute(bstack, b$, True)
+        
+       SpeedGroup = Execute(bstack, b$, True)
         ' CopyGroup var(y1), bstack
-   
+   If SpeedGroup <> 0 Then
         CopyGroup0 var(y1), bs, pppp.item(v)
+        If bstack.lastobj Is Nothing Then
+        MyEr "Internal Error", "Εσωτερικό Λάθος"
+            bstack.LastValue = ""
+        Else
        Set tempRef = pppp.GroupRef  ''  .item(v).Link
         Set pppp.item(v) = bstack.lastobj
         Set pppp.item(v).LinkRef = tempRef
         Set bstack.lastobj = Nothing
-        If SpeedGroup <> 0 Then
+        
             bstack.LastValue = CStr(var(i))
+        End If
         End If
         GoTo fastexit
 ElseIf Prefix = "FOR" Then
@@ -12922,102 +12928,102 @@ Select Case w1&
 Case 5
             ' check again
 rvalObjectstring:
-            If Left$(aheadstatus(q$ + Split(a$, Chr$(13))(0), False), 1) = "S" Then
-
-            If neoGetArray(bstackstr, q$, pppp) Then
-                If NeoGetArrayItem(pppp, bstackstr, q$, w, a$) Then
+    If Left$(aheadstatus(q$ + Split(a$, Chr$(13))(0), False), 1) = "S" Then
+        If neoGetArray(bstackstr, q$, pppp) Then
+            If NeoGetArrayItem(pppp, bstackstr, q$, w, a$) Then
                 If Not pppp.Arr And FastSymbol(a$, ")") Then
                 ' need an object
-                
-                If IsNumber(bstackstr, q$ + ")", p) Then
-                If Not bstackstr.lastobj Is Nothing Then
-                Set pppp.GroupRef = bstackstr.lastobj
-                Set bstackstr.lastobj = Nothing
-                w = -2
-                If FastSymbol(a$, "(") Then
-                If NeoGetArrayItem(pppp, bstackstr, q$, w, a$) Then
-                
-                End If
-                End If
-                End If
-                End If
-                ElseIf pppp.item(w).IamFloatGroup Then
-               ' If IsNumber(bstackstr, q$, p) Then
-                
-                'End If
+                    If IsNumber(bstackstr, q$ + ")", p) Then
+                        If Not bstackstr.lastobj Is Nothing Then
+                            Set pppp.GroupRef = bstackstr.lastobj
+                            Set bstackstr.lastobj = Nothing
+                            w = -2
+                            If FastSymbol(a$, "(") Then
+                                If NeoGetArrayItem(pppp, bstackstr, q$, w, a$) Then
+                                End If
+                            End If
+                        End If
+                    End If
                 Else
                     If Typename(pppp.item(w)) = "Group" Then
-                    
+                    If pppp.item(w).IamFloatGroup Then
+                    'MyEr "no proper group", "Μη κατάλληλη ομάδα"
+                    'IsStr1 = False
+                    'Exit Function
+                    GoTo groupstrvalue
+                    End If
+                    If pppp.GroupRef Is Nothing Then
+                   ' Stop
+                   GoTo groupstrvalue
+                    Else
                         If Len(q$) > Len(pppp.GroupRef.GroupName) Then
-        q1$ = Left$(q$, Len(q$) - 1) + "." + ChrW(&H1FFF) + ";()"
-    Else
-            q1$ = pppp.GroupRef.GroupName + ChrW(&H1FFF) + ";()"
-    End If
-                    q$ = BlockParam(a$)
-                    a$ = Mid$(a$, Len(q$) + 2)
-                    If GetSub(q1$, w1) Then
-                        Set nBstack = New basetask
-                        nBstack.reflimit = varhash.Count
-                        Set nBstack.Parent = bstackstr
-                        If bstackstr.IamThread Then Set nBstack.Process = bstackstr.Process
-                        Set nBstack.Owner = bstackstr.Owner
-                        nBstack.OriginalCode = w1
-                        nBstack.UseGroupname = sbf(w1).sbgroup
+                            q1$ = Left$(q$, Len(q$) - 1) + "." + ChrW(&H1FFF) + ";()"
+                        Else
+                            q1$ = pppp.GroupRef.GroupName + ChrW(&H1FFF) + ";()"
+                        End If
+                    End If
+                        q$ = BlockParam(a$)
+                        a$ = Mid$(a$, Len(q$) + 2)
+                        If GetSub(q1$, w1) Then
+                            Set nBstack = New basetask
+                            nBstack.reflimit = varhash.Count
+                            Set nBstack.Parent = bstackstr
+                            If bstackstr.IamThread Then Set nBstack.Process = bstackstr.Process
+                            Set nBstack.Owner = bstackstr.Owner
+                            nBstack.OriginalCode = w1
+                            nBstack.UseGroupname = sbf(w1).sbgroup
                             If GoFunc(nBstack, q1$, q$ + ")", r$) Then
-                                    If Not nBstack.StaticCollection Is Nothing Then
-                                        bstackstr.Parent.SetVarobJ "%_" + nBstack.StaticInUse, nBstack.StaticCollection
-                                    End If
-                                    'Set bstackstr.lastobj = nBstack.lastobj
-                                    If IsOperator(a$, "(") Then
-                                        Set pppp = New mArray
-                                        Set pppp.GroupRef = bstackstr.lastobj
-                                        Set bstackstr.lastobj = Nothing
-                                        pppp.Arr = False
-                                        w2 = -2
+                                If Not nBstack.StaticCollection Is Nothing Then
+                                    bstackstr.Parent.SetVarobJ "%_" + nBstack.StaticInUse, nBstack.StaticCollection
+                                End If
+                                'Set bstackstr.lastobj = nBstack.lastobj
+                                If IsOperator(a$, "(") Then
+                                    Set pppp = New mArray
+                                    Set pppp.GroupRef = bstackstr.lastobj
+                                    Set bstackstr.lastobj = Nothing
+                                    pppp.Arr = False
+                                    w2 = -2
                                     Set nBstack = Nothing
-                                        GoTo contrightstrpar
-                                    ElseIf Left$(a$, 1) = "." Then
+                                    GoTo contrightstrpar
+                                ElseIf Left$(a$, 1) = "." Then
                                      Set pppp = New mArray
                                      Set pppp.GroupRef = bstackstr.lastobj
-                                         Set bstackstr.lastobj = Nothing
-                                         pppp.Arr = False
-                                         w2 = -2
+                                     Set bstackstr.lastobj = Nothing
+                                     pppp.Arr = False
+                                     w2 = -2
                                      Set nBstack = Nothing
                                      GoTo groupstrvalue
-                                     End If
-                            End If
-                                    Set nBstack = Nothing
-                                    IsStr1 = True
-                                Else
-                                    IsStr1 = False
                                 End If
-                   Else
-                        IsStr1 = False
-                    End If
+                            End If
+                                Set nBstack = Nothing
+                                IsStr1 = True
+                            Else
+                                IsStr1 = False
+                            End If
+                        Else
+                            IsStr1 = False
+                        End If
                         Exit Function
-                End If
+                    End If
 groupstrvalue:
-                        If Typename(pppp.item(w)) = "Group" Then
+                    If Typename(pppp.item(w)) = "Group" Then
                         IsStr1 = SpeedGroup(bstackstr, pppp, "VAL$", q$, a$, w) = 1
                         r$ = bstackstr.LastValue
                         Exit Function
-                        End If
+                    End If
                 End If
-                End If
-            Else
-                 
-                IsStr1 = False
-                Exit Function
-                
             End If
-      
+        Else
+            IsStr1 = False
+            Exit Function
+        End If
     Case 3
-    IsStr1 = False
-    If Not strid.Find(q$, w1) Then GoTo itisavar
+        IsStr1 = False
+        If Not strid.Find(q$, w1) Then GoTo itisavar
     
     'Select Case q$
     'Case "ABOUT$", "ΠΕΡΙ$"
-On w1 GoTo lit1, lit2, lit3, lit4, lit5, lit6, lit7, lit8, lit9, lit10, lit11, lit12, lit13, lit14, lit15, lit16, lit17, lit18, lit19, lit20, lit21, lit22, lit23, lit24, lit25, lit26, lit27, lit28, lit29, lit30, lit31, lit32, lit33, lit34, lit35
+        On w1 GoTo lit1, lit2, lit3, lit4, lit5, lit6, lit7, lit8, lit9, lit10, lit11, lit12, lit13, lit14, lit15, lit16, lit17, lit18, lit19, lit20, lit21, lit22, lit23, lit24, lit25, lit26, lit27, lit28, lit29, lit30, lit31, lit32, lit33, lit34, lit35
 
 lit1:
             r$ = feedback$
@@ -15519,6 +15525,7 @@ If a$ = "" Then IsStr1 = False: Exit Function
 IsStr1 = True
 
 End Function
+
 Function ISSTRINGA(bb$, r$) As Boolean
 '
 Dim q$, w As Long, a$
@@ -18349,7 +18356,7 @@ MyDoEvents1 di
                 
     ' k1 = 0
       '          MyDoEvents1 di
-     ' RRCOUNTER = 1
+      RRCOUNTER = 0
      ' If di.Visible Then di.Refresh
       
                 MyDoEvents0 di
@@ -21704,11 +21711,13 @@ End If
                                   Set pppp.item(v) = bstack.lastobj
                                   
                                   If TypeOf bstack.lastobj Is Group Then
-                                      Set pppp.item(v).LinkRef = myobject
-                                      If myobject Is Nothing Then
-                                       
-                                        Set pppp.item(v).LinkRef = bstack.lastobj.Link
-                                        
+                                     ' look this again
+                                      If Not myobject Is Nothing Then
+                                       If pppp.item(v).LinkRef Is Nothing Then
+                                            Set pppp.item(v).LinkRef = myobject
+                                       'Else
+                                        'Set pppp.item(v).LinkRef = bstack.lastobj.Link
+                                      End If
                                       End If
                                   End If
                                   
@@ -23766,6 +23775,22 @@ conthereplease:
    
     
             Else
+            ' these lines give module call in object recuirsive without call command
+'            If basestack.UseGroupname <> "" Then
+ '           If Left$(here$, Len(basestack.UseGroupname)) = basestack.UseGroupname Then
+  '          If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
+  
+   '         Identifier = True
+    '        Exit Function
+     '       End If
+          ' End If
+          If what$ = here$ Then
+          MyErMacro rest$, "Use Call command to call recuirsive in module", "Χρησιμοποίησε την Κάλεσε για αναδρομική κλήση τμήματος"
+          
+          here$ = ohere$
+          Identifier = True
+          Exit Function
+          End If
 NERR:
           
                     '    If Err.Number = 6 Then
@@ -38174,12 +38199,14 @@ Select Case x1
 Case 1
     If bs.IsObjectRef(myobject) Then
         MyRead = True
-        If flag Then
+        If flag2 Then
+        GoTo comehere
+        ElseIf flag Then
             p = 0
            i = GlobalVar(what$, p)
            GoTo contread123
         End If
-        If GetVar(bstack, what$, i, , , flag) Then
+       If GetVar(bstack, what$, i, , , flag) Then
 contread123:
                 If Typename$(myobject) = Typename(var(i)) Then
                     If Typename$(var(i)) = "Group" Then
@@ -38216,6 +38243,7 @@ contread123:
                     Exit Function
                 End If
         Else
+comehere:
             i = GlobalVar(what$, 0)
             If Typename$(myobject) = "Group" Then
                 UnFloatGroup bstack, what$, i, myobject, here$ = ""
@@ -46327,11 +46355,35 @@ Set bb = Nothing
 Set aa = Nothing
 
 Exit Function
+ElseIf TypeOf aa.objref Is mArray Then
+While IsSymbol(rest$, ",")
+If Not IsExp(bstack, rest$, p) Then
+    MyEr "Expected Array", "Περίμενα Πίνακα"
+    Set aa = Nothing
+    Set bstack.lastobj = Nothing
+    Exit Function
 End If
+Dim myobject As Object
+Set myobject = bstack.lastobj
+Set bstack.lastobj = Nothing
+If CheckIsmArray(myobject, var()) Then
+Set pppp = myobject
+pppp.AppendArray aa.objref
+Else
+    MyEr "Expected Array", "Περίμενα Πίνακα"
+    Set aa = Nothing
+    Set bstack.lastobj = Nothing
+    Exit Function
 End If
-MyEr "Wrong type of object (not Inventory)", "Λάθος τύπος αντικειμένου (όχι Κατάσταση)"
+Wend
 Set aa = Nothing
+AddInventory = True
+Exit Function
 End If
+End If
+End If
+MyEr "Wrong type of object (not Inventory or pointer to Array)", "Λάθος τύπος αντικειμένου (όχι Κατάσταση ή δείτκης σε Πίνακα)"
+Set aa = Nothing
 End If
 Set bstack.lastobj = Nothing
 End Function
