@@ -650,7 +650,7 @@ ElseIf command = 10 Then
    
     ReDim Preserve actualdata(cursor) As Variant
     maxitems = cursor
-    limit(0) = maxitems - 1
+    limit(0) = maxitems
 dnum = 1
 maxitems1 = maxitems - 1
 End If

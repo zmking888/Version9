@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 16 active-X
+Version 8.9 revision 17 active-X
 
+help file now is completed use Help All to see all identifiers
 
 http://georgekarras.blogspot.gr/
 

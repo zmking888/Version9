@@ -1645,11 +1645,11 @@ Public Sub SetBinaryCompare()
 sortmlcid = 0
 mSortstyle = vbBinaryCompare
 End Sub
-Public Sub SetLocaleCompare(Optional Rhs As Variant)
-If IsMissing(Rhs) Then
+Public Sub SetLocaleCompare(Optional RHS As Variant)
+If IsMissing(RHS) Then
 sortmlcid = mlcid
 Else
-sortmlcid = CLng(Rhs)
+sortmlcid = CLng(RHS)
 End If
 If sortmlcid = 0 Then sortmlcid = &H800
 mSortstyle = vbBinaryCompare
@@ -2694,8 +2694,8 @@ Public Property Get LCID() As Long
 LCID = mlcid
 End Property
 
-Public Property Let LCID(ByVal Rhs As Long)
-mlcid = Rhs
+Public Property Let LCID(ByVal RHS As Long)
+mlcid = RHS
 End Property
 Function FindWord(Find$, Direction As Boolean, there As Long, cur As Long) As Boolean
 Dim oncemore As Boolean, result As Boolean, res$

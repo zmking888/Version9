@@ -2587,6 +2587,7 @@ cc.ClassKey = HKEY_CURRENT_USER
 If Not cc.KeyExists Then
 myBold = True
 MYFONT = defFontname
+            mNoUseDec = True
             If Not Form1.FontName = MYFONT Then
             MYFONT = "Arial"
             Form1.FontName = MYFONT
@@ -2665,6 +2666,10 @@ MYFONT = defFontname
                cc.ValueKey = "FUNCDEEP"  ' BY DEFAULT
              cc.ValueType = REG_DWORD
              If Not m_bInIDE Then cc.Value = funcdeep
+             ' mTextCompare
+            cc.ValueKey = "TEXTCOMPARE"
+             cc.ValueType = REG_DWORD
+                    cc.Value = CLng(mTextCompare)
             cc.ValueKey = "DEC"
              cc.ValueType = REG_DWORD
                     cc.Value = CLng(mNoUseDec)
@@ -2778,6 +2783,9 @@ End If
         Else
         If m_bInIDE Then funcdeep = 128 Else funcdeep = 300
         End If
+                    cc.ValueKey = "TEXTCOMPARE"
+             cc.ValueType = REG_DWORD
+               mTextCompare = CBool(cc.Value)
              cc.ValueKey = "DEC"
              cc.ValueType = REG_DWORD
                      mNoUseDec = CBool(cc.Value)

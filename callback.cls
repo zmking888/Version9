@@ -62,7 +62,7 @@ End If
 
 
 Switches para$, True
-If Trim$(para$) <> "" Then interpret basestack1, para$
+If Trim$(para$) <> "" And Not Left$(para$, 1) Like "[+-]" Then interpret basestack1, para$
 If Not INK$ = Chr(27) Then
 Form1.MyPrompt cLine, Prompt$
 End If

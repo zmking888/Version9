@@ -31,6 +31,7 @@ Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As 
 Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (ByVal ByteLen As Long, ByVal Destination As Long, ByVal Source As Long) As Long
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
 Private Declare Function IsBadCodePtr Lib "KERNEL32" (ByVal lpfn As Long) As Long
+Private Declare Function CompareString Lib "KERNEL32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 Private Declare Function CallWindowProc _
  Lib "user32.dll" Alias "CallWindowProcW" ( _
  ByVal lpPrevWndFunc As Long, _
@@ -57,6 +58,7 @@ Public UseEsc As Boolean
 ' 0 for DIS
 Public NowDec$, NowThou$
 Public priorityOr As Boolean, NoUseDec As Boolean, mNoUseDec As Boolean, UseIntDiv As Boolean
+Public mTextCompare As Boolean
 Public csvsep$, csvDec$, csvuseescape As Boolean
 Public Const DisForm = 0
 Public Const BackForm = -1
@@ -69,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 16
+Global Const Revision = 17
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8419,12 +8421,12 @@ IsNumber = False
                     If Not neoGetArray(bstack, s1$, pppp) Then MissingStrVar::   Exit Function
                     If Not NeoGetArrayItem(pppp, bstack, s1$, w2, a$) Then Exit Function
 
-                    r = SG * StrComp(var(w1), CStr(pppp.item(w2)))
+                    r = SG * CompareStr3(var(w1), CStr(pppp.item(w2)))    'StrComp(var(w1), CStr(pppp.item(w2)))
 
                 ElseIf W3 = 3 Then
                     If Not GetVar(bstack, s1$, w2) Then: Exit Function
 
-                    r = SG * StrComp(var(w1), var(w2))
+                    r = SG * CompareStr3(var(w1), var(w2))  ' StrComp(var(w1), var(w2))
                             Else
                 
                 MissFuncParameterStringVarMacro a$
@@ -8445,12 +8447,12 @@ IsNumber = False
                     If Not neoGetArray(bstack, s1$, pppp1) Then MissingStrVar::   Exit Function
                     If Not NeoGetArrayItem(pppp1, bstack, s1$, W3, a$) Then Exit Function
 
-                    r = SG * StrComp(pppp.item(w2), pppp1.item(W3))
+                    r = SG * CompareStr3(pppp.item(w2), pppp1.item(W3)) ' StrComp(pppp.item(w2), pppp1.item(W3))
  
                 ElseIf W3 = 3 Then
                     If Not GetVar(bstack, s1$, W3) Then: Exit Function
 
-                    r = SG * StrComp(pppp.item(w2), var(W3))
+                    r = SG * CompareStr3(pppp.item(w2), var(W3)) ' StrComp(pppp.item(w2), var(W3))
                 Else
                 
                 MissFuncParameterStringVarMacro a$
@@ -13039,11 +13041,19 @@ lit2: '    Case "CONTROL$"
                   Case "AVI"
                   r$ = "AVI"
                   Case "Form1"
-                    r$ = "Main"
+                    r$ = "MAIN"
                   Case "Form4"
-                  r$ = "Help"
+                  r$ = "HELP"
                   Case Else
+                  If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                  If Screen.ActiveForm.index > -1 Then
+                  r$ = myUcase(Screen.ActiveForm.MyName$ + "(" + CStr(Screen.ActiveForm.index) + ")", True)
+                  Else
+                  r$ = myUcase(Screen.ActiveForm.MyName$, True)
+                  End If
+                  Else
                   r$ = ""
+                  End If
                   End Select
                   End If
                       IsStr1 = True
@@ -13062,7 +13072,15 @@ lit32:   ' Case "÷œ—Ã¡$"
                   Case "Form4"
                   r$ = "¬œ«»≈…¡"
                   Case Else
+                  If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                  If Screen.ActiveForm.index > -1 Then
+                  r$ = myUcase(Screen.ActiveForm.MyName$ + "(" + CStr(Screen.ActiveForm.index) + ")", True)
+                  Else
+                  r$ = myUcase(Screen.ActiveForm.MyName$, True)
+                  End If
+                  Else
                   r$ = ""
+                  End If
                   End Select
                   End If
                  IsStr1 = True
@@ -14089,7 +14107,7 @@ fstr24: ' "œƒ«√œ”$("
                         Exit Function
                 End If
                 Exit Function
-fstr25: '"‘…À‘œ”.¡—◊≈…œ’$(", "FILE.TITLE$("
+fstr25: '"‘…‘Àœ”.¡—◊≈…œ’$(", "FILE.TITLE$("
                 If IsStrExp(bstackstr, a$, r$) Then
                         If r$ <> "" Then r$ = FileNameType(r$)
                         IsStr1 = True
@@ -16835,7 +16853,9 @@ err123456:
                     If OverideDec Then wwPlain bstack, prive, "Locale Overide " + CStr(cLid), bstack.Owner.Width, 1000, True
                     If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
                     If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
-                    If NoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
+                    If Not mNoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
+                    If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(bypass)"
+                    If mTextCompare Then ss$ = ss$ + " +TXT" Else ss$ = ss$ + " -TXT"
                     wwPlain bstack, prive, "Switches " + ss$, bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, "About Switches: use command Help Switches", bstack.Owner.Width, 1000, True
                     
@@ -25119,6 +25139,7 @@ s2$ = s$
 If Left$(ah, 1) <> "N" Then
  IsStrExp basestack, s$, b$
 logical = False
+If Not mTextCompare Then
 If FastSymbol(s$, "=") Then
     logical = False
     If IsStrExp(basestack, s$, s2$) Then
@@ -25190,7 +25211,80 @@ ElseIf FastSymbol(s$, "~") Then
     Exit Function
     End If
 End If
+Else
+If FastSymbol(s$, "=") Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) = 0
+    Exit Function
+    Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "<>", , 2) Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) <> 0
+    Exit Function
+        Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "<=", , 2) Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) < 1
+    Exit Function
+            Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "<") Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) = -1
+    Exit Function
+            Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, ">=", , 2) Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) > -1
+    Exit Function
+            Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, ">") Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$) = 1
+    Exit Function
+            Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "~") Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = b$ Like s2$
+    Exit Function
+            Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+End If
 
+End If
 If LastErNum <> -2 Then s$ = s2$
 
 Else
@@ -47601,3 +47695,40 @@ ContGoto:
                 End If
               End If
 End Function
+Private Function CompareStr2(a$, b$) As Long
+On Error GoTo comperr
+If cLid = 0 Then
+CompareStr2 = StrComp(a$, b$, vbTextCompare)
+Else
+CompareStr2 = -2 + CompareString(cLid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
+End If
+Exit Function
+comperr:
+CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
+
+End Function
+Private Function CompareStr3(a As Variant, b As Variant) As Long
+On Error GoTo comperr
+If Not mTextCompare Then
+CompareStr3 = StrComp(a, b)
+ElseIf cLid = 0 Then
+CompareStr3 = StrComp(a, b, vbTextCompare)
+Else
+CompareStr3 = -2 + CompareString(cLid, &H1000, StrPtr(a), Len(a), StrPtr(b), Len(b))
+End If
+Exit Function
+comperr:
+Err.Clear
+
+
+If mTextCompare Then
+If MyIsObject(a) Or MyIsObject(b) Then
+Else
+CompareStr3 = -2 + CompareString(0, 0, StrPtr(a), Len(a), StrPtr(b), Len(b))
+
+Exit Function
+End If
+End If
+MyEr "Not string found", "ƒÂÌ ‚ÒﬁÍ· ·Îˆ·ÒÈËÏÁÙÈÍ¸"
+End Function
+

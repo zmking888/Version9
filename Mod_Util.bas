@@ -4829,7 +4829,6 @@ Dim d$, w$, p As Long, b As Long
 If s$ <> "" Then
 's$ = mylcasefILE(s$)
     Do While FastSymbol(s$, "-")
-    
             If IsLabel(basestack1, s$, d$) > 0 Then
             d$ = UCase(d$)
             If d$ = "TEST" Then
@@ -4924,9 +4923,15 @@ If s$ <> "" Then
             ElseIf d$ = "DEC" Then
             cc.ValueKey = "DEC"
              cc.ValueType = REG_DWORD
-                    cc.Value = CLng(True)
-                    mNoUseDec = True
+                    cc.Value = CLng(0)
+                    mNoUseDec = False
                     CheckDec
+            ElseIf d$ = "TXT" Then
+            cc.ValueKey = "TEXTCOMPARE"
+             cc.ValueType = REG_DWORD
+                    cc.Value = CLng(0)
+                    mTextCompare = False
+                    
             ElseIf d$ = "REC" Then
                cc.ValueKey = "FUNCDEEP"  ' RESET
              cc.ValueType = REG_DWORD
@@ -5027,11 +5032,16 @@ If IsLabel(basestack1, s$, d$) > 0 Then
                 cc.ValueType = REG_DWORD
                 cc.Value = CLng(True)
             priorityOr = True
+            ElseIf d$ = "TXT" Then
+            cc.ValueKey = "TEXTCOMPARE"
+             cc.ValueType = REG_DWORD
+                    cc.Value = CLng(True)
+                    mTextCompare = True
         ElseIf d$ = "DEC" Then
             cc.ValueKey = "DEC"
              cc.ValueType = REG_DWORD
-                    cc.Value = CLng(0)
-                    mNoUseDec = False
+                    cc.Value = CLng(True)
+                    mNoUseDec = True
                     CheckDec
         ElseIf d$ = "REC" Then
                cc.ValueKey = "FUNCDEEP"  ' RESET
@@ -5049,7 +5059,6 @@ Sleep 2
 Loop
 
 End If
-
 End Sub
 Function blockStringPOS(s$, pos As Long) As Boolean
 Dim i As Long, j As Long, c As Long
