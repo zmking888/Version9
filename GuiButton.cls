@@ -156,6 +156,14 @@ glistN.ShowMe
 End If
 End Sub
 
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
+
 Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 glistN.ShowMe
 End Sub
@@ -201,9 +209,9 @@ Public Property Let Caption(myCap As String)
 mCaptext = myCap
 If Not glistN Is Nothing Then
 If glistN.CenterText Then
-glistN.List(0) = mCaptext
+glistN.list(0) = mCaptext
 Else
-glistN.List(0) = "  " + mCaptext
+glistN.list(0) = "  " + mCaptext
 End If
 glistN.ShowMe
 End If

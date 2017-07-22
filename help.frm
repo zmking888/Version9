@@ -282,6 +282,8 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
 Label1.Dereference  ' to ensure that no reference hold objects..
 Set Label1 = Nothing
+Helplastfactor = 1
+helpSizeDialog = 1
 End Sub
 
 Private Sub gList1_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
@@ -296,6 +298,36 @@ End If
 End Sub
 
 
+Private Sub glist1_getpair(a As String, b As String)
+If mHelp Or abt Then
+gList1.EditFlag = False
+    MKEY$ = MKEY$ & a
+    a = ""
+End If
+End Sub
+
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+Select Case KeyCode
+Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
+gList1.EditFlag = False
+If mHelp Or abt Then MKEY$ = MKEY$ & Chr$(KeyCode): KeyCode = 0
+End Select
+If mHelp Or abt Then shift = 0
+End Sub
+
+Private Sub gList1_KeyDownAfter(KeyCode As Integer, shift As Integer)
+If mHelp Or abt Then
+'KeyCode = 0
+'shift = 0
+End If
+End Sub
+
+Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+If mHelp Then
+shift = 0
+End If
+End Sub
+
 Private Sub gList1_selected2(item As Long)
 Label1.NoMark = False
 Label1.EditDoc = True
@@ -307,8 +339,7 @@ feedback$ = Trim$(Replace(ThisWord, ChrW(160), " "))
 feednow$ = FeedbackExec$
 CallGlobal feednow$
 Else
-
-ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
+If Not mHelp Then ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
 
 End If
 ThisWord = ""

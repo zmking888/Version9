@@ -212,7 +212,7 @@ End Sub
 
 Private Sub Form_Click()
 If gList2.Visible Then gList2.SetFocus
-If index > -1 Then
+If mIndex > -1 Then
     Callback MyName$ + ".Click(" + CStr(index) + ")"
 Else
     Callback MyName$ + ".Click()"
@@ -332,7 +332,7 @@ End If
 End Sub
 
 Private Sub Form_LostFocus()
-If index > -1 Then
+If mIndex > -1 Then
     Callback MyName$ + ".LostFocus(" + CStr(index) + ")"
 Else
     Callback MyName$ + ".LostFocus()"
@@ -348,7 +348,7 @@ If Not Relax Then
 
 
 Relax = True
-If index > -1 Then
+If mIndex > -1 Then
     Callback MyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
     Callback MyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
@@ -364,7 +364,7 @@ Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y A
 If Not Relax Then
 Relax = True
 
-If index > -1 Then
+If mIndex > -1 Then
 Callback MyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback MyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
@@ -379,7 +379,7 @@ If Not Relax Then
 
 Relax = True
 
-If index > -1 Then
+If mIndex > -1 Then
 Callback MyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
 Callback MyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
@@ -415,6 +415,14 @@ gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
 ResizeMark.Move Width - ResizeMark.Width, Height - ResizeMark.Height
 End Sub
 
+
+Private Sub gList2_CtrlPlusF1()
+    If mIndex > -1 Then
+        Callback MyName$ + ".About(" + CStr(index) + ")"
+    Else
+        Callback MyName$ + ".About()"
+    End If
+End Sub
 
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
@@ -757,7 +765,7 @@ If Not Relax Then
                 Lx = x
                 ly = y
                 Move Left, top, Width + addX, Height + addy
-                If index > -1 Then
+                If mIndex > -1 Then
                     Callback MyName$ + ".Resize(" + CStr(index) + ")"
                 Else
                     Callback MyName$ + ".Resize()"

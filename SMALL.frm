@@ -239,7 +239,7 @@ On Error Resume Next
 If Not bstack.Owner Is Nothing Then
 If bstack.Owner.Visible Then
 If bstack.Owner.name = "DIS" Then
-Form1.SetFocus
+If Form1.Visible Then Form1.SetFocus
 Else
 bstack.Owner.SetFocus
 End If

@@ -33,6 +33,13 @@ Dim Callback As GuiM2000
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
  Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
@@ -260,7 +267,7 @@ If glistN.ListRadio(item) Then
     
 End If
 Else
-Textbox.vartext = glistN.List(item): Textbox.SelStart = Len(Textbox.Text) + 1
+Textbox.vartext = glistN.list(item): Textbox.SelStart = Len(Textbox.Text) + 1
 End If
 
    If mIndex >= 0 Then
@@ -290,13 +297,13 @@ Private Sub glistN_ScrollSelected(item As Long, y As Long)
 End Sub
 
 
-Public Property Get List(index) As Variant
+Public Property Get list(index) As Variant
 On Error Resume Next
-List = glistN.List(CLng(index))
+list = glistN.list(CLng(index))
 End Property
-Public Property Let List(index, RHS As Variant)
+Public Property Let list(index, RHS As Variant)
 On Error Resume Next
-glistN.List(CLng(index)) = CStr(RHS)
+glistN.list(CLng(index)) = CStr(RHS)
 End Property
 
 Private Sub glistN_Selected(item As Long)
@@ -314,6 +321,14 @@ End Sub
 
 Private Sub Pad_Deactivate()
 'Pad.UNhookMe
+End Sub
+
+Private Sub Textbox_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
 End Sub
 
 Private Sub Textbox_DeployMenu()
@@ -503,7 +518,7 @@ If glistN.ListRadio(item) Then
     
 End If
 Else
-Textbox.vartext = glistN.List(item): Textbox.SelStart = Len(Textbox.Text) + 1
+Textbox.vartext = glistN.list(item): Textbox.SelStart = Len(Textbox.Text) + 1
 End If
 
 Pad.UNhookMe
@@ -640,13 +655,13 @@ Else
 f = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
 End If
 If f >= 0 Then
-If Not NoCaseSensitive Then ThatString = Myleft$(glistN.List(f), Len(ThatString))
-Textbox.glistN.LastLinePart = Mid$(glistN.List(f), Len(ThatString) + 1)
+If Not NoCaseSensitive Then ThatString = Myleft$(glistN.list(f), Len(ThatString))
+Textbox.glistN.LastLinePart = Mid$(glistN.list(f), Len(ThatString) + 1)
 'RaiseEvent AutoCompleteDone(glistN.List(f))
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".AutoCompleteDone(" + Str(mIndex) + ",{" + glistN.List(f) + "})"
+   Callback.Callback mesCtrlName + ".AutoCompleteDone(" + Str(mIndex) + ",{" + glistN.list(f) + "})"
    Else
-      Callback.Callback mesCtrlName + ".AutoCompleteDone({" + glistN.List(f) + "})"
+      Callback.Callback mesCtrlName + ".AutoCompleteDone({" + glistN.list(f) + "})"
       End If
 
 glistN.enabled = False

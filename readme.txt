@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 17 active-X
+Version 8.9 revision 18 active-X
 
+New About event for form controls and forms (fired when we press ctrl+F1)
 help file now is completed use Help All to see all identifiers
 
 http://georgekarras.blogspot.gr/

@@ -4574,8 +4574,7 @@ sv = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d
 End With
 End Sub
 
-Sub sHelp(TITLE$, doc$, x As Long, y As Long, Optional txtbox As Boolean)
-mHelp = Not txtbox
+Sub sHelp(TITLE$, doc$, x As Long, y As Long)
 vH_title$ = TITLE$
 vH_doc$ = doc$
 vH_x = x
@@ -4586,7 +4585,7 @@ Sub vHelp(Optional ByVal bypassshow As Boolean = False)
 Dim huedif As Long
 Dim UAddPixelsTop As Long
 If abt Then
-'If vH_title$ = lastAboutHTitle Then Exit Sub
+If vH_title$ = lastAboutHTitle Then Exit Sub
 vH_title$ = lastAboutHTitle
 vH_doc$ = LastAboutText
 Else
@@ -4654,7 +4653,7 @@ End With
 
 Form4.ZOrder
 Form4.Label1.glistN.DragEnabled = Not abt
-If exWnd = 0 Then Form1.SetFocus
+If exWnd = 0 Then If Form1.Visible Then Form1.SetFocus
 End Sub
 
 Function FileNameType(extension As String) As String

@@ -26,13 +26,20 @@ Dim Callback As GuiM2000
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
 Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
@@ -124,7 +131,7 @@ Public Property Let Caption(myCap As String)
 '
 mCaptext = myCap
 If Not glistN Is Nothing Then
-glistN.List(0) = "  " + mCaptext
+glistN.list(0) = "  " + mCaptext
 glistN.ShowMe
 End If
 End Property

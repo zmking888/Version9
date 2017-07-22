@@ -56,6 +56,7 @@ Dim myfilename As String
 Dim all As Long, onelineheight As Long
 Event inform(tLine As Long, tPos As Long)
 Event ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
+Event CtrlPlusF1()
 Public LastSelStart As Long
 Public NoMark As Boolean
 Public NoTitle As Boolean
@@ -400,6 +401,10 @@ End If
 End Sub
 
 
+
+Private Sub glistN_CtrlPlusF1()
+RaiseEvent CtrlPlusF1
+End Sub
 
 Private Sub glistN_getpair(a As String, b As String)
 If Not UsedAsTextBox Then

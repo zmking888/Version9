@@ -237,6 +237,7 @@ Event RegisterGlist(this As gList)
 Event UnregisterGlist()
 Event DeployMenu()
 Event BlinkNow(Face As Boolean)
+Event CtrlPlusF1()
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -1345,6 +1346,11 @@ Private Sub UserControl_KeyUp(KeyCode As Integer, shift As Integer)
 Dim i As Long
 If KeyCode = 18 Then
 RaiseEvent Maybelanguage
+ElseIf KeyCode = 112 And (shift And 2) = 2 Then
+KeyCode = 0
+shift = 0
+RaiseEvent CtrlPlusF1
+Exit Sub
 ElseIf KeyCode = 16 And shift <> 0 Then
 RaiseEvent Maybelanguage
 ElseIf KeyCode = vbKeyV Then

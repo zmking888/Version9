@@ -83,11 +83,11 @@ Private Sub glistN_BlockCaret(item As Long, blockme As Boolean, skipme As Boolea
 If trans And noeditme Then blockme = True  ': glistN.NoCaretShow = True
 End Sub
 
-Private Sub glistN_ChangeListItem(item As Long, Content As String)
+Private Sub glistN_ChangeListItem(item As Long, content As String)
 If Not mEnabled Then Exit Sub
 Dim thispos As Long, VR(3)
 thispos = glistN.SelStart
-VR(0) = Content
+VR(0) = content
 VR(1) = thispos
 VR(2) = item
    If mIndex >= 0 Then
@@ -97,12 +97,18 @@ VR(2) = item
       End If
       
 thispos = VR(1)
-Content = VR(0)
-If thispos <> glistN.SelStart And Content <> "" Then glistN.SelStart = thispos: glistN.ShowMe
+content = VR(0)
+If thispos <> glistN.SelStart And content <> "" Then glistN.SelStart = thispos: glistN.ShowMe
 End Sub
-
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
 Private Sub glistN_CheckGotFocus()
-If Not Locked Then
+If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 If Not trans Then
     If enabled Then
@@ -129,7 +135,7 @@ End If
 End Sub
 
 Private Sub glistN_CheckLostFocus()
-If Not Locked Then
+If Not locked Then
 If mStayOpen Then
 If glistN.Visible Then glistN.PanPos = 0: glistN.PrepareToShow
 Exit Sub
@@ -192,18 +198,18 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
-Public Property Get Locked() As Boolean
-Locked = Not glistN.enabled
+Public Property Get locked() As Boolean
+locked = Not glistN.enabled
 End Property
 
-Public Property Let Locked(ByVal RHS As Boolean)
+Public Property Let locked(ByVal RHS As Boolean)
 glistN.enabled = Not RHS
 End Property
 
@@ -248,19 +254,19 @@ Private Sub glistN_PanLeftRight(Direction As Boolean)
       End If
 End Sub
 
-Private Sub glistN_ReadListItem(item As Long, Content As String)
+Private Sub glistN_ReadListItem(item As Long, content As String)
 If Not mEnabled Then Exit Sub
 Dim VR(1)
 
 
-VR(0) = Content
+VR(0) = content
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".External(" + Str(item) + "," + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".External(" + Str(item) + ")", VR()
       End If
     
-Content = VR(0)
+content = VR(0)
 
 
 End Sub
@@ -372,32 +378,32 @@ glistN.CalcAndShowBar
 If glistN.Visible Then glistN.ShowMe2
 End Sub
 
-Public Property Get List(Index) As Variant
+Public Property Get list(index) As Variant
 On Error Resume Next
-List = glistN.List(CLng(Index))
+list = glistN.list(CLng(index))
 End Property
 
-Public Property Let List(Index, ByVal vNewValue As Variant)
+Public Property Let list(index, ByVal vNewValue As Variant)
 On Error Resume Next
-glistN.List(CLng(Index)) = CStr(vNewValue)
+glistN.list(CLng(index)) = CStr(vNewValue)
 glistN.PrepareToShow
 End Property
-Sub Add(Content$)
-glistN.additem Content$
+Sub Add(content$)
+glistN.additem content$
 End Sub
-Sub AddFast(Index As Long, Content$)
-glistN.additemFast Content$
+Sub AddFast(index As Long, content$)
+glistN.additemFast content$
 End Sub
-Sub Insert(Content$)
-glistN.additemAtListIndex Content$
+Sub Insert(content$)
+glistN.additemAtListIndex content$
 End Sub
 Sub Clear()
 glistN.Clear
 If glistN.Visible Then glistN.ShowMe2
 End Sub
 
-Sub Delete(Index As Long)
-glistN.Removeitem Index
+Sub Delete(index As Long)
+glistN.Removeitem index
 End Sub
 
 Public Property Get ListIndex() As Variant
@@ -418,8 +424,8 @@ End Property
 Public Property Get listcount() As Variant
 listcount = glistN.listcount
 End Property
-Public Sub ShowThis(Index As Long, Optional noselect)
-glistN.ShowThis Index, CBool(noselect)
+Public Sub ShowThis(index As Long, Optional noselect)
+glistN.ShowThis index, CBool(noselect)
 End Sub
 
 Public Property Get Text() As Variant

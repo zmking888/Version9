@@ -449,6 +449,13 @@ undomode = 1
 End If
 
 End Sub
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
 Public Sub AddUndo(that As String)
 If Not enabled Then Exit Sub
 ClearRedo

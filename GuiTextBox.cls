@@ -101,14 +101,14 @@ Public Property Get Text() As String
 If glistN.listcount = 0 Then
 glistN.additem mprompt
 Else
-Text = glistN.List(0)
+Text = glistN.list(0)
 End If
 End Property
 Public Property Get vartext() As String
 If glistN.listcount = 0 Then
 glistN.additem ""
 Else
-vartext = Mid$(glistN.List(0), 1 + Len(mprompt))
+vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
 End Property
 Public Property Let vartext(ByVal RHS As String)
@@ -119,7 +119,7 @@ glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
 glistN.additem mprompt + RHS
 Else
-glistN.List(0) = mprompt + RHS
+glistN.list(0) = mprompt + RHS
 End If
 glistN.SelStart = Len(mprompt + RHS) + 1
 glistN.ShowMe
@@ -135,7 +135,7 @@ glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
 glistN.additem RHS
 Else
-glistN.List(0) = RHS
+glistN.list(0) = RHS
 End If
 'glistN.LeftMarginPixels = oldright
 
@@ -247,7 +247,13 @@ thispos = VR(1) + Len(mprompt)
 content = mprompt + VR(0)
 If thispos <> glistN.SelStart And VR(0) <> "" Then glistN.SelStart = thispos: glistN.ShowMe
 End Sub
-
+Private Sub glistN_CtrlPlusF1()
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
+End Sub
 Public Sub ResetPan()
 glistN.PanPos = 0
 End Sub
@@ -257,7 +263,7 @@ If thisselstart <= Len(mprompt) Then thisselstart = Len(mprompt) + 1
 'glistN.ShowPan
 With glistN
 .ShowPan
-.ExternalCursor .SelStart, .List(.ListIndex), .ForeColor
+.ExternalCursor .SelStart, .list(.ListIndex), .ForeColor
 End With
 End Sub
 

@@ -24,6 +24,7 @@ Event KeyPress(KeyAscii As Integer)
 Event MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
+Event CtrlPlusF1()
 Private mprompt As String
 Private mkind As String
 Public SkipProcAtExitFocus As Boolean
@@ -67,7 +68,7 @@ Public Property Get Text() As String
 If glistN.listcount = 0 Then
 glistN.additem mprompt
 Else
-Text = glistN.List(0)
+Text = glistN.list(0)
 End If
 End Property
 Public Property Get vartext() As String
@@ -75,7 +76,7 @@ Attribute vartext.VB_UserMemId = 0
 If glistN.listcount = 0 Then
 glistN.additem ""
 Else
-vartext = Mid$(glistN.List(0), 1 + Len(mprompt))
+vartext = Mid$(glistN.list(0), 1 + Len(mprompt))
 End If
 End Property
 Public Property Let vartext(ByVal RHS As String)
@@ -86,7 +87,7 @@ glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
 glistN.additem mprompt + RHS
 Else
-glistN.List(0) = mprompt + RHS
+glistN.list(0) = mprompt + RHS
 End If
 glistN.SelStart = Len(mprompt + RHS) + 1
 glistN.ShowMe
@@ -100,7 +101,7 @@ glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
 glistN.additem RHS
 Else
-glistN.List(0) = RHS
+glistN.list(0) = RHS
 End If
 'glistN.LeftMarginPixels = oldright
 
@@ -113,13 +114,13 @@ Info = glistN.HeadLine
 End Property
 
 Public Property Let Info(ByVal RHS As String)
-Locked = False
+locked = False
 glistN.restrictLines = 0
 glistN.HeadLineHeightMinimum = glistN.HeightPixels
 glistN.HeadLine = RHS
 
 glistN.ShowMe
-Locked = True
+locked = True
 End Property
 
 Public Property Get top() As Long
@@ -150,6 +151,10 @@ Text = RHS
 End Property
 
 
+Private Sub glistN_CtrlPlusF1()
+RaiseEvent CtrlPlusF1
+End Sub
+
 Private Sub glistN_DeployMenu()
 '
 RaiseEvent DeployMenu
@@ -168,14 +173,14 @@ End Sub
 
 
 
-Private Sub glistN_ChangeListItem(item As Long, Content As String)
+Private Sub glistN_ChangeListItem(item As Long, content As String)
 If Not enabled Then Exit Sub
 Dim this As String, thispos As Long
 thispos = glistN.SelStart - Len(mprompt)
-this = Mid$(Content, 1 + Len(mprompt))
+this = Mid$(content, 1 + Len(mprompt))
 RaiseEvent ValidString(this, thispos)
 thispos = thispos + Len(mprompt)
-Content = mprompt + this
+content = mprompt + this
 If thispos <> glistN.SelStart And this <> "" Then glistN.SelStart = thispos: glistN.ShowMe
 End Sub
 Public Sub ResetPan()
@@ -208,7 +213,7 @@ End Property
 
 
 Private Sub glistN_CheckGotFocus()
-If Not Locked Then
+If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 RaiseEvent GotFocus
 If enabled Then
@@ -232,7 +237,7 @@ glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 End Sub
 
 Private Sub glistN_CheckLostFocus()
-If Not Locked Then
+If Not locked Then
 If mStayOpen Then
 glistN.NoCaretShow = True
 
@@ -299,11 +304,11 @@ End Sub
 Private Sub glistN_SpinnerValue(ThatValue As Long)
 RaiseEvent SpinnerValue(ThatValue)
 End Sub
-Public Property Get Locked() As Boolean
-Locked = Not glistN.enabled
+Public Property Get locked() As Boolean
+locked = Not glistN.enabled
 End Property
 
-Public Property Let Locked(ByVal RHS As Boolean)
+Public Property Let locked(ByVal RHS As Boolean)
 glistN.enabled = Not RHS
 End Property
 Public Sub Spinner(ShowBar As Boolean, MinValue As Long, maxvalue As Long, LargeValue As Long)

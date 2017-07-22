@@ -1313,7 +1313,7 @@ End If
 Case vbKeyF1 To vbKeyF12
 If FKey >= 0 Then FKey = KeyCode - vbKeyF1 + 1
 If Abs(FKey) = 1 And ctrl And (shift And &H2) = 2 Then
-If lastAboutHTitle <> "" Then abt = True
+If lastAboutHTitle <> "" Then abt = True: vH_title$ = ""
 
 FKey = 0: KeyCode = 0: vHelp
 ElseIf FKey = 1 And (shift And 1) Then
@@ -1997,9 +1997,11 @@ End If
 If KeyCode = vbKeyPause Then
  KeyCode = 0: NOEDIT = True: noentrance = False
  If Form4.Visible Then Form4.Visible = False
+            If Form1.Visible Then
              If TEXT1.Visible Then
                 TEXT1.SetFocus
                 Form1.SetFocus
+            End If
             End If
             BreakMe = True
             If ASKINUSE Then
@@ -2268,6 +2270,11 @@ Case Else
 ctrl = False
 End Select
 noentrance = False
+End Sub
+
+Private Sub TEXT1_CtrlPlusF1()
+If lastAboutHTitle <> "" Then abt = True: vH_title$ = ""
+vHelp
 End Sub
 
 Private Sub TEXT1_Inform(tLine As Long, tPos As Long)

@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -31874,8 +31874,18 @@ Function ProcAbout(basestack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, s$, ss$, x As Double, y As Double, i As Long
 Dim kk As New Document
 Dim UAddPixelsTop As Long  ' just not used
-
-If FastSymbol(rest$, "!") Then
+If IsLabelSymbolNewExp(rest$, "ΔΕΙΞΕ", "SHOW", lang, ss$) Then
+If lastAboutHTitle <> "" Then abt = True: vH_title$ = ""
+If IsStrExp(basestack, rest$, ss$) Then
+    feedback$ = ss$
+feednow$ = FeedbackExec$
+CallGlobal feednow$
+Else
+    vHelp
+ End If
+ProcAbout = True
+Exit Function
+ElseIf FastSymbol(rest$, "!") Then
 '*******
 vH_title$ = ""
 par = True
@@ -31883,7 +31893,9 @@ par = par And IsStrExp(basestack, rest$, s$)
 
 If par Then
 If s$ = "" Then
+mHelp = False
 abt = False
+lastAboutHTitle = ""
 sHelp "", "", 0, 0
 GoTo conthere
 Else
@@ -31912,7 +31924,8 @@ End If
 End If
 '*******
 ElseIf IsLabelSymbolNew(rest$, "ΚΑΛΕΣΕ", "CALL", lang) Then
-
+mHelp = True
+abt = True
 If IsStrExp(basestack, rest$, ss$) Then
 
 kk.textDoc = ReplaceSpace(ss$)
@@ -31920,6 +31933,7 @@ FeedbackExec$ = kk.textFormat(vbCrLf)
 End If
 Else
 If IsStrExp(basestack, rest$, s$) Then
+mHelp = True
 If s$ = "" Then
 If lang = 0 Then
 lastAboutHTitle = "Βοήθεια Εφαρμογής"
@@ -31936,6 +31950,7 @@ s$ = kk.textFormat(vbCrLf)
 kk.EmptyDoc
 kk.textDoc = ReplaceSpace(s$)
 s$ = kk.TextParagraph(1)
+vH_title$ = s$
         i = 0
         x = (ScrX() - 1) * 2 / 5
         y = (ScrY() - 1) / 7
@@ -31955,8 +31970,10 @@ s$ = kk.TextParagraph(1)
                         End If
                     End If
         End If
- 
+
         If Not Form4.Visible Then
+        Helplastfactor = 1
+       helpSizeDialog = 1
            vH_x = CLng(x * Helplastfactor)
            vH_y = CLng(y * Helplastfactor)
            
@@ -31994,6 +32011,9 @@ End With
 Else
 conthere:
 vH_title$ = ""
+If Not basestack.IamChild Then
+abt = False
+End If
 If Form4.Visible Then
 Form4.Visible = False
 If Form1.Visible Then
@@ -32004,7 +32024,10 @@ If Form1.Visible Then
     End If
     End If
 End If
+Helplastfactor = 1
+helpSizeDialog = 1
 
+Unload Form4
 End If
 End If
 Exit Function
@@ -32125,7 +32148,7 @@ ClearScrNew scr, players(GetCode(scr)), CLng(mycolor(.Paper))   '' here 1.15 is 
 End If
 ''.Paper = scr.BackColor  ' Αυτό θα γίνει του BASESTACK
 If Form4.Visible Then
-vHelp
+If Not mHelp And Not abt Then vHelp
 End If
 End With
 Set scr = Nothing
@@ -32801,6 +32824,7 @@ Function ProcEdit(basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$, x1 As Long, y1 As Long, o As Long, frm$, i As Long, par As Boolean, p As Double
 Dim scr As Object, ss$
 ProcEdit = True
+If Not basestack.IamChild Then abt = False: mHelp = False: lastAboutHTitle = ""
 Set scr = basestack.Owner
 If Typename(scr) Like "Gui*" Then oxiforforms: Exit Function
 Form1.EditTextWord = False ' edit code
@@ -46266,7 +46290,10 @@ MyVol = True
 End Function
 Function MyHelp(basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$
+If Not basestack.IamChild Or Not mHelp Then
+mHelp = False
 abt = False
+lastAboutHTitle = ""
 If Abs(IsLabel(basestack, rest$, s$)) > 0 Then
     vH_title$ = ""
     fHelp basestack, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
@@ -46274,6 +46301,7 @@ ElseIf Not ISSTRINGA(rest$, s$) Then
     nhelp basestack, lang <> 1
 Else
     fHelp basestack, s$, lang = 1
+End If
 End If
 MyHelp = True
 End Function
