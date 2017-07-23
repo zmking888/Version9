@@ -149,12 +149,17 @@ End Property
 
 Public Property Let Info(ByVal RHS As String)
 locked = False
+If RHS = "" Then
+Text = Text
+Else
 glistN.restrictLines = 0
 glistN.HeadLineHeightMinimum = glistN.HeightPixels
 glistN.HeadLine = RHS
 
 glistN.ShowMe
 locked = True
+End If
+
 End Property
 
 Public Property Get top() As Variant
@@ -230,7 +235,7 @@ End Sub
 
 
 Private Sub glistN_ChangeListItem(item As Long, content As String)
-If Not enabled Then Exit Sub
+'If Not enabled Then Exit Sub
 Dim this As String, thispos As Long, VR(2)
 thispos = glistN.SelStart - Len(mprompt)
 this = Mid$(content, 1 + Len(mprompt))
@@ -284,22 +289,28 @@ End Property
 Public Property Let enabled(ByVal RHS As Boolean)
 glistN.EditFlag = RHS
 glistN.NoCaretShow = Not RHS
+glistN.NoBarClick = Not RHS
 End Property
 '
 
 
 Private Sub glistN_CheckGotFocus()
+
 If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 ' RaiseEvent GotFocus
 If enabled Then
+If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
 glistN.BackColor = white
+End If
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
+If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
 glistN.BackColor = dimm1
+End If
 glistN.NoCaretShow = True
 End If
 glistN.ShowMe
@@ -308,12 +319,16 @@ End If
 End Sub
 Public Sub Retired()
 If mStayOpen Then
+If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
 glistN.BackColor = white
+End If
 glistN.NoCaretShow = False
 Else
+If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
 glistN.BackColor = dimm2
+End If
 glistN.NoCaretShow = True
 End If
  glistN.PanPos = 0: glistN.ShowMe
@@ -363,8 +378,8 @@ If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
 If Pad$ <> "" Then
-If glistN.maxchar > 0 Then
-    vartext = Mid$(Pad$, 1, glistN.maxchar)
+If (glistN.maxchar - Len(mprompt)) > 0 Then
+    vartext = Mid$(Pad$, 1, (glistN.maxchar - Len(mprompt)))
 
 Else
     vartext = Pad$

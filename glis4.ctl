@@ -260,7 +260,7 @@ Public NoPanRight As Boolean
 Private LastVScroll As Long
 Private FreeMouse As Boolean
 Public NoCaretShow As Boolean
-
+Public NoBarClick As Boolean
 Dim valuepoint As Long, minimumWidth As Long
 Dim mValue As Long, mmax As Long, mmin As Long, mLargeChange As Long  ' min 1
 Dim mSmallChange As Long  ' min 1
@@ -827,6 +827,8 @@ If Not NoWheel Then RaiseEvent RegisterGlist(Me)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
+
+
 If dropkey Then KeyAscii = 0: Exit Sub
 Dim bb As Boolean, kk$, pair$
 If ListIndex < 0 Then
@@ -3952,11 +3954,13 @@ If EnabledBar Then
 Select Case KeyCode
 Case vbKeyLeft, vbKeyUp
 If Spinner Then
-If shift Then
-Value = Value - 1
-Else
-Value = Value - mSmallChange
-End If
+If Not NoBarClick Then
+    If shift Then
+        Value = Value - 1
+    Else
+        Value = Value - mSmallChange
+    End If
+    End If
 Else
 Value = Value - mSmallChange
 End If
@@ -3964,11 +3968,13 @@ Case vbKeyPageUp
 Value = Value - largechange
 Case vbKeyRight, vbKeyDown
 If Spinner Then
-If shift Then
-Value = Value + 1
-Else
-Value = Value + mSmallChange
-End If
+    If Not NoBarClick Then
+        If shift Then
+        Value = Value + 1
+        Else
+        Value = Value + mSmallChange
+        End If
+    End If
 Else
 If Value + largechange + 1 <= Max Then
 Value = Value + mSmallChange
@@ -4005,6 +4011,7 @@ Public Property Let jumptothemousemode(ByVal RHS As Boolean)
 mjumptothemousemode = RHS
 End Property
 Private Function processXY(ByVal x As Single, ByVal y As Single, Optional rep As Boolean = True) As Boolean
+If NoBarClick Then Exit Function
 Timer1bar.enabled = False
 Dim checknewvalue As Long, newheight As Long
 With UserControl
@@ -4144,7 +4151,6 @@ End Function
 Private Sub barMouseMove(Button As Integer, shift As Integer, x As Single, ByVal y As Single)
 If Not EnabledBar Then Exit Sub
 Dim ForValidValue As Long, newheight As Long
-
 If OurDraw Then
 If Button = 1 Then
 Timer1bar.Interval = 5000
