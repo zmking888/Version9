@@ -449,13 +449,6 @@ undomode = 1
 End If
 
 End Sub
-Private Sub glistN_CtrlPlusF1()
-  If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
-   Else
-      Callback.Callback mesCtrlName + ".About()"
-      End If
-End Sub
 Public Sub AddUndo(that As String)
 If Not enabled Then Exit Sub
 ClearRedo
@@ -1245,6 +1238,13 @@ If shift = 0 Then
 glistN.MarkNext = 0
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".MarkNo(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".MarkNo(" + ")"
+      End If
+
+
 ElseIf (shift And 1) = 1 Then
 
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
@@ -1624,7 +1624,11 @@ Charpos = OLDPOS
 End If
 End If
 Render
-
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".MarkNo(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".MarkNo(" + ")"
+      End If
 End If
 
 End Sub
@@ -1640,7 +1644,6 @@ BlockStartPos = BlockEndPos
    Else
       Callback.Callback mesCtrlName + ".MarkNo(" + ")"
       End If
-
 Else
 glistN.MarkNext = 1
 ' we have to raise event now
@@ -1758,11 +1761,19 @@ Else
     BlockBottomline = BlockEndline
 End If
 '
+If HaveMarkedText Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".MarkOut(" + Str(mIndex) + ")"
    Else
       Callback.Callback mesCtrlName + ".MarkOut(" + ")"
       End If
+Else
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".MarkNo(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".MarkNo(" + ")"
+      End If
+End If
 End Sub
 
 Private Sub glistN_ReadListItem(item As Long, content As String)
@@ -2112,7 +2123,7 @@ If i > 0 Then blockString = ReplaceStr(Chr$(10) + Space(i), Chr$(10), blockStrin
 End If
 End If
 End Function
-Function IsLabelDot(where$, a$, r$) As Long
+Private Function IsLabelDot(where$, a$, r$) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -2247,7 +2258,7 @@ a$ = NLtrim$(a$)
    'a$ = LTrim(a$)
 
 End Function
-Function IsLabelOnly(a$, r$) As Long
+Private Function IsLabelOnly(a$, r$) As Long
 
 Dim rr&, one As Boolean, c$, dot&, Extra&
 r$ = ""
@@ -2427,7 +2438,7 @@ Case Is >= "A"
     IsLabelOnly = rr& + Extra&
    
 End Function
-Function MaybeIsSymbol(a$, c$, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
+Private Function MaybeIsSymbol(a$, c$, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
 Dim i As Long, ok As Boolean
 If a$ = "" Or c$ = "" Then Exit Function
 i = 1
@@ -2442,7 +2453,7 @@ End If
 If Remove Then If ok Then a$ = Mid$(a$, i + 1 + Len(tail$))
 MaybeIsSymbol = ok
 End Function
-Function MaybeIsSymbol2(a$, num As Long, c$, Optional num2 As Long, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
+Private Function MaybeIsSymbol2(a$, num As Long, c$, Optional num2 As Long, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
 If num <= 0 Then Exit Function
 Dim i As Long, ok As Boolean
 If a$ = "" Or c$ = "" Then Exit Function
@@ -2459,7 +2470,7 @@ If Remove Then If ok Then a$ = Mid$(a$, i + num + num2)
 MaybeIsSymbol2 = ok
 End Function
 
-Function MaybeIsSymbolNoSpace(a$, c$, Optional Remove As Boolean = False) As Boolean
+Private Function MaybeIsSymbolNoSpace(a$, c$, Optional Remove As Boolean = False) As Boolean
 Dim ok As Boolean
 
 If a$ = "" Then Exit Function
@@ -3102,9 +3113,7 @@ Visible = glistN.Visible
 End Property
 
 Public Property Let Visible(ByVal RHS As Boolean)
-''If Not rhs Then LastSelStart = SelStart
 glistN.Visible = RHS
-
 End Property
 Public Property Get FontSize() As Single
 
@@ -4060,7 +4069,11 @@ If SelText <> "" Then
 helpmeSub
 Else
 
-vHelp
+  If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".About(" + Str(mIndex) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".About()"
+      End If
 End If
 Else
 nowrap = Not nowrap
@@ -4265,17 +4278,11 @@ sdupOut:
 mDoc.LCID = OldLcid
 End Sub
 Public Sub helpmeSub()
-    If Not abt Then
-            If mIndex >= 0 Then
+      If mIndex >= 0 Then
        Callback.Callback mesCtrlName + ".Help(" + Str(mIndex) + ",{" + Trim(SelText) + "})"
        Else
           Callback.Callback mesCtrlName + ".Help({" + Trim(SelText) + "})"
           End If
-    Else
-        feedback$ = Trim(SelText)
-        feednow$ = FeedbackExec$
-        CallGlobal feednow$
-    End If
 End Sub
 Public Sub supsub()
 Dim b$
@@ -4477,7 +4484,7 @@ If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
-Sub MarkSoftButton(para As Long, pospara As Long)
+Private Sub MarkSoftButton(para As Long, pospara As Long)
 If glistN.lines = 1 Then Exit Sub
 If ShadowMarks Then Exit Sub
 If para = 0 Then 'set
@@ -4515,7 +4522,7 @@ Else ' goto that paragraph
     End If
 End If
 End Sub
-Public Sub SetME()
+Private Sub SetME()
 If (600 - hueconv(BackColor)) Mod 360 > 30 And lightconv(BackColor) >= 128 Then ColorSet = 1 Else ColorSet = 0
 Select Case fState
 Case 0
@@ -4540,19 +4547,19 @@ Else
 fHelp basestack1, a$
 End If
 End Sub
-Function Myleft$(a As Variant, pos As Variant)
+Private Function Myleft$(a As Variant, pos As Variant)
 Myleft$ = Mid$(a, 1, pos)
 End Function
-Function IsmineHere(a$) As Boolean
+Private Function IsmineHere(a$) As Boolean
 IsmineHere = InStr(mColorCollection1, "|" + UCase(a$) + "|") > 0
 End Function
-Function IsmineHere1(a$) As Boolean
+Private Function IsmineHere1(a$) As Boolean
 IsmineHere1 = InStr(ColorCollection2, "|" + UCase(a$) + "|") > 0
 End Function
-Function IsmineHere2(a$) As Boolean
+Private Function IsmineHere2(a$) As Boolean
 IsmineHere2 = InStr(ColorCollection3, "|" + UCase(a$) + "|") > 0
 End Function
-Function IsmineHere3(a$) As Boolean
+Private Function IsmineHere3(a$) As Boolean
 IsmineHere3 = InStr(ColorCollection4, "|" + UCase(a$) + "|") > 0
 End Function
 
@@ -4680,7 +4687,7 @@ Set Callback.mDoc = Nothing
 ManualInform
 end1:
 End Sub
-Sub ReColorBlock()
+Private Sub ReColorBlock()
 Dim order1, order2
 order1 = 0: order2 = 0
 If BlockEndPara <> BlockStartPara Then
@@ -4697,7 +4704,7 @@ mDoc.WrapAgainColorBlock2 BlockEndPara, BlockStartPara
 End If
 ManualInform
 End Sub
-Sub ColorBlockOnly()
+Private Sub ColorBlockOnly()
 Dim order1, order2
 order1 = 0: order2 = 0
 If BlockEndPara <> BlockStartPara Then
