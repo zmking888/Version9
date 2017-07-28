@@ -175,14 +175,14 @@ Else
     CallEventFromGui Me, myEvent, b$
 End If
 End Sub
-Public Sub CallbackNow(b$, VR())
+Public Sub CallbackNow(b$, vr())
 If Quit Then Exit Sub
 If myEvent.excludeme.IamBusy Then Exit Sub
 Dim Mark$
 Mark$ = Split(b$, "(")(0)
 If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
 If Visible Then myEvent.excludeme.AddKey2 Mark$
-If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then myEvent.excludeme.Remove Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, vr()) Then myEvent.excludeme.Remove Mark$
 
 End Sub
 
@@ -424,6 +424,14 @@ Private Sub gList2_CtrlPlusF1()
     End If
 End Sub
 
+Private Sub gList2_EnterOnly()
+    If mIndex > -1 Then
+        Callback MyName$ + ".Enter(" + CStr(index) + ")"
+    Else
+        Callback MyName$ + ".Enter()"
+    End If
+End Sub
+
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 If item = -1 Then
 FillThere thisHDC, thisrect, gList2.CapColor
@@ -652,9 +660,20 @@ Public Property Get CtrlFontBold()
     CtrlFontBold = CtrlFont.bold
 End Property
 
+Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
+'
+Dim vr(2)
+vr(0) = KeyCode
+vr(1) = shift
+If mIndex > -1 Then
+    CallbackNow MyName$ + ".KeyDown(" + CStr(index) + ")", vr()
+Else
+    CallbackNow MyName$ + ".KeyDown()", vr()
+End If
+shift = vr(1)
+KeyCode = vr(0)
 
-
-
+End Sub
 
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
@@ -723,9 +742,6 @@ End Sub
 Public Sub hookme(this As gList)
 Set LastGlist = this
 End Sub
-
-
-
 
 Private Sub mDoc_MayQuit(yes As Variant)
 If mQuit Or Not Visible Then yes = True

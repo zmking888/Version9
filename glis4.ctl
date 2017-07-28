@@ -238,6 +238,7 @@ Event UnregisterGlist()
 Event DeployMenu()
 Event BlinkNow(Face As Boolean)
 Event CtrlPlusF1()
+Event EnterOnly()
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -827,13 +828,13 @@ If Not NoWheel Then RaiseEvent RegisterGlist(Me)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
-
-
 If dropkey Then KeyAscii = 0: Exit Sub
 Dim bb As Boolean, kk$, pair$
 If ListIndex < 0 Then
+If KeyAscii = 13 Then RaiseEvent EnterOnly
 Else
     If Not state Then
+       
         If KeyAscii = 13 And myEnabled And Not MultiLineEditBox Then
             KeyAscii = 0
             If SELECTEDITEM < 0 Then
@@ -1333,6 +1334,8 @@ If MultiLineEditBox Then
 
 RaiseEvent SplitLine
 RaiseEvent RemoveOne(vbCrLf)
+Else
+RaiseEvent EnterOnly
 End If
 End Select
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then

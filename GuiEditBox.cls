@@ -76,7 +76,7 @@ Dim all As Long, onelineheight As Long
 ''Event inform(tLine As Long, tPos As Long)
 Public LastSelStart As Long
 Public NoMark As Boolean
-Public NoTitle As Boolean
+Public NoTitle As Boolean, TitleStay As Boolean
 Private mNoColor As Boolean, mNoColor1 As Boolean
 Public TITLE As String
 Public UsedAsTextBox As Boolean  '' only in m2000. Enter exit - use maxchar - No wrap
@@ -536,7 +536,15 @@ If Not locked Then
 If mStayOpen And Not SkipProcAtExitFocus Then
 glistN.NoCaretShow = NoMark
 glistN.HideCaretOnexit = True
-If glistN.Visible Then glistN.ShowPan
+If glistN.Visible Then
+If NumberOnly Or UsedAsTextBox Then
+SelStartSilent = 0
+BlockStartPara = BlockEndPara
+BlockStartPos = BlockEndPos
+glistN.MarkNext = 0
+End If
+glistN.ShowPan
+End If
 
 Exit Sub
 End If
@@ -661,14 +669,25 @@ Private Sub glistN_MayRefresh(ok As Boolean)
 ok = Not HaveMarkedText
 End Sub
 
+Public Property Get MaxCharLength() As Long
+MaxCharLength = glistN.maxchar
+End Property
 
+Public Property Let MaxCharLength(ByVal RHS As Long)
+glistN.maxchar = RHS
+End Property
 Private Sub glistN_ChangeListItem(item As Long, content As String)
-Dim selstart2 As Long, checklistindex As Long
+Dim selstart2 As Long, checklistindex As Long, old$
 '' only for M2000, use NumberOnly
-
-
-If NumberOnly Then
-If Not ValidNum(content, False, NumberIntOnly) Then
+If NumberOnly Or NumberIntOnly Then
+NumberOnly = True
+If Len(content) > glistN.maxchar Then
+Charpos = glistN.maxchar
+glistN.SelStartEventAlways = glistN.SelStart - 1
+Exit Sub
+End If
+If content = "" Then
+ElseIf Not ValidNum(content, False, NumberIntOnly) Then
 undotext = ""
 content = mDoc.TextLine(item + 1)
 Exit Sub
@@ -740,7 +759,6 @@ ThatData = UndoDoc.textDoc
 End Sub
 
 Private Sub glistN_DragPasteData(ThatData As String)
-
 Dim a() As String, k As Long
 a() = Split(ThatData, ChrW(9))
 PasteDoc Join(a(), "    ")
@@ -998,9 +1016,13 @@ End Sub
 
 Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 If glistN.HeadLine <> "" Then
+If NoTitle Then
 glistN.HeadLine = ""
 onelineheight = 0
 glistN.HeadlineHeight = 0
+ElseIf TITLE <> glistN.HeadLine And Not TitleStay Then
+ReplaceTitle = ""
+End If
 End If
 'If KeyCode = vbKeyTab Then
 'If shift = 2 Then
@@ -1055,22 +1077,37 @@ ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
 KeyCode = 0
 ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
-Pad$ = GetTextData(13)
-If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
-If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
-SelStart = SelStart - 1
-End If
-AddUndo ""
-If UsedAsTextBox Then
-Pad$ = GetNextLine((Pad$))
-If Len(Text) + Len(Pad$) > glistN.maxchar Then
-Pad$ = Myleft$(Pad$, glistN.maxchar - Len(Text))
-End If
-End If
-SelText = Pad$
-RemoveUndo Pad$
-KeyCode = 0
-ReColorBlock
+    Pad$ = GetTextData(13)
+    If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
+    If NumberOnly Or NumberIntOnly Then
+        If Not ValidNum(Pad$, False, NumberIntOnly) Then GoTo conthere
+        NumberOnly = True
+        If Not mNoWrap = True Then
+            mNoWrap = True
+            glistN.NoScroll = False
+        End If
+    ElseIf UsedAsTextBox Then
+        Pad$ = Replace(Pad$, Chr(13), "")
+        Pad$ = Replace(Pad$, Chr(10), "")
+        If Not mNoWrap = True Then
+            mNoWrap = True
+            glistN.NoScroll = False
+        End If
+    End If
+    If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
+        SelStart = SelStart - 1
+    End If
+    AddUndo ""
+    If UsedAsTextBox Then
+    Pad$ = GetNextLine((Pad$))
+    If Len(Text) + Len(Pad$) > glistN.maxchar Then
+        Pad$ = Myleft$(Pad$, glistN.maxchar - Len(Text))
+    End If
+    End If
+    SelText = Pad$
+    RemoveUndo Pad$
+    KeyCode = 0
+    ReColorBlock
 ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
@@ -1227,6 +1264,7 @@ glistN_MarkDelete False
 KeyCode = 0
 End If
 End If
+conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
 If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
 End Sub
@@ -1828,7 +1866,7 @@ End Sub
 Private Sub glistN_SplitLine()
 '
 Dim b$, dummy As Long, a As Long
-
+If NumberOnly Or NumberIntOnly Or UsedAsTextBox Then Exit Sub
 If glistN.ListIndex >= 0 Then
     b$ = mDoc.TextParagraph(mDoc.MarkParagraphID)
 If Charpos = 1 And b$ <> "" Then
@@ -2909,6 +2947,7 @@ nowrap = mNoWrap
 End Property
 
 Public Property Let nowrap(ByVal RHS As Boolean)
+If UsedAsTextBox Then Exit Property
 If Not (mNoWrap = RHS) Then
 mNoWrap = RHS
 glistN.NoScroll = Not mNoWrap
@@ -2988,6 +3027,13 @@ End Property
 Public Property Let Text(RHS As String)
 On Error Resume Next
 If glistN Is Nothing Then Exit Property
+If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then
+If Not mNoWrap = True Then
+    mNoWrap = True
+    glistN.NoScroll = False
+End If
+
+End If
 Dim oldenabled As Boolean
 If Me.HaveMarkedText Then
 BlockStartPara = BlockEndPara
@@ -3231,15 +3277,22 @@ If Right$(RHS, 1) = vbCr Then RHS = RHS + vbLf
 If RHS <> "" Then
 
 If NumberOnly Then
+If undotext = "" Then
+undotext = glistN.list(0)
+ElseIf glistN.list(0) = "" And undotext <> "" Then
+glistN.list(0) = undotext
+End If
 Pad$ = Space$(Len(RHS) + Len(glistN.list(0)))
 Mid$(Pad$, 1, Charpos - 1) = Myleft$(glistN.list(0), Charpos - 1)
 Mid$(Pad$, Charpos, Len(RHS)) = RHS
 If Len(glistN.list(0)) > 0 Then
-Mid$(Pad$, Charpos + Len(RHS) - 1) = Mid$(glistN.list(0), Charpos)
+If Mid$(glistN.list(0), Charpos) <> "" Then
+Mid$(Pad$, Charpos + Len(RHS) - 1) = Mid$(undotext, Charpos)
+End If
 End If
 RHS = glistN.list(0)
-glistN.list(0) = Pad$
-If Not glistN.list(0) = Pad$ Then glistN.list(0) = RHS
+ glistN.list(0) = Pad$
+If Not glistN.list(0) = Pad$ Then glistN.list(0) = RHS: undotext = ""
 Else
 mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, RHS, tabwidth
 End If
@@ -3540,27 +3593,28 @@ Function GetLCIDFromKeyboard() As Long
     GetLCIDFromKeyboard = CLng(val("&h" + Myleft$(Buffer, ret - 1)))
 End Function
 Public Property Let ReplaceTitle(a$)  ' at the end
-
 Dim curlines As Long
-NoTitle = False
+NoTitle = TITLE = ""
 NoHeadwrap = False
 curlines = mDoc1.DocLines
 mDoc1.EmptyDoc
-mDoc1.textDoc = TITLE$ + a$
+mDoc1.textDoc = RTrim$(TITLE$ + " " + a$)
 mDoc1.WrapAgain
 If mDoc1.DocLines >= curlines + glistN.lines + 1 Then
 mDoc1.EmptyDoc
 NoHeadwrap = True
-mDoc1.textDoc = TITLE$ + a$
+mDoc1.textDoc = RTrim$(TITLE$ + " " + a$)
 End If
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight
 glistN.HeadlineHeight = mDoc1.DocLines * onelineheight
-
-there12345:
 glistN.ShowMe
 
+End Property
+Public Property Let ReplaceTitleHold(a$)
+ReplaceTitle = a$
+TitleStay = a$ <> ""
 End Property
 Private Sub PrintItem1X(mHdc As Long, ByVal c As String, r As RECT, col() As Variant)
 On Error Resume Next
@@ -4041,7 +4095,6 @@ End Sub
 Private Sub PressKey_A(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, noentrance As Boolean, where As Long
 Dim aa$, a$, JJ As Long, ii As Long
-
 If noentrance Then
 KeyCode = 0
 Exit Sub
@@ -4050,8 +4103,14 @@ noentrance = True
 Select Case KeyCode
 Case vbKeyReturn
 nochange = True
-
-If AutoIntNewLine Then
+If UsedAsTextBox Or NumberOnly Or NumberIntOnly Then
+KeyCode = 0
+If Not Callback Is Nothing Then
+With Callback.Control(1)
+.PressKey 13, 0
+End With
+End If
+ElseIf AutoIntNewLine Then
 
 KeyCode = 0
 Else
@@ -4119,16 +4178,17 @@ Case vbKeyF5
 If SelText <> "" Then rthissub
 KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-MarkSoftButton Para1, PosPara1
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para1, PosPara1
 KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2
-MarkSoftButton Para2, PosPara2
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
 KeyCode = 0
 Case vbKeyF8  'Set/Show/Reset Para2
-MarkSoftButton Para3, PosPara3
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para3, PosPara3
 KeyCode = 0
 
 Case vbKeyF9  ' Count Words
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 If glistN.lines > 1 Then
 If UserCodePage = 1253 Then
 ReplaceTitle = "Λέξεις στο κείμενο:" + Str(mDoc.WordCount)
@@ -4136,11 +4196,14 @@ Else
 ReplaceTitle = "Words in text:" + Str(mDoc.WordCount)
 End If
 End If
+End If
 KeyCode = 0
 Case vbKeyF10
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 showparagraph = Not showparagraph
 mDoc.WrapAgain
 Render
+End If
 KeyCode = 0
 
 Case vbKeyF11
@@ -4151,6 +4214,7 @@ ManualInform
 glistN.ShowMe
 KeyCode = 0
 Case vbKeyTab
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 nochange = True
 shift = shift And &H1
 glistN.enabled = False
@@ -4217,6 +4281,7 @@ glistN.enabled = True
     ReColorBlock
 Render
 nochange = False
+End If
 'glistN_MarkOut
 Case Else
 
@@ -4570,7 +4635,7 @@ mDoc.final = vNewValue
 End Property
 Public Sub PopUpMenu(poptitle$, x As Variant, y As Variant)
 Dim oldModalId As Variant, i As Long
-If UsedAsTextBox Then Exit Sub
+''If UsedAsTextBox Then Exit Sub
 i = SelLength
 Form1mn1Enabled = i > 1
 Form1mn2Enabled = i > 1
@@ -4611,13 +4676,28 @@ On Error Resume Next
 Dim aa$
 aa$ = GetTextData(13)
 If aa$ = "" Then aa$ = Clipboard.GetText(1)
+If NumberOnly Or NumberIntOnly Then
+    If Not ValidNum(aa$, False, NumberIntOnly) Then Exit Sub
+    NumberOnly = True
+    If Not mNoWrap = True Then
+        mNoWrap = True
+        glistN.NoScroll = False
+    End If
+ElseIf UsedAsTextBox Then
+    aa$ = Replace(aa$, Chr(13), "")
+    aa$ = Replace(aa$, Chr(10), "")
+    If Not mNoWrap = True Then
+        mNoWrap = True
+        glistN.NoScroll = False
+    End If
+End If
 If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
 SelStart = SelStart - 1
 End If
 AddUndo ""
 SelText = aa$
 RemoveUndo aa$
-
+ReColorBlock
 End Sub
 
 Private Sub wdragSub()
@@ -4779,3 +4859,40 @@ If Quit Then yes = True
 'MyDoEvents1 Form3
 End Sub
 
+
+Public Property Get Value() As Variant
+If Not (NumberOnly Or NumberIntOnly) Then Exit Property
+NumberOnly = True
+If mDoc.SizeCRLF = 0 Then
+Value = 0
+Else
+If Not NumberIntOnly Then
+If NowDec$ <> "." Then
+Value = val(Replace$(Text, NowDec$, "."))
+Else
+Value = val(Replace$(Text, NowDec$, "."))
+End If
+Else
+Value = val(Text)
+End If
+End If
+
+End Property
+
+Public Property Let Value(ByVal vNewValue As Variant)
+NumberOnly = True
+Dim content As String
+
+If MyIsNumeric(vNewValue) Then
+content = NLtrim$(Str(vNewValue))
+If Not ValidNum(content, True, NumberIntOnly) Then
+    Text = ""
+ElseIf vNewValue = 0 Then
+    Text = ""
+Else
+    Text = content
+    End If
+    Else
+    Text = ""
+    End If
+End Property
