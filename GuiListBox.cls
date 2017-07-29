@@ -22,6 +22,8 @@ Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000, Point2Me As Object
 ' colors
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, trans As Boolean, noeditme As Boolean
+Private mHideCaret As Boolean, mTitle As String
+Private lastshift As Boolean
 
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
@@ -80,9 +82,16 @@ Set Point2Me = Nothing
 End Sub
 
 Private Sub glistN_BlockCaret(item As Long, blockme As Boolean, skipme As Boolean)
-If trans And noeditme Then blockme = True  ': glistN.NoCaretShow = True
+If (trans And noeditme) Or mHideCaret Then
+blockme = True
+If mHideCaret Then glistN.NoCaretShow = True
+End If
 End Sub
 
+
+Private Sub glistN_RefreshOnly()
+glistN.PrepareToShow
+End Sub
 Private Sub glistN_ChangeListItem(item As Long, content As String)
 If Not mEnabled Then Exit Sub
 Dim thispos As Long, vr(3)
@@ -234,6 +243,7 @@ Set pic = Point2Me
 End Sub
 
 Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+lastshift = (shift And 1) = 0
 Dim vr(2)
 vr(0) = KeyCode
 vr(1) = shift
@@ -248,9 +258,9 @@ End Sub
 
 Private Sub glistN_PanLeftRight(Direction As Boolean)
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(glistN.ListIndex) + ")"
+   Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(glistN.ListIndex) + "," + Str(Direction) + ")"
    Else
-      Callback.Callback mesCtrlName + ".DblClick(" + Str(glistN.ListIndex) + ")"
+      Callback.Callback mesCtrlName + ".DblClick(" + Str(glistN.ListIndex) + "," + Str(Direction) + ")"
       End If
 End Sub
 
@@ -323,9 +333,9 @@ End Sub
 Private Sub glistN_Selected2(item As Long)
 '
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(item) + ")"
+   Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(item) + "," + Str(lastshift) + ")"
    Else
-      Callback.Callback mesCtrlName + ".DblClick(" + Str(item) + ")"
+      Callback.Callback mesCtrlName + ".DblClick(" + Str(item) + "," + Str(lastshift) + ")"
       End If
 End Sub
 
@@ -557,3 +567,28 @@ On Error Resume Next
 Callback.Controls(CtrlName).SetFocus
 End Sub
 
+Public Property Let HideCaret(ByVal vNewValue As Variant)
+    mHideCaret = vNewValue
+    glistN.NoCaretShow = vNewValue
+End Property
+
+Public Property Get Title() As Variant
+Title = mTitle
+End Property
+
+Public Property Let Title(ByVal vNewValue As Variant)
+Dim onelineheight As Long
+mTitle = vNewValue
+glistN.HeadLine = ""
+If mTitle <> "" Then
+glistN.HeadLine = mTitle
+onelineheight = glistN.HeadlineHeight
+glistN.HeadlineHeight = onelineheight
+Else
+glistN.HeadlineHeight = 0
+End If
+
+End Property
+Public Property Let PanDouble(ByVal vNewValue As Variant)
+glistN.NoPanLeft = Not vNewValue
+End Property

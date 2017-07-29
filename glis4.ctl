@@ -239,6 +239,7 @@ Event DeployMenu()
 Event BlinkNow(Face As Boolean)
 Event CtrlPlusF1()
 Event EnterOnly()
+Event RefreshOnly()
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -1360,6 +1361,8 @@ ElseIf KeyCode = 16 And shift <> 0 Then
 RaiseEvent Maybelanguage
 ElseIf KeyCode = vbKeyV Then
 Exit Sub
+Else
+RaiseEvent RefreshOnly
 End If
 i = -1
 If shift <> 4 And mynum$ <> "" Then
@@ -1379,6 +1382,7 @@ End If
  Else
 UKEY$ = ""
  End If
+ 
 End Sub
 
 Private Sub UserControl_LostFocus()
@@ -2895,7 +2899,7 @@ nr.Bottom = nr.top + mytPixels + 1
     If SELECTEDITEM > 0 Then
         If SELECTEDITEM - topitem - 1 <= lines And Not ListSep(SELECTEDITEM - 1) Then
                 If Not NoCaretShow Then
-                                If EditFlag And Not BlockItemcount Then
+                                If EditFlag Then 'And Not BlockItemcount Then
                                 If SelStart = 0 Then SelStart = 1
                                         DrawStyle = vbSolid
                                  If CenterText Then
@@ -2950,6 +2954,7 @@ End If
  DrawStyle = vbSolid
     LastVScroll = Value
 RepaintScrollBar
+RaiseEvent ScrollMove(topitem)
 End Sub
 Public Sub ShowMe2()
 Dim YYT As Long, nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long, hnr As RECT, nfg As Long
@@ -3111,7 +3116,7 @@ If SELECTEDITEM > 0 Then
        '' cY = yyt * (i - topitem + 1) 'CurrentY
         
         If Not NoCaretShow Then
-                 If EditFlag And Not BlockItemcount Then
+                 If EditFlag Then ' And Not BlockItemcount Then
                     If SelStart = 0 Then SelStart = 1
                                              DrawStyle = vbSolid
                                              RaiseEvent PureListOff

@@ -39,10 +39,11 @@ End Property
 Public Property Get ListText()
 ListText = glistN.ListValue
 End Property
-Public Property Let Label(A$)
-Textbox.Prompt = A$ + " " + ChrW(&H25BC) & " "
+Public Property Let Label(a$)
+Textbox.Prompt = a$ + " " + ChrW(&H25BC) & " "
 Textbox.glistN.ShowMe
 End Property
+
 
 Private Sub glistN_RegisterGlist(this As gList)
 Dim mo As Object
@@ -88,7 +89,7 @@ End Sub
 
 Private Sub glistN_PanLeftRight(Direction As Boolean)
 If Direction = True Then
-Text = glistN.List(glistN.ListIndex)
+Text = glistN.list(glistN.ListIndex)
 End If
 End Sub
 
@@ -165,7 +166,7 @@ End Sub
 Private Sub glistN_Selected2(item As Long)
 If glistN.ListSep(item) Then Exit Sub
 If item >= 0 Then
-Textbox.vartext = glistN.List(item): Textbox.SelStart = Len(Textbox.Text) + 1
+Textbox.vartext = glistN.list(item): Textbox.SelStart = Len(Textbox.Text) + 1
 Textbox.SetFocus
 ElseIf item < -1 Then
 glistN.Visible = False
@@ -185,7 +186,7 @@ If Iam Then Exit Sub
 If (Button And 1) = 1 And Not glistN.Visible Then
 Iam = True
 If UseOnlyTheList Then If Textbox.enabled Then Textbox.glistN.NoCaretShow = False:    Textbox.glistN.ShowMe2
-Textbox.Locked = True
+Textbox.locked = True
 glistN.Visible = True
 glistN.ZOrder
 glistN.LeaveonChoose = True
@@ -205,7 +206,7 @@ glistN.LeaveonChoose = True
     End If
     Textbox.SkipProcAtExitFocus = True
     glistN.SetFocus
-Textbox.Locked = False
+Textbox.locked = False
 Iam = False
 End If
 End Sub
@@ -232,9 +233,9 @@ Else
 f = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
 End If
 If f >= 0 Then
-If Not NoCaseSensitive Then ThatString = Left$(glistN.List(f), Len(ThatString))
-Textbox.glistN.LastLinePart = Mid$(glistN.List(f), Len(ThatString) + 1)
-RaiseEvent AutoCompleteDone(glistN.List(f))
+If Not NoCaseSensitive Then ThatString = Left$(glistN.list(f), Len(ThatString))
+Textbox.glistN.LastLinePart = Mid$(glistN.list(f), Len(ThatString) + 1)
+RaiseEvent AutoCompleteDone(glistN.list(f))
 glistN.enabled = False
 glistN.ScrollTo f - glistN.lines / 2, f + 1
 glistN.enabled = True
@@ -263,34 +264,34 @@ Public Property Let Text(ByVal RHS As String)
 Textbox.vartext = RHS
 
 End Property
-Public Property Get Locked() As Boolean
-Locked = Textbox.Locked
+Public Property Get locked() As Boolean
+locked = Textbox.locked
 End Property
 
-Public Property Let Locked(ByVal RHS As Boolean)
-If RHS = Textbox.Locked Then Exit Property
+Public Property Let locked(ByVal RHS As Boolean)
+If RHS = Textbox.locked Then Exit Property
 If RHS Then
-If Not Textbox.Locked Then
+If Not Textbox.locked Then
 glistN.BypassLeaveonChoose = True
 Textbox.SetFocus
 glistN.BypassLeaveonChoose = False
 End If
 End If
-Textbox.Locked = RHS
+Textbox.locked = RHS
 End Property
-Public Sub additem(A$)
-glistN.additemFast A$
-Text = A$
+Public Sub additem(a$)
+glistN.additemFast a$
+Text = a$
 End Sub
 
-Public Sub additemFast(A$)
-glistN.additemFast A$
+Public Sub additemFast(a$)
+glistN.additemFast a$
 End Sub
 Public Sub Shutdown()
 'new
 glistN.Shutdown
 glistN.enabled = False
-Textbox.Locked = True
+Textbox.locked = True
 
 End Sub
 

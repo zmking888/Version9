@@ -156,6 +156,9 @@ End Property
 
 Public Sub Callback(b$)
 If Quit Then Exit Sub
+If myEvent Is Nothing Then
+Set EventObj = New mEvent
+End If
 If ByPassEvent Then
     If myEvent.excludeme.IamBusy Then Exit Sub
     Dim Mark$
@@ -177,6 +180,10 @@ End If
 End Sub
 Public Sub CallbackNow(b$, vr())
 If Quit Then Exit Sub
+If myEvent Is Nothing Then
+Set EventObj = New mEvent
+End If
+
 If myEvent.excludeme.IamBusy Then Exit Sub
 Dim Mark$
 Mark$ = Split(b$, "(")(0)

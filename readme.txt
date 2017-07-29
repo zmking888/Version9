@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 21 active-X
+Version 8.9 revision 22 active-X
 
-Better TextBox for user forms
+Better Listbox for user forms
 
 http://georgekarras.blogspot.gr/
 

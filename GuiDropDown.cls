@@ -187,6 +187,10 @@ Id = glistN.Id(item)
 End Property
 
 
+Private Sub glistN_RefreshOnly()
+glistN.PrepareToShow
+End Sub
+
 Private Sub glistN_RegisterGlist(this As gList)
 Dim mo As Object
 Set mo = glistN.Parent
@@ -313,6 +317,7 @@ If glistN.PanPos <> 0 Then glistN.PanPos = 0
    Else
       Callback.Callback mesCtrlName + ".Click(" + Str(item) + ")"
       End If
+      
 End Sub
 
 Private Sub Pad_Activate()

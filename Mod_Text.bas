@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5495,7 +5495,7 @@ End If
 End If
 End Function
 Function IsNumber(bstack As basetask, a$, r As Double) As Boolean
-Dim VR As Long, v$, V1&, w1 As Long, w2 As Long, p As Double, s1$, dd As Long, dn As Long, W3 As Long
+Dim vr As Long, v$, V1&, w1 As Long, w2 As Long, p As Double, s1$, dd As Long, dn As Long, W3 As Long
 Dim PP As Double, pppp As mArray, nBstack As basetask, pppp1 As mArray, rB As Byte, ri As Integer
 Dim anything As Object, n$, anything2 As Object
 
@@ -6235,19 +6235,19 @@ num86: ' Case "STACK", "ΣΩΡΟΣ"
 
 LOOKFORVARNUM:
 
-If GetVar(bstack, v$, VR) Then
-    If MyIsObject(var(VR)) Then
+If GetVar(bstack, v$, vr) Then
+    If MyIsObject(var(vr)) Then
     n$ = v$
-        v$ = Typename(var(VR))
+        v$ = Typename(var(vr))
         If v$ Like "Pro*" Then
-            If MyIsObject(var(VR).Value) Then
-               Set bstack.lastobj = var(VR).Value
+            If MyIsObject(var(vr).Value) Then
+               Set bstack.lastobj = var(vr).Value
                 r = 0
             Else
-                r = SG * var(VR).Value
+                r = SG * var(vr).Value
             End If
         ElseIf v$ Like "Gr*" Then
-            If var(VR).HasValue And Not IsOperator(a$, "::", 2) Then
+            If var(vr).HasValue And Not IsOperator(a$, "::", 2) Then
                 s1$ = n$ + "." + ChrW(&H1FFF) + ";()"
                 If GetSub(s1$, V1&) Then
 foundprivate:
@@ -6280,9 +6280,9 @@ foundprivate:
                         IsNumber = False
                     End If
                 Else
-                    If var(VR).HasStrValue Then
+                    If var(vr).HasStrValue Then
                         r = 0
-                        CopyGroup var(VR), bstack
+                        CopyGroup var(vr), bstack
                     Else
                         r = 0
                         W3 = Len(n$) - rinstr(n$, ".") + 1
@@ -6294,49 +6294,49 @@ foundprivate:
                 End If
             Else
                 r = 0
-                CopyGroup2 var(VR), bstack
+                CopyGroup2 var(vr), bstack
             End If
         ElseIf v$ Like "mE*" Then
-            CopyEvent var(VR), bstack
+            CopyEvent var(vr), bstack
             r = 0
         ElseIf v$ = "lambda" Then
             
-            CopyLambda var(VR), bstack
+            CopyLambda var(vr), bstack
             r = 0
         ElseIf v$ = "mHandler" Then
         ' this is ok for both buffer and inventory
-          If var(VR).t1 = 2 Then
-            CopyHandler var(VR), bstack
+          If var(vr).t1 = 2 Then
+            CopyHandler var(vr), bstack
             r = 0
             Else
-            If Not var(VR).UseIterator Then
-            CopyHandler var(VR), bstack
+            If Not var(vr).UseIterator Then
+            CopyHandler var(vr), bstack
             r = 0
             ElseIf FastSymbol(a$, "^") Then
 
-                    r = SG * var(VR).index_cursor
+                    r = SG * var(vr).index_cursor
               Else
-               Set bstack.lastobj = var(VR)
+               Set bstack.lastobj = var(vr)
                 r = 0
             End If
         End If
         ElseIf v$ = "Constant" Then
-            r = var(VR)
+            r = var(vr)
         Else
-                Set bstack.lastobj = MakeitObjectGeneric(VR)
+                Set bstack.lastobj = MakeitObjectGeneric(vr)
                 r = 0
         End If
     
 Else
-If IsNumeric(var(VR)) Then
-    r = SG * var(VR)
+If IsNumeric(var(vr)) Then
+    r = SG * var(vr)
     Else
-    r = SG * val(var(VR))
+    r = SG * val(var(vr))
     End If
 End If
 
 IsNumber = True
-ElseIf VR = -1 Then
+ElseIf vr = -1 Then
 r = SG * ReadVarDouble(bstack, v$)
 
 IsNumber = True
@@ -6369,16 +6369,16 @@ Exit Function
 
 Case 4
 LOOKFORVARNUM4:
-If GetVar(bstack, v$, VR) Then
-If Typename(var(VR)) = "lambda" Then
-CopyLambda var(VR), bstack
+If GetVar(bstack, v$, vr) Then
+If Typename(var(vr)) = "lambda" Then
+CopyLambda var(vr), bstack
 Else
-r = SG * var(VR)
+r = SG * var(vr)
 End If
 
 IsNumber = True
 Else
-If VR = -1 Then
+If vr = -1 Then
 r = SG * ReadVarInt(bstack, v$)
 
 IsNumber = True
@@ -7881,12 +7881,12 @@ fun45: 'Case "RECORDS(", "ΕΓΓΡΑΦΕΣ("
  IsNumber = False
 
     If IsExp(bstack, a$, r) Then
-        VR = r Mod 512
-        If FLEN(VR) = 0 Then
+        vr = r Mod 512
+        If FLEN(vr) = 0 Then
             MyErMacro a$, "not valid file number", "λάθος αριθμός αρχείου"
             
         Else
-            r = SG * LOF(VR) / FLEN(VR)
+            r = SG * LOF(vr) / FLEN(vr)
             
             IsNumber = FastSymbol(a$, ")", True)
         End If
@@ -9287,16 +9287,16 @@ fun87: 'Case "SEEK(", "ΜΕΤΑΘΕΣΗ("
  IsNumber = False
   IsSymbol3 a$, "#"  ' drop it
     If IsExp(bstack, a$, r) Then
-    VR = r Mod 512
+    vr = r Mod 512
     
-    If FLEN(VR) = 0 Then
+    If FLEN(vr) = 0 Then
  MyErMacro a$, "not valid file number", "λάθος αριθμός αρχείου"
 
-    ElseIf FLEN(VR) <> 1 Then
+    ElseIf FLEN(vr) <> 1 Then
      MyErMacro a$, "not valid file TYPE", "λάθος ΤΥΠΟΣ αρχείου"
 
     Else
-    r = SG * Seek(VR)
+    r = SG * Seek(vr)
     
   IsNumber = FastSymbol(a$, ")", True)
   End If
@@ -9311,12 +9311,12 @@ fun88:  'Case "EOF(", "ΤΕΛΟΣ("
  IsNumber = False
    IsSymbol3 a$, "#"  ' drop it
     If IsExp(bstack, a$, r) Then
-        VR = r Mod 512
-        If FLEN(VR) = 0 Then
+        vr = r Mod 512
+        If FLEN(vr) = 0 Then
         MyErMacro a$, "not valid file number", "λάθος αριθμός αρχείου"
          
     Else
-    r = SG * (LOF(VR) < Seek(VR))
+    r = SG * (LOF(vr) < Seek(vr))
     
   IsNumber = FastSymbol(a$, ")", True)
   End If
@@ -10197,11 +10197,11 @@ conthereGroupValue:
                     End If
                     
                 Else
-                    If Typename(var(VR)) = "Group" Then
+                    If Typename(var(vr)) = "Group" Then
                     
-                    If var(VR).HasStrValue Then
+                    If var(vr).HasStrValue Then
                         r = 0
-                        CopyGroup var(VR), bstack
+                        CopyGroup var(vr), bstack
                     Else
                         r = 0
                         InternalEror
@@ -25637,7 +25637,7 @@ textDel = (chk <> "")
 If chk <> "" Then KillFile chk
 End Function
 Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
-Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, buf$, i As Long
+Dim chk As String, b$, j As Long, PREPARE$, vr$, s$, v As Double, buf$, i As Long
 ThisFile = strTemp + ThisFile
 chk = GetDosPath(ThisFile)
 If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
@@ -25650,15 +25650,15 @@ If j > 1 Then PREPARE$ = PREPARE$ & Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 j = InStr(THISBODY, "##")
 If j = 0 Then PREPARE$ = PREPARE$ & THISBODY: Exit Do
-If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
+If j > 1 Then vr$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
 THISBODY = Mid$(THISBODY, j + 2)
 '
-If IsExp(bstack, VR$, v) Then
+If IsExp(bstack, vr$, v) Then
 buf$ = Trim$(Str$(v))
-ElseIf IsStrExp(bstack, VR$, s$) Then
+ElseIf IsStrExp(bstack, vr$, s$) Then
 buf$ = s$
 Else
-buf$ = VR$
+buf$ = vr$
 End If
 PREPARE$ = PREPARE$ & buf$
 Loop
@@ -36212,18 +36212,18 @@ ElseIf IsLabelSymbolNew(rest$, "ΕΙΣΑΓΩΓΗ", "TEXTBOX", lang) Then
 End Function
 
 Sub ProcMethodArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, lang As Long, ifier0 As Boolean)
-Dim VR(1)
-Set VR(0) = pppp.item(index)
+Dim vr(1)
+Set vr(0) = pppp.item(index)
 On Error Resume Next
-ProcMethod bstack, VR(), 0, co$, rest$, lang, ifier0
+ProcMethod bstack, vr(), 0, co$, rest$, lang, ifier0
  ifier0 = (Err = 0) And ifier0
           Err.Clear
 End Sub
 Sub ProcPropertyArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, lang As Long, ifier0 As Boolean)
-        Dim VR(1)
-        Set VR(0) = pppp.item(index)
+        Dim vr(1)
+        Set vr(0) = pppp.item(index)
         On Error Resume Next
-          ProcProperty bstack, VR(), 0, co$, rest$, lang, True
+          ProcProperty bstack, vr(), 0, co$, rest$, lang, True
   ifier0 = Err = 0
           Err.Clear
 End Sub
