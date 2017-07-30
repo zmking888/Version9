@@ -64,7 +64,7 @@ dwReserved1 As Long
 cFileName(MAX_PATH * 2 - 1) As Byte
 cAlternate(14 * 2 - 1) As Byte
 End Type
-Private Declare Function FindFirstFile Lib "kernel32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindFirstFile Lib "KERNEL32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) As Long
 
 Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
@@ -82,7 +82,7 @@ Public LastGlist3 As gList
 
 Public HOOKTEST As Long
 
-Public Sub Hook3(hWnd As Long, A As gList)
+Public Sub Hook3(hWnd As Long, a As gList)
 ' work in IDE but for development and a fear...of a crash...
 
 If m_bInIDE Then Exit Sub
@@ -95,7 +95,7 @@ If m_bInIDE Then Exit Sub
                                  MyDoEvents
          If defWndProc3 = 0 Then Set LastGlist3 = Nothing
     End If
-           Set LastGlist3 = A
+           Set LastGlist3 = a
 End Sub
 Public Sub UnHook3(hWnd As Long)
 
@@ -107,7 +107,7 @@ If m_bInIDE Then Exit Sub
    End If
   
 End Sub
-Public Sub Hook2(hWnd As Long, A As gList)
+Public Sub Hook2(hWnd As Long, a As gList)
 ' work in IDE but for development and a fear...of a crash...
 
 If m_bInIDE Then Exit Sub
@@ -120,7 +120,7 @@ If m_bInIDE Then Exit Sub
                                  MyDoEvents
          If defWndProc2 = 0 Then Set LastGlist2 = Nothing
     End If
-           Set LastGlist2 = A
+           Set LastGlist2 = a
 End Sub
 Public Sub UnHook2(hWnd As Long)
 
@@ -133,7 +133,7 @@ If m_bInIDE Then Exit Sub
   
 End Sub
 
-Public Sub Hook(hWnd As Long, A As gList, Optional NoEvents As Boolean = False)
+Public Sub Hook(hWnd As Long, a As gList, Optional NoEvents As Boolean = False)
 ' work in IDE but for development and a fear...of a crash...
 
 If HOOKTEST <> 0 Then
@@ -157,7 +157,7 @@ If m_bInIDE Then Exit Sub
          If defWndProc = 0 Then Set LastGlist = Nothing
          
     End If
-           Set LastGlist = A
+           Set LastGlist = a
 End Sub
 Public Sub UnHook(hWnd As Long)
 
@@ -317,32 +317,32 @@ Public Function WindowProc(ByVal hWnd As Long, _
    End Select
     
 End Function
-Public Function ExistFileT(A$, TIMESTAMP As Double) As Boolean
+Public Function ExistFileT(a$, TIMESTAMP As Double) As Boolean
 Dim wfd As WIN32_FIND_DATA
 On Error GoTo there2
 Dim fhandle As Long
-fhandle = FindFirstFile(StrPtr(A$), wfd)
+fhandle = FindFirstFile(StrPtr(a$), wfd)
 ExistFileT = (fhandle > 0)
 If ExistFileT Then FindClose fhandle: TIMESTAMP = uintnew(wfd.ftLastAccessTime.dwLowDateTime)
 Exit Function
 there2:
 End Function
-Public Sub ChangeScreenRes(X As Long, Y As Long)
+Public Sub ChangeScreenRes(x As Long, y As Long)
 ' this is a modified version that i found in internet
-Static Once As Boolean
+Static once As Boolean
 Dim DevM As DEVMODE, erg As Long, BITS As Long, nDc As Long
 On Error GoTo abort
-If Not Once Then
+If Not once Then
 oldx = ScrX() / Screen.TwipsPerPixelX
 oldy = ScrY() / Screen.TwipsPerPixelY
-Once = True
+once = True
 End If
 nDc = CreateDC("DISPLAY", vbNullString, vbNullString, ByVal 0&)
 BITS = GetDeviceCaps(nDc, BITSPIXEL)
 erg = EnumDisplaySettings(0&, 0&, DevM)
 DevM.dmFields = DM_PELSWIDTH Or DM_PELSHEIGHT Or DM_BITSPERPEL
-DevM.dmPelsWidth = X
-DevM.dmPelsHeight = Y
+DevM.dmPelsWidth = x
+DevM.dmPelsHeight = y
 DevM.dmBitsPerPel = BITS
 erg = ChangeDisplaySettings(DevM, CDS_TEST)
 DeleteDC nDc

@@ -329,8 +329,13 @@ If QRY Or GFQRY Then
 If IsWine Then If Form1.Visible Then Form1.SetFocus
 End If
 End If
-If Form1.Visible Then releasemouse = True
+If Form1.Visible Then releasemouse = True: If lockme Then hookme TEXT1.glistN
 End Sub
+
+Private Sub Form_Deactivate()
+UnHook hWnd
+End Sub
+
 Private Sub Form_GotFocus()
 UseEsc = True
 End Sub

@@ -3012,7 +3012,7 @@ End If
 i = back.LastSelStart
 Dim aaaa As Document, tcol As Long, trans As Boolean
 If usecol Then tcol = mycolor(col) Else tcol = d.BackColor
-
+If Not Form1.Visible Then newshow basestack1
 
 'd.Enabled = False
 If Not bstack.toback Then d.TabStop = False
@@ -3199,7 +3199,9 @@ d.Parent.lockme = True
 Else
 d.lockme = True
 End If
-
+If Not Form1.Visible Then newshow basestack1
+d.Visible = True
+If d.Visible Then d.SetFocus
 With Form1.TEXT1
 'MyDoEvents
 ProcTask2 bstack

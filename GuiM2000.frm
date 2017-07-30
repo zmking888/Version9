@@ -178,7 +178,7 @@ Else
     CallEventFromGui Me, myEvent, b$
 End If
 End Sub
-Public Sub CallbackNow(b$, vr())
+Public Sub CallbackNow(b$, VR())
 If Quit Then Exit Sub
 If myEvent Is Nothing Then
 Set EventObj = New mEvent
@@ -189,7 +189,7 @@ Dim Mark$
 Mark$ = Split(b$, "(")(0)
 If myEvent.excludeme.ExistKey3(Mark$) Then Exit Sub
 If Visible Then myEvent.excludeme.AddKey2 Mark$
-If CallEventFromGuiNow(Me, myEvent, b$, vr()) Then myEvent.excludeme.Remove Mark$
+If CallEventFromGuiNow(Me, myEvent, b$, VR()) Then myEvent.excludeme.Remove Mark$
 
 End Sub
 
@@ -227,9 +227,11 @@ End If
 End Sub
 
 Private Sub Form_Activate()
-
 On Error Resume Next
 If Not Quit Then
+If myEvent Is Nothing Then
+Set EventObj = New mEvent
+End If
 If Not myEvent.excludeme.IamBusy Then
 Set myEvent.excludeme = New FastCollection
 End If
@@ -669,16 +671,16 @@ End Property
 
 Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
 '
-Dim vr(2)
-vr(0) = KeyCode
-vr(1) = shift
+Dim VR(2)
+VR(0) = KeyCode
+VR(1) = shift
 If mIndex > -1 Then
-    CallbackNow MyName$ + ".KeyDown(" + CStr(index) + ")", vr()
+    CallbackNow MyName$ + ".KeyDown(" + CStr(index) + ")", VR()
 Else
-    CallbackNow MyName$ + ".KeyDown()", vr()
+    CallbackNow MyName$ + ".KeyDown()", VR()
 End If
-shift = vr(1)
-KeyCode = vr(0)
+shift = VR(1)
+KeyCode = VR(0)
 
 End Sub
 
