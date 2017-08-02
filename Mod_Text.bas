@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9779,6 +9779,9 @@ If MaybeIsSymbol2(a$, ")", W3) Then
                     r = SG * pppp.GroupRef.objref.Done
                 End If
             End If
+        ElseIf Typename(pppp.GroupRef) = "PropReference" Then
+        Set bstack.lastobj = pppp
+         a$ = Mid$(a$, W3 + 1)
         Else
                 a$ = Mid$(a$, W3 + 1)
                 ' what object we have here????
@@ -9797,6 +9800,12 @@ dn = 0
 
 pppp.SerialItem (0), dd, 5
 dd = dd - 1
+If dd < 0 Then
+            If Typename(pppp.GroupRef) = "PropReference" Then
+            
+            GoTo contreadprop
+            End If
+            End If
 p = 0
 PP = 0
     IsNumber = True
@@ -10216,6 +10225,7 @@ conthereGroupValue:
                 Exit Function
     
      Else
+contreadprop:
             If IsExp(bstack, a$, p) Then
                 pppp.GroupRef.index = p
                 ElseIf IsStrExp(bstack, a$, s$) Then
@@ -15278,6 +15288,12 @@ contStrArr:
             dn = 0
             pppp.SerialItem (0), dd, 5
             dd = dd - 1
+            If dd < 0 Then
+            If Typename(pppp.GroupRef) = "PropReference" Then
+            
+            GoTo contreadprop
+            End If
+            End If
             p = 0
             PP = 0
         IsStr1 = True
@@ -15319,10 +15335,11 @@ contStrArr:
     If FastSymbol(a$, "(") Then
     
     If Typename(pppp.item(w2)) = "lambda" Then
+    Set anything = pppp.item(w2)
 contlambdastr:
     PushStage bstackstr, False
      w1 = GlobalVar("A_" + CStr(Abs(w2)), 0)
-     Set var(w1) = pppp.item(w2)
+     Set var(w1) = anything
                 If here$ = "" Then
                         dd = GlobalSub("A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1))
                     Else
@@ -15398,8 +15415,15 @@ contrightstrpar:
                If .Done Then
                If .IsObj Then
                If TypeOf .ValueObj Is lambda Then
-               w2 = -.index - 1
-               If FastSymbol(a$, ")(", , 2) Then GoTo contlambdastr
+               'w2 = -.index - 1
+               
+               
+               If FastSymbol(a$, ")(", , 2) Then
+               Set anything = .ValueObj
+               GoTo contlambdastr
+               Else
+               Set bstackstr.lastobj = .ValueObj
+               End If
                ElseIf TypeOf .ValueObj Is mArray Then
                Set pppp = .ValueObj
                 If FastSymbol(a$, ")(", , 2) Then GoTo contStrArr
@@ -15471,13 +15495,17 @@ contrightstrpar:
         
             Exit Function
         Else
+contreadprop:
             If IsExp(bstackstr, a$, p) Then
                 pppp.GroupRef.index = p
+                r$ = pppp.GroupRef.Value
             ElseIf IsStrExp(bstackstr, a$, r$) Then
                 pppp.GroupRef.index = r$
+                r$ = pppp.GroupRef.Value
+            ElseIf Typename(pppp.GroupRef) = "PropReference" Then
+                Set bstackstr.lastobj = pppp '.GroupRef
+                r$ = ""
             End If
-        
-        r$ = pppp.GroupRef.Value
         End If
           IsStr1 = FastSymbol(a$, ")")
         Exit Function
@@ -22027,7 +22055,10 @@ Else
     If Not IsStrExp(bstack, b$, ss$) Then Execute = 0: Exit Function
     If Not MyIsObject(pppp.item(v)) Then
     If pppp.Arr Then
-    If bstack.lastobj Is Nothing Then
+    If pppp.Count = 0 Then
+
+    pppp.GroupRef.Value = ss$
+    ElseIf bstack.lastobj Is Nothing Then
         pppp.item(v) = ss$
     
     Else
@@ -26370,6 +26401,7 @@ contlabel1:
     Exit Function
     
         Else
+contprop:
             Dim aprop As PropReference
             Set aprop = PP.GroupRef
             If IsExp(bstack, rst$, p) Then
@@ -26386,6 +26418,12 @@ conthere:
 ElseIf PP.SerialItem((0), dd, 5) Then
 dd = dd - 1
 offset = 0
+If dd < 0 Then
+If Typename(PP.GroupRef) = "PropReference" Then
+GoTo contprop
+
+End If
+End If
 Do While dn <= dd
 
 PP.SerialItem W3, dn, 6
@@ -29151,12 +29189,12 @@ If IsExp(bstack, rest$, r) Then
                             Set bstack.lastobj = Nothing
                             ReDim var1(0 To 1)
                             If IsExp(bstack, rest$, sp) Then
-                                var1(0).Value = sp
+                                var1(0) = sp
                             ElseIf IsStrExp(bstack, rest$, ss$) Then
-                                var1(0).Value = ss$
+                                var1(0) = ss$
                             End If
                             If oo Is Nothing Then
-                                var1(1).Value = r
+                                var1(1) = r
                             Else
                             If TypeOf oo Is mHandler Then
                                 Set bstack.lastobj = oo
@@ -29256,7 +29294,9 @@ End If
 Else
 
 
-
+If y2 Then
+If FastSymbol(rest$, ")") Then GoTo contherenew
+End If
  If neoGetArray(bstack, s$, pppp, here$ <> "") Then
 
  
@@ -29292,6 +29332,7 @@ End With
 End If
 ElseIf FastSymbol(rest$, ")") Then
 ''s$ = Left$(s$, Len(s$) - 1)
+contherenew:
 If pppp Is Nothing Then
 
 GlobalArr bstack, s$, "0)", (1), (y1)
@@ -30616,15 +30657,15 @@ End Function
 Sub MakeMyTitle(s$, lang As Long)
      If InStr(s$, "(") > 0 Then
             If shortlang Then
-            If lang Then Form1.TEXT1.TITLE = "F. " + s$ + " F12 " Else Form1.TEXT1.TITLE = "Σ. " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "F. " + s$ + " F12 " Else Form1.TEXT1.Title = "Σ. " + s$ + " "
             Else
-            If lang Then Form1.TEXT1.TITLE = "Function " + s$ + " F12 " Else Form1.TEXT1.TITLE = "Συνάρτηση " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "Function " + s$ + " F12 " Else Form1.TEXT1.Title = "Συνάρτηση " + s$ + " "
             End If
             Else
             If shortlang Then
-            If lang Then Form1.TEXT1.TITLE = "M. " + s$ + " F12 " Else Form1.TEXT1.TITLE = "Τ. " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "M. " + s$ + " F12 " Else Form1.TEXT1.Title = "Τ. " + s$ + " "
             Else
-            If lang Then Form1.TEXT1.TITLE = "Module " + s$ + " F12 " Else Form1.TEXT1.TITLE = "Τμήμα " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "Module " + s$ + " F12 " Else Form1.TEXT1.Title = "Τμήμα " + s$ + " "
             End If
             End If
 End Sub
@@ -32893,7 +32934,7 @@ If Left$(s$, 1) = "S" Then
             par = False
             End If
             Form1.EditTextWord = LCase(ExtractType(s$)) <> "gsb"
-                Form1.TEXT1.TITLE = ExtractName(s$) + " "
+                Form1.TEXT1.Title = ExtractName(s$) + " "
             If x1 = 0 Then x1 = -5
             Form1.ResetMarks
             If o < 1 Then o = 0
@@ -33009,9 +33050,9 @@ x1 = Abs(IsLabel(basestack, rest$, s$))
         frm$ = Mid$(ReplaceStr(vbCr, vbCrLf, QUERYLIST), 3)
         Form1.ShadowMarks = True
         If UserCodePage = 1253 Then
-        Form1.TEXT1.TITLE = "Λίστα εντολών "
+        Form1.TEXT1.Title = "Λίστα εντολών "
         Else
-        Form1.TEXT1.TITLE = "Command List "
+        Form1.TEXT1.Title = "Command List "
         End If
         With players(GetCode(basestack.Owner))
         ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1
@@ -35707,7 +35748,7 @@ what$ = Left$(what$, Len(what$) - 1)
                                 With aVar
                                  .MyName = what$
                                  .modulename = h$
-                                 .TITLE = what$ + "(" + LTrim(Str$(i)) + ")"
+                                 .Title = what$ + "(" + LTrim(Str$(i)) + ")"
                                  .index = i
                                 End With
 Case "GuiButton"
@@ -35869,7 +35910,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", lang) Then
                                   alfa.index = -1
                                   alfa.MyName = what$
                                   alfa.modulename = here$
-                                  alfa.TITLE = what$
+                                  alfa.Title = what$
                                   Set alfa = Nothing
                             Else
                                 ProcEvent bstack, "{Read index, msg$, &obj}", 1, y1
@@ -35894,7 +35935,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΦΟΡΜΑ", "FORM", lang) Then
                                   alfa.index = -1
                                   alfa.modulename = here$
                                   alfa.ByPass = bp
-                                  alfa.TITLE = what$
+                                  alfa.Title = what$
                                   Set mmmm = Nothing
                                   Set alfa = Nothing
                     Else
@@ -35922,7 +35963,7 @@ contEvArray:
                                  .MyName = what$
                                  .modulename = here$
                                  .ByPass = bp
-                                 .TITLE = what$ + "(" + LTrim(Str$(i)) + ")"
+                                 .Title = what$ + "(" + LTrim(Str$(i)) + ")"
                                  .index = i
                                 End With
                                 Next i
@@ -41628,7 +41669,7 @@ conteditdoc2:
                                     If sx = 0 Then sx = -1
                                     x1 = sx
                                 End If
-                                   Form1.TEXT1.TITLE = frm$ + " "
+                                   Form1.TEXT1.Title = frm$ + " "
                                   ScreenEditDOC bstack, var(i), 0, .mysplit, .mx - 1, .My - 1, x1, DUM, col
                                     var(i).LastSelStart = x1
                                     ProcEditDoc = True
@@ -41648,7 +41689,7 @@ conteditdoc2:
                                     If sx = 0 Then sx = -1
                                     x1 = sx
                                 End If
-                                    Form1.TEXT1.TITLE = frm$ + " "
+                                    Form1.TEXT1.Title = frm$ + " "
                                   ScreenEditDOC bstack, pppp.item(i), 0, .mysplit, .mx - 1, .My - 1, x1, DUM, col
                                     pppp.item(i).LastSelStart = x1
                                     ProcEditDoc = True

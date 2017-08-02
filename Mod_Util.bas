@@ -2976,7 +2976,7 @@ wi& = wi& + x&
 Hi& = Hi& + y&
 Form1.EditTextWord = True
 wh& = -1
-If n <= 0 Then Form1.TEXT1.TITLE = aTitle$ + " ": wh& = Abs(n - 1)
+If n <= 0 Then Form1.TEXT1.Title = aTitle$ + " ": wh& = Abs(n - 1)
 If NumberOnly Then
 Form1.TEXT1.NumberOnly = True
 Form1.TEXT1.NumberIntOnly = UseIntOnly
@@ -4576,8 +4576,8 @@ sv = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d
 End With
 End Sub
 
-Sub sHelp(TITLE$, doc$, x As Long, y As Long)
-vH_title$ = TITLE$
+Sub sHelp(Title$, doc$, x As Long, y As Long)
+vH_title$ = Title$
 vH_doc$ = doc$
 vH_x = x
 vH_y = y
@@ -4779,7 +4779,7 @@ MesTitle$ = Form1.Caption
 End If
 Else
 If Typename$(Screen.ActiveForm) = "GuiM2000" Then
-MesTitle$ = Screen.ActiveForm.TITLE
+MesTitle$ = Screen.ActiveForm.Title
 Else
 If here$ = "" Or LASTPROG$ = "" Then
 MesTitle$ = "M2000"
@@ -6674,8 +6674,12 @@ MyEr en$, gr$
 End If
 End Sub
 Public Sub MyErMacroStr(wher$, en$, gr$)
+If stackshowonly Then
 LastErNum = -2
 wher$ = " : ERROR -2" & Sput(en$) + Sput(gr$) + wher$
+Else
+MyEr en$, gr$
+End If
 End Sub
 Public Sub ZeroParam(ar$)   ' we use MyErMacro in isNumber and isString
 MyErMacro ar$, "Empty parameter", "Μηδενική παράμετρος"

@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 23 active-X
+Version 8.9 revision 24 active-X
 
+introduce advanced use of properties in arrays and inventories lists.
 
 http://georgekarras.blogspot.gr/
 

@@ -501,6 +501,7 @@ Next i
 End If
 '' new
 Set k.GroupRef = Me.GroupRef
+k.Arr = Me.Arr
 k.IHaveGui = Me.IHaveGui
 k.IHaveClass = Me.IHaveClass
 End Sub
