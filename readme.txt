@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 25 active-X
+Version 8.9 revision 26 active-X
 
-new functions property() and property$()
 
 http://georgekarras.blogspot.gr/
 

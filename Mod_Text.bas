@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 25
+Global Const Revision = 26
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -21789,7 +21789,7 @@ End If
   
    
                                             Set pppp.item(v) = bstack.lastobj
-                                            If TypeOf bstack.lastobj Is Group Then Set pppp.item(v).LinkRef = myobject
+                                         
                                  End If
                           Else
                           
@@ -38551,6 +38551,7 @@ Else
             GlobalVar what$, p
         ElseIf GetVar(bstack, what$, i, , , flag) Then
         ElseIf i = -1 Then
+        
         Else
                 GlobalVar what$, p
         End If
@@ -38705,6 +38706,40 @@ Case 5
                             Set myobject = Nothing
                             MyRead = True
                             GoTo loopcont123
+
+                    ElseIf Typename$(myobject) = "mArray" Then
+                                  If myobject.Arr Then
+                        Set pppp.item(it) = CopyArray(myobject)
+                    Else
+                        Set pppp.item(it) = myobject
+                    End If
+                    Set myobject = Nothing
+                            MyRead = True
+                            GoTo loopcont123
+                    ElseIf Typename$(myobject) = "mHandler" Then
+                    If myobject.indirect > -0 Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    p = myobject.t1
+                    If CheckDeepAny(myobject, var()) Then
+                    If TypeOf myobject Is mHandler Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    Set pppp.item(it) = New mHandler
+                    pppp.item(it).it = p
+                    Set pppp.item(it).objref = myobject
+                    End If
+                    Set myobject = Nothing
+                    End If
+                    
+                    End If
+                    MyRead = True
+                            GoTo loopcont123
+                    ElseIf Typename$(myobject) = "PropReference" Then
+                    Set pppp.item(it) = myobject
+                            Set myobject = Nothing
+                            MyRead = True
+                            GoTo loopcont123
                     End If
         ElseIf bs.IsOptional Then
         MyRead = True
@@ -38732,6 +38767,34 @@ Case 5
                     Set pppp.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf Typename$(myobject) = "Group" Then
+                    Set pppp.item(it) = myobject
+                    Set myobject = Nothing
+
+            ElseIf Typename$(myobject) = "mArray" Then
+                    If myobject.Arr Then
+                        Set pppp.item(it) = CopyArray(myobject)
+                    Else
+                        Set pppp.item(it) = myobject
+                    End If
+                    Set myobject = Nothing
+                ElseIf Typename$(myobject) = "mHandler" Then
+                    If myobject.indirect > -0 Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    p = myobject.t1
+                    If CheckDeepAny(myobject, var()) Then
+                    If TypeOf myobject Is mHandler Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    Set pppp.item(it) = New mHandler
+                    pppp.item(it).it = p
+                    Set pppp.item(it).objref = myobject
+                    End If
+                    Set myobject = Nothing
+                    End If
+                    
+                    End If
+              ElseIf Typename$(myobject) = "PropReference" Then
                     Set pppp.item(it) = myobject
                     Set myobject = Nothing
                 Else
@@ -46998,19 +47061,21 @@ End If
 End Sub
 
 Sub CheckGarbage(bstack As basetask)
+On Error GoTo nogarbage
 With bstack.lastobj
      If .indirect = -1 Then
                                         If .t1 < 2 Then
                                             If Not GarbageCollector.ExistKey(objptr(.objref)) Then
                                             GarbageCollector.AddKey objptr(.objref), .objref
                                             End If
-                                        End If
                                         ElseIf var(.indirect).objref.t1 < 2 Then
                                             If Not GarbageCollector.ExistKey(objptr(var(.indirect).objref)) Then
                                                 GarbageCollector.AddKey objptr(var(.indirect).objref), var(.indirect)
                                             End If
                                         End If
+                                      End If
 End With
+nogarbage:
 End Sub
 Function FindPrevOriginal(bstack As basetask) As Long
 Dim curparent As basetask, cur As basetask
