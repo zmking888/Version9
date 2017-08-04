@@ -2830,7 +2830,7 @@ Case "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPERATOR", "OPTIMIZATION", "OR", "ORDER
 Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
 Case "PATH", "PATH$(", "PAUSE", "PEN", "PI", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
 Case "PLAYER", "PLAYSCORE", "POINT", "POINT(", "POLYGON", "POS", "POS.X", "POS.Y", "PRINT"
-Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
+Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
 Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REVISION"
 Case "RIGHT$(", "RIGHTPART$(", "RINSTR(", "RND", "ROUND(", "ROW", "SAVE", "SAVE.AS", "SAVE.DOC", "SCALE.X"
@@ -2873,7 +2873,7 @@ Case "епамы", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекен
 Case "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцес$(", "епикоцес.жамеяес", "епикоцг", "епикоцг$(", "епикоцгс", "епипедо"
 Case "епистяожг", "епижамеиа", "еполемо", "еполема(", "етийета.жоялас", "етоило(", "еуяеиа", "еуяесг", "еуяиа", "ежап(", "ежаялоцг.аявеиоу$(", "ежаялоцг.йат$", "ежаялоцг"
 Case "еыс", "г", "гл(", "глеяа$(", "глеяа(", "глеяолгмиа", "гво$(", "гвоцяажгсг"
-Case "гвои", "гвос", "хесе", "хесе(", "хесг", "хесг(", "хесг.у", "хесг.в", "хесгдениа(", "идиотгта"
+Case "гвои", "гвос", "хесе", "хесе(", "хесг", "хесг(", "хесг.у", "хесг.в", "хесгдениа(", "идиотгта", "идиотгта(", "идиотгта$("
 Case "идиотгтес", "идиотгтес$", "идиытийо", "исвмг", "исвмг$(", "ивмос", "йахаяг", "йахаяо", "йахе", "йахе(", "йаи", "йакесе", "йалпукг"
 Case "йаме", "йамомийа", "йат", "йат$", "йатакоцои", "йатакоцос", "йатастасг", "йатастасг.таимиас$", "йатавыягсг", "йаты"
 Case "йатылисо(", "йеилемо", "йемг", "йемо", "йемтяо", "йеж$(", "йимгсг", "йимгсг.п", "йимгсг.пу"
@@ -3702,7 +3702,7 @@ myfun() = Array("FORMAT$(", 1, "лояжг$(", 1, "EVAL$(", 2, "ейжя$(", 2, "ейжяасг$
 , "LEFT$(", 46, "аяис$(", 46, "RIGHT$(", 47, "дени$(", 47, "SND$(", 48, "гво$(", 48, "BMP$(", 49, "еий$(", 49, "JPG$(", 50, "жыто$(", 50 _
 , "TRIM$(", 51, "апой$(", 51, "QUOTE$(", 52, "паяахесг$(", 52, "сыяос$(", 53, "STACK$(", 53, "ADD.LICENCE$(", 54, "баке.адеиа$(", 54 _
 , "ENVELOPE$(", 55, "жайекос$(", 55, "FIELD$(", 56, "педио$(", 56, "DRW$(", 57, "свд$(", 57, "TIME$(", 58, "вяомос$(", 58, "DATE$(", 59, "глеяа$(", 59 _
-, "STR$(", 60, "цяажг$(", 60, "CHRCODE$(", 61, "ваяйыд$(", 61, "CHR$(", 62, "вая$(", 62, "GROUP$(", 63, "олада$(", 63)
+, "STR$(", 60, "цяажг$(", 60, "CHRCODE$(", 61, "ваяйыд$(", 61, "CHR$(", 62, "вая$(", 62, "GROUP$(", 63, "олада$(", 63, "PROPERTY$(", 64, "идиотгта$(", 64)
 
 For i = 0 To UBound(myfun()) Step 2
     bHash.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
@@ -3751,7 +3751,7 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "BINARY.AND(", 77, "дуадийо.йаи(", 77, "BINARY.XOR(", 78, "дуадийо.апо(", 78, "HILOWWORD(", 79, "дуолиса(", 79, "BINARY.SHIFT(", 80, "дуадийо.окисхгсг(", 80 _
 , "BINARY.ROTATE(", 81, "дуадийг.пеяистяожг(", 81, "SINT(", 82, "айеяаио.дуадийо(", 82, "USGN(", 83, "дуадийо(", 83, "UINT(", 84, "дуадийо.айеяаио(", 84, "ROUND(", 85, "стяоцц(", 85 _
 , "INT(", 86, "ай(", 86, "SEEK(", 87, "летахесг(", 87, "EOF(", 88, "текос(", 88, "RANDOM(", 89, "туваиос(", 89, "CHRCODE(", 90, "ваяйыд(", 90, "ASC(", 91, "йыд(", 91 _
-, "GROUP(", 92, "олада(", 92, "TEST(", 93, "дойилг(", 93, "CONS(", 94, "емысг(", 94, "CAR(", 95, "пяыто(", 95, "CDR(", 96, "еполема(", 96, "сыяос(", 24, "STACK(", 24, "READY(", 97, "етоило(", 97)
+, "GROUP(", 92, "олада(", 92, "TEST(", 93, "дойилг(", 93, "CONS(", 94, "емысг(", 94, "CAR(", 95, "пяыто(", 95, "CDR(", 96, "еполема(", 96, "сыяос(", 24, "STACK(", 24, "READY(", 97, "етоило(", 97, "PROPERTY(", 98, "идиотгта(", 98)
 For i = 0 To UBound(myfun()) Step 2
     bHash.ItemCreator CStr(myfun(i)), CLng(myfun(i + 1))
 Next i

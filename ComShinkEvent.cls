@@ -396,7 +396,7 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
 
     ' GetNames
     hRet = CallPointer(oTypeInfo.GetNames, pTypeInfo, dispid, VarPtr(strName), 1, VarPtr(pcNames))
-    Debug.Print pcNames
+   ' Debug.Print pcNames
 finalize:
     If Len(strName) = 0 Then
         ' no string... :(
@@ -415,10 +415,10 @@ finalize:
 End Function
 
 Public Sub FireEvent(ByVal dispid As Long, ByVal params As Long)
-Static Once As Boolean
-If Once Then Exit Sub
+Static once As Boolean
+If once Then Exit Sub
 If exclude.ExistKey(dispid) Then Exit Sub
-Once = True
+once = True
     Dim strEvent    As String
     Dim vParams()   As Variant
     Dim NumVar As Long, what$, delme As Boolean
@@ -449,7 +449,7 @@ Once = True
    If delme Then exclude.AddKey dispid, ""
 
     pvSetParamArray params, vParams
-    Once = False
+    once = False
 End Sub
 
 Public Sub Detach()

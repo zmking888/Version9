@@ -684,7 +684,7 @@ If Arr Then
 If maxitems1 >= curitem Then
 If IsObject(actualdata(curitem)) Then
 If Typename(actualdata(curitem)) = "PropReference" Then
-item = actualdata(curitem)
+item = actualdata(curitem).Value
 Else
 Set item = actualdata(curitem)
 End If
@@ -701,11 +701,15 @@ If curitem = -2 Then
 Set item = GroupRef
 ElseIf curitem < 0 Then
 'If TypeOf GroupRef Is Group Then Set item = GroupRef: Exit Property
+If TypeOf GroupRef Is mHandler Then
 If GroupRef.objref.Done Then
 If GroupRef.objref.IsObj Then
 Set item = GroupRef.objref.ValueObj
 Else
 item = GroupRef.objref.Value
+End If
+Else
+Set item = GroupRef
 End If
 
 End If
@@ -720,7 +724,7 @@ If Arr Then
 If maxitems1 >= curitem Then
 If IsObject(actualdata(curitem)) Then
 If Typename(actualdata(curitem)) = "PropReference" Then
-itemnumeric = CDbl(actualdata(curitem))
+itemnumeric = CDbl(actualdata(curitem).Value)
 Else
 itemnumeric = 0
 End If
@@ -755,8 +759,12 @@ If curitem < 0 Then
 ElseIf Not IsObject(actualdata(curitem)) Then
 actualdata(curitem) = item
 Else
-If Not IsObject(item) Then
-Set actualdata(curitem) = Nothing
+If Not MyIsObject(item) Then
+    If TypeOf actualdata(curitem) Is PropReference Then
+        actualdata(curitem).Value = item
+    Else
+        Set actualdata(curitem) = Nothing
+    End If
 Else
 actualdata(curitem).Value = item
 End If

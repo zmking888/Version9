@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -6401,7 +6401,7 @@ Case 5
 'On Error Resume Next
 If Not funid.Find(v$, w1) Then GoTo LOOKFORSUBNUM
 'Select Case v$
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98
 IsNumber = False
 Exit Function
 fun97: 'Case "READY(", "ΕΤΟΙΜΟ("
@@ -9423,6 +9423,20 @@ CopyGroup2 var(w1), bstack
 Else
 jmp1478:
 MyErMacro a$, "Expected a group name", "Περίμενα όνομα ομάδας"
+End If
+Exit Function
+fun98: 'Case "PROPERTY(", "ΙΔΙΟΤΗΤΑ("
+w1 = Abs(IsLabel(bstack, a$, s$))
+If w1 = 1 Then
+If Not GetVar(bstack, s$, w1) Then GoTo jmp147811
+If Not Typename(var(w1)) = "PropReference" Then GoTo jmp147811
+    Set bstack.lastobj = var(w1)
+    r = 0
+    IsNumber = FastSymbol(a$, ")", True)
+    Exit Function
+Else
+jmp147811:
+MyErMacro a$, "Expected a property name", "Περίμενα όνομα ιδιότητας"
 End If
 Exit Function
 fun90: 'Case "CHRCODE(", "ΧΑΡΚΩΔ("
@@ -13419,7 +13433,7 @@ Case 6
     IsStr1 = False
 If Not strfunid.Find(q$, w2) Then GoTo itisarrayorfunction
 
-On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63
+On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63, fstr64
 fstr1: '"FORMAT$(", "ΜΟΡΦΗ$("
     r$ = enthesi(bstackstr, a$)
     IsStr1 = FastSymbol(a$, ")", True)
@@ -15199,7 +15213,22 @@ jmp1478:
         MyErMacro a$, "Expected a group name", "Περίμενα όνομα ομάδας"
         End If
 Exit Function
-    
+fstr64: ' "PROPERTY$(", "ΙΔΙΟΤΗΤΑ$("
+        w1 = Abs(IsLabel(bstackstr, a$, s$))
+        If w1 = 1 Or w1 = 3 Then
+        If Not GetVar(bstackstr, s$, w1) Then GoTo jmp147811
+        If Not Typename(var(w1)) = "PropReference" Then GoTo jmp147811
+        ''CopyGroup2 var(w1), bstackstr
+        Set bstackstr.lastobj = var(w1)
+             r$ = ""
+            IsStr1 = FastSymbol(a$, ")", True)
+            Exit Function
+                
+        Else
+jmp147811:
+        MyErMacro a$, "Expected a property name", "Περίμενα όνομα ιδιότητας"
+        End If
+Exit Function
 itisarrayorfunction:
     MakeThisSubNum bstackstr, q$
     q1$ = q$
@@ -15448,6 +15477,12 @@ contrightstrpar:
                         Set .ValueObj = pppp.item(0)
                         Set pppp.item(0) = Nothing
                         Exit Function
+                ElseIf TypeOf .ValueObj Is PropReference Then
+               ' r$ = ""
+               .ValueObj.index = p
+               r$ = .ValueObj.Value
+               
+                 IsStr1 = IsStr1 And FastSymbol(a$, ")")
                Else
                MyErMacroStr a$, "This kind of object not supported", "Αυτού του είδους το αντικείμενο δεν υποστηρίζεται"
                End If
@@ -21807,7 +21842,9 @@ End If
         Else
      NoNumberAssign
         End If
-     ElseIf Not pppp.Arr Then
+    ElseIf Typename(pppp.item(v)) = "PropReference" Then
+        pppp.item(v).Value = p
+    ElseIf Not pppp.Arr Then
         NoAssignThere
      End If
      
@@ -21916,6 +21953,8 @@ ElseIf FastSymbol(b$, ")") Then
             Execute = 0
             Exit Function
         End If
+  
+        
         End If
 If v = -2 Then GoTo checkpar
 againstrarr:
@@ -21923,10 +21962,12 @@ If Not NeoGetArrayItem(pppp, bstack, w$, v, b$) Then Execute = 0: Exit Function
 'On Error Resume Next
 ' WHY BEFORE WAS : If Typename(pppp.item(v)) = "mArray" And Not pppp.Arr Then
 there12567:
-If Typename(pppp.item(v)) = "mArray" And pppp.Arr Then
+If pppp.Arr Then
+If Typename(pppp.item(v)) = "mArray" Then
 If FastSymbol(b$, "(") Then
 Set pppp = pppp.item(v)
 GoTo againstrarr
+End If
 End If
 End If
 If v = -2 Then
@@ -22086,6 +22127,8 @@ Else
         Else
         Stop
         End If
+    ElseIf Typename(pppp.item(v)) = "PropReference" Then
+    pppp.item(v).Value = ss$
     Else
         CheckVar pppp.item(v), ss$
     End If
@@ -27475,7 +27518,9 @@ End Sub
 Private Function GetShink(ev As ComShinkEvent, v As Long, objname$) As Boolean
 Dim aa As Object
     Set ev = New ComShinkEvent
+
     Set aa = var(v)
+    
                          ev.VarIndex = v
                          If here$ <> "" Then
                          ev.modulename = here$ + "." + objname$
@@ -29403,7 +29448,7 @@ End Sub
 ' METHOD A "Multiply", &alfa,&beta$   'passing by reference
 ''ProcMethod bstack, var(i), sS$, rest$,  LANG
 Sub ProcMethod(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, ok As Boolean)
-Dim var1() As Variant, s$, r As Double, l As Long, newref As Long, glob As Boolean
+Dim var1() As Variant, s$, r As Double, l As Long, newref As Long, glob As Boolean, newvar As Boolean
 Dim vv As Object, mstack As New mStiva, result As Variant, retobject As Object
 Dim namarg As Long
 ok = True
@@ -29451,23 +29496,33 @@ If Not retobject Is Nothing Then
     y3 = IsLabelSymbolNew(rest$, "ΜΕΓΕΓΟΝΟΤΑ", "WITHEVENTS", language)
      If IsLabelSymbolNew(rest$, "ΩΣ", "AS", language) Then
              glob = IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", language)
+             
+              newvar = IsLabelSymbolNew(rest$, "ΝΕΟ", "NEW", language)
+             
              If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
-                                If GetVar(bstack, what$, it) Then
-                                    Set var(it) = retobject
-                                Else
-                                    it = GlobalVar(what$, 0, glob)
-                                    Set var(it) = retobject
-                                End If
+                        If newvar Then
+                            it = GlobalVar(what$, 0, , glob)
+                            Set var(it) = retobject
+                        ElseIf GetVar(bstack, what$, it) Then
+                            Set var(it) = retobject
+                        Else
+                            it = GlobalVar(what$, 0, , glob)
+                            Set var(it) = retobject
+                        End If
+                            
                                 If y3 <> 0 Then
                                             Dim ev As ComShinkEvent
                                     If GetShink(ev, it, what$) Then
                                             ' private
                                             ' no need for a name, we do not address it in any way.
                                             ' ev knows how to call handler
-                                                     If Not GetVar(bstack, ChrW(&HFFBF) + "_" + what$, it) Then
+                                            If newvar Then
+                                                it = GlobalVar(ChrW(&HFFBF) + "_" + what$, s$, , glob)
+                                            ElseIf Not GetVar(bstack, ChrW(&HFFBF) + "_" + what$, it) Then
                                                         
                                                         it = GlobalVar(ChrW(&HFFBF) + "_" + what$, s$, , glob)
                                                         End If
+                                                        
                                                     Set var(it) = ev
                                      Else
                                             MyEr "Can't handle events here", "Δεν μπορώ να χειριστώ γεγονότα"
@@ -29481,28 +29536,36 @@ If Not retobject Is Nothing Then
 Else
      If IsLabelSymbolNew(rest$, "ΩΣ", "AS", language) Then
              glob = IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", language)
+             
+              newvar = IsLabelSymbolNew(rest$, "ΝΕΟ", "NEW", language)
+             
              Select Case Abs(IsLabel(bstack, rest$, what$))
              Case 1
-                                If GetVar(bstack, what$, it) Then
+                               If newvar Then
+                                    GlobalVar what$, CDbl(result), , glob
+                                ElseIf GetVar(bstack, what$, it) Then
                                     var(it) = CDbl(result)
                                     
                                 Else
-                                    GlobalVar what$, CDbl(result), glob
+                                    GlobalVar what$, CDbl(result), , glob
                                     
                                 End If
               Case 4
-                                If GetVar(bstack, what$, it) Then
+                                If newvar Then
+                                    GlobalVar what$, Int(CDbl(result)), , glob
+                                ElseIf GetVar(bstack, what$, it) Then
                                     var(it) = Int(CDbl(result))
                                 Else
-                                    GlobalVar what$, Int(CDbl(result)), glob
+                                    GlobalVar what$, Int(CDbl(result)), , glob
                                     
                                 End If
               Case 3
-              If GetVar(bstack, what$, it) Then
+                                If newvar Then
+                                    GlobalVar what$, result, , glob
+                                ElseIf GetVar(bstack, what$, it) Then
                                     var(it) = result
                                 Else
-                                    GlobalVar what$, result, glob
-                                    
+                                    GlobalVar what$, result, , glob
                                 End If
               End Select
             
@@ -31762,14 +31825,14 @@ End If
 Else
 If sx * W4 > scr.Height Then
 y = scr.Height
-While sx * W4 > scr.Height
+Do While sx * W4 > scr.Height
 
 XX = y / (dv20 * sx)
-
 nForm basestack, XX, W3, W4, 0  'using no spacing so we put a lot of lines
+If x = CDbl(XX) Then Exit Do
 x = CDbl(XX)
 y = y * 0.9
-Wend
+Loop
 
 
 End If
@@ -34830,6 +34893,8 @@ If scr.name = "GuiM2000" Then
                             scr.Move (ScrX() - .MAXXGRAPH) / 2, (ScrY() - .MAXYGRAPH) / 2
                             
                 Else
+                If x1 = 0 Then x1 = 14000
+                If y1 = 0 Then y1 = 6000
                             scr.Move scr.Left, scr.top, x1, y1
 
                             FrameText scr, .SZ, 0, 0, .Paper, True
@@ -39351,6 +39416,12 @@ If x1 = 1 Or x1 = 3 Then
                     If IsStrExp(bstack, rest$, ss$) Then
                     On Error Resume Next
                       ProcProperty bstack, var(), i, ss$, rest$, lang
+                      If Err.Number > 0 Then
+                      MyEr "Property " + ss$ + " problem", "Πρόβλημα με ιδιότητα " + ss$
+                      Err.Clear
+                      MyWith = False
+                    Exit Do
+                      End If
                       MyWith = Err = 0
                       Err.Clear
                     Else
@@ -39374,6 +39445,14 @@ ElseIf x1 = 5 Then
       Do While FastSymbol(rest$, ",")
                     If IsStrExp(bstack, rest$, ss$) Then
                   ProcPropertyArray bstack, pppp, i, ss$, rest$, lang, MyWith
+                  If Err.Number > 0 Then
+                      MyEr "Property " + ss$ + " problem", "Πρόβλημα με ιδιότητα " + ss$
+                      Err.Clear
+                      MyWith = False
+                    Exit Do
+                      End If
+                      MyWith = Err = 0
+                      Err.Clear
                     Else
                     MissStringExpr
                     MyWith = False
@@ -46573,11 +46652,11 @@ Dim v$
         Set bstack.lastobj = ob
         rValue = 0
     ElseIf v$ Like "Pro*" Then
-   If MyIsObject(ob.Value) Then
+   If IsObject(ob.Value) Then
        Set bstack.lastobj = ob.Value
         rValue = 0
    Else
-        rValue = ob
+        rValue = ob.Value
         End If
     ElseIf v$ Like "Gr*" Then
         rValue = 0
@@ -46743,9 +46822,13 @@ Set bstack.Sorosref = bb
             '''bb.DataObj evCom
             '' last is the second name, the class name??
             bb.DataStr what$
+     
+            bb.DataObj MakeitObjectGeneric(evCom.VarIndex)
+  
             'f$ = aString$
             
            '' WE ARE GOING TO OUR MODULE
+           
             here$ = evCom.modulenameonly
             If FastCallModule(bstack, klm) <> 1 Then
             
