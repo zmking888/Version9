@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -38726,7 +38726,7 @@ Case 5
                     Set pppp.item(it) = myobject
                     Else
                     Set pppp.item(it) = New mHandler
-                    pppp.item(it).it = p
+                    pppp.item(it).t1 = p
                     Set pppp.item(it).objref = myobject
                     End If
                     Set myobject = Nothing
@@ -38787,7 +38787,7 @@ Case 5
                     Set pppp.item(it) = myobject
                     Else
                     Set pppp.item(it) = New mHandler
-                    pppp.item(it).it = p
+                    pppp.item(it).t1 = p
                     Set pppp.item(it).objref = myobject
                     End If
                     Set myobject = Nothing
@@ -47068,12 +47068,13 @@ With bstack.lastobj
                                             If Not GarbageCollector.ExistKey(objptr(.objref)) Then
                                             GarbageCollector.AddKey objptr(.objref), .objref
                                             End If
+                                        End If
                                         ElseIf var(.indirect).objref.t1 < 2 Then
                                             If Not GarbageCollector.ExistKey(objptr(var(.indirect).objref)) Then
                                                 GarbageCollector.AddKey objptr(var(.indirect).objref), var(.indirect)
                                             End If
                                         End If
-                                      End If
+                                      
 End With
 nogarbage:
 End Sub
