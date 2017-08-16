@@ -56,13 +56,8 @@ End Sub
 .gList2.HeadlineHeight = .gList2.HeightPixels
 End With
  Set Textbox = New myTextBox
- Set Textbox.Container = there.Controls.Add("m2000.glist", name$)
- CtrlName = name$
- If Err.Number > 0 Then
- Set Textbox.Container = there.Controls.Add("m2000.glist", GetTag$)
  CtrlName = GetTag$
- End If
-
+ Set Textbox.Container = there.Controls.Add("m2000.glist", CtrlName)
  there.AddGuiControl Me
  glistN.Dynamic
  Textbox.glistN.Dynamic
@@ -86,13 +81,8 @@ End Sub
 .gList2.HeadlineHeight = .gList2.HeightPixels
 End With
  Set Textbox = New myTextBox
- Set Textbox.Container = there.Controls.Add("m2000.glist", name$ + "_" + LTrim(Str$(i)))
- CtrlName = name$ + "_" + LTrim(Str$(i))
- If Err.Number > 0 Then
- Set Textbox.Container = there.Controls.Add("m2000.glist", GetTag$)
- CtrlName = GetTag$
- End If
-
+  CtrlName = GetTag$
+ Set Textbox.Container = there.Controls.Add("m2000.glist", CtrlName)
  there.AddGuiControl Me
  glistN.Dynamic
  Textbox.glistN.Dynamic

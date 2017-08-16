@@ -69,12 +69,12 @@ Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
 Dim dummy As Long
 Private Type Myshape
-Visible As Boolean
-hatchType As Long
-top As Long
-Left As Long
-Width As Long
-Height As Long
+    Visible As Boolean
+    hatchType As Long
+    top As Long
+    Left As Long
+    Width As Long
+    Height As Long
 End Type
 Private mynum$, dragslow As Long
 Public BlinkON As Boolean

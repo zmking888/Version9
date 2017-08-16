@@ -78,7 +78,7 @@ Public LastSelStart As Long
 Public NoMark As Boolean
 Public NoTitle As Boolean, TitleStay As Boolean
 Private mNoColor As Boolean, mNoColor1 As Boolean
-Public TITLE As String
+Public Title As String
 Public UsedAsTextBox As Boolean  '' only in m2000. Enter exit - use maxchar - No wrap
 Private mEditDoc As Boolean
 Public AutoNumber As Boolean
@@ -148,13 +148,8 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- Set glistN = there.Controls.Add("m2000.glist", name$)
-  CtrlName = name$
- If Err.Number > 0 Then
- Set glistN = there.Controls.Add("m2000.glist", GetTag$)
-  CtrlName = GetTag$
- End If
-
+ CtrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", CtrlName)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(CtrlName).TabStop = True
@@ -163,14 +158,8 @@ End Sub
 Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
-
-  Set glistN = there.Controls.Add("m2000.glist", name$ + "_" + LTrim(Str$(i)))
-CtrlName = name$ + "_" + LTrim(Str$(i))
-
- If Err.Number > 0 Then
- Set glistN = there.Controls.Add("m2000.glist", GetTag$)
  CtrlName = GetTag$
- End If
+ Set glistN = there.Controls.Add("m2000.glist", CtrlName)
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
@@ -318,21 +307,21 @@ Public Property Get FileName() As String
 FileName = myfilename
 End Property
 Sub NewTitle(RHS As String, addpixelstoo As Long, Optional factor As Single = 1)
-TITLE = RHS
+Title = RHS
 '' remove addpixelstoo
 '' and factor
 
 Set mDoc1 = New Document
-If TITLE = "" Then
+If Title = "" Then
 Else
 NoHeadwrap = False
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 
 glistN.VerticalCenterText = True
 If mDoc1.DocLines >= glistN.lines + 1 Then
 mDoc1.EmptyDoc
 NoHeadwrap = True
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 End If
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
@@ -370,12 +359,12 @@ End If
 Dim what$, ThatPara As Long, pastchars
     pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
-NoTitle = TITLE = ""
+NoTitle = Title = ""
 nowrap = True
 
 
 If Not NoTitle Then
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
@@ -1020,7 +1009,7 @@ If NoTitle Then
 glistN.HeadLine = ""
 onelineheight = 0
 glistN.HeadlineHeight = 0
-ElseIf TITLE <> glistN.HeadLine And Not TitleStay Then
+ElseIf Title <> glistN.HeadLine And Not TitleStay Then
 ReplaceTitle = ""
 End If
 End If
@@ -3594,16 +3583,16 @@ Function GetLCIDFromKeyboard() As Long
 End Function
 Public Property Let ReplaceTitle(a$)  ' at the end
 Dim curlines As Long
-NoTitle = TITLE = ""
+NoTitle = Title = ""
 NoHeadwrap = False
 curlines = mDoc1.DocLines
 mDoc1.EmptyDoc
-mDoc1.textDoc = RTrim$(TITLE$ + " " + a$)
+mDoc1.textDoc = RTrim$(Title$ + " " + a$)
 mDoc1.WrapAgain
 If mDoc1.DocLines >= curlines + glistN.lines + 1 Then
 mDoc1.EmptyDoc
 NoHeadwrap = True
-mDoc1.textDoc = RTrim$(TITLE$ + " " + a$)
+mDoc1.textDoc = RTrim$(Title$ + " " + a$)
 End If
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline

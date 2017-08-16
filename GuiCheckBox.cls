@@ -44,13 +44,8 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- Set glistN = there.Controls.Add("m2000.glist", name$)
-  CtrlName = name$
- If Err.Number > 0 Then
- Set glistN = there.Controls.Add("m2000.glist", GetTag$)
-  CtrlName = GetTag$
- End If
-
+ CtrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", CtrlName)
  there.AddGuiControl Me
  glistN.Dynamic
  there.Controls(CtrlName).TabStop = True
@@ -61,12 +56,13 @@ Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
 
-  Set glistN = there.Controls.Add("m2000.glist", name$ + "_" + LTrim(Str$(i)))
-CtrlName = name$ + "_" + LTrim(Str$(i))
-  If Err.Number > 0 Then
- Set glistN = there.Controls.Add("m2000.glist", GetTag$)
+  'Set glistN = there.Controls.Add("m2000.glist", name$ + "_" + LTrim(Str$(i)))
+'CtrlName = name$ + "_" + LTrim(Str$(i))
+ ' If Err.Number > 0 Then
  CtrlName = GetTag$
- End If
+ Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ 
+ 'End If
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
@@ -81,13 +77,6 @@ Public Property Let enabled(ByVal RHS As Long)
 If glistN Is Nothing Then Exit Property
 glistN.enabled = RHS
 End Property
-Public Sub ConstructContainer1212(there As Form, name$, containerCtrl As Object)
-Set Callback = there
- Set glistN = there.Controls.Add("m2000.glist", name$, containerCtrl)
-there.AddGuiControl Me
-CtrlName = nam$
- glistN.Dynamic
-End Sub
 Public Sub Move(x, y, Optional w, Optional h)
 If IsMissing(w) Then
 glistN.MoveTwips CLng(x), CLng(y), 0, 0
