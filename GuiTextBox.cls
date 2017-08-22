@@ -139,12 +139,13 @@ End Property
 Public Property Let Info(ByVal RHS As String)
 locked = False
 If RHS = "" Then
+glistN.InfoDropBarClick = False
 Text = Text
 Else
 glistN.restrictLines = 0
 glistN.HeadLineHeightMinimum = glistN.HeightPixels
 glistN.HeadLine = RHS
-
+glistN.InfoDropBarClick = True
 glistN.ShowMe
 locked = True
 End If

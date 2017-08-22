@@ -263,6 +263,7 @@ Private LastVScroll As Long
 Private FreeMouse As Boolean
 Public NoCaretShow As Boolean
 Public NoBarClick As Boolean
+Public InfoDropBarClick As Boolean
 Dim valuepoint As Long, minimumWidth As Long
 Dim mValue As Long, mmax As Long, mmin As Long, mLargeChange As Long  ' min 1
 Dim mSmallChange As Long  ' min 1
@@ -3629,6 +3630,7 @@ PropertyChanged "LargeChange"
 PropertyChanged "Min"
 End Property
 Public Property Get EnabledBar() As Boolean
+If InfoDropBarClick Then Exit Property
 EnabledBar = Not NoFire
 End Property
 
