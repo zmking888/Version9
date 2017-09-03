@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 29
+Global Const Revision = 30
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -40697,9 +40697,25 @@ operators:
                                        MyEr what$ & " missing definition", what$ & " λείπει ο ορισμός"
                                 End If
                          Else
-
+            If FastSymbol(rest$, "(") Then
+                                frm$ = BlockParam(rest$)
+                            If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+                            If Not FastSymbol(rest$, ")") Then
+                       
+                            End If
+                            
+                        frm$ = Trim$(frm$)
+                        End If
                                 If FastSymbol(rest$, "{") Then
                                         what$ = block(rest$)
+                                            If Len(frm$) <> 0 Then
+                                                    If lang = 1 Then
+                                                        what$ = "Read " + frm$ + vbCrLf + what$
+                                                    Else
+                                                        what$ = "Διάβασε " + frm$ + vbCrLf + what$
+                                                    End If
+                                                    frm$ = ""
+                                                End If
                                         If Not FastSymbol(rest$, "}") Then
                                                 MyFunction = False
                                         Else
@@ -40727,21 +40743,28 @@ jump1:
                                 End If
                                 If FastSymbol(rest$, "(") Then
                                     frm$ = BlockParam(rest$)
+                                    If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
                                     If Not FastSymbol(rest$, ")") Then
                                     End If
                                     frm$ = Trim$(frm$)
+                                    Else
+                                    frm$ = ""
+                                    
                                 End If
                                 If FastSymbol(rest$, "{") Then
-                                          ''  I = Len(Rest$)      'function point in source
+                                
                                             what$ = block(rest$) + " "
-                                           '' While Left$(what$, 10) = "'11001EDIT"
-                                            ''        SetNextLine what$
-                                           '' Wend
-                                         ''   what$ = "'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(I) + vbCrLf + what$
+                                                If Len(frm$) <> 0 Then
+                                                    If lang = 1 Then
+                                                        what$ = "Read " + frm$ + vbCrLf + what$
+                                                    Else
+                                                        what$ = "Διάβασε " + frm$ + vbCrLf + what$
+                                                    End If
+                                                    frm$ = ""
+                                                End If
                                             If Not FastSymbol(rest$, "}") Then
                                                     MyFunction = False
                                             Else
-                                                    ' Call preProcessor(bstack, what$)
                                                     If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
                                                     sbf(x1).sb = what$: bstack.IndexSub = x1
                                                     Set sbf(x1).subs = Nothing
@@ -40754,20 +40777,34 @@ jump1:
                      
                                 If FastSymbol(rest$, "(") Then
                                     frm$ = BlockParam(rest$)
+                                    If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
                                     If Not FastSymbol(rest$, ")") Then
                                     End If
                                 frm$ = Trim$(frm$)
+                                  Else
+                                frm$ = ""
                                 End If
+                                
                                     If FastSymbol(rest$, "{") Then
-                                    If bstack.OriginalCode > x1 Then
+                                      If bstack.OriginalCode > x1 Then
                                             GoTo jumpheretoo
                                     End If
+                                    If Len(frm$) <> 0 Then
+                                    If lang = 1 Then
+                                    rest$ = "Read " + frm$ + vbCrLf + rest$
+                                    Else
+                                    rest$ = "Διάβασε " + frm$ + vbCrLf + rest$
+                                    End If
+                                    frm$ = ""
+                                    End If
+
                                     If x1 >= lckfrm And lckfrm <> 0 Then
                                             MyEr what$ & " is locked", what$ & " είναι κλειδωμένο"
                                             rest$ = ""
                                             MyFunction = False: Exit Function
                                     End If
                                             i = Len(rest$)
+                                            
                                             what$ = block(rest$) + " "
                                             While Left$(what$, 10) = "'11001EDIT"
                                                     SetNextLine what$
