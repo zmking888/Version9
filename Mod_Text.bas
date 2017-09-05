@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19742,7 +19742,7 @@ ContTry:
          ss$ = "{" & block(b$) & "}"
           b$ = NLtrim$(Mid$(b$, 2))
                      Call executeblock(Execute, bstack, ss$, once, ok)
-     var(v) = Execute = 1
+     var(v) = CDbl(Execute = 1)
         MOUT = False
          NOEXECUTION = False
          NERR = False
@@ -47253,8 +47253,7 @@ End Function
 Function MyIsNumeric(v As Variant) As Boolean
 Dim n As Integer
 GetMem2 VarPtr(v), n
-'If n < 2 Then Exit Function
-MyIsNumeric = n < 8
+MyIsNumeric = (n < 8) Or (n = 11) Or (n = 17)
 End Function
 Function MyIsObject(v As Variant) As Boolean
 Dim n As Integer

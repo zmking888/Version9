@@ -2768,11 +2768,23 @@ a$ = myUcase(a$, True)
 Select Case a$
 Case "ABOUT", "AFTER", "BACK", "BACKGROUND", "CLASS", "COLOR", "DECLARE", "ELSE", "EVENT", "EVERY", "GLOBAL", "FOR", "FKEY", "FUNCTION", "GROUP", "INVENTORY", "LAYER", "LOCAL", "MAIN.TASK", "MODULE", "OPERATOR", "PATH", "PEN", "PROPERTY", "PRINTER", "PRINTING", "SET", "STACK", "START", "STRUCTURE", "TASK.MAIN", "THEN", "THREAD", "TRY", "WIDTH", "VALUE", "WHILE"
 Case "аявг", "аккиыс", "аниа", "аниа(", "цецомос", "цемийо", "цемийг", "цемийес", "циа", "дес", "долг", "ейтупытгс", "ейтупысг", "емы", "епипедо", "хесе", "хесе(", "идиотгтес", "ивмос", "идиотгта", "йахе", "йатастасг", "йкасг", "йкеиди", "йуяио.еяцо", "лета", "мгла", "олада", "ояисе", "павос", "пема", "пеяи", "пеяихыяио", "сумаятгсг", "сыяос", "текестгс", "тлгла", "топийа", "топийг", "топийес", "тоте", "вяыла"
+Case "CONST", "стахеяг", "стахеяес"
 Case "->"
 Case Else
 ismine2 = False
 End Select
 End Function
+
+Function ismine5(ByVal a$) As Boolean  '  make
+ismine5 = True
+a$ = myUcase(a$, True)
+Select Case a$
+Case "GLOBAL", "цемийо", "цемийг", "цемийес"
+Case Else
+ismine5 = False
+End Select
+End Function
+
 Function ismine3(ByVal a$) As Boolean  ' CAN START A NEW COMMAND
 ismine3 = True
 a$ = myUcase(a$, True)

@@ -61,7 +61,7 @@ Public LastSelStart As Long
 Public NoMark As Boolean
 Public NoTitle As Boolean
 Public NoColor As Boolean
-Public TITLE As String
+Public Title As String
 Public UsedAsTextBox As Boolean  '' only in m2000. Enter exit - use maxchar - No wrap
 Private mEditDoc As Boolean
 Public AutoNumber As Boolean
@@ -213,20 +213,20 @@ Public Property Get FileName() As String
 FileName = myfilename
 End Property
 Sub NewTitle(RHS As String, addpixelstoo As Long, Optional factor As Single = 1)
-TITLE = RHS
+Title = RHS
 
 
 Set mDoc1 = New Document
-If TITLE = "" Then
+If Title = "" Then
 Else
 NoHeadwrap = False
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 
 glistN.VerticalCenterText = True
 If mDoc1.DocLines >= glistN.lines + 1 Then
 mDoc1.EmptyDoc
 NoHeadwrap = True
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 End If
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
@@ -264,12 +264,12 @@ End If
 Dim what$, ThatPara As Long, pastchars
     pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
-NoTitle = TITLE = ""
+NoTitle = Title = ""
 nowrap = True
 
 
 If Not NoTitle Then
-mDoc1.textDoc = TITLE
+mDoc1.textDoc = Title
 
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
@@ -1982,6 +1982,8 @@ If kind > 0 Then
                                             pos2 = k - Len(a$) + 1
                                             onetime = True
                                             GoTo again
+                                        ElseIf ismine5(drop$) Then
+                                        GoTo again500
                                         ElseIf ismine3(drop$) Then
                                         onetime = True
                                         kind = -2
@@ -3344,12 +3346,12 @@ NoTitle = False
 NoHeadwrap = False
 curlines = mDoc1.DocLines
 mDoc1.EmptyDoc
-mDoc1.textDoc = TITLE$ + a$
+mDoc1.textDoc = Title$ + a$
 mDoc1.WrapAgain
 If mDoc1.DocLines >= curlines + glistN.lines + 1 Then
 mDoc1.EmptyDoc
 NoHeadwrap = True
-mDoc1.textDoc = TITLE$ + a$
+mDoc1.textDoc = Title$ + a$
 End If
 glistN.HeadLine = "" ' reset
 glistN.HeadLine = " " ' give a fake headline
