@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -10974,6 +10974,12 @@ again1947:
             Else
             Exit Do
             End If
+        Case ":"
+        If one Then Exit Do
+        If Mid$(a$, 2, 1) <> "\" Then Exit Do
+        If InStr(r$, ":") > 1 Then Exit Do
+        r$ = r$ & Left$(a$, 2)
+                a$ = Mid$(a$, 3)
         Case "("
             If r$ <> "" Then
                 If Mid$(a$, 2, 2) = ")@" Then
