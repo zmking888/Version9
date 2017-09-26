@@ -71,7 +71,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 32
+Global Const Revision = 33
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19156,9 +19156,18 @@ ContInline:
         If IsLabelSymbolNew(b$, "ΚΩΔΙΚΑ", "CODE", lang) Then
         If IsLabelDot(here$, b$, sw$) = 1 Then
                 If GetSub(myUcase(sw$, True), nd&) Then
+                
                 WaitShow = Len(b$)
                 bstack.addlen = 0
+                If IsSymbol(b$, ",") Then
+                If lang = 1 Then
+                b$ = vbCrLf + "Inline code " + b$
+                Else
+                b$ = vbCrLf + "Ένθεση Κώδικα " + b$
+                End If
+                End If
                                 b$ = vbCrLf + sbf(nd&).sb & b$
+                                
                                  If trace Then TestShowSub = b$
                    sss = Len(b$)
                    GoTo AGAIN1
@@ -19506,7 +19515,8 @@ contWhile:
                  
                  
                  Loop Until p = 0 Or NOEXECUTION
-                 
+                 ' addition in 8.9 rev 33
+                Set bstack.lastobj = Nothing
                  If MOUT Then Execute = 0: Exit Function
                  Else
                  sss = Len(b$)
@@ -20369,6 +20379,7 @@ varonly:
 If Len(w$) > 3 Then
     If lang = 1 Then
         If Left$(w$, 4) = "THIS" Then
+            If Len(w$) = 4 Or Mid$(w$, 5, 1) = "." Then
             ss$ = ".DELETEME"
             If IsLabel(bstack, ss$, bb$) < 0 Then
                     If Len(bb$) = 8 Then Execute = 0: Exit Function
@@ -20379,9 +20390,11 @@ If Len(w$) > 3 Then
                 GoTo somethingelse
             End If
             End If
+            End If
     End If
 Else
     If Left$(w$, 4) = "ΑΥΤΟ" Then
+        If Len(w$) = 4 Or Mid$(w$, 5, 1) = "." Then
         ss$ = ".DELETEME"
         If IsLabel(bstack, ss$, bb$) < 0 Then
                 If Len(bb$) = 8 Then Execute = 0: Exit Function
@@ -20394,6 +20407,7 @@ Else
                 GoTo somethingelse
             End If
             End If
+        End If
         End If
     End If
 End If
@@ -38111,7 +38125,11 @@ If x1 = 1 Then
         If Typename(var(i)) <> "Group" Then MyRead = True: Exit Function
         Set ps = New mStiva
         If ohere$ <> "" Then
-                Set myobject = var(i).PrepareSoros(var(), ohere$ + "." + Left$(ss$, Len(ss$) - Len(var(i).GroupName) + 1))
+                If bstack.UseGroupname <> "" Then
+                    Set myobject = var(i).PrepareSoros(var(), "")
+                Else
+                    Set myobject = var(i).PrepareSoros(var(), ohere$ + "." + Left$(ss$, Len(ss$) - Len(var(i).GroupName) + 1))
+                End If
                 Else
                 Set myobject = var(i).PrepareSoros(var(), Left$(ss$, Len(ss$) - Len(var(i).GroupName) + 1))
                 End If
@@ -40843,6 +40861,7 @@ jumpheretoo:
                         
                                     If here$ = "" Then
                                                 s$ = block(rest$)
+                                                 If frm$ <> "" Then s = "READ " + frm$ + vbCrLf + s$
                                                 If Right$(s$, 2) <> vbCrLf Then s$ = s$ + vbCrLf
                                                 ' NEED TO HAVE A HEADER ******************************************************************************
                                                 bstack.IndexSub = GlobalSub(what$, s$)
@@ -44782,7 +44801,19 @@ End If
 X3 = Abs(IsLabel(basestack, rest$, what$))
 If X3 = 1 Or X3 > 4 Then
 If X3 <> 1 Then
-FastSymbol rest$, ")"
+If Not FastSymbol(rest$, ")") Then
+If Not MaybeIsSymbol(rest$, "{") Then
+    rest$ = what$ + rest$
+    MyEr "Please insert a space after name and before parameters", "Παρακαλώ βάλει ένα διάστημα μετά το όνομα και πριν τη λίστα παραμέτρων"
+    MyModule = False
+    Exit Function
+    ' this is a solution, but I want an error
+    'what$ = Left$(what$, Len(what$) - 1)
+    'rest$ = "(" + rest$
+    'x1 = 1
+    'GoTo BYPASS1
+End If
+End If
 what$ = what$ + ")"
 End If
 
@@ -44941,6 +44972,7 @@ jumpheretoo:
                         If here$ = "" Then
                                 pa$ = block(rest$)
                                 ' Call preProcessor(basestack, pa$)
+                                If frm$ <> "" Then pa$ = "READ " + frm$ + vbCrLf + pa$
                                 If Right$(pa$, 2) <> vbCrLf Then pa$ = pa$ + vbCrLf
                                 basestack.IndexSub = GlobalSub(what$, pa$, , what$)
                         Else
