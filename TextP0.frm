@@ -1792,7 +1792,7 @@ End If
 
       If basestack1.Owner Is Nothing Then Exit Sub
 If basestack1.Owner.Visible = True Then basestack1.Owner.Refresh Else basestack1.Owner.Visible = True
-
+    FKey = 0
     FK$(13) = "”’√√—¡÷≈¡”"
     INK$ = ""
     mybasket.pageframe = 0
@@ -2696,6 +2696,9 @@ MYFONT = defFontname
         End If
         
         End If
+        cc.ValueKey = "FOR-LIKE-BASIC"
+            cc.ValueType = REG_DWORD
+            cc.Value = CLng(0)  ' NO ¬’ DEFAULT
                  cc.ValueKey = "PRIORITY-OR"
             cc.ValueType = REG_DWORD
             cc.Value = CLng(0)
@@ -2814,6 +2817,8 @@ End If
             cc.ValueKey = "PRIORITY-OR"
             cc.ValueType = REG_DWORD
              priorityOr = CLng(cc.Value) = True
+            ' cc.ValueKey = "FOR-LIKE-BASIC"
+             ' ForLikeBasic = CLng(cc.Value) = True
         Set cc = Nothing
         End If
        DIS.ForeColor = mycolor(PenOne) ' NOW PEN IS RGB VALUE
@@ -2960,11 +2965,11 @@ End Sub
 
 Function Mark$()
 If ShadowMarks Then Mark$ = "": Exit Function
-If TEXT1.TITLE = "" Then  'reset all para
+If TEXT1.Title = "" Then  'reset all para
 Para1 = 0: Para2 = 0: Para3 = 0
-ElseIf LastDocTitle$ <> TEXT1.TITLE Then
+ElseIf LastDocTitle$ <> TEXT1.Title Then
 Para1 = 0: Para2 = 0: Para3 = 0
-LastDocTitle$ = TEXT1.TITLE
+LastDocTitle$ = TEXT1.Title
 End If
 Dim s$
 If Para1 <> 0 Then
