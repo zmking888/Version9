@@ -871,6 +871,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                 myobject2.HasSet = myobject.HasSet
                 myobject2.HasParameters = myobject.HasParameters
                 myobject2.HasParametersSet = myobject.HasParametersSet
+                Set myobject2.SuperClassList = myobject.SuperClassList
                 Set myobject2.LinkRef = myobject
                 End If
             End With

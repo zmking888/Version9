@@ -27,6 +27,8 @@ Dim mTag As String
 Public IamGlobal As Boolean
 Public HasValue As Boolean, HasSet As Boolean, HasStrValue As Boolean, HasParameters As Boolean
 Public HasParametersSet As Boolean
+Public SuperClassList As Object
+Public IamSuperClass As Boolean
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva
 Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
 For i = 1 To OwnSoros.Total
@@ -243,6 +245,7 @@ Set OwnSoros = New mStiva
 End Sub
 
 Private Sub Class_Terminate()
+Set SuperClassList = Nothing
 If IamFloatGroup Then EndFloat
 Set LinkToGroup = Nothing
 End Sub

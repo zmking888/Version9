@@ -23,7 +23,7 @@ Public commnum As Long
 Public connectnow As Boolean
 Public LastExecute As Long
 Public LastOnce As Boolean
-Public priveflag As Boolean
+Public priveflag As Boolean, uniflag As Boolean
 Private parentSoros As mStiva ' reference to parent..stiva
 Private MyParent As basetask  'reference to parent
 Private myOwner As Object

@@ -1,6 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 37 active-X
+Version 8.9 revision 38 active-X
+Introduce SuperClass for objects.
 
 http://georgekarras.blogspot.gr/
 
