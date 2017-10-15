@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 38
+Global Const Revision = 39
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -23405,6 +23405,33 @@ Case "амакутгс", "PROFILER"  ' no Neo...
 Identifier = True
 prof.MARKONE
 Exit Function
+Case "FUNCTION", "сумаятгсг"
+    Identifier = MyFunction(0, basestack, rest$, lang)
+    Exit Function
+Case "MODULE", "тлгла"
+    Identifier = MyModule(basestack, rest$, lang)
+    Exit Function
+Case "SUPERCLASS", "упеяйкасг"
+    Identifier = ProcClass(basestack, rest$, lang, True)
+Exit Function
+Case "EVENT", "цецомос"
+ Identifier = myEvent(basestack, rest$, lang)
+ Exit Function
+Case "GROUP", "олада"
+  Identifier = ProcGroup(0, basestack, rest$, lang)
+  Exit Function
+Case "CLASS", "йкасг"
+    Identifier = ProcClass(basestack, rest$, lang, False)
+Exit Function
+Case "DIM", "пимайас", "пимайес"
+    Identifier = MyDim(basestack, rest$, lang)
+    Exit Function
+Case "йатастасг", "INVENTORY"
+    Identifier = ProcInventory(basestack, rest$, lang)
+    Exit Function
+Case "диаяхяысг", "BUFFER"
+    Identifier = ProcBuffer(basestack, rest$, lang)
+    Exit Function
 Case "WAIT", "амаломг"  '' copy to NeoWait
 Identifier = MyDelay(basestack, rest$)
 Exit Function
@@ -23414,12 +23441,6 @@ Exit Function
 Case "LET", "стг", "стгм", "сто"  'ok
 Identifier = MyLet(basestack, rest$, lang)
 Exit Function
-Case "EVENT", "цецомос"
- Identifier = myEvent(basestack, rest$, lang)
- Exit Function
-Case "GROUP", "олада"
-  Identifier = ProcGroup(0, basestack, rest$, lang)
-  Exit Function
 Case "CALL", "йакесе"
 ' CHECK FOR NUMBER...
 NeoCall objptr(basestack), rest$, lang, Identifier
@@ -23536,20 +23557,8 @@ Case "START", "аявг"
 Case "REMOVE", "диацяажг"
     Identifier = ProcRemove(basestack, rest$, lang)
 Exit Function
-Case "SUPERCLASS", "упеяйкасг"
-    Identifier = ProcClass(basestack, rest$, lang, True)
-Exit Function
-Case "CLASS", "йкасг"
-    Identifier = ProcClass(basestack, rest$, lang, False)
-Exit Function
 Case "DEF", "йаме"
     Identifier = ProcDef(basestack, rest$)
-    Exit Function
-Case "FUNCTION", "сумаятгсг"
-    Identifier = MyFunction(0, basestack, rest$, lang)
-    Exit Function
-Case "MODULE", "тлгла"
-    Identifier = MyModule(basestack, rest$, lang)
     Exit Function
 Case "LOAD", "жоятысе" '
 Identifier = ProcLoad(basestack, rest$)
@@ -23590,9 +23599,6 @@ Exit Function
 Case "ERROR", "кахос"
 Identifier = MyError(basestack, rest$, lang)
 Exit Function
-Case "DIM", "пимайас", "пимайес"
-    Identifier = MyDim(basestack, rest$, lang)
-    Exit Function
 Case "SET", "хесе"
     Identifier = interpret(basestack, GetNextLine(rest$))
     Exit Function
@@ -23977,12 +23983,6 @@ Case "THREAD.PLAN", "сведио.мглатым"
 Case "яухлисеис", "SETTINGS"
     Identifier = ProcSettings(basestack, rest$, lang)
     Exit Function
-Case "йатастасг", "INVENTORY"
-    Identifier = ProcInventory(basestack, rest$, lang)
-    Exit Function
-Case "диаяхяысг", "BUFFER"
-    Identifier = ProcBuffer(basestack, rest$, lang)
-    Exit Function
 Case "PROTOTYPE", "пяытотупо"
     Identifier = ProcProto(basestack, rest$, lang)
     Exit Function
@@ -23996,7 +23996,8 @@ JUMPHEREFORMODULESFAST:
             ElseIf GetSub(here$ & "." & what$, y1) Then
                     it = 1
             ElseIf basestack.UseGroupname <> "" Then
-             If what$ Like basestack.UseGroupname + "*" Then
+            ' If what$ Like basestack.UseGroupname + "*" Then
+            If InStr(what$, basestack.UseGroupname) = 1 Then
             what$ = basestack.UseGroupname + ChrW(&HFFBF) + Mid$(what$, Len(basestack.UseGroupname) + 1)
             If GetSub(what$, y1) Then
                 it = 0
@@ -40506,6 +40507,7 @@ s$ = ""
 pa$ = ""
 ss$ = ""
 Do While ISSTRINGA(frm$, s$)
+'If InStr(s$, ChrW(&H1FFF)) > 0 And False Then
 If InStr(s$, ChrW(&H1FFF)) > 0 Then
 Else
 If frm$ <> "" Then
