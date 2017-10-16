@@ -56,7 +56,65 @@ Next
 Set PrepareSoros = AllSoros
 
 End Function
+Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva
+Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
+For i = 1 To OwnSoros.Total
+s = OwnSoros.StackItem(i)
+If Left$(s$, 1) = "*" Then
+AllSoros.DataStr "*" + topname$ + "." + Split(Mid$(s, 2))(0)
 
+ Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), GroupName)
+ 
+AllSoros.MergeBottom vv
+Else
+AllSoros.DataStr GroupName + Split(s)(0)
+End If
+Next
+Dim a() As String
+If FuncRef$ <> "" Then
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr topname$ + "." + Split(a(i))(0)
+Next i
+End If
+End If
+Set PrepareSoros1 = AllSoros
+
+End Function
+Public Function PrepareSorosToCompare(ByRef v()) As mStiva
+Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
+For i = 1 To OwnSoros.Total
+s = OwnSoros.StackItem(i)
+'Debug.Print s, topname$, GroupName
+
+If Left$(s$, 1) = "*" Then
+AllSoros.DataStr "*" + Split(Mid$(s, 2))(0)
+ If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
+ 
+ Set vv = v(val(Split(s)(1))).PrepareSoros1(v(), "")
+ 
+ 
+ 
+AllSoros.MergeBottom vv
+Else
+
+AllSoros.DataStr (Split(s)(0))
+
+End If
+Next
+Dim a() As String
+If FuncRef$ <> "" Then
+a() = Split(Replace(FuncRef$, Chr$(3), Chr$(2)), Chr$(2))
+If UBound(a()) > 0 Then
+For i = 1 To UBound(a())
+AllSoros.DataStr (Split(a(i))(0))
+Next i
+End If
+End If
+Set PrepareSorosToCompare = AllSoros
+
+End Function
 Public Function types() As String
 Dim i As Long, s$
 i = OwnSoros.Total
@@ -177,22 +235,8 @@ End Property
 Public Property Get Varlist() As String
 Varlist = VarRef$
 End Property
-Public Function FunclistTotal(v(), skip As Boolean) As String
-Dim i As Long, s As String, Sm As String
-For i = 1 To OwnSoros.Total
-s = OwnSoros.StackItem(i)
-If Left$(s, 1) = "*" Then
-If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
 
- Sm = Sm + v(val(Split(s)(1))).FunclistTotal(v(), False)
-End If
-Next
-If skip Then
-FunclistTotal = FuncRef + Sm
-Else
-FunclistTotal = Replace(FuncRef + Sm$, Chr$(2), Chr$(2) + mName$)
-End If
-End Function
+
 Public Property Get FuncList() As String
 FuncList = FuncRef$
 End Property
