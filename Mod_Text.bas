@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 40
+Global Const Revision = 42
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2705,12 +2705,12 @@ If basestack.IamThread Then
 ' let thread do the refresh
 ElseIf par Then
 If Not extreme Then
-    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+    If uintnew(timeGetTime) > k1 Then
       
-            If RRCOUNTER = 0 Then
+            
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
          If scr.Visible Then scr.Refresh
-                  End If
+                  
                    If Not TaskMaster Is Nothing Then
                             TaskMaster.StopProcess
                              DoEvents
@@ -2718,6 +2718,8 @@ If Not extreme Then
                     Else
                         DoEvents
                     End If
+                    End If
+                
                   End If
 End If
 RevisionPrint = True
@@ -2940,6 +2942,9 @@ RetStackSize = bstack.RetStackTotal
         GoTo CONT104010
         End If
         End If
+        Else
+            MyEr "Double use of SuperClass", "Διπλή χρήση της Υπερκλάσης"
+            GoTo fastexit
         End If
         End If
         End If
@@ -3030,13 +3035,17 @@ w$ = myUcase(w$)
         v = 0
         w$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
         If GetVar(bstack, w$, y1) Then
-        If TypeOf var(y1) Is Group Then
-        If Not var(y1).SuperClassList Is Nothing Then
-                Set pppp.item(v) = var(y1).SuperClassList
-                 subspoint = True
-        GoTo contheretoo
-        End If
-        End If
+            If TypeOf var(y1) Is Group Then
+            If Not var(y1).SuperClassList Is Nothing Then
+                    Set pppp.item(v) = var(y1).SuperClassList
+                     subspoint = True
+            GoTo contheretoo
+            End If
+            End If
+                Else
+            MyEr "Double use of SuperClass", "Διπλή χρήση της Υπερκλάσης"
+            GoTo fastexit
+        
         End If
         End If
         End If
@@ -18480,7 +18489,8 @@ ContScan:
             If GetForegroundWindow <> Form1.hWnd Or Not Targets Then
             If IsExp(bstack, b$, p) Then
             End If
-            MyDoEvents0new di
+            RRCOUNTER = 0
+            MyDoEvents0 di
             If FKey > 0 Then
                 If FK$(FKey) <> "" Then
                 If bstack.IamChild And FKey = 13 And lastAboutHTitle <> "" Then
@@ -20660,7 +20670,12 @@ checkobject:
                         Set myobject = bstack.lastobj
                             If TypeOf bstack.lastobj Is Group Then ' oh is a group
                                 Set bstack.lastobj = Nothing
+                               ' If VarStat Then
                                 UnFloatGroup bstack, w$, v, myobject, VarStat  ' global??
+                                'Else
+                               ' Set var(v) = New Group
+                                'UnFloatGroupReWriteVars bstack, w$, v, myobject
+                               'End If
                                 Set myobject = Nothing
                             ElseIf CheckIsmArray(myobject, var()) Then
                                     Set var(v) = New mHandler
@@ -20769,12 +20784,23 @@ assigngroup:
                                 Exit Function
                                 Else
                                 If Len(var(v).GroupName) > Len(w$) Then
+                                If var(v).IamRef Then
+                                
+                                     sw$ = here$
+                                      here$ = ""
                                     UnFloatGroupReWriteVars bstack, w$, v, myobject
+                                    here = sw$
+                                    Else
+                                    UnFloatGroupReWriteVars bstack, w$, v, myobject
+                                    End If
                                 Else
                                     bstack.GroupName = Left$(w$, Len(w$) - Len(var(v).GroupName) + 1)
                                     If Len(var(v).GroupName) > 0 Then
                                         w$ = Left$(var(v).GroupName, Len(var(v).GroupName) - 1)
+                                        sw$ = here$
+                                        here$ = ""
                                         UnFloatGroupReWriteVars bstack, w$, v, myobject
+                                        here = sw$
                                     Else
                                         GroupWrongUse
                                         Execute = 0
@@ -30344,6 +30370,7 @@ If Not TypeOf myobject Is Group Then Exit Sub
  ohere$ = here$
 
 If bstack.UseGroupname <> "" Or glob Then
+'If globl Then
 here$ = ""
 End If
  oldgroupname$ = bstack.GroupName
@@ -30629,8 +30656,12 @@ If Not TypeOf myobject Is Group Then Exit Sub
   If myobject.IamSuperClass Then Set myobject = myobject.SuperClassList
  End If
 If bstack.UseGroupname <> "" Or glob Then
-' check this please..
+    If Not glob Then
+Else
 here$ = ""
+End If
+
+'If glob Then here$ = ""
 End If
  oldgroupname$ = bstack.GroupName
  
@@ -30768,7 +30799,8 @@ If myobject Is Nothing Then GoTo exithere1
 cont1010:
                  Next x1
                 End If
-                 If ohere$ = "" Or bstack.UseGroupname <> "" Or glob Then
+               '  If ohere$ = "" Or bstack.UseGroupname <> "" Or glob Then
+                If ohere$ = "" Or glob Then
                                 here$ = ""
               Else
                                  here$ = ohere$
@@ -30786,7 +30818,8 @@ cont1010:
            
                 bstack.GroupName = ""
               While s$ <> ""
-                 If ohere$ = "" Or bstack.UseGroupname <> "" Or glob Then
+                 ' If ohere$ = "" Or bstack.UseGroupname <> "" Or glob Then
+                 If ohere$ = "" Or glob Then
                here$ = oldgroupname$ + what$
               Else
      here$ = ohere$ + "." + oldgroupname$ + what$
@@ -38516,6 +38549,7 @@ backfromstr:
                 var(it).HasParameters = var(i).HasParameters
                 var(it).HasParametersSet = var(i).HasParametersSet
             End With
+             var(it).IamRef = True
             If var(i).HasStrValue Then
                 GlobalVar what$ + "$", it, True
             End If
@@ -38746,7 +38780,9 @@ contread123:
 comehere:
             i = GlobalVar(what$, 0)
             If Typename$(myobject) = "Group" Then
-                UnFloatGroup bstack, what$, i, myobject, here$ = ""
+               ' Set var(i) = New Group
+                'UnFloatGroupReWriteVars bstack, what$, i, myobject
+               UnFloatGroup bstack, what$, i, myobject, here$ = ""
             ElseIf Typename$(myobject) = "mEvent" Then
                 Set var(i) = myobject
             ElseIf Typename$(myobject) = "lambda" Then
@@ -40451,15 +40487,15 @@ Do While ISSTRINGA(frm$, s$)
 If InStr(s$, ChrW(&H1FFF)) > 0 Then
 Else
 If frm$ <> "" Then
-    If InStrRev(s$, ")") > 0 Then
+    If InStrRev(s$, ") ") > 0 Then
     
-    pa$ = pa$ & Left$(s$, InStrRev(s$, ")") - 1) & ", "
+    pa$ = pa$ & Left$(s$, InStrRev(s$, ")")) & ", "
     ElseIf InStrRev(s$, " ") > 0 Then
     pa$ = pa$ & Left$(s$, InStrRev(s$, " ") - 1) & ", "
     End If
 Else
-    If InStrRev(s$, ")") > 0 Then
-    pa$ = pa$ & Left$(s$, InStrRev(s$, ")") - 1)
+    If InStrRev(s$, ") ") > 0 Then
+    pa$ = pa$ & Left$(s$, InStrRev(s$, ")"))
     ElseIf InStrRev(s$, " ") > 0 Then
     pa$ = pa$ & Left$(s$, InStrRev(s$, " ") - 1)
     End If
@@ -44982,7 +45018,9 @@ If x1 = 1 Then
             '' GROUP
                 s$ = basestack.GroupName
                 prepareGroup basestack, what$, y1, flag, HasStrName
+
                 var(y1).IamGlobal = flag
+                
                 If flag Then ss$ = here$: here$ = ""
                 If ExecuteVarOnly(basestack, basestack.GroupName & what$, y1, rest$, lang, flag) = 0 Then
                     If flag Then here$ = ss$
@@ -45842,9 +45880,9 @@ Case 1
                 
                 i = Len(rest$)
               If lang = 1 Then
-                     rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "group " + w$ + " +{" + ss$ & "}" + vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")" + rest$
+                     rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "group " + w$ + " {" + ss$ & "}" + vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")" + rest$
                 Else
-                      rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "ομαδα " + w$ + " +{" + ss$ & "}" + vbCrLf + "Αν Τμήμα(" + w$ + "." + w$ + ") Τότε Κάλεσε! " + w$ + "." + w$ + vbCrLf + "=Ομάδα(" + w$ + ")" + rest$
+                      rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "ομαδα " + w$ + " {" + ss$ & "}" + vbCrLf + "Αν Τμήμα(" + w$ + "." + w$ + ") Τότε Κάλεσε! " + w$ + "." + w$ + vbCrLf + "=Ομάδα(" + w$ + ")" + rest$
                 End If
                 ProcClass = MyFunction(1, basestack, rest$, lang)
          Else
@@ -45863,9 +45901,9 @@ w2$ = Left$(w$, Len(w$) - 1)
                 
                 i = Len(rest$)
                If lang = 1 Then
-                        rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "group " + w$ + " +{" + ss$ & "}" + vbCrLf + "if module(" + w2$ + "." + w2$ + ") then call! " + w2$ + "." + w2$ + vbCrLf + "=group$(" + w2$ + ")" + rest$
+                        rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "group " + w$ + " {" + ss$ & "}" + vbCrLf + "if module(" + w2$ + "." + w2$ + ") then call! " + w2$ + "." + w2$ + vbCrLf + "=group$(" + w2$ + ")" + rest$
                Else
-                      rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "ομαδα " + w$ + " +{" + ss$ & "}" + vbCrLf + "Αν Τμήμα(" + w2$ + "." + w2$ + ") Τότε Κάλεσε! " + w2$ + "." + w2$ + vbCrLf + "=Ομάδα$(" + w2$ + ")" + rest$
+                      rest$ = w$ + "{'11001EDIT " & StripRVAL(ohere$) & ",-" & CStr(i) + vbCrLf + "ομαδα " + w$ + " {" + ss$ & "}" + vbCrLf + "Αν Τμήμα(" + w2$ + "." + w2$ + ") Τότε Κάλεσε! " + w2$ + "." + w2$ + vbCrLf + "=Ομάδα$(" + w2$ + ")" + rest$
                 End If
                 ProcClass = MyFunction(1, basestack, rest$, lang)
          Else

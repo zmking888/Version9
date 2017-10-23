@@ -24,7 +24,7 @@ Dim bank As mArray
 Dim mTeam As Boolean
 Dim LinkToGroup As Object
 Dim mTag As String
-Public IamGlobal As Boolean
+Public IamGlobal As Boolean, IamRef As Boolean
 Public HasValue As Boolean, HasSet As Boolean, HasStrValue As Boolean, HasParameters As Boolean
 Public HasParametersSet As Boolean
 Public SuperClassList As Object

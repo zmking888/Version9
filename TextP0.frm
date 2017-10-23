@@ -149,15 +149,15 @@ Begin VB.Form Form1
       EndProperty
    End
    Begin SHDocVwCtl.WebBrowser view1 
-      Height          =   2280
-      Left            =   4620
+      Height          =   6000
+      Left            =   0
       TabIndex        =   2
       TabStop         =   0   'False
-      Top             =   3135
+      Top             =   0
       Visible         =   0   'False
-      Width           =   3015
-      ExtentX         =   5318
-      ExtentY         =   4022
+      Width           =   8000
+      ExtentX         =   14111
+      ExtentY         =   10583
       ViewMode        =   1
       Offline         =   0
       Silent          =   0
@@ -911,42 +911,32 @@ End If
 End Sub
 
 Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
-If lockme Then Exit Sub
-MOUB = Button
-
 If Not NoAction Then
 NoAction = True
-''Dim xx&, yy&, , ox&, oy&
-''SetText DIS
-''GetXY DIS, ox&, oy&
 Dim sel&
 If Button > 0 And Targets Then
 
-
-sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
-
-If sel& >= 0 Then
-
 If Button = 1 Then
-
-
-Select Case q(sel&).Id Mod 100
-Case Is < 10
-If Not interpret(DisStack, (q(sel&).Comm)) Then Beep
-MyEr "", ""
-Case Else
-INK$ = q(sel&).Comm
-End Select
-
-
-Else
-
+    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
+    If sel& >= 0 Then
+        Select Case q(sel&).Id Mod 100
+        Case Is < 10
+        If Not interpret(DisStack, (q(sel&).Comm)) Then Beep
+        MyEr "", ""
+        Case Else
+        INK$ = q(sel&).Comm
+        End Select
+    End If
 End If
 
-End If
 If Not nomore Then NoAction = False
 
 End If
+
+If lockme Then Exit Sub
+MOUB = Button
+
+
 End If
 
 End Sub
@@ -1552,10 +1542,6 @@ End Sub
 
 
 Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
-If lockme Then Exit Sub
-MOUB = Button
-clickMe2 = -1
-
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
@@ -1585,6 +1571,11 @@ End If
 If Not nomore Then NoAction = False
 
 End If
+If lockme Then Exit Sub
+MOUB = Button
+clickMe2 = -1
+
+
 
 End Sub
 
@@ -2479,7 +2470,24 @@ IESizeY = Me.ScaleHeight
 End If
 If (IESizeX - IEX) > Me.ScaleWidth Then IESizeX = Me.ScaleWidth - IEX
 If (IESizeY - IEY) > Me.ScaleHeight Then IESizeY = Me.ScaleHeight - IEY
+If IsWine Then
+With view1
+On Error Resume Next
+    .Visible = True
+    .top = IEY
+    .Left = IEX
+    .Width = IESizeX
+    .Height = IESizeY
+    .Refresh
+    .Refresh2
+
+End With
+Else
 view1.Move IEX, IEY, IESizeX, IESizeY
+End If
+
+
+
 view1.RegisterAsBrowser = True
    If homepage$ = "" Then homepage$ = ThisFile$
    exWnd = 1
