@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -48488,3 +48488,12 @@ End If
 End If
 
 End Function
+Sub testme()
+Dim aa$
+aa$ = "&m.beta()." & ChrW(&HFFBF) & "[xx] = {X}"
+Dim p1234 As Long
+p1234 = 1
+Debug.Print aheadstatus(aa$, False, p1234)
+Debug.Print Mid$(aa$, 1, p1234)
+Debug.Print p1234
+End Sub

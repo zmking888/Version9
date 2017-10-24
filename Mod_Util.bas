@@ -5203,6 +5203,11 @@ Do While pos <= Len(a$)
 again:
         If part$ <> "" Then
             ' after
+            If part$ = "S" And Level& = 0 Then
+            '
+             If Mid$(a$, pos + 1, 1) = ")" Then pos = pos + 2: GoTo conthere
+             
+            End If
             ElseIf Right$(b$, 1) = "a" Then
             b$ = Left$(b$, Len(b$) - 1)
             part$ = ""
@@ -5369,8 +5374,10 @@ there1:
             End If
         End Select
         End If
-        pos = pos + 1
 
+        pos = pos + 1
+        
+conthere:
   
 Loop
 
