@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 8
 Global Const VerMinor = 9
-Global Const Revision = 43
+Global Const Revision = 44
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -38549,7 +38549,7 @@ backfromstr:
                 var(it).HasParameters = var(i).HasParameters
                 var(it).HasParametersSet = var(i).HasParametersSet
             End With
-             var(it).IamRef = True
+             var(it).IamRef = Len(bstack.UseGroupname) > 0
             If var(i).HasStrValue Then
                 GlobalVar what$ + "$", it, True
             End If
