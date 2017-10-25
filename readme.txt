@@ -1,6 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 8.9 revision 44 active-X
+Version 9.0 revision 0 active-X
+(all revisions of 8.9 until 45)
 
 http://georgekarras.blogspot.gr/
 

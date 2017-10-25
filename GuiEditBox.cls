@@ -558,6 +558,14 @@ End If
 'RaiseEvent LostFocus
 End Sub
 
+Private Sub glistN_HaveMark(Yes As Boolean)
+Yes = HaveMarkedText
+End Sub
+
+Private Sub glistN_MarkCut(ThatData As String)
+ThatData = undotext
+End Sub
+
 Private Sub glistN_Maybelanguage()
 If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
@@ -4843,8 +4851,8 @@ glistN.CalcNewFont
 TextPixelOffset = Int(glistN.TextHeightOffset)
 End Property
 
-Private Sub mDoc_MayQuit(yes As Variant)
-If Quit Then yes = True
+Private Sub mDoc_MayQuit(Yes As Variant)
+If Quit Then Yes = True
 'MyDoEvents1 Form3
 End Sub
 

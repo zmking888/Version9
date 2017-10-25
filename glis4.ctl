@@ -99,6 +99,7 @@ Private Type itemlist
     contentID As String
     line As Boolean
 End Type
+Private ehat$
 Private fast As Boolean
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Private Declare Function SetWindowRgn Lib "user32" (ByVal hWnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -207,6 +208,8 @@ Event LineUp()
 Event LineDown()
 Event PureListOn()
 Event PureListOff()
+Event HaveMark(Yes As Boolean)
+Event MarkCut(ThatData As String)
 Event MarkIn()
 Event MarkOut()
 Event MarkDestroyAny()
@@ -831,7 +834,7 @@ End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
 If dropkey Then KeyAscii = 0: Exit Sub
-Dim bb As Boolean, kk$, pair$
+Dim bb As Boolean, kk$, pair$, b1 As Boolean
 If ListIndex < 0 Then
 If KeyAscii = 13 Then RaiseEvent EnterOnly
 Else
@@ -858,6 +861,7 @@ Else
             If EditFlag Then
             bb = enabled
             enabled = False
+            RaiseEvent HaveMark(b1)
             RaiseEvent PushUndoIfMarked
             RaiseEvent MarkDelete(False)
             enabled = bb
@@ -873,15 +877,27 @@ Else
              '
              
             If SelStart = 0 Then mSelstart = 1
-            RaiseEvent RemoveOne(kk$)
+           
+        
            If pair$ <> "" Then
+           
+           If b1 Then
+           RaiseEvent MarkCut(ehat$)
+           If InStr(ehat$, Chr(13)) > 0 Then ehat$ = Left$(ehat$, InStr(ehat$, Chr(13)) - 1)
+            kk$ = kk$ + ehat$ + pair$
+            Else
+            kk$ = kk$ + pair$
+            End If
            mSelstart = mSelstart + 1
-           RaiseEvent RemoveOne(pair$)
+           
            mSelstart = mSelstart - 1
+           Else
+                RaiseEvent RemoveOne(kk$)
            End If
+           RaiseEvent RemoveOne(kk$)
             SelStartEventAlways = SelStart + 1
             RaiseEvent PureListOn
-                list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 2) + kk$ + pair$ + Mid$(list(SELECTEDITEM - 1), SelStart - 1)
+                list(SELECTEDITEM - 1) = Left$(list(SELECTEDITEM - 1), SelStart - 2) + kk$ + Mid$(list(SELECTEDITEM - 1), SelStart - 1)
                 
         
             RaiseEvent PureListOff

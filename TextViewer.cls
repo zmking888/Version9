@@ -377,17 +377,29 @@ undomode = 0
 End If
 End Sub
 Public Sub insertbrackets()
-Dim i As Long, j As Long
-If SelLength = 0 Then
+Dim i As Long, j As Long, ss$
+If SelLength > 0 Then
+ClearRedo
+PushUndo
+glistN_MarkDelete False
+ss$ = undotext
+End If
 Dim a$
 a$ = Left$(CurrentParagraph, Charpos)
 i = ((Len(a$) - Len(LTrim$(a$))) \ 6) * 6
 j = SelStart
+If ss$ <> "" Then
+ss$ = Replace(ss$, vbCrLf, vbCrLf + Space$(6))
+RemoveUndo "{" + vbCrLf + Space$(i + 6) + ss$ + vbCrLf + Space$(i) + "}"
+InsertText = "{" + vbCrLf + Space$(i + 6) + ss$ + vbCrLf + Space$(i) + "}"
+Else
 RemoveUndo "{" + vbCrLf + Space$(i + 6) + vbCrLf + Space$(i) + "}"
 InsertText = "{" + vbCrLf + Space$(i + 6) + vbCrLf + Space$(i) + "}"
+End If
 SelStartSilent = j + i + 3 + 6
 Render
-End If
+
+
 
  
 End Sub
@@ -419,6 +431,14 @@ Case "["
 b = "]"
 End Select
 End If
+End Sub
+
+Private Sub glistN_HaveMark(Yes As Boolean)
+Yes = HaveMarkedText
+End Sub
+
+Private Sub glistN_MarkCut(ThatData As String)
+ThatData = undotext
 End Sub
 
 Private Sub glistN_Maybelanguage()

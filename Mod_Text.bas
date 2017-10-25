@@ -70,9 +70,9 @@ Public m_bInIDE As Boolean
 Public UKEY$
 Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, WaitShow As Long
 Public feedback$, FeedbackExec$, feednow$ ' for about$
-Global Const VerMajor = 8
-Global Const VerMinor = 9
-Global Const Revision = 44
+Global Const VerMajor = 9
+Global Const VerMinor = 0
+Global Const Revision = 0
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16411,6 +16411,12 @@ Case 1
         If FastOperator(b$, "<=", i, 2, False) Then
         ' LOOK GLOBAL
         If GetVar(bstack, w$, v, True) Then
+        w$ = varhash.lastkey
+            Mid$(b$, i, 2) = "  "
+            
+            GoTo assignvalue
+        ElseIf GetlocalVar(w$, v) Then
+            w$ = varhash.lastkey
             Mid$(b$, i, 2) = "  "
             GoTo assignvalue
         Else
@@ -16545,11 +16551,12 @@ checkobject:
                                 Set bstack.lastobj = Nothing
                                 ss$ = bstack.GroupName
                                 If var(v).HasValue Or var(v).HasSet Then
-                                    MyEr "Property can change", "Η ιδιότητα δεν μπορεί να αλλάξει"
+                                    PropCantChange
                                     interpret = 0
                                     Exit Function
                                 Else
                                 If Len(var(v).GroupName) > Len(w$) Then
+                                ' here$ is ""
                                     UnFloatGroupReWriteVars bstack, w$, v, myobject
                                 Else
                                     bstack.GroupName = Left$(w$, Len(w$) - Len(var(v).GroupName) + 1)
@@ -20626,6 +20633,10 @@ If MaybeIsSymbol(b$, "/*-+=~^&|<>") Then
             Mid$(b$, i, 2) = "  "
             
             GoTo assignvalue
+        ElseIf GetlocalVar(w$, v) Then
+            w$ = varhash.lastkey
+            Mid$(b$, i, 2) = "  "
+            GoTo assignvalue
         Else
         Mid$(b$, i, 1) = " "
         i = i + 1
@@ -20670,12 +20681,7 @@ checkobject:
                         Set myobject = bstack.lastobj
                             If TypeOf bstack.lastobj Is Group Then ' oh is a group
                                 Set bstack.lastobj = Nothing
-                               ' If VarStat Then
                                 UnFloatGroup bstack, w$, v, myobject, VarStat  ' global??
-                                'Else
-                               ' Set var(v) = New Group
-                                'UnFloatGroupReWriteVars bstack, w$, v, myobject
-                               'End If
                                 Set myobject = Nothing
                             ElseIf CheckIsmArray(myobject, var()) Then
                                     Set var(v) = New mHandler

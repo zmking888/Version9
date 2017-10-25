@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -917,6 +917,7 @@ Dim sel&
 If Button > 0 And Targets Then
 
 If Button = 1 Then
+    MOUB = Button
     sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).Id Mod 100
