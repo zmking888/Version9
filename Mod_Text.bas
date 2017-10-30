@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3238,9 +3238,10 @@ breakexit:
                 If v <> -100 Then
                         CopyGroup var(y1), bstack
                      Else
-                            v = 0
+                            
                             
                             If pppp.Arr Then
+                            v = 0
                             CopyGroup0 var(y1), bstack, pppp.item(v)
                             Else
                             
@@ -20766,9 +20767,10 @@ assigngroup:
                     ElseIf TypeOf var(v) Is Group Then
                         If IsExp(bstack, b$, p) Then
                         
-                            If Not TypeOf var(v) Is Group Then
-                            GoTo assignvalue3
-                            ElseIf var(v).HasSet Then
+                            'If Not TypeOf var(v) Is Group Then
+                            'GoTo assignvalue3
+                            'Else
+                            If var(v).HasSet Then
                                 If bstack.lastobj Is Nothing Then
                                     bstack.soros.PushVal p
                                 Else
@@ -38789,6 +38791,7 @@ comehere:
                ' Set var(i) = New Group
                 'UnFloatGroupReWriteVars bstack, what$, i, myobject
                UnFloatGroup bstack, what$, i, myobject, here$ = ""
+                var(i).IamRef = Len(bstack.UseGroupname) > 0
             ElseIf Typename$(myobject) = "mEvent" Then
                 Set var(i) = myobject
             ElseIf Typename$(myobject) = "lambda" Then
@@ -47264,9 +47267,9 @@ Dim p As Double, mm As MemBlock, w2 As Long
         
     End If
 End Function
-Sub MouseShow(yes As Boolean)
+Sub MouseShow(Yes As Boolean)
 Dim k As Long, b1 As Boolean
-If yes Then
+If Yes Then
 k = ShowCursor(True)
 k1 = k = -1
 If k < 0 Then
