@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 1
+Global Const Revision = 2
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -33706,7 +33706,18 @@ Set ParentStack = basestack.Parent
                         ps.DataOptional
             ElseIf FastSymbol(rest$, "!") Then
                 If IsExp(ParentStack, rest$, p) Then
+                If ParentStack.lastobj Is Nothing Then
                 ps.DataValLong p
+                ElseIf TypeOf ParentStack.lastobj Is mHandler Then
+                    ps.MergeBottom ParentStack.lastobj.objref
+                    Set ParentStack.lastobj = Nothing
+                Else
+                    PushParamGeneralV7 = False
+                    MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο Σωρό μετά το !"
+                    Set ParentStack.lastobj = Nothing
+                    Exit Function
+                End If
+                
                 End If
                 ElseIf IsExp(ParentStack, rest$, p) Then
         If Not ParentStack.lastobj Is Nothing Then
@@ -33763,15 +33774,24 @@ PushParamGeneral = True
 Dim ps As mStiva, p As Double, s$
     Set ps = New mStiva
     
-        
-
-    
                 Do
         If FastSymbol(rest$, "?") Then
                         ps.DataOptional
             ElseIf FastSymbol(rest$, "!") Then
                 If IsExp(basestack, rest$, p) Then
-                ps.DataValLong p
+                If basestack.lastobj Is Nothing Then
+                   ps.DataValLong p
+                ElseIf TypeOf basestack.lastobj Is mHandler Then
+                    If TypeOf basestack.lastobj.objref Is mStiva Then
+                        ps.MergeBottom basestack.lastobj.objref
+                        Else
+                            PushParamGeneral = False
+                            MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο Σωρό μετά το !"
+                            Set basestack.lastobj = Nothing
+                            Exit Function
+                    End If
+                Set basestack.lastobj = Nothing
+                End If
                 End If
                 ElseIf IsExp(basestack, rest$, p) Then
         If Not basestack.lastobj Is Nothing Then
@@ -39203,7 +39223,19 @@ MyData = True
 Do
        If FastSymbol(rest$, "!") Then
                 If IsExp(bstack, rest$, p) Then
-                 bstack.soros.DataValLong p
+                 If bstack.lastobj Is Nothing Then
+                   bstack.soros.DataValLong p
+                ElseIf TypeOf bstack.lastobj Is mHandler Then
+                    If TypeOf bstack.lastobj.objref Is mStiva Then
+                        bstack.soros.MergeBottom bstack.lastobj.objref
+                        Else
+                            MyData = False
+                            MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο Σωρό μετά το !"
+                            Set bstack.lastobj = Nothing
+                            Exit Function
+                    End If
+                Set bstack.lastobj = Nothing
+                End If
                 End If
                 ElseIf IsExp(bstack, rest$, p) Then
                   If bstack.lastobj Is Nothing Then
