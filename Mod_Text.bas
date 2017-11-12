@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -20708,7 +20708,7 @@ If MaybeIsSymbol(b$, "/*-+=~^&|<>") Then
         End If
         ' do something here
         ElseIf varhash.Find(here$ & "." & myUcase(w$), v) Then
-        If TypeOf var(v) Is Group Then w$ = varhash.lastkey
+    '   If TypeOf var(v) Is Group Then w$ = varhash.lastkey
         ' CHECK VAR
 fromThis:            If FastOperator(b$, "=", i) Then
 
@@ -20732,8 +20732,7 @@ checkobject:
                         Set myobject = bstack.lastobj
                             If TypeOf bstack.lastobj Is Group Then ' oh is a group
                                 Set bstack.lastobj = Nothing
-                                
-                                UnFloatGroup bstack, w$, v, myobject, VarStat  ' global??
+                                 UnFloatGroup bstack, w$, v, myobject, VarStat  ' global??
                                 Set myobject = Nothing
                             ElseIf CheckIsmArray(myobject, var()) Then
                                     Set var(v) = New mHandler
