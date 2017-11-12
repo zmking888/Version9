@@ -306,3 +306,17 @@ Public Property Let edittag(ByVal vNewValue As String)
 If Not mTeam Then mTag = vNewValue
 End Property
 
+Public Sub ResetGroup()
+Set SuperClassList = Nothing
+If IamFloatGroup Then EndFloat
+Set LinkToGroup = Nothing
+Set OwnSoros = New mStiva
+HasValue = False
+HasSet = fasle
+HasStrValue = False
+HasParameters = False
+IamSuperClass = False
+FuncRef = ""
+LocalRef = ""
+VarRef = ""
+End Sub

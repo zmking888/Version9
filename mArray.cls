@@ -764,6 +764,7 @@ If Not MyIsObject(item) Then
         actualdata(curitem).Value = item
     Else
         Set actualdata(curitem) = Nothing
+        actualdata(curitem) = CLng(0)
     End If
 Else
 actualdata(curitem).Value = item

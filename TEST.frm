@@ -507,7 +507,17 @@ vHelp
 End If
 Else
 If index = 0 Then
+Dim aa As Long
+If subHash.Find(s$, aa) Then
+
+sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+vHelp Not Form4.Visible
+ElseIf subHash.Find(subHash.LastKnown, aa) Then
+sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+vHelp Not Form4.Visible
+Else
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
+    End If
 Else
 Select Case Left$(LTrim(Label(2)) + " ", 1)
 Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
