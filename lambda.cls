@@ -20,7 +20,7 @@ Private Type Vars
     there As Long
 End Type
 Private Total As Long, fixed As Long, used As Long
-Private myVar() As Vars, myHash As New Hash
+Private myVar() As Vars, myHash As New Hash, refcount As Long
 Public subs As FastCollection
 Sub CopyToVar(bstack As basetask, glb As Boolean, v() As Variant)
 Dim i As Long, nm$, where As Long, dummy As Variant, x1 As Long
@@ -29,6 +29,8 @@ bstack.IamLambda = True
 If used > 0 Then
 For i = 0 To used - 1
     myHash.ReadVar i, nm$, where
+    If refcount = 0 Then
+    
     If IsObject(myVar(where).Value) Then
     dummy = 0
     myVar(where).there = GlobalVar(nm$, dummy, , glb)
@@ -54,13 +56,45 @@ For i = 0 To used - 1
     Else
     myVar(where).there = GlobalVar(nm$, myVar(where).Value, , glb)
     End If
+    Else
+    
+    Dim there As Long
+    there = myVar(where).there
+     If IsObject(myVar(where).Value) Then
+        
+        
+           If Typename(myVar(where).Value) = "lambda" Then
+             GlobalVar nm$, there, True, glb
+                        If glb Then
+                        GlobalSub nm$ + "()", "CALL EXTERN " & Str(myVar(where).there)
+                    Else
+                        GlobalSub here$ & "." & bstack.GroupName & nm$ + "()", "CALL EXTERN " & Str(there)
+                End If
+          ElseIf Typename(myVar(where).Value) = "Group" Then
+          'If glb Then
+          LinkGroup bstack, nm$, v(i)
+          'Else
+          'LinkGroup bstack, here$ & "." & bstack.GroupName & nm$, v(i)
+          'End If
+          Else
+          GlobalVar nm$, there, True, glb
+          End If
+Else
+          GlobalVar nm$, there, True, glb
+    End If
+    End If
+    
+    
 Next i
 End If
+refcount = refcount + 1
 End Sub
 
 Sub CopyFromVar(bstack As basetask, v() As Variant)
 Dim i As Long, aa As Group
 bstack.IamLambda = False
+refcount = refcount - 1
+If refcount = 0 Then
 For i = 0 To used - 1
     If IsObject(v(myVar(i).there)) Then
         If Typename(myVar(where).Value) = "Group" Then
@@ -79,6 +113,7 @@ For i = 0 To used - 1
     End If
     myVar(i).there = 0
 Next i
+End If
 
 End Sub
 
@@ -107,6 +142,7 @@ End Sub
 Private Sub Class_Initialize()
 Total = 10
 ReDim myVar(Total) As Vars
+
 End Sub
 Private Function GetFree() As Long
     If used >= Total Then
