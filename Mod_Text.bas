@@ -14,6 +14,7 @@ Attribute VB_Name = "Module1"
 'limitations under the License.
 
 Option Explicit
+Const thislabel$ = "[!" + vbCr + "'\]"
 Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
 Public LastUse As Long
@@ -72,7 +73,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4786,6 +4787,40 @@ If FastSymbol(aa$, "(") Then
     IsExpA = False
     Exit Function
  End If
+ElseIf FastSymbol(aa$, "<=>", , 3) Then
+'  good
+  MUL = 3
+If FastSymbol(aa$, "(") Then
+    If IsExp(bstack, aa$, r) Then
+    Select Case ac + po
+    Case Is < r
+    po = -1
+    Case Is = r
+    po = 0
+    Case Else
+    po = 1
+    End Select
+     ac = 0
+        If Not FastSymbol(aa$, ")") Then
+        IsExpA = False: Exit Function
+        End If
+   Else
+   IsExpA = False: Exit Function
+        End If
+  ElseIf IsExp(bstack, aa$, r, False) Then
+    Select Case ac + po
+    Case Is < r
+    po = -1
+    Case Is = r
+    po = 0
+    Case Else
+    po = 1
+    End Select
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
  
 ElseIf FastSymbol(aa$, "<=", , 2) Then
 '  good
@@ -6517,8 +6552,12 @@ Case 5
 'On Error Resume Next
 If Not funid.Find(v$, w1) Then GoTo LOOKFORSUBNUM
 'Select Case v$
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99
 IsNumber = False
+Exit Function
+fun99: ' case "IF(","ΑΝ("
+IsNumber = False
+If IsExp(bstack, a$, p) Then IsNumber = ProcessIf(p, bstack, a$, r)
 Exit Function
 fun97: 'Case "READY(", "ΕΤΟΙΜΟ("
 IsNumber = False
@@ -13605,7 +13644,11 @@ Case 6
     IsStr1 = False
 If Not strfunid.Find(q$, w2) Then GoTo itisarrayorfunction
 
-On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63, fstr64, fstr65
+On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63, fstr64, fstr65, fstr66
+fstr66: '"IF$(","ΑΝ("
+IsStr1 = False
+If IsExp(bstackstr, a$, p) Then IsStr1 = ProcessIfStr(p, bstackstr, a$, r$)
+Exit Function
 fstr1: '"FORMAT$(", "ΜΟΡΦΗ$("
     r$ = enthesi(bstackstr, a$)
     IsStr1 = FastSymbol(a$, ")", True)
@@ -15982,7 +16025,8 @@ If j - i >= k - 1 Then
     Exit Function
     End If
 End If
-If j - i >= Len(d$) - 1 Then
+'If j - i >= Len(d$) - 1 Then
+If j - i >= l - 1 Then
     If InStr(d$, Mid$(a$, i, l)) > 0 Then
     a$ = Mid$(a$, MyTrimLi(a$, i + l))
     Fast2Symbol = True
@@ -20208,6 +20252,9 @@ End If
             Wend
             If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", lang) Then GoTo contElseIf
             If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", lang) Then GoTo ContElse
+            If MaybeIsSymbol(b$, "0123456789") Then
+                        GoTo ContGoto
+            End If
             End If
         Else
         ' error
@@ -25354,9 +25401,11 @@ If Left$(b$, Len(w$)) = w$ Then
 Else
 i = InStr(b$, Chr(10) + w$)
 If i = 0 Then
-
+Dim w1$, w2$
+w1$ = " " & w$
+w2$ = "0" & w$
     Do
-    i = InStr(i + 1, b$, " " & w$)
+    i = InStr(i + 1, b$, w1$)
     If i = 0 Then Exit Do
     j = Len(RTrim(Left$(b$, i)))
     If j = 0 Then Exit Do
@@ -25364,7 +25413,7 @@ If i = 0 Then
     Loop
     If i = 0 Then
     Do
-    i = InStr(i + 1, b$, "0" & w$)
+    i = InStr(i + 1, b$, w2$)
     If i = 0 Then Exit Do
 
     j = Len(RTrim(Left$(b$, i)))
@@ -25379,9 +25428,18 @@ If i = 0 Then
     End If
 End If
 
+
 End If
 If jmp Then
+
+If i > 0 Then
+While Mid$(b$, MyTrimLi(b$, i + Len(w$) + 1), 1) Like thislabel$ And i > 0
+    i = InStr(i + Len(w$) + 1, b$, Chr(10) + w$)
+Wend
 If i > 0 Then PosLabel = i + 1
+
+End If
+
 Else
 If i > 1 Then PosLabel = i + 1 '' Else PosLabel = 1
 End If
@@ -25437,6 +25495,23 @@ ElseIf FastSymbol(s$, "<>", , 2) Then
     d = b$ <> s2$
     Exit Function
         Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "<=>", , 3) Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    Select Case b$
+    Case Is < s2$
+    d = -1
+    Case Is = s2$
+    d = 0
+    Case Else
+    d = 1
+    End Select
+    Exit Function
+            Else
     If LastErNum = -2 Then logical = True
     Exit Function
     End If
@@ -25509,6 +25584,16 @@ ElseIf FastSymbol(s$, "<>", , 2) Then
     d = CompareStr2(b$, s2$) <> 0
     Exit Function
         Else
+    If LastErNum = -2 Then logical = True
+    Exit Function
+    End If
+ElseIf FastSymbol(s$, "<=>", , 3) Then
+    logical = False
+    If IsStrExp(basestack, s$, s2$) Then
+    logical = True
+    d = CompareStr2(b$, s2$)
+    Exit Function
+            Else
     If LastErNum = -2 Then logical = True
     Exit Function
     End If
@@ -48677,3 +48762,83 @@ Debug.Print aheadstatus(aa$, False, p1234)
 Debug.Print Mid$(aa$, 1, p1234)
 Debug.Print p1234
 End Sub
+Function ProcessIf(flag As Double, bstack As basetask, rest$, r As Double) As Boolean
+
+Dim mode As Boolean
+mode = flag < 1
+If bstack.lastobj Is Nothing Then
+flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
+Else
+flag = 1
+End If
+Dim nowpos As Double, w1 As Long, s$
+nowpos = 1
+ProcessIf = True
+ If Not FastSymbol(rest$, "->", True, 2) Then Exit Function
+Do
+    If flag = nowpos Then
+        If MaybeIsSymbol(rest$, ",)") Then
+            If mode Then
+            r = flag = 1
+            Else
+            r = 0
+            End If
+        Else
+            If Not IsExp(bstack, rest$, r) Then
+                MissNumExpr
+                ProcessIf = False
+                Exit Function
+            End If
+        End If
+        ProcessIf = True
+    Else
+        If Not MaybeIsSymbol(rest$, ",)") Then
+        w1 = 1
+        s$ = aheadstatus(rest$, True, w1)
+        If s$ = "" Then Exit Do
+        Mid$(rest$, 1, w1 - 1) = Space$(w1 - 1)
+        End If
+    End If
+    If Not FastSymbol(rest$, ",") Then Exit Do
+    nowpos = nowpos + 1
+    If mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
+Loop
+If nowpos = 1 Then MyEr "Need two expressions", "Χρειάζομαι δυο εκφράσεις"
+If Not FastSymbol(rest$, ")") Then ProcessIf = False
+End Function
+Function ProcessIfStr(flag As Double, bstack As basetask, rest$, ss As String) As Boolean
+Dim mode As Boolean
+mode = flag < 1
+flag = Int(Abs(flag > 0) * (flag - 1) - (flag <= 0) * (flag + 1) + 1)
+Dim nowpos As Double, w1 As Long, s$
+nowpos = 1
+ProcessIfStr = True
+ If Not FastSymbol(rest$, "->", True, 2) Then Exit Function
+Do
+    If flag = nowpos Then
+        If MaybeIsSymbol(rest$, ",)") Then
+            ss = ""
+        Else
+            If Not IsStrExp(bstack, rest$, ss) Then
+                MissStringExpr
+                ProcessIfStr = False
+                Exit Function
+            End If
+        End If
+        ProcessIfStr = True
+    Else
+        If Not MaybeIsSymbol(rest$, ",)") Then
+        w1 = 1
+        s$ = aheadstatus(rest$, True, w1)
+        If s$ = "" Then Exit Do
+        Mid$(rest$, 1, w1 - 1) = Space$(w1 - 1)
+        End If
+    End If
+    If Not FastSymbol(rest$, ",") Then Exit Do
+    nowpos = nowpos + 1
+    If mode Then If nowpos > 2 Then MyEr "To many expressions", "Πολλές εκφράσεις"
+Loop
+If nowpos = 1 Then MyEr "Need two xpressions", "Χρειάζομαι δυο εκφράσεις"
+If Not FastSymbol(rest$, ")") Then ProcessIfStr = False
+End Function
+
