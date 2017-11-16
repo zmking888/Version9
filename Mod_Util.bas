@@ -6710,6 +6710,9 @@ End Sub
 Public Sub NotAfter(a$)
 MyErMacro a$, "not an expression after not", "δεν υπάρχει παράσταση δεξιά τού όχι"
 End Sub
+Public Sub EmptyArray()
+MyEr "Empty Array", "Άδειος Πίνακας"
+End Sub
 Public Sub EmptyStack(a$)
  MyErMacro a$, "Stack is empty", "O σωρός είναι άδειος"
 End Sub

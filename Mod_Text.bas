@@ -73,7 +73,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 7
+Global Const Revision = 8
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5656,13 +5656,16 @@ If sng& > 1 Then Mid$(a$, 1, sng& - 1) = Space$(sng& - 1)
 'A$ = Mid$(A$, sng&)
 w2 = Len(a$)
 sng& = 1
-If Len(a$) < 257 Then
-V1& = IsLabelBig(bstack, a$, v$, par, s1$, True)
+If Len(a$) < 129 Then
+    V1& = IsLabelBig(bstack, a$, v$, par, s1$, True)
 Else
-n$ = Space$(256)
-    Mid$(n$, 1, 256) = Left$(a$, 256)
-V1& = IsLabelBig(bstack, n$, v$, par, s1$, True)
- a$ = n$ + Mid$(a$, 257)
+    n$ = Left$(a$, 128)
+    V1& = IsLabelBig(bstack, n$, v$, par, s1$, True)
+    If Len(n$) = 0 Then
+        V1& = IsLabelBig(bstack, a$, v$, par, s1$, True)
+    Else
+        a$ = Mid$(a$, 129 - Len(n$))
+    End If
 End If
 
 
@@ -7116,7 +7119,7 @@ check123678:
                     End If
                 Else
                     
-                    MyEr "Empty Array", "Άδειος Πίνακας"
+                    EmptyArray
                 End If
             Else
                  Set bstack.lastobj = Nothing
@@ -7158,7 +7161,9 @@ check123678:
                         Set bstack.lastobj = anything.ExportArray(anything.Count)
                         
                     End If
+                    Set anything = Nothing
                     IsNumber = FastSymbol(a$, ")", True)
+                    Exit Function
                 Else
                      Set bstack.lastobj = Nothing
                     NotArray
@@ -11008,7 +11013,9 @@ a$ = NLtrim$(a$)
              nocommand = True
             rr& = 1 'is an identifier or floating point variable
             Else
-            If dot& > 0 Then a$ = "." + a$: dot& = 0
+            If dot& > 0 Then
+            a$ = "." + a$: dot& = 0
+            End If
             
             Exit Do
             End If
@@ -12469,6 +12476,9 @@ LB = 1
         Else
         mb = LB
         End If
+        Case "$", "(", "%"
+            IsLabelSYMB3 = 0
+            Exit Function
         Case "."
          If LB > mb Then
             rr& = 1
@@ -13081,13 +13091,16 @@ Dim anything As Object
 Set bstackstr.lastobj = Nothing
 w2 = Len(a$)
 Dim n$
-If Len(a$) < 257 Then
+If Len(a$) < 129 Then
 w1& = IsLabelBig(bstackstr, a$, q$, par)
 Else
-n$ = Space$(256)
-    Mid$(n$, 1, 256) = Left$(a$, 256)
-w1& = IsLabelBig(bstackstr, n$, q$, par)
- a$ = n$ + Mid$(a$, 257)
+    n$ = Left$(a$, 128)
+    w1& = IsLabelBig(bstackstr, n$, q$, par)
+     If Len(n$) > 0 Then
+        a$ = Mid$(a$, 129 - Len(n$))
+    Else
+        w1& = IsLabelBig(bstackstr, a$, q$, par)
+    End If
 End If
 ''''''''If NoOptimum Then If w1& > 0 Then par = False
 If w1& <= 0 Or par Then
@@ -13644,7 +13657,60 @@ Case 6
     IsStr1 = False
 If Not strfunid.Find(q$, w2) Then GoTo itisarrayorfunction
 
-On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63, fstr64, fstr65, fstr66
+On w2 GoTo fstr1, fstr2, fstr3, fstr4, fstr5, fstr6, fstr7, fstr8, fstr9, fstr10, fstr11, fstr12, fstr13, fstr14, fstr15, fstr16, fstr17, fstr18, fstr19, fstr20, fstr21, fstr22, fstr23, fstr24, fstr25, fstr26, fstr27, fstr28, fstr29, fstr30, fstr31, fstr32, fstr33, fstr34, fstr35, fstr36, fstr37, fstr38, fstr39, fstr40, fstr41, fstr42, fstr43, fstr44, fstr45, fstr46, fstr47, fstr48, fstr49, fstr50, fstr51, fstr52, fstr53, fstr54, fstr55, fstr56, fstr57, fstr58, fstr59, fstr60, fstr61, fstr62, fstr63, fstr64, fstr65, fstr66, fstr67
+fstr67: '"ΜΕΡΟΣ$(", "PIECE$("
+If IsStrExp(bstackstr, a$, q$) Then
+    If FastSymbol(a$, ",") Then
+        If IsStrExp(bstackstr, a$, r$) Then
+            If FastSymbol(a$, ",") Then
+                If IsExp(bstackstr, a$, p) Then
+                    p = Abs(p)
+                    Set anything = GETarrayFROMstr(q$, r$)
+                    Set pppp = anything.objref
+                    r$ = pppp.item(CLng(p - 1))
+                    Set pppp = Nothing
+                Else
+                    MissNumExpr
+                    Set anything = Nothing
+                    Exit Function
+                End If
+            Else
+            Set anything = GETarrayFROMstr(q$, r$)
+            
+            
+            If FastSymbol(a$, ")(", , 2) Then
+                If IsExp(bstackstr, a$, p) Then
+                    p = Abs(p)
+                    Set pppp = anything.objref
+                    r$ = pppp.item(CLng(p))
+                    Set pppp = Nothing
+                Else
+                    Set bstackstr.lastobj = anything
+                    Set anything = Nothing
+                End If
+            Else
+                Set bstackstr.lastobj = anything
+                Set anything = Nothing
+                
+                
+            r$ = ""
+            End If
+            ' RETURN ARRAY
+            End If
+        Else
+            MissStringExpr
+            Exit Function
+        End If
+    Else
+        MissPar
+        Exit Function
+    End If
+Else
+    MissStringExpr
+    Exit Function
+End If
+    IsStr1 = FastSymbol(a$, ")", True)
+    Exit Function
 fstr66: '"IF$(","ΑΝ("
 IsStr1 = False
 If IsExp(bstackstr, a$, p) Then IsStr1 = ProcessIfStr(p, bstackstr, a$, r$)
@@ -14471,7 +14537,7 @@ check1236789:
             Set bstackstr.lastobj = Nothing
         End If
     ElseIf IsExp(bstackstr, a$, p) Then
-If Not bstackstr.lastobj Is Nothing Then
+        If Not bstackstr.lastobj Is Nothing Then
             If TypeOf bstackstr.lastobj Is mHandler Then
                 If bstackstr.lastobj.indirect >= 0 Then
                     Set pppp = var(bstackstr.lastobj.indirect)
@@ -14479,6 +14545,22 @@ If Not bstackstr.lastobj Is Nothing Then
                 ElseIf TypeOf bstackstr.lastobj.objref Is mArray Then
                     Set pppp = bstackstr.lastobj.objref
                     GoTo check1236789
+                ElseIf TypeOf bstackstr.lastobj.objref Is mStiva Then
+                Set anything = bstackstr.lastobj.objref
+                Set bstackstr.lastobj = Nothing
+                    If FastSymbol(a$, ",") Then
+                    If IsExp(bstackstr, a$, p) Then
+                    Set bstackstr.lastobj = anything.ExportArray(CLng(MyRound(p)))
+                    
+                    End If
+                    Else
+                        Set bstackstr.lastobj = anything.ExportArray(anything.Count)
+                        
+                    End If
+                    Set anything = Nothing
+                    IsStr1 = FastSymbol(a$, ")", True)
+                    
+                    Exit Function
                 Else
                  Set bstackstr.lastobj = Nothing
                 NotArray
@@ -18372,7 +18454,7 @@ ElseIf NocharsInLine(b$) Then
 SetNextLine b$
 If b$ <> "" Then GoTo AGAIN1
 Else
-MyEr "Place a comma before", "Βάλε ένα κόμα πριν"
+MyEr "Place a comma before", "Βάλε ένα κόμμα πριν"
 Execute = 0
 Exit Function
 End If
@@ -22239,7 +22321,11 @@ ElseIf FastSymbol(b$, ")") Then
         If FastSymbol(b$, "=") Then
             If IsStrExp(bstack, b$, w$) Then
                 If Not bstack.lastobj Is Nothing Then
+                    If TypeOf bstack.lastobj Is mHandler Then
+                    bstack.lastobj.objref.CopyArray pppp
+                    Else
                     bstack.lastobj.CopyArray pppp
+                    End If
                     Set bstack.lastobj = Nothing
                     GoTo loopcontinue
                 End If
@@ -23097,12 +23183,107 @@ End Sub
 Function RepPara(basestack As basetask, rest$) As Boolean
 Dim x1 As Long, y1 As Long, i As Long, j As Long
 Dim x As Double, y As Double, ss$, s$, what$
-Dim pppp As mArray
+Dim pppp As mArray, aa() As String, p As Double
 RepPara = True
         If Not IsExp(basestack, rest$, y) Then
-            MissNumExpr
-            RepPara = False
+            ' new mode
+            x1 = Abs(IsLabel(basestack, rest$, what$))
+            If x1 = 3 Then
+                    If GetVar(basestack, what$, i) Then
+                        If FastSymbol(rest$, ",") Then
+                            If IsStrExp(basestack, rest$, ss$) Then
+                                  aa = Split(var(i), ss$)
+                                    Do While FastSymbol(rest$, ",")
+                                        RepPara = True
+                                        If IsExp(basestack, rest$, p) Then
+                                            p = Abs(p)
+                                            If FastSymbol(rest$, ":=", , 2) Then
+                                                If IsStrExp(basestack, rest$, s$) Then
+                                                ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
+                                                    If UBound(aa) < p Then
+                                                        ReDim Preserve aa(p)
+                                                        aa(p) = s$
+                                                        Else
+                                                        aa(p) = s$
+                                                        
+                                                    End If
+                                                
+                                                Else
+                                                     RepPara = False
+                                                End If
+                                            Else
+                                                RepPara = False
+                                            End If
+                                        Else
+                                            RepPara = False
+                                            Exit Do
+                                        End If
+                                    Loop
+                                If IsObject(var(i)) Then
+                                var(i).EmptyDoc
+                                var(i).textDoc = Join(aa, ss$)
+                                Else
+                                var(i) = Join(aa, ss$)
+                                End If
+                                Else
+                                MissStringExpr
+                            End If
+                        Else
+                        MissPar
+                        End If
+                    End If
+            ElseIf x1 = 6 Then
+                    If neoGetArray(basestack, what$, pppp) Then
+                        If Not NeoGetArrayItem(pppp, basestack, what$, i, rest$) Then RepPara = False: Exit Function
+                        If FastSymbol(rest$, ",") Then
+                            If IsStrExp(basestack, rest$, ss$) Then
+                                  aa = Split(pppp.item(i), ss$)
+                                    Do While FastSymbol(rest$, ",")
+                                        RepPara = True
+                                        If IsExp(basestack, rest$, p) Then
+                                            p = Abs(p)
+                                            If FastSymbol(rest$, ":=", , 2) Then
+                                                If IsStrExp(basestack, rest$, s$) Then
+                                                ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
+                                                    If UBound(aa) < p Then
+                                                        ReDim Preserve aa(p)
+                                                        aa(p) = s$
+                                                        Else
+                                                        aa(p) = s$
+                                                        
+                                                    End If
+                                                
+                                                Else
+                                                     RepPara = False
+                                                End If
+                                            Else
+                                                RepPara = False
+                                            End If
+                                        Else
+                                            RepPara = False
+                                            Exit Do
+                                        End If
+                                    Loop
+                                If IsObject(pppp.item(i)) Then
+                                    pppp.item(i).EmptyDoc
+                                    pppp.item(i).textDoc = Join(aa, ss$)
+                                Else
+                                    pppp.item(i) = Join(aa, ss$)
+                                End If
+                                Else
+                                MissStringExpr
+                            End If
+                        Else
+                        MissPar
+                        End If
+                        
+                    End If
+            Else
+                MyEr "Need a string/document as variable/array item or a numeric expression, look help", "Χρειάζομαι αλφαριθμητικό ή έγγραφο σε μεταβλητή ή σε στοιχείο πίνακα ή μια έκφραση αριθμητική, δες βοήθεια"
+                RepPara = False
+            End If
             Exit Function
+            
         Else
          If FastSymbol(rest$, ",") Then
                     If IsExp(basestack, rest$, x) Then
@@ -42839,8 +43020,9 @@ End If
 Wend
 RTarget bstack, q(p)
 End If
-End If
 ProcCHANGE = True
+End If
+
 End Function
 Function ProcSaveAs(bstack As basetask, rest$, lang As Long) As Boolean
 Dim scr As Object, frm$, pa$, s$, ss$, w$
@@ -48841,4 +49023,22 @@ Loop
 If nowpos = 1 Then MyEr "Need two xpressions", "Χρειάζομαι δυο εκφράσεις"
 If Not FastSymbol(rest$, ")") Then ProcessIfStr = False
 End Function
+Function GETarrayFROMstr(a$, b$) As mHandler
+Dim pppp As mArray, aa() As String
+aa = Split(a$, b$)
+Set pppp = New mArray
+If UBound(aa) = -1 Then
 
+Else
+Dim i As Long
+pppp.PushDim UBound(aa) + 1
+pppp.PushEnd
+For i = 0 To UBound(aa)
+pppp.item(i) = aa(i)
+Next i
+End If
+Set GETarrayFROMstr = New mHandler
+GETarrayFROMstr.t1 = 3
+Set GETarrayFROMstr.objref = pppp
+
+End Function
