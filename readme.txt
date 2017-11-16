@@ -1,7 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 8 active-X
-Setup file build 2. newer help file
+Version 9.0 revision 9 active-X
 
 http://georgekarras.blogspot.gr/
 

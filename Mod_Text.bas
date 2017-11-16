@@ -73,7 +73,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2936,6 +2936,14 @@ RetStackSize = bstack.RetStackTotal
         v = 0
         w$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
         If GetVar(bstack, w$, y1) Then
+        If TypeOf var(y1) Is Group Then
+        If Not var(y1).SuperClassList Is Nothing Then
+                Set pppp.item(v) = var(y1).SuperClassList
+                subspoint = True
+        GoTo CONT104010
+        End If
+        End If
+        ElseIf GetVar(bstack, bstack.OriginalName + "." + w$, y1) Then
         If TypeOf var(y1) Is Group Then
         If Not var(y1).SuperClassList Is Nothing Then
                 Set pppp.item(v) = var(y1).SuperClassList
