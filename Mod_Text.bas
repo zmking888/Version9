@@ -14,6 +14,7 @@ Attribute VB_Name = "Module1"
 'limitations under the License.
 
 Option Explicit
+Const a123 = "={"
 Const thislabel$ = "[!" + vbCr + "'\]"
 Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
@@ -73,7 +74,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 10
+Global Const Revision = 11
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2935,6 +2936,17 @@ RetStackSize = bstack.RetStackTotal
         Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
         v = 0
         w$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
+      If Right$(here$, 2) = "()" Then
+            If GetVar(bstack, bstack.Parent.OriginalName + "." + w$, y1) Then
+                If TypeOf var(y1) Is Group Then
+                    If Not var(y1).SuperClassList Is Nothing Then
+                            Set pppp.item(v) = var(y1).SuperClassList
+                            subspoint = True
+                            GoTo CONT104010
+                    End If
+                End If
+            End If
+        End If
         If GetVar(bstack, w$, y1) Then
         If TypeOf var(y1) Is Group Then
         If Not var(y1).SuperClassList Is Nothing Then
@@ -18285,87 +18297,94 @@ End If
 End If
 AGAIN1:
 LLL = Len(b$)
-If MaybeIsSymbol(b$, "=") Then
-b$ = Mid$(Trim$(b$), 2)
-If (InStr(bstack.OriginalName$, "(") > 1) Then   ' return from a function no error checking
-x1 = 0
-Do
-    If IsExp(bstack, b$, p) Then
-    If x1 = 0 Then If MaybeIsSymbol(b$, ",") Then x1 = 1: Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd
-    If x1 = 0 Then
-            If Len(bstack.OriginalName$) > 3 Then
-                    If Mid$(bstack.OriginalName$, Len(bstack.OriginalName$) - 2, 1) = "$" Then
-                        MissStringExpr
-                        Exit Do
-                    End If
-                End If
-             If Right$(bstack.OriginalName$, 3) = "%()" Then p = MyRound(p)
-             Set bstack.FuncObj = bstack.lastobj
-             Set bstack.lastobj = Nothing
-             bstack.FuncValue = p
-    Else
-            pppp.SerialItem 0, x1, 9
-            If bstack.lastobj Is Nothing Then
-                pppp.item(x1 - 1) = p
-            Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-                Set pppp.item(x1 - 1) = bstack.lastobj
-                Set bstack.lastobj = Nothing
-            End If
-            bstack.FuncValue = p
-            x1 = x1 + 1
-                         
-    End If
-    ElseIf IsStrExp(bstack, b$, ss$) Then
+i = 0
+If MaybeIsSymbol2(b$, a123, i) Then
+'If MaybeIsSymbol(b$, "={") Then
+'If MaybeIsSymbol(b$, "=") Then
+If Mid$(b$, i, 1) = "=" Then
+    'b$ = Mid$(NLtrim$(b$), 2)
+    b$ = Mid$(b$, MyTrimLi(b$, i + 1))
+    If (InStr(bstack.OriginalName$, "(") > 1) Then   ' return from a function no error checking
+    x1 = 0
+    Do
+        If IsExp(bstack, b$, p) Then
         If x1 = 0 Then If MaybeIsSymbol(b$, ",") Then x1 = 1: Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd
         If x1 = 0 Then
-            If Len(bstack.OriginalName$) > 3 Then
-                If Mid$(bstack.OriginalName$, Len(bstack.OriginalName$) - 2, 1) <> "$" Then
-                     MissNumExpr
-                     Execute = False
-                     Exit Function
-                End If
-            Else
-                MissNumExpr
-                Execute = 0
-                Exit Function
-            End If
-            Set bstack.FuncObj = bstack.lastobj
-            Set bstack.lastobj = Nothing
-            bstack.FuncValue = ss$
+                If Len(bstack.OriginalName$) > 3 Then
+                        If Mid$(bstack.OriginalName$, Len(bstack.OriginalName$) - 2, 1) = "$" Then
+                            MissStringExpr
+                            Exit Do
+                        End If
+                    End If
+                 If Right$(bstack.OriginalName$, 3) = "%()" Then p = MyRound(p)
+                 Set bstack.FuncObj = bstack.lastobj
+                 Set bstack.lastobj = Nothing
+                 bstack.FuncValue = p
         Else
-            pppp.SerialItem 0, x1, 9
-            If bstack.lastobj Is Nothing Then
-                pppp.item(x1 - 1) = ss$
-            Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-                Set pppp.item(x1 - 1) = bstack.lastobj
-                Set bstack.lastobj = Nothing
-            End If
-            x1 = x1 + 1
-            bstack.FuncValue = ss$
-                        
+                pppp.SerialItem 0, x1, 9
+                If bstack.lastobj Is Nothing Then
+                    pppp.item(x1 - 1) = p
+                Else
+                    If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
+                    Set pppp.item(x1 - 1) = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                End If
+                bstack.FuncValue = p
+                x1 = x1 + 1
+                             
         End If
+        ElseIf IsStrExp(bstack, b$, ss$) Then
+            If x1 = 0 Then If MaybeIsSymbol(b$, ",") Then x1 = 1: Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd
+            If x1 = 0 Then
+                If Len(bstack.OriginalName$) > 3 Then
+                    If Mid$(bstack.OriginalName$, Len(bstack.OriginalName$) - 2, 1) <> "$" Then
+                         MissNumExpr
+                         Execute = False
+                         Exit Function
+                    End If
+                Else
+                    MissNumExpr
+                    Execute = 0
+                    Exit Function
+                End If
+                Set bstack.FuncObj = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                bstack.FuncValue = ss$
+            Else
+                pppp.SerialItem 0, x1, 9
+                If bstack.lastobj Is Nothing Then
+                    pppp.item(x1 - 1) = ss$
+                Else
+                    If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
+                    Set pppp.item(x1 - 1) = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                End If
+                x1 = x1 + 1
+                bstack.FuncValue = ss$
+                            
+            End If
+        End If
+        Loop Until Not FastSymbol(b$, ",")
+        If x1 > 0 Then
+         pppp.SerialItem 0, x1, 9
+         Set bstack.FuncObj = pppp
+         Set pppp = New mArray
+         Set bstack.lastobj = Nothing
+         If VarType(bstack.FuncValue) = 5 Then
+         bstack.FuncValue = 0
+         Else
+         bstack.FuncValue = ""
+         End If
+        End If
+        x1 = 0
+        If once Then Exit Function
     End If
-    Loop Until Not FastSymbol(b$, ",")
-    If x1 > 0 Then
-     pppp.SerialItem 0, x1, 9
-     Set bstack.FuncObj = pppp
-     Set pppp = New mArray
-     Set bstack.lastobj = Nothing
-     If VarType(bstack.FuncValue) = 5 Then
-     bstack.FuncValue = 0
-     Else
-     bstack.FuncValue = ""
-     End If
-    End If
-    x1 = 0
-    If once Then Exit Function
-End If
-ElseIf MaybeIsSymbol(b$, "{") Then
-b$ = Mid$(Trim$(b$), 2)
-If MaybeIsSymbol(b$, "}") Then
-b$ = Mid$(Trim$(b$), 2)
+    GoTo AGAIN1
+Else
+b$ = Mid$(b$, MyTrimLi(b$, i + 1))
+i = 0
+If MaybeIsSymbol2(b$, "}", i) Then
+b$ = Mid$(b$, MyTrimLi(b$, i + 1))
 sss = Len(b$)
  GoTo AGAIN1
 ''GoTo loopcontinue
@@ -18393,6 +18412,9 @@ End If
 
     
     End If
+ 
+    End If
+
 contVarNew:
 If MaybeIsSymbol(b$, "\'") Then
     NewStat = False

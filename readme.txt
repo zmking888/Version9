@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 10 active-X
+Version 9.0 revision 11 active-X
 
 http://georgekarras.blogspot.gr/
 
