@@ -74,7 +74,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2937,7 +2937,17 @@ RetStackSize = bstack.RetStackTotal
         v = 0
         w$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
       If Right$(here$, 2) = "()" Then
-            If GetVar(bstack, bstack.Parent.OriginalName + "." + w$, y1) Then
+      If Right$(here$, 3) = ";()" Then
+      If GetVar(bstack, bstack.fHere + "." + w$, y1) Then
+                      If TypeOf var(y1) Is Group Then
+                    If Not var(y1).SuperClassList Is Nothing Then
+                            Set pppp.item(v) = var(y1).SuperClassList
+                            subspoint = True
+                            GoTo CONT104010
+                    End If
+                End If
+      End If
+            ElseIf GetVar(bstack, bstack.Parent.OriginalName + "." + w$, y1) Then
                 If TypeOf var(y1) Is Group Then
                     If Not var(y1).SuperClassList Is Nothing Then
                             Set pppp.item(v) = var(y1).SuperClassList
@@ -6020,10 +6030,11 @@ num44: 'Case "MOUSE", "ƒ≈… ‘«”"
 If Not releasemouse Then
 If Not Form1.Visible Then Form1.Visible = True
 End If
+r = SG * mouse
+If r = 0 Then
 MyDoEvents
-
      r = SG * MOUB
-
+End If
     
 
 
@@ -48181,7 +48192,8 @@ Dim s1$, W3 As Long, v$
      s1$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
      If GetVar(bstack, s1$, W3) Then
           CopyGroup var(W3), bstack
-          
+     ElseIf GetVar(bstack, bstack.fHere + "." + s1$, W3) Then
+          CopyGroup var(W3), bstack
     End If
     Else
     s1$ = ".DELETEME"
