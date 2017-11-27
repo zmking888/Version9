@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -2653,6 +2653,9 @@ MYFONT = defFontname
              DIS.ForeColor = mycolor(PenOne)
              On Error Resume Next
              cc.Value = Form1.FontName
+             cc.ValueKey = "SECURENAMES"
+                cc.ValueType = REG_DWORD
+              SecureNames = cc.Value
              cc.ValueKey = "DIV"
         cc.ValueType = REG_DWORD
         
@@ -2743,11 +2746,14 @@ End If
         cc.ValueType = REG_DWORD
         basestack.myBold = cc.Value <> 0
         Form1.Font.bold = basestack.myBold
+            cc.ValueKey = "SECURENAMES"
+            cc.ValueType = REG_DWORD
+            SecureNames = cc.Value
             cc.ValueKey = "DIV"
-        cc.ValueType = REG_DWORD
+            cc.ValueType = REG_DWORD
         
             UseIntDiv = cc.Value
-    cc.ValueKey = "LINESPACE"
+         cc.ValueKey = "LINESPACE"
         cc.ValueType = REG_DWORD
         If cc.Value >= 0 And cc.Value <= 120 * dv15 Then
   FeedBasket Form1.DIS, players(0), CLng(cc.Value) \ 2

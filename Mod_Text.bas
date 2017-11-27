@@ -59,7 +59,7 @@ Public UseEsc As Boolean
 ' 1 to 32 for layers
 ' 0 for DIS
 Public NowDec$, NowThou$
-Public ForLikeBasic As Boolean, DimLikeBasic As Boolean
+Public ForLikeBasic As Boolean, DimLikeBasic As Boolean, SecureNames As Boolean
 Public priorityOr As Boolean, NoUseDec As Boolean, mNoUseDec As Boolean, UseIntDiv As Boolean
 Public mTextCompare As Boolean
 Public csvsep$, csvDec$, csvuseescape As Boolean
@@ -74,7 +74,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 12
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11621,14 +11621,16 @@ Case Is >= "A"
 End Function
 Function IsLabel(bstack As basetask, a$, rrr$, Optional skipdot As Boolean) As Long
 Dim buf$
-If Len(a$) < 257 Then IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot): Exit Function
+If Len(a$) < 129 Then IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot): Exit Function
 
- 
-    
-    buf$ = Space$(256)
-    Mid$(buf$, 1, 256) = Left$(a$, 256)
+   
+    buf$ = Left$(a$, 128)
     IsLabel = innerIsLabel(bstack, buf$, rrr$, , , skipdot)
-    a$ = buf$ + Mid$(a$, 257)
+    If buf$ = "" Then
+        IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot)
+    Else
+        a$ = Mid$(a$, 129 - Len(buf$))
+    End If
 
     
     
@@ -17266,6 +17268,7 @@ err123456:
                     If mTextCompare Then ss$ = ss$ + " +TXT" Else ss$ = ss$ + " -TXT"
                     If ForLikeBasic Then ss$ = ss$ + " +FOR" Else ss$ = ss$ + " -FOR"
                     If DimLikeBasic Then ss$ = ss$ + " +DIM" Else ss$ = ss$ + " -DIM"
+                    If SecureNames Then ss$ = ss$ + " +SEC" Else ss$ = ss$ + " -SEC"
                     wwPlain bstack, prive, "Switches " + ss$, bstack.Owner.Width, 1000, True
                     wwPlain bstack, prive, "About Switches: use command Help Switches", bstack.Owner.Width, 1000, True
                     
@@ -18510,7 +18513,7 @@ If Left$(w$, 1) = "." Then
  ss$ = w$
 IsLabel bstack, ss$, w$
 End If
-GoTo varonly
+GoTo Varonly
 Case 2
 NoRef
 Execute = 0
@@ -18583,26 +18586,26 @@ If Left$(w$, 1) = "." Then
 IsLabel bstack, ss$, w$
 iscom = True
 lbl = False
-GoTo varonly
+GoTo Varonly
 ElseIf Len(temphere$) > 0 Then
 iscom = True
 lbl = False
 VarStat = True
-GoTo varonly
+GoTo Varonly
 ElseIf Not NoOptimum Then
 contherecom:
       '
       v = 0
     ' If Not comhash.Find(w$, i) Then
 If MaybeIsSymbolNoSpace(b$, "[+-/*~]") Then
-GoTo varonly
+GoTo Varonly
 '
 ElseIf MaybeIsSymbol(b$, "<=") Then
-GoTo varonly
+GoTo Varonly
 ElseIf Not comhash.Find2(w$, i, v) Then
                 iscom = True
                 lbl = False
-                GoTo varonly
+                GoTo Varonly
 
           ElseIf i <> 0 Then
              If Not IsBadCodePtr(i) Then
@@ -18621,7 +18624,7 @@ myerr1:
               GoTo parsecommand
                End If
         ElseIf v <> 0 Then
-                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, varonly
+                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, Varonly
                 Execute = 0: Exit Function
                 
 BypassGlobalComm:
@@ -20645,7 +20648,7 @@ contNegLocal:
                      ss$ = w$
                     IsLabel bstack, ss$, w$
                     End If
-                    GoTo varonly
+                    GoTo Varonly
                     Case 2
                     NoRef
                     Execute = 0
@@ -20680,7 +20683,7 @@ contNegGlobal:
                     w$ = "EVENT"
                     End If
                     sss = Len(b$)
-                    GoTo varonly
+                    GoTo Varonly
                 End If
                 If Not GlobalEVENT(bstack, b$, lang) Then Execute = 0: Exit Function
                 ElseIf IsLabelSymbolNew(b$, "ÊÁÔÁÓÔÁÓÇ", "INVENTORY", lang) Then
@@ -20693,7 +20696,7 @@ contNegGlobal:
                     w$ = "INVENTORY"
                     End If
                     sss = Len(b$)
-                    GoTo varonly
+                    GoTo Varonly
                 End If
                 If IsLabelSymbolNew(b$, "ÏÕÑÁ", "QUEUE", lang) Then
                     If Not GlobalHandler(bstack, b$, lang, 3) Then Execute = 0: Exit Function
@@ -20710,7 +20713,7 @@ contNegGlobal:
                     w$ = "BUFFER"
                     End If
                     sss = Len(b$)
-                    GoTo varonly
+                    GoTo Varonly
                 End If
                 If Not GlobalHandler(bstack, b$, lang, 2) Then Execute = 0: Exit Function
                 Else
@@ -20746,7 +20749,7 @@ CONT12212:
                     End If
                     
                     End If
-                    GoTo varonly
+                    GoTo Varonly
                     Case 2
                     NoRef
                     Execute = 0
@@ -20779,12 +20782,19 @@ If Not NoOptimum Then
 Else
 iscom = False
 End If
-
-varonly:
+Varonly:
+If False Then
 If Len(w$) > 3 Then
     If lang = 1 Then
         If Left$(w$, 4) = "THIS" Then
-            If Len(w$) = 4 Or Mid$(w$, 5, 1) = "." Then
+        If Len(w$) = 4 Or Mid$(w$, 5, 1) = "." Then
+             If bstack.UseGroupname <> "" Then
+                  ss$ = bstack.UseGroupname + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo assignvalue
+                
+                  ss$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo assignvalue
+            Else
             ss$ = ".DELETEME"
             If IsLabel(bstack, ss$, bb$) < 0 Then
                     If Len(bb$) = 8 Then Execute = 0: Exit Function
@@ -20793,6 +20803,7 @@ If Len(w$) > 3 Then
                 If FastOperator(b$, "=", (0)) Then GoTo assignvalue
                 If FastOperator(b$, "<=", i, 2) Then GoTo assignvalue
                 GoTo somethingelse
+            End If
             End If
             End If
             End If
@@ -20817,7 +20828,15 @@ Else
     End If
 End If
 ' VARSTAT MEANS GLOBAL FOR NEW VARIABLES
-
+End If
+Select Case checkThis(bstack, w$, b$, v, lang, i)
+Case 1
+GoTo assignvalue
+Case 2
+GoTo somethingelse
+Case -1
+Execute = 0: Exit Function
+End Select
 i = MyTrimL(b$)
 
 If VarStat Then
@@ -21398,6 +21417,11 @@ checkobject1:
             ElseIf GetVar(bstack, w$, v, True) Then
                     GoTo somethingelse
             End If
+  '      ElseIf GetVar(bstack, w$, v) Then
+       
+   '                     If FastOperator(b$, "=", (0)) Then GoTo assignvalue
+    '            If FastOperator(b$, "<=", i, 2) Then GoTo assignvalue
+     '           GoTo somethingelse
         ElseIf FastOperator(b$, "=", i) Then ' MAKE A NEW ONE IF FOUND =
 jumpiflocal:
             v = GlobalVar(w$, p, , VarStat, temphere$)
@@ -21456,7 +21480,13 @@ If Left$(w$, 1) = "." Then
 
  ss$ = w$
 IsLabel bstack, ss$, w$
-
+Else
+Select Case checkThis(bstack, w$, b$, v, lang, i)
+Case 1
+GoTo assignvaluestr
+Case -1
+Execute = 0: Exit Function
+End Select
 End If
 
         ss$ = ""
@@ -21510,6 +21540,7 @@ End If
 If ss$ <> "" Then
 
     If ss$ = "=" Then
+assignvaluestr:
     If VarStat Then
             If IsStrExp(bstack, b$, ss$) Then
                     GlobalVar w$, ss$, , VarStat, temphere$
@@ -21735,6 +21766,14 @@ contcase4:
 If Left$(w$, 1) = "." Then
  ss$ = w$
 IsLabel bstack, ss$, w$
+Else
+Select Case checkThis(bstack, w$, b$, v, lang, i)
+Case 1
+GoTo assignvalue100
+Case -1
+Execute = 0: Exit Function
+End Select
+
 End If
 If MaybeIsSymbol(b$, "=-+*/<~") Then
     If FastSymbol(b$, "=") Then
@@ -21753,7 +21792,7 @@ If MaybeIsSymbol(b$, "=-+*/<~") Then
             End If
     Else
             If GetlocalVar(w$, v) Then
-            
+assignvalue100:
                 If IsExp(bstack, b$, p) Then
                 If Typename(var(v)) = "PropReference" Then
                   If FastSymbol(b$, "@") Then
@@ -24414,17 +24453,23 @@ conthereplease:
             what$ = myUcase(what$):   MakeThisSub basestack, what$
             ohere$ = here$
             If it = 0 Then
-                here$ = what$
+            If SecureNames Then
+                If here$ = "" Then here$ = what$ Else here$ = RVAL3(here$, 1)
             Else
-                here$ = ohere$ & "." & what$
+                here$ = what$
             End If
             
+            Else
+                here$ = ohere$ + "." & what$
+            End If
+            'Debug.Print here$
+            'Debug.Print ">>>>>>" + ohere$
             If here$ <> ohere$ Then
 
             If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
-   
     
             Else
+            
             ' these lines give module call in object recuirsive without call command
 '            If basestack.UseGroupname <> "" Then
  '           If Left$(here$, Len(basestack.UseGroupname)) = basestack.UseGroupname Then
@@ -25371,6 +25416,19 @@ End Function
 Function GetlocalVar(nm$, i As Long) As Boolean
 If varhash.Find(here$ & "." & myUcase(nm$), i) Then GetlocalVar = True
 End Function
+Function RVAL3(ByVal s$, v As Long) As String
+Dim ss$
+If InStr(s$, "[") = 0 Then
+RVAL3 = s$ + "[1]"
+Else
+ss$ = GetStrUntilR("[", s$)
+If val(s$) + v <= 0 Then
+RVAL3 = ss$
+Else
+RVAL3 = ss$ & "[" & CStr(val(s$) + v) & "]"
+End If
+End If
+End Function
 Function RVAL2(ByVal s$, v As Long) As String
 Dim ss$
 If InStr(s$, "[") = 0 Then
@@ -26282,7 +26340,23 @@ fromStr = Mid$(fromStr, i)
 End If
 End If
 End Function
+Public Function GetStrUntilR(ByVal sStr As String, fromStr As String, Optional RemoveSstr As Boolean = True) As String
+Dim i As Long
 
+If fromStr = "" Then GetStrUntilR = "": Exit Function
+i = InStrRev(fromStr, sStr)
+If i < 2 Then
+GetStrUntilR = ""
+fromStr = ""
+Else
+GetStrUntilR = Left$(fromStr, i - 1)
+If RemoveSstr Then
+fromStr = Mid$(fromStr, Len(sStr) + i)
+Else
+fromStr = Mid$(fromStr, i)
+End If
+End If
+End Function
 Function RESOURCES() As String
 'ON ERROR GoTo r1
  '   r1 = GetFreeResources(GFSR_GDIRESOURCES)
@@ -49083,4 +49157,73 @@ Set GETarrayFROMstr = New mHandler
 GETarrayFROMstr.t1 = 3
 Set GETarrayFROMstr.objref = pppp
 
+End Function
+Function checkThis(bstack As basetask, w$, b$, v As Long, lang As Long, i As Long) As Long
+
+If Len(w$) > 3 Then
+    If lang = 1 Then
+        If Left$(w$, 4) = "THIS" Then
+        Dim bb$, ss$
+        If Len(w$) = 4 Then
+            ss$ = ".DELETEME"
+            If IsLabel(bstack, ss$, bb$) < 0 Then
+                    If Len(bb$) = 8 Then checkThis = -1: Exit Function
+            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
+            If GetGlobalVar(w$, v) Then GoTo found
+            End If
+        ElseIf Mid$(w$, 5, 1) = "." Then
+             If bstack.UseGroupname <> "" Then
+                  ss$ = bstack.UseGroupname + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo found
+                
+                  ss$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo found
+            Else
+  
+            ss$ = ".DELETEME"
+            If IsLabel(bstack, ss$, bb$) < 0 Then
+                    If Len(bb$) = 8 Then checkThis = -1: Exit Function
+            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
+            If GetGlobalVar(w$, v) Then GoTo found
+            End If
+            End If
+            End If
+    End If
+Else
+    If Left$(w$, 4) = "ÁÕÔÏ" Then
+    
+        If Len(w$) = 4 Then
+                    ss$ = ".DELETEME"
+            If IsLabel(bstack, ss$, bb$) < 0 Then
+                    If Len(bb$) = 8 Then checkThis = -1: Exit Function
+            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
+            If GetGlobalVar(w$, v) Then GoTo found
+            End If
+        ElseIf Mid$(w$, 5, 1) = "." Then
+        
+             If bstack.UseGroupname <> "" Then
+                  ss$ = bstack.UseGroupname + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo found
+                
+                  ss$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
+                If varhash.Find(ss$, v) Then GoTo found
+            Else
+            ss$ = ".DELETEME"
+            If IsLabel(bstack, ss$, bb$) < 0 Then
+                    If Len(bb$) = 8 Then checkThis = -1: Exit Function
+            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
+            If GetGlobalVar(w$, v) Then GoTo found
+            End If
+            End If
+            End If
+    End If
+End If
+End If
+Exit Function
+found:
+            checkThis = 1
+                If FastOperator(b$, "=", (0)) Then Exit Function
+                If FastOperator(b$, "<=", i, 2) Then Exit Function
+                                checkThis = 2
+                 Exit Function
 End Function

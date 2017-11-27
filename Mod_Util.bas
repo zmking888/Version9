@@ -4871,6 +4871,11 @@ If s$ <> "" Then
                  ' LoadFont (mcd & "TITUSCBZ.TTF")
                     
                cc.Value = "Monospac821Greek BT"
+            ElseIf d$ = "SEC" Then
+                    cc.ValueKey = "SECURENAMES"
+                cc.ValueType = REG_DWORD
+                cc.Value = 0
+                SecureNames = False
             ElseIf d$ = "DIV" Then
                 cc.ValueKey = "DIV"
                     cc.ValueType = REG_DWORD
@@ -4991,6 +4996,11 @@ If IsLabel(basestack1, s$, d$) > 0 Then
         cc.ValueKey = "FONT"
             cc.ValueType = REG_SZ
             If ISSTRINGA(s$, w$) Then cc.Value = w$
+            ElseIf d$ = "SEC" Then
+                    cc.ValueKey = "SECURENAMES"
+                cc.ValueType = REG_DWORD
+                cc.Value = -1
+                SecureNames = True
             ElseIf d$ = "DIV" Then
                 cc.ValueKey = "DIV"
                     cc.ValueType = REG_DWORD
