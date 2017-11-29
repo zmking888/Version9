@@ -75,7 +75,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 16
+Global Const Revision = 17
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2755,8 +2755,8 @@ End If
 var(where).FloatGroupName = w$
 
 
-NeoCall objptr(bstack), "VOID " + w$ + "." + ChrW(&H1FFF) + oper$ + "()", lang, ok
-
+'NeoCall objptr(bstack), "VOID " + w$ + "." + ChrW(&H1FFF) + oper$ + "()", lang, ok
+NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + oper$ + "()", lang, ok
 If soroslen < bstack.soros.Total Then
 If soroslen + 1 = bstack.soros.Total And flag Then
 r = bstack.soros.PopVal
@@ -3308,7 +3308,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         If Prefix = "@READ2" Then
                           
             Dim lang As Long, ok As Boolean
-          NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
+          NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
           SpeedGroup = Abs(ok)
           GoTo CONTlastEtnum
         ElseIf Prefix = "@READ" Then
@@ -16743,7 +16743,7 @@ checkobject:
                                     bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
                             ElseIf bstack.lastobj Is Nothing Then
                                 NeedAGroupInRightExpression
                                 interpret = False
@@ -17010,7 +17010,7 @@ somethingelse:
                             Set bstack.lastobj = Nothing
                         End If
                     End If
-                    NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", lang, ok
+                    NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", lang, ok
                     If Not ok Then
                         If LastErNum = 0 Then
                             MisOperatror (ss$)
@@ -17438,7 +17438,7 @@ If ss$ <> "" Then
                                 bstack.soros.PushObj bstack.lastobj
                                 Set bstack.lastobj = Nothing
                             End If
-                            NeoCall objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", lang, ok
+                            NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", lang, ok
                     If Not ok Then
                         If LastErNum = 0 Then
                             MisOperatror (ss$)
@@ -21010,7 +21010,7 @@ assigngroup:
                                     bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
                             ElseIf bstack.lastobj Is Nothing Then
                                 NeedAGroupInRightExpression
                                 Execute = 0
@@ -21302,7 +21302,7 @@ checksyntax:
                             Set bstack.lastobj = Nothing
                         End If
                     End If
-                    NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", lang, ok
+                    NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", lang, ok
                     If Not ok Then
 here1234:
                         If LastErNum = 0 Then
@@ -21477,7 +21477,7 @@ IsLabel bstack, ss$, w$
 Else
 Select Case checkThis(bstack, w$, b$, v, lang, i)
 Case 1
-GoTo assignvaluestr
+GoTo assignvaluestr1
 Case -1
 Execute = 0: Exit Function
 End Select
@@ -21534,7 +21534,6 @@ End If
 If ss$ <> "" Then
 
     If ss$ = "=" Then
-assignvaluestr:
     If VarStat Then
             If IsStrExp(bstack, b$, ss$) Then
                     GlobalVar w$, ss$, , VarStat, temphere$
@@ -21548,6 +21547,7 @@ assignvaluestr:
                     If IsStrExp(bstack, b$, ss$) Then GlobalVar w$, ss$, , VarStat, temphere$
             Else
              If GetlocalVar(w$, v) Then
+assignvaluestr1:
   ''                 If TypeOf var(v) Is Group Then w$ = varhash.lastkey  ' don't know yet
                      If IsStrExp(bstack, b$, ss$) Then
                   If Typename(var(v)) = "PropReference" Then
@@ -21582,7 +21582,7 @@ assignvaluestr:
                                     bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                                NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
                    Else
                   
                              If bstack.lastobj Is Nothing Then
@@ -21724,7 +21724,7 @@ again12345:
                             End If
 a325674:
                             
-                            NeoCall objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", lang, ok
+                            NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", lang, ok
                             If Not ok Then GoTo here1234
                                 
                 Else
@@ -22074,7 +22074,7 @@ Set myobject = bstack.soros
                     bstack.soros.DataObj bstack.lastobj
                     Set bstack.lastobj = Nothing
                 End If
-                NeoCall objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
                 Set bstack.Sorosref = myobject
                 GoTo loopcontinue
             Else
@@ -22479,7 +22479,7 @@ PushParamGeneral bstack, b$
                                     Set bstack.lastobj = Nothing
                                 End If
                                 
-                                NeoCall objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                                NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
                                 Set bstack.Sorosref = myobject
                                 GoTo loopcontinue
                                 
@@ -38146,6 +38146,90 @@ basestack.nokillvars = False
 Set basestack = Nothing
 
 End Sub
+Sub NeoCall2(basestackLP As Long, rest$, lang As Long, resp As Boolean)
+Dim basestack As basetask, i As Long, p As Double, par As Boolean, f As Long
+Dim flag As Boolean, it As Long, what$, s$, x1 As Long, ss$, bs As basetask, vvl As Variant, x As Double
+Set basestack = ObjFromPtr(basestackLP)
+resp = True
+i = Abs(IsLabel(basestack, rest$, what$))
+If i = 1 Then
+If Right$(what$, 1) = ChrW(&H1FFF) Then
+i = InStr(rest$, "()")
+If i > 0 And i < 4 Then
+what$ = what$ + Left$(rest$, i + 1)
+rest$ = Mid$(rest$, i + 1)  ' leave last )
+End If
+End If
+    MakeThisSub basestack, what$
+   it = GetlocalSub(what$, x1)
+  
+    If Not it Then it = GetSub(what$, x1)
+ If Not it Then
+ If here$ = what$ Then
+  it = True: x1 = basestack.OriginalCode
+ Else
+ For i = -iRVAL(here$, 0) To -1
+ 
+    it = GetSub(RVAL2(here$, i) + what$, x1)
+    If it Then Exit For
+    Next i
+   End If
+  If it = 0 Then
+ If StripThis(here$) = what$ Then
+ it = True: x1 = basestack.OriginalCode
+ ElseIf Replace(here$, ChrW(&HFFBF), "") = what$ Then
+ it = True: x1 = basestack.OriginalCode
+ ElseIf InStr(what$, basestack.UseGroupname) = 1 Then
+ what$ = basestack.UseGroupname + ChrW(&HFFBF) + Mid$(what$, Len(basestack.UseGroupname) + 1)
+ it = GetSub(what$, x1)
+ End If
+ End If
+ End If
+
+    If it Then
+       
+        resp = True
+        Set bs = New basetask
+        bs.reflimit = varhash.Count
+        Set bs.Parent = basestack
+        If basestack.IamThread Then Set bs.Process = basestack.Process
+        Set bs.Sorosref = basestack.soros  ' same stack
+        Set bs.Owner = basestack.Owner
+        bs.UseGroupname = sbf(x1).sbgroup
+        bs.OriginalCode = x1
+        If here$ = "" Then
+            here$ = what$
+            Call GoFunc(bs, what$, rest$, vvl, , x1)
+            here$ = ""
+        ElseIf x1 >= 0 Then
+           ' Call GoFunc(bs, "", rest$, vvl, , x1)
+                bs.UseGroupname = sbf(x1).sbgroup
+                bs.StaticInUse = what$
+                Call GoFunc(bs, "", rest$, vvl, , x1)
+        Else
+            Call GoFunc(bs, what$, rest$, vvl)
+        End If
+myerror1:
+        If Not bs.StaticCollection Is Nothing Then
+            basestack.Parent.SetVarobJ "%_" + bs.StaticInUse, bs.StaticCollection
+        End If
+        Set bs = Nothing
+       
+        If LastErNum = -1 Then
+            Set basestack = Nothing
+            resp = False: Set basestack = Nothing: Exit Sub
+        End If
+    Else
+        resp = False
+        rest$ = ":" & what$ & " " & rest$
+    End If
+End If
+
+  Set basestack = Nothing
+
+
+End Sub
+
 Sub NeoSwap(basestackLP As Long, rest$, lang As Long, resp As Boolean)
 resp = MySwap(ObjFromPtr(basestackLP), rest$, lang)
 End Sub
@@ -39838,7 +39922,7 @@ comehere:
                         Set m = bstack.soros
                         Set bstack.Sorosref = New mStiva
                         bstack.soros.PushVal p
-                        NeoCall objptr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                        NeoCall2 objptr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", lang, ok
                         Set bstack.Sorosref = m
                         Set m = Nothing
                     Else
@@ -39895,7 +39979,7 @@ Case 3
                         Set m = bstack.soros
                         Set bstack.Sorosref = New mStiva
                         bstack.soros.PushStr s$
-                        NeoCall objptr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
+                        NeoCall2 objptr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", lang, ok
                         Set bstack.Sorosref = m
                         Set m = Nothing
                 ElseIf TypeOf var(i) Is Constant Then
@@ -48852,43 +48936,8 @@ On Error Resume Next
 LambdaList = var(-bstack.OriginalCode).code$
 End Function
 Sub PrepareLabel(bstack As basetask)
- If bstack.IamThread Then
-  If pagio$ = "GREEK" Then
-  Form2.Label1prompt(0) = "Õ«Ã¡(" + CStr(bstack.Process.Id) + "): "
-  Else
-  Form2.Label1prompt(0) = "THREAD(" + CStr(bstack.Process.Id) + "): "
-  End If
-  
-    Else
-    If pagio$ = "GREEK" Then
-        If bstack.fHere <> "" Then
-            Form2.Label1prompt(0) = "”ıÌ‹Ò.: "
-        Else
-            Form2.Label1prompt(0) = "‘ÏﬁÏ·: "
-        End If
-  Else
-        If bstack.fHere <> "" And InStr(bstack.fHere, "(") > 0 Then
-        Form2.Label1prompt(0) = "Func.: "
-  Else
-  Form2.Label1prompt(0) = "Module: "
-  End If
-  End If
- End If
-   If bstack.IamLambda Then
-  If pagio$ = "GREEK" Then
-  If Right$(here$, 3) = "$()" Then
-  Form2.Label1(0) = "À¡Ãƒ¡$()"
-  Else
-  Form2.Label1(0) = "À¡Ãƒ¡()"
-  End If
-  Else
-  If Right$(here$, 3) = "$()" Then
-  Form2.Label1(0) = "LAMBDA$()"
-  Else
-  Form2.Label1(0) = "LAMBDA()"
-  End If
-  End If
-  Else
+
+   If Not bstack.IamLambda Then
   Dim MMM$
 
 
@@ -48897,14 +48946,81 @@ MMM$ = sbf(bstack.OriginalCode).goodname
 Else
 MMM$ = here$
 End If
+ MMM$ = CleanStr(MMM$, ChrW(-65))
     If InStr(MMM$, "].") > 0 Then
         MMM$ = Mid$(MMM$, InStr(MMM$, "].") + 2)
     End If
    ' If AscW(MMM$) = 8191 Then MMM$ = Mid$(MMM$, 8)
     If bstack.fHere <> "" And InStr(bstack.fHere, "(") > 0 Then MMM$ = bstack.fHere + "." + MMM$
     End If
-    Form2.Label1(0) = MMM$
+    If InStr(MMM$, ChrW(8191)) > 0 Then
+    DropLeft ChrW(8191), MMM$
+    If InStr(MMM$, ChrW(8191)) > 0 Then
+    DropLeft ChrW(8191), MMM$
+    End If
+    If InStr(MMM$, ".") > 0 Then
+    DropLeft ".", MMM$
+    GoTo conthere
+    Else
+    If Right$(MMM$, 2) = "()" Then
+        MMM$ = Left$(MMM$, Len(MMM$) - 2)
+    End If
     
+     If pagio$ = "GREEK" Then
+         Form2.Label1prompt(0) = "‘ÂÎÂÛÙﬁÚ "
+     Else
+            Form2.Label1prompt(0) = "Operator "
+     End If
+     End If
+    Else
+conthere:
+    If bstack.IamThread Then
+  If pagio$ = "GREEK" Then
+  Form2.Label1prompt(0) = "Õ«Ã¡(" + CStr(bstack.Process.Id) + "): "
+  Else
+  Form2.Label1prompt(0) = "THREAD(" + CStr(bstack.Process.Id) + "): "
+  End If
+  
+    Else
+    If pagio$ = "GREEK" Then
+        If bstack.fHere <> "" Or Right$(MMM$, 2) = "()" Then
+        If bstack.IamLambda Then
+        If Right$(here$, 3) = "$()" Then
+            Form2.Label1(0) = "À¡Ãƒ¡$()"
+            Else
+            Form2.Label1(0) = "À¡Ãƒ¡()"
+            End If
+            Exit Sub
+        Else
+            Form2.Label1prompt(0) = "”ıÌ‹Ò.: "
+        End If
+        Else
+            Form2.Label1prompt(0) = "‘ÏﬁÏ·: "
+        End If
+  Else
+        If bstack.fHere <> "" Or Right$(MMM$, 2) = "()" Then
+         If bstack.IamLambda Then
+         If Right$(here$, 3) = "$()" Then
+            Form2.Label1(0) = "LAMBDA$()"
+            Else
+            Form2.Label1(0) = "LAMBDA()"
+            End If
+            Exit Sub
+         Else
+        Form2.Label1prompt(0) = "Func.: "
+        End If
+  Else
+  Form2.Label1prompt(0) = "Module: "
+  End If
+  End If
+ End If
+    
+    
+    
+    End If
+    
+    Form2.Label1(0) = MMM$
+     
      
     
     

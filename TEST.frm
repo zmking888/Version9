@@ -507,10 +507,14 @@ vHelp
 End If
 Else
 If index = 0 Then
-Dim aa As Long
+Dim aa As Long, aaa As String
 aa = MyBaseTask.OriginalCode
+aaa = SBcode(aa)
+If Left$(aaa, 10) = "'11001EDIT" Then
+SetNextLine aaa
+End If
 If aa > 0 Then
-sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+sHelp s$, aaa, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
 vHelp Not Form4.Visible
 ElseIf subHash.Find(s$, aa) Then
 sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
