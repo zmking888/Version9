@@ -75,7 +75,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37907,7 +37907,9 @@ i = x1
       
         
     End If
-    If it = 0 Then x1 = i: it = True
+    If it = 0 Then
+    If AscW(what$) <> &H1FFF Then x1 = i: it = True
+    End If
 Else
  it = True
  End If
