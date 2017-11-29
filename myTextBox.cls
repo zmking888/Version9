@@ -81,7 +81,7 @@ End If
 End Property
 Public Property Let vartext(ByVal RHS As String)
 glistN.restrictLines = 1
-glistN.HeadLine = "" ' no info
+glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 
 If glistN.listcount = 0 Then
@@ -96,7 +96,7 @@ Public Property Let Text(ByVal RHS As String)
 'Dim oldright As Long
 'oldright = glistN.LeftMarginPixels
 glistN.restrictLines = 1
-glistN.HeadLine = "" ' no info
+glistN.HeadLine = vbNullString ' no info
 glistN.HeadlineHeight = 0
 If glistN.listcount = 0 Then
 glistN.additem RHS
@@ -132,8 +132,8 @@ End Property
 Public Property Set Container(glistNN As gList)
 Set glistN = glistNN
 glistNN.enabled = True
-Info = ""
-If glistNN.listcount = 0 Then Text = ""
+Info = vbNullString
+If glistNN.listcount = 0 Then Text = vbNullString
 glistN.NoCaretShow = True
 glistN.VerticalCenterText = True
 If Not glistN.CenterText Then glistN.LeftMarginPixels = 8
@@ -268,7 +268,7 @@ ElseIf KeyCode = vbKeyDown Then
 ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
-If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
+If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
 If Pad$ <> "" Then vartext = Pad$
 End If
 

@@ -126,26 +126,26 @@ If inUse Then OpenImage = False: Exit Function
 inUse = True
 ' do something with multifiles..
 ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = "" Then ReturnFile = mcd + LastName
+If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
 SaveDialog = False
 FileExist = True
 FolderOnly = False
 ''If TopDir <> "" Then TopFolder = TopDir
-If TopDir = "" Then
+If TopDir = vbNullString Then
 TopFolder = mcd
 ReturnFile = mcd
 ElseIf TopDir = "\" Then
-TopFolder = ""
+TopFolder = vbNullString
 ReturnFile = mcd
 ElseIf TopDir = "*" Then
-TopFolder = ""
-ReturnFile = ""
+TopFolder = vbNullString
+ReturnFile = vbNullString
 
 Else
 TopFolder = TopDir
 End If
-ReturnListOfFiles = ""
-If TypeList = "" Then FileTypesShow = "BMP|JPG|GIF|WMF|EMF|DIB|ICO|CUR" Else FileTypesShow = TypeList
+ReturnListOfFiles = vbNullString
+If TypeList = vbNullString Then FileTypesShow = "BMP|JPG|GIF|WMF|EMF|DIB|ICO|CUR" Else FileTypesShow = TypeList
 DialogPreview = True
 If thattitle <> "" Then
 LoadFileCaption = thattitle
@@ -174,25 +174,25 @@ If inUse Then OpenDialog = False: Exit Function
 inUse = True
 ' do something with multifiles..
 ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = "" Then ReturnFile = mcd + LastName
+If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
 SaveDialog = False
 FileExist = OpenNew
 FolderOnly = False
 ' If TopDir <> "" Then TopFolder = TopDir
-If TopDir = "" Then
+If TopDir = vbNullString Then
 TopFolder = mcd
 ReturnFile = mcd
 ElseIf TopDir = "\" Then
-TopFolder = ""
+TopFolder = vbNullString
 ReturnFile = mcd
 ElseIf TopDir = "*" Then
-TopFolder = ""
-ReturnFile = ""
+TopFolder = vbNullString
+ReturnFile = vbNullString
 
 Else
 TopFolder = TopDir
 End If
-ReturnListOfFiles = ""
+ReturnListOfFiles = vbNullString
 FileTypesShow = TypeList
 DialogPreview = False
 If thattitle <> "" Then
@@ -231,23 +231,23 @@ SaveDialog = True
 UserFileName = LastName
 'ReturnFile = ExtractPath(LastName)
 ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = "" Then ReturnFile = mcd + LastName
+If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
 FileTypesShow = TypeList
 ''If TopDir <> "" Then TopFolder = TopDir
-If TopDir = "" Then
+If TopDir = vbNullString Then
 TopFolder = mcd
 ReturnFile = mcd
 ElseIf TopDir = "\" Then
-TopFolder = ""
+TopFolder = vbNullString
 ReturnFile = mcd
 ElseIf TopDir = "*" Then
-TopFolder = ""
-ReturnFile = ""
+TopFolder = vbNullString
+ReturnFile = vbNullString
 
 Else
 TopFolder = TopDir
 End If
-If ReturnFile = "" Then ReturnFile = TopDir + ExtractName(LastName)
+If ReturnFile = vbNullString Then ReturnFile = TopDir + ExtractName(LastName)
 If thattitle <> "" Then
 SaveFileCaption = thattitle
 If InStr(Settings, ",expand") = 0 Then
@@ -301,15 +301,15 @@ Settings = Settings & ",expand"
 End If
 End If
 If NewFolder Then FileExist = False
-If TopDir = "" Then
+If TopDir = vbNullString Then
 TopFolder = mcd
 ReturnFile = mcd
 ElseIf TopDir = "\" Then
-TopFolder = ""
+TopFolder = vbNullString
 ReturnFile = mcd
 ElseIf TopDir = "*" Then
-TopFolder = ""
-ReturnFile = ""
+TopFolder = vbNullString
+ReturnFile = vbNullString
 
 Else
 TopFolder = TopDir

@@ -502,7 +502,7 @@ Public Sub CreateEXEAssociation( _
     Dim bn(0 To 5) As Byte
     ClassKey = HKEY_CLASSES_ROOT
     SectionKey = "." & sAssociation
-    ValueKey = ""
+    ValueKey = vbNullString
     ValueType = REG_SZ
     Value = sClassName
       If OperatingSystem > System_Windows_Vista Then
@@ -510,7 +510,7 @@ Public Sub CreateEXEAssociation( _
     sClassName = "\Applications\M2000"
     End If
     SectionKey = sClassName
-    ValueKey = ""
+    ValueKey = vbNullString
     ValueType = REG_SZ
     Value = sClassDescription
 
@@ -521,14 +521,14 @@ Public Sub CreateEXEAssociation( _
     Value = bn()
 
     SectionKey = sClassName & "\shell"
-    ValueKey = ""
+    ValueKey = vbNullString
     ValueType = REG_SZ
-    Value = ""
+    Value = vbNullString
     
     SectionKey = sClassName & "\shell\open"
-    ValueKey = ""
+    ValueKey = vbNullString
     ValueType = REG_SZ
-    Value = ""
+    Value = vbNullString
 
     ValueKey = "EditFlags"
     ValueType = REG_BINARY
@@ -536,12 +536,12 @@ Public Sub CreateEXEAssociation( _
     Value = bn()
     
     SectionKey = sClassName & "\shell\open\command"
-    ValueKey = ""
+    ValueKey = vbNullString
     ValueType = REG_EXPAND_SZ
     Value = Chr(34) + sExePath + Chr(34) & " " & Chr(34) & "&1" & Chr(34)
     If lDefaultIconIndex > -1 Then
         SectionKey = sClassName & "\DefaultIcon"
-        ValueKey = ""
+        ValueKey = vbNullString
         Value = sExePath & "," & CStr(lDefaultIconIndex)
 
     End If

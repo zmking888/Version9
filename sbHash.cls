@@ -62,16 +62,17 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
     
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
-            .Key = ""
+            .Key = vbNullString
             .Pleft = 0
         Else
             Hash(.lastpos) = 0
-            .Key = ""
+            .Key = vbNullString
         End If
         If .KeyType = 0 And .ndx >= 0 Then
-            v(.ndx).sb = ""
+            v(.ndx).sb = vbNullString
             v(.ndx).sbc = 0
-            v(.ndx).sbgroup = ""
+            v(.ndx).sbgroup = vbNullString
+            v(.ndx).goodname = vbNullString
             Set v(.ndx).subs = Nothing
             End If
         .KeyType = 0

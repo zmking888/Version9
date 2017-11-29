@@ -156,7 +156,7 @@ End If
  If m_duration <= uintnew(CDbl(timeGetTime)) Then
         m_duration = uintnew(CDbl(timeGetTime)) + mYspace
 
-            If mybuf$ = "" Then mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False
+            If mybuf$ = vbNullString Then mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False
             ohere$ = here$
             here$ = myHere$
  ''Set NowProcess.Owner = myOwner ' μπορεί να έχει αλλάξει... για ασφάλεια???
@@ -169,7 +169,7 @@ End If
         If Not (NowProcess Is Nothing) Then Set myOwner = NowProcess.Owner
         '' resync thread if we need more time new from 7 rev 19
         If Len(mybuf$) < 3 Then
-        mybuf$ = ""
+        mybuf$ = vbNullString
     '' If Not mNostretch And Not Interrupted Then
             ''      If m_duration < uintnew(CDbl(timeGetTime)) Then
    ''         mYspace = uintnew(CDbl(timeGetTime)) - m_duration - mYspace
@@ -188,7 +188,7 @@ End If
         If x = 3 Then x = 1: look = False
         If ProcessEnd Then Exit Sub
         
-        If (x = 1 Or (x = 2 And mybuf$ = "")) And look = True Then
+        If (x = 1 Or (x = 2 And mybuf$ = vbNullString)) And look = True Then
         
             If NowProcess.Parent.Exist(myid, "_multi") Then
               TaskMaster.RestEnd1
@@ -251,7 +251,7 @@ End If
  If m_duration <= uintnew(CDbl(timeGetTime)) Then
         m_duration = uintnew(CDbl(timeGetTime)) + mYspace
 
-            If mybuf$ = "" Then mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False
+            If mybuf$ = vbNullString Then mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False
             ohere$ = here$
             here$ = myHere$
             x = 1
@@ -262,7 +262,7 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner))
  Call executeblock(x, NowProcess, mybuf$, False, look, Interrupted)
   If Not (NowProcess Is Nothing) Then Set myOwner = NowProcess.Owner
         If Len(mybuf$) < 3 Then
-        mybuf$ = ""
+        mybuf$ = vbNullString
         Else
       
      If Interrupted Then m_duration = 0           ' do it in past;;
@@ -276,7 +276,7 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner))
         If x = 3 Then x = 1: look = False
         If ProcessEnd Then Exit Sub
         
-        If (x = 1 Or (x = 2 And mybuf$ = "")) And look = True Then
+        If (x = 1 Or (x = 2 And mybuf$ = vbNullString)) And look = True Then
         
             If NowProcess.Parent.Exist(myid, "_multi") Then
               TaskMaster.RestEnd1

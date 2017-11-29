@@ -42,9 +42,9 @@ dwReserved1 As Long
 cFileName(MAX_PATH * 2 - 1) As Byte
 cAlternate(14 * 2 - 1) As Byte
 End Type
-Private Declare Function FindFirstFile Lib "kernel32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindFirstFile Lib "KERNEL32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 
-Private Declare Function FindNextFile Lib "kernel32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindNextFile Lib "KERNEL32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) As Long
 
 Dim myfile$(), myLevel() As Integer
@@ -61,25 +61,25 @@ Private mTopFolder As String
 Dim InUseItems As Long
 Public LevelStop As Long
 
-Private Declare Function GetDiskFreeSpace Lib "kernel32" _
+Private Declare Function GetDiskFreeSpace Lib "KERNEL32" _
  Alias "GetDiskFreeSpaceA" (ByVal lpRootPathName As String, _
  lpSectorsPerCluster As Long, lpBytesPerSector As Long, _
  lpNumberOfFreeClusters As Long, lpTtoalNumberOfClusters As Long) _
  As Long
-Private Declare Function GetLogicalDriveStrings Lib "kernel32" _
+Private Declare Function GetLogicalDriveStrings Lib "KERNEL32" _
   Alias "GetLogicalDriveStringsA" (ByVal nBufferLength As Long, _
   ByVal lpBuffer As String) As Long
 
 
-Private Declare Function GetLongPathName Lib "kernel32" _
+Private Declare Function GetLongPathName Lib "KERNEL32" _
    Alias "GetLongPathNameW" _
   (ByVal lpszShortPath As Long, _
    ByVal lpszLongPath As Long, _
    ByVal cchBuffer As Long) As Long
 Public lastTimeStamp As Date
 Public lastTimeStamp2 As Date
-Private Declare Function FileTimeToSystemTime Lib "kernel32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
-Private Declare Function FileTimeToLocalFileTime Lib "kernel32" (lpFileTime As FILETIME, lpLocalFileTime As FILETIME) As Long
+Private Declare Function FileTimeToSystemTime Lib "KERNEL32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
+Private Declare Function FileTimeToLocalFileTime Lib "KERNEL32" (lpFileTime As FILETIME, lpLocalFileTime As FILETIME) As Long
 Public UseUTC As Boolean
 Private Function FileTimeToDate(File_Time As FILETIME) As Date
 Dim System_Time As SYSTEMTIME
@@ -167,7 +167,7 @@ Function NumberofDrives() As Integer
     DriveCount = 0
 ' Search for a null -- which separates the drives
     For i = 1 To BuffLen
-        If Asc(Mid(Buffer, i, 1)) = 0 Then _
+        If Asc(Mid$(Buffer, i, 1)) = 0 Then _
           DriveCount = DriveCount + 1
     Next i
     NumberofDrives = DriveCount
@@ -184,18 +184,18 @@ Function DriveName(index As Integer) As String
    
     BuffLen = GetLogicalDriveStrings(Len(Buffer), Buffer)
 
-    TheDrive = ""
+    TheDrive = vbNullString
     DriveCount = 0
     For i = 1 To BuffLen
-        If Asc(Mid(Buffer, i, 1)) <> 0 Then _
-          TheDrive = TheDrive & Mid(Buffer, i, 1)
-        If Asc(Mid(Buffer, i, 1)) = 0 Then 'null separates drives
+        If Asc(Mid$(Buffer, i, 1)) <> 0 Then _
+          TheDrive = TheDrive & Mid$(Buffer, i, 1)
+        If Asc(Mid$(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
             If DriveCount = index Then
                 DriveName = UCase(Left(TheDrive, 1))
                 Exit Function
             End If
-            TheDrive = ""
+            TheDrive = vbNullString
         End If
     Next i
 End Function
@@ -291,7 +291,7 @@ InUseItems = 0
 End Sub
 Public Property Get list(index As Long) As String
 If index < 0 Then
-list = ""
+list = vbNullString
 Else
 If Not onetime Then onetime = True: once
 list = myfile$(index)
@@ -310,15 +310,15 @@ CheckFile = InStr(Filetypes2find, "|" & UCase(Mid$(expan$, InStrRev(expan$, ".")
 End If
 End Function
 
-Public Function Dir2(Optional ByVal ff As String = "", Optional FileType$ = "", Optional recursive As Boolean = True, Optional Append As Boolean = False) As String
+Public Function Dir2(Optional ByVal ff As String = vbNullString, Optional FileType$ = vbNullString, Optional recursive As Boolean = True, Optional Append As Boolean = False) As String
 Dim i As Integer
-If LastPath <> "" And ff = "" Then
+If LastPath <> "" And ff = vbNullString Then
 
 Else
 LastPath = ff
 
 Static ndx As Long
-If ff = "" Then
+If ff = vbNullString Then
 ClearList
 
 ndx = 0
@@ -365,7 +365,7 @@ Else
             ndx = ndx + 1   ' read with auto increment
             Else
             ndx = 0  ' reset
-                Dir2 = "" ' this is the end
+                Dir2 = vbNullString ' this is the end
             End If
 End If
 RaiseEvent DirFinished
@@ -433,7 +433,7 @@ End Function
 
 Public Function Dir1(ByVal ThisFile As String, curdir As String) As String
 
-    If curdir = "" Or ExtractPath(ThisFile) = ThisFile Then
+    If curdir = vbNullString Or ExtractPath(ThisFile) = ThisFile Then
     
       If ExistFolder(ThisFile) Then
       Dir1 = ThisFile
@@ -442,7 +442,7 @@ Public Function Dir1(ByVal ThisFile As String, curdir As String) As String
       Exit Function
     End If
 
-    If ExtractPath(ThisFile) = "" Then ThisFile = curdir & ThisFile
+    If ExtractPath(ThisFile) = vbNullString Then ThisFile = curdir & ThisFile
     If ExistFile(ThisFile) Then Dir1 = ThisFile
 End Function
 Private Function look(ByVal Level As Integer, ByVal folder As String, Optional offset As Long = 0, Optional foldersincluded As Boolean = False, Optional foldersonly As Boolean = False) As Long
@@ -521,7 +521,7 @@ If fff Mod 30 = 29 Then mywait basestack1, 1
         End If
     End If
   If FindNextFile(fhandle, wfd) = 0& Then
-  lookpath = ""
+  lookpath = vbNullString
   Else
     lookpath = StripNulls(wfd.cFileName)
     End If
@@ -660,7 +660,7 @@ While IsSymbol3(f$, """")
 f$ = GetStrUntil(Chr(34), f$)
 Wend
 Dim i As Long, j As Long, oj As Long
-If f$ = "" Then
+If f$ = vbNullString Then
 PointPos = 1
 Else
 er = 3
@@ -706,7 +706,7 @@ End Function
 Public Function ExtractType(f$, Optional JJ As Long = 0) As String
 Dim i As Long, j As Long, d$
 If IsSymbol3(f$, """") Then f$ = GetStrUntil(Chr(34), f$)
-If f$ = "" Then ExtractType = "": Exit Function
+If f$ = vbNullString Then ExtractType = vbNullString: Exit Function
 If JJ > 0 Then
 j = JJ
 Else
@@ -722,12 +722,12 @@ Exit For
 End Select
 Next i
 If (i - j - 2) < 1 Then
-ExtractType = ""
+ExtractType = vbNullString
 Else
 ExtractType = Mid$(d$, j + 1, i - j - 2)
 End If
 Else
-ExtractType = ""
+ExtractType = vbNullString
 End If
 End Function
 Public Function ExtractPath(f$, Optional IsAfile As Boolean = True) As String
@@ -754,14 +754,14 @@ If Not IsAfile Then
     Next i
 End If
 If i = 0 Then
-ExtractPath = ""
+ExtractPath = vbNullString
 Else
 ExtractPath = Mid$(f$, 1, i)
 End If
 End Function
 Public Function ExtractName(f$) As String
 Dim i As Long, j As Long, k$
-If f$ = "" Then Exit Function
+If f$ = vbNullString Then Exit Function
 j = PointPos(f$)
 If Mid$(f$, j, 1) = "." Then
 k$ = ExtractType(f$, j)
@@ -774,7 +774,7 @@ Case Is < " ", "\", "/", ":"
 Exit For
 End Select
 Next i
-If k$ = "" Then
+If k$ = vbNullString Then
 If Mid$(f$, i + j - i, 1) = "." Then
 ExtractName = Mid$(f$, i + 1, j - i - 1)
 Else
@@ -806,7 +806,7 @@ End Function
 Public Function isdir(f$) As Boolean
 Dim v&
 Err.Clear
-If f$ = "" Then Exit Function
+If f$ = vbNullString Then Exit Function
 On Error Resume Next
 If FileAttr(f$, v&) Then
 isdir = (v& And 16) > 0
@@ -821,11 +821,11 @@ ReDim myLevel(100) As Integer
 End Sub
 Public Function GetStrUntil(ByVal sStr As String, fromStr As String, Optional RemoveSstr As Boolean = True) As String
 Dim i As Long
-If fromStr = "" Then GetStrUntil = "": Exit Function
+If fromStr = vbNullString Then GetStrUntil = vbNullString: Exit Function
 i = InStr(fromStr, sStr)
 If (i < 2) And Not ((i > 0) And RemoveSstr) Then
-GetStrUntil = ""
-fromStr = ""
+GetStrUntil = vbNullString
+fromStr = vbNullString
 Else
 GetStrUntil = Left$(fromStr, i - 1)
 If RemoveSstr Then
@@ -841,7 +841,7 @@ i = InStr(fromStr, uStr)
 If i > 0 Then
 fromStr = Mid$(fromStr, i + Len(uStr))
 Else
-fromStr = ""
+fromStr = vbNullString
 End If
 End Sub
 Private Function StripNulls(ByVal OriginalStr As String) As String

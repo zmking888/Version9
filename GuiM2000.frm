@@ -463,7 +463,7 @@ If Not Quit Then CallEventFromGuiNow Me, myEvent, MyName$ + ".Unload()", var()
 End If
 If var(0) = 0 Then
                      If ttl Then
-                     Form3.CaptionW = ""
+                     Form3.CaptionW = vbNullString
                      If Form3.WindowState = 1 Then Form3.WindowState = 0
                
                     Unload Form3
@@ -490,7 +490,7 @@ gList2.enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 gList2.HeadLine = "Form"
 gList2.HeadlineHeight = gList2.HeightPixels
 gList2.SoftEnterFocus
@@ -554,18 +554,18 @@ a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 End Sub
 
-Public Property Get TITLE() As Variant
-TITLE = gList2.HeadLine
+Public Property Get Title() As Variant
+Title = gList2.HeadLine
 End Property
 
-Public Property Let TITLE(ByVal vNewValue As Variant)
+Public Property Let Title(ByVal vNewValue As Variant)
 ' A WORKAROUND TO CHANGE TITLE WHEN FORM IS DISABLED BY A MODAL FORM
 On Error Resume Next
 Dim oldenable As Boolean
 oldenable = gList2.enabled
 gList2.enabled = True
-gList2.HeadLine = ""
-If Trim(vNewValue) = "" Then vNewValue = " "
+gList2.HeadLine = vbNullString
+If Trim(vNewValue) = vbNullString Then vNewValue = " "
 gList2.HeadLine = vNewValue
 gList2.HeadlineHeight = gList2.HeightPixels
 'If oldenable = False Then
@@ -593,7 +593,7 @@ Dim w As Object
 Next w
 Set w = Nothing
          If ttl Then
-                     Form3.CaptionW = ""
+                     Form3.CaptionW = vbNullString
                      If Form3.WindowState = 1 Then Form3.WindowState = 0
                
                     Unload Form3
@@ -752,8 +752,8 @@ Public Sub hookme(this As gList)
 Set LastGlist = this
 End Sub
 
-Private Sub mDoc_MayQuit(yes As Variant)
-If mQuit Or Not Visible Then yes = True
+Private Sub mDoc_MayQuit(Yes As Variant)
+If mQuit Or Not Visible Then Yes = True
 MyDoEvents1 Me
 'ProcTask2 basestack1
 End Sub

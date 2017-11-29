@@ -209,7 +209,7 @@ mTeam = False
 Set LinkToGroup = a
 If a Is Nothing Then Exit Property
 'erase functions,,,
- bank.item(bank.item(1) * 2 + 3) = ""
+ bank.item(bank.item(1) * 2 + 3) = vbNullString
 mTeam = True
 Else
 ' only when is in an array as Float Group
@@ -316,7 +316,7 @@ HasSet = fasle
 HasStrValue = False
 HasParameters = False
 IamSuperClass = False
-FuncRef = ""
-LocalRef = ""
-VarRef = ""
+FuncRef = vbNullString
+LocalRef = vbNullString
+VarRef = vbNullString
 End Sub

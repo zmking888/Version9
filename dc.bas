@@ -18,10 +18,10 @@ Private Type LOGPALETTE
     palPalEntry(255) As PALETTEENTRY ' Enough for 256 colors
 End Type
 Private Type GUID
-    Data1 As Long
-    Data2 As Integer
-    Data3 As Integer
-    Data4(7) As Byte
+    data1 As Long
+    data2 As Integer
+    data3 As Integer
+    data4(7) As Byte
 End Type
 Private Type PicBmp
     Size As Long
@@ -93,12 +93,12 @@ Private Type RECT
     Right As Long
     Bottom As Long
 End Type
-Private Declare Function GetDriveType Lib "kernel32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
-Private Declare Function GetVolumeInformation Lib "kernel32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
+Private Declare Function GetDriveType Lib "KERNEL32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
+Private Declare Function GetVolumeInformation Lib "KERNEL32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
 'Private Const MAX_PATH As Long = 1024
 Private Const MAX_PATH_UNICODE As Long = 260 * 2 - 1
 
-Private Declare Function GetLongPathName Lib "kernel32" _
+Private Declare Function GetLongPathName Lib "KERNEL32" _
    Alias "GetLongPathNameW" _
   (ByVal lpszShortPath As Long, _
    ByVal lpszLongPath As Long, _
@@ -165,9 +165,9 @@ Function CreateBitmapPicture(ByVal hbmp As Long, ByVal hPal As Long) As Picture
 
     'Fill GUID info
     With IID_IDispatch
-        .Data1 = &H20400
-        .Data4(0) = &HC0
-        .Data4(7) = &H46
+        .data1 = &H20400
+        .data4(0) = &HC0
+        .data4(7) = &H46
     End With
 
     'Fill picture info
@@ -291,7 +291,7 @@ Dim SecondTry As Boolean, PP$
 On Error GoTo wecant
 PP$ = ExtractPath(path$, , True)
 PP$ = GetDosPath(PP$)
-If PP$ = "" Then
+If PP$ = vbNullString Then
 MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
 Exit Function
 End If
@@ -308,7 +308,7 @@ PP$ = PathStrip2root(path$)
    Exit Function
 wecant:
                    If Err.Number > 0 Then
-                Err.clear
+                Err.Clear
                  MyEr "Not writable device " & path$, "Δεν μπορώ να γράψω στη συσκευή " & path$
             WeCanWrite = False
                 Exit Function
@@ -319,7 +319,7 @@ Public Function VoiceName(ByVal d As Double) As String
 On Error Resume Next
 Dim o As Object
 If Typename(sapi) = "Nothing" Then Set sapi = CreateObject("sapi.spvoice")
-If Typename(sapi) = "Nothing" Then VoiceName = "": Exit Function
+If Typename(sapi) = "Nothing" Then VoiceName = vbNullString: Exit Function
 d = Int(d)
 If sapi.getvoices().Count >= d And d > 0 Then
 For Each o In sapi.getvoices
@@ -336,7 +336,7 @@ If sapi.getvoices().Count > 0 Then
 NumVoices = sapi.getvoices().Count
 End If
 End Function
-Public Sub SPEeCH(ByVal A$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
+Public Sub SPEeCH(ByVal a$, Optional BOY As Boolean = False, Optional ByVal vNumber As Long = -1)
 Static lastvoice As Long
 If vNumber = -1 Then vNumber = lastvoice
 On Error Resume Next
@@ -352,13 +352,13 @@ If sapi.getvoices().Count <= vNumber Or sapi.getvoices().Count < 1 Then vNumber 
         
          .Rate = 2
        ' boy
-         .speak "<pitch absmiddle='25'>" & A$
+         .Speak "<pitch absmiddle='25'>" & a$
          Else
          
          'man
        .Rate = 1
        .volume = vol
-         .speak "<pitch absmiddle='-5'>" & A$
+         .Speak "<pitch absmiddle='-5'>" & a$
          End If
        End With
        lastvoice = vNumber

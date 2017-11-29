@@ -198,7 +198,7 @@ Dim photo As Object
 novisible = True
 ''Set LastGlist = Nothing
 
-If AskCancel$ = "" Then command1(1).Visible = False
+If AskCancel$ = vbNullString Then command1(1).Visible = False
 gList2.enabled = True
 command1(0).enabled = True
 command1(1).enabled = True
@@ -225,7 +225,7 @@ gList1.LeftMarginPixels = 8
 gList1.enabled = True
 Set ListPad = New Document
 ListPad = AskText$
-If AskDIB$ = "" Then
+If AskDIB$ = vbNullString Then
 
 Set LoadPictureMine = Form3.Icon
 Else
@@ -252,7 +252,7 @@ gList2.enabled = True
 gList2.CapColor = rgb(255, 160, 0)
 gList2.FloatList = True
 gList2.MoveParent = True
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 gList2.HeadLine = AskTitle$
 gList2.HeadlineHeight = gList2.HeightPixels
 gList2.SoftEnterFocus
@@ -325,8 +325,8 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
 Set myOk = Nothing
 Set myCancel = Nothing
-AskDIB$ = ""
-AskOk$ = ""
+AskDIB$ = vbNullString
+AskOk$ = vbNullString
 AskLastX = Left
 AskLastY = top
 ''Sleep 200
@@ -347,13 +347,13 @@ End Sub
 
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
-                       AskCancel$ = ""
+                       AskCancel$ = vbNullString
             Unload Me
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -383,7 +383,7 @@ Else
 
         
   
-        Once = True
+        once = True
          If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
       
@@ -430,7 +430,7 @@ Else
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -601,7 +601,7 @@ End Sub
 
 Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyEscape Then
-                AskCancel$ = ""
+                AskCancel$ = vbNullString
             Unload Me
 
 End If
@@ -615,13 +615,13 @@ End Sub
 Private Sub InterPress_Press(index As Long)
 If index = 0 Then
 AskResponse$ = AskCancel$
-AskCancel$ = ""
+AskCancel$ = vbNullString
 Else
 If AskInput Then AskStrInput$ = textbox1
 AskResponse$ = AskOk$
 End If
 
-AskOk$ = ""
+AskOk$ = vbNullString
 Unload Me
 End Sub
 Private Sub glist1_ReadListItem(item As Long, content As String)

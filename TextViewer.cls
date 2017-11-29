@@ -129,7 +129,7 @@ Public Sub PasteDoc(thisdoc As String)
 
  Const CF_UNICODETEXT = 13
  ClearRedo
-If thisdoc = "" Then
+If thisdoc = vbNullString Then
 thisdoc = GetTextData(CF_UNICODETEXT)
 Else
 PushUndo
@@ -217,7 +217,7 @@ Title = RHS
 
 
 Set mDoc1 = New Document
-If Title = "" Then
+If Title = vbNullString Then
 Else
 NoHeadwrap = False
 mDoc1.textDoc = Title
@@ -228,7 +228,7 @@ mDoc1.EmptyDoc
 NoHeadwrap = True
 mDoc1.textDoc = Title
 End If
-glistN.HeadLine = "" ' reset
+glistN.HeadLine = vbNullString ' reset
 glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight + addpixelstoo
 glistN.addpixels = 4 * factor ' 'line spacing
@@ -255,8 +255,8 @@ Dim i As Long
 glistN.NoCaretShow = True
 ClearRedo
 ClearUndo
-If RHS = "" Then
-mDoc.textDoc = ""
+If RHS = vbNullString Then
+mDoc.textDoc = vbNullString
 Else
 mDoc.textDoc = ReadUnicodeOrANSI(RHS)
 End If
@@ -264,14 +264,14 @@ End If
 Dim what$, ThatPara As Long, pastchars
     pastchars = mDoc.TextParagraphLine(1, what$, ThatPara)
 mDoc.MarkParagraphID = ThatPara
-NoTitle = Title = ""
+NoTitle = Title = vbNullString
 nowrap = True
 
 
 If Not NoTitle Then
 mDoc1.textDoc = Title
 
-glistN.HeadLine = "" ' reset
+glistN.HeadLine = vbNullString ' reset
 glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight
 End If
@@ -540,7 +540,7 @@ If NumberOnly Then
 If Not ValidNum(content, False, NumberIntOnly) Then
 
 
-undotext = ""
+undotext = vbNullString
 content = mDoc.TextLine(item + 1)
 Exit Sub
 End If
@@ -890,8 +890,8 @@ MarkCopy
 KeyCode = 0
 ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 Pad$ = GetTextData(13)
-If Pad$ = "" Then Pad$ = Clipboard.GetText(1)
-If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = "" Then
+If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
+If ParaSelStart = 2 And glistN.list(glistN.ListIndex) = vbNullString Then
 SelStart = SelStart - 1
 End If
 AddUndo ""
@@ -959,7 +959,7 @@ SelLength = Len(Redotext) + 1
 Else
 SelLength = Len(Redotext)
 End If
-SelText = ""
+SelText = vbNullString
 ElseIf Redomode = 2 Then
    keyzLineUp
 ElseIf Redomode = 3 Then
@@ -971,7 +971,7 @@ enabled = b
 glistN.ShowPan
 If Not PopRedo Then
 Redopara = -1
-Redotext = ""
+Redotext = vbNullString
 Redomode = 0
 End If
 End If
@@ -1016,7 +1016,7 @@ If undomode = 0 Or undomode = 4 Then
     ' now we have undomode 5
     InsertText = undotext
     Else
-    SelText = ""
+    SelText = vbNullString
     End If
 ElseIf undomode = 3 Then
     keyzLineUp
@@ -1032,7 +1032,7 @@ End If
  If Not PopUndo Then
  ClearUndo
 undopara = -1
-undotext = ""
+undotext = vbNullString
 undomode = 0
 End If
 KeyCode = 0
@@ -1176,7 +1176,7 @@ On Error GoTo fbl
         b$ = mDoc.TextParagraph(BlockStartPara)
         
         UndoDoc.CrTail = False
-        If b$ = "" Then
+        If b$ = vbNullString Then
         Else
         If BlockStartPos < BlockEndPos Then
            '' UndoDoc.textDoc = Mid$(b$, BlockStartPos, BlockEndPos - BlockStartPos)
@@ -1227,7 +1227,7 @@ On Error GoTo fbl
                End If
         Else
             a$ = mDoc.TextParagraph(BlockEndPara)
-        '   If a$ = "" Then UndoDoc.AppendParagraph ""
+        '   If a$ = VbNullString Then UndoDoc.AppendParagraph ""
          UndoDoc.LfLead = False
             If BlockEndPos < 1 Then
         
@@ -1376,7 +1376,7 @@ OLDPOS = Charpos
             mDoc.RemoveDocParaIndex BlockEndPara
             If BlockEndPos < 1 Then
             UndoDoc.AppendParagraph ""
-            b$ = ""
+            b$ = vbNullString
             Else
             UndoDoc.AppendParagraph Left$(b$, BlockEndPos - 1) 'maybe is empty
             b$ = Mid$(b$, BlockEndPos)
@@ -1679,7 +1679,7 @@ Private Sub mDoc_BreakLine(data As String, datanext As String)
  Dim data1 As String, datanext1 As String
  If nowrap Then
     datanext = data
-    data = ""
+    data = vbNullString
  Else
     If showparagraph Then
    ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
@@ -1692,7 +1692,7 @@ Private Sub mDoc_BreakLine(data As String, datanext As String)
         data = Right$(data, Len(data1))
         Else
             datanext = data
-             data = ""
+             data = vbNullString
         End If
       
     Else
@@ -1734,7 +1734,7 @@ Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
 Dim n$
 again:
-If a$ = "" Then Exit Sub
+If a$ = vbNullString Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then
     If IsSymbol(a$, "@") Then
@@ -1758,7 +1758,7 @@ End If
 
 If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = ""
+If kind = 0 Then drop$ = vbNullString
 If kind > 0 Then
     If ismine(drop$) Then
     lastcol = 11
@@ -1800,7 +1800,7 @@ If kind > 0 Then
     drop$ = blockString(a$)
     
      ColorizeExpressions drop$, col(), k - Len(a$), pos2, feedthis
-     drop$ = ""
+     drop$ = vbNullString
      If FastSymbol(a$, "}") Then
         addone col(), pos2, 14
     pos2 = k - Len(a$) + 1
@@ -1825,14 +1825,14 @@ ElseIf MaybeIsSymbol(a$, "{", , True) Then
 addone col(), pos2, 15
 
 drop$ = blockString(a$)
-If drop$ <> "" Or (drop$ = "" And Left$(a$, 1) = "}") Then
+If drop$ <> "" Or (drop$ = vbNullString And Left$(a$, 1) = "}") Then
 feedthis = 0
 ''If Not IsSymbol(a$, "}") Then
 If Not MaybeIsSymbol(a$, "}", , True) Then feedthis = 15
 Else
 feedthis = 15
 End If
-drop$ = ""
+drop$ = vbNullString
 pos2 = k - Len(a$) + 1
 If feedthis = 15 Then Exit Sub
     GoTo again
@@ -1840,12 +1840,12 @@ If feedthis = 15 Then Exit Sub
 ElseIf MaybeIsSymbol(a$, Chr(34)) Then
 
 If Not ISSTRINGA(a$, drop$) Then
-a$ = ""
+a$ = vbNullString
 addone col(), pos2, 10
 Else
 addone col(), pos2, 15
 End If
-drop$ = ""
+drop$ = vbNullString
 pos2 = k - Len(a$) + 1
     GoTo again
 
@@ -1863,7 +1863,7 @@ If pos2 > 0 Then addone col(), pos2, 14
 
 End Sub
 Private Function blockString(s$) As String
-If s$ = "" Then Exit Function
+If s$ = vbNullString Then Exit Function
 Dim i As Long, j As Long, c As Long
 Dim a1 As Boolean
 c = Len(s$)
@@ -1890,7 +1890,7 @@ s$ = Mid$(s$, i)
 Else
 '' blockString = "Error " & chr(34) & "missing }" & chr(34)
 blockString = s$
-s$ = ""
+s$ = vbNullString
 End If
 If Right$(blockString, 1) = " " Then
 i = Len(blockString) - Len(RTrim(blockString))
@@ -1924,7 +1924,7 @@ Else
 lastcol = 14
 End If
 again:
-If RTrim$(a$) = "" Then
+If RTrim$(a$) = vbNullString Then
 If pos2 > 0 Then
   addone col(), pos2, lastcol
   Else
@@ -1982,7 +1982,7 @@ kind = IsLabelDot("", a$, drop$)
 If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 If kind = 0 Then drop$ = "->": kind = Abs(FastSymbol(a$, drop$, , 2))
-If kind = 0 Then drop$ = ""
+If kind = 0 Then drop$ = vbNullString
 If kind > 0 Then
     If ismine(drop$) Then
                 lastcol = 11
@@ -2134,7 +2134,7 @@ a$ = NLtrim$(a$)
   pos1 = Len(a$) + 1
   Else
   drop$ = Mid$(a$, 1, pos1 - 1)
-  If drop$ = "" Then drop$ = " "
+  If drop$ = vbNullString Then drop$ = " "
   End If
 feedback = 0
  ColorizeExpressions drop$, col(), k - Len(a$) + pos1 - 1, pos2, feedback
@@ -2296,8 +2296,8 @@ Function IsLabelDot(where$, a$, r$) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
-r$ = ""
-If a$ = "" Then IsLabelDot = 0: Exit Function
+r$ = vbNullString
+If a$ = vbNullString Then IsLabelDot = 0: Exit Function
 
 a$ = NLtrim$(a$)
     Do While Len(a$) > 0
@@ -2314,13 +2314,13 @@ a$ = NLtrim$(a$)
                 IsLabelDot = 0: a$ = firstdot$ + a$: Exit Function
             End If
         Case "?"
-        If r$ = "" And firstdot$ = "" Then
+        If r$ = vbNullString And firstdot$ = vbNullString Then
         r$ = "?"
         a$ = Mid$(a$, 2)
         IsLabelDot = 1
         Exit Function
     
-        ElseIf firstdot$ = "" Then
+        ElseIf firstdot$ = vbNullString Then
         IsLabelDot = 1
         Exit Function
         Else
@@ -2431,8 +2431,8 @@ End Function
 Function IsLabelOnly(a$, r$) As Long
 
 Dim rr&, one As Boolean, c$, dot&, Extra&
-r$ = ""
-If a$ = "" Then IsLabelOnly = 0: Exit Function
+r$ = vbNullString
+If a$ = vbNullString Then IsLabelOnly = 0: Exit Function
 a$ = NLtrim$(a$)
     Do While Len(a$) > 0
      c$ = Left$(a$, 1) 'ANYCHAR HERE
@@ -2449,7 +2449,7 @@ a$ = NLtrim$(a$)
           rr& = 10
            End If
         Case "@"
-           If r$ = "" Then
+           If r$ = vbNullString Then
               a$ = Mid$(a$, 2)
               ElseIf Mid$(a$, 2, 1) <> "(" And r$ <> "" Then
             r$ = r$ & "."
@@ -2480,7 +2480,7 @@ a$ = NLtrim$(a$)
                         
                         
             Else
-            If r$ = "" And dot& > 0 Then
+            If r$ = vbNullString And dot& > 0 Then
 
             r$ = String$(dot& + 1, ".")
             a$ = Mid$(a$, 2)
@@ -2529,7 +2529,7 @@ Case Is >= "A"
   
             End If
       Case "&"
-            If r$ = "" Then rr& = 2:    a$ = Mid$(a$, 2)
+            If r$ = vbNullString Then rr& = 2:    a$ = Mid$(a$, 2)
             Exit Do
        Case "$"
        If one Then Exit Do
@@ -2608,9 +2608,9 @@ Case Is >= "A"
     IsLabelOnly = rr& + Extra&
    
 End Function
-Function MaybeIsSymbol(a$, c$, Optional tail$ = "", Optional Remove As Boolean = False) As Boolean
+Function MaybeIsSymbol(a$, c$, Optional tail$ = vbNullString, Optional Remove As Boolean = False) As Boolean
 Dim i As Long, ok As Boolean
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 i = 1
 While Mid$(a$, i, 1) = " "
     i = i + 1
@@ -2626,7 +2626,7 @@ End Function
 Function MaybeIsSymbolNoSpace(a$, c$, Optional Remove As Boolean = False) As Boolean
 Dim ok As Boolean
 
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 ok = InStr(c$, Left$(a$, 1))
 If Remove And ok Then a$ = Mid$(a$, 2)
 MaybeIsSymbolNoSpace = ok
@@ -2638,7 +2638,7 @@ End Sub
 Private Sub mDoc1_BreakLine(data As String, datanext As String)
 If NoHeadwrap Or (NoTitle) Or UsedAsTextBox Then
     datanext = data
-    data = ""
+    data = vbNullString
 Else
  glistN.BreakLine data, datanext
 End If
@@ -3209,7 +3209,7 @@ With MultiUndo(b)
 .undomode = undomode  ' needed
 .undopos = undopos  ' new not charpos but selstart
 undopos = ParaSelStart
-undotext = ""
+undotext = vbNullString
 undopara = mDoc.MarkParagraphID  ' nod needed maybe for trace errors later
 undomode = -1
 undopara = -1
@@ -3221,7 +3221,7 @@ If NeoUndo < 1 Then Exit Function
 
 With MultiUndo(NeoUndo)
 undotext = .undotext
-.undotext = ""  ' flush
+.undotext = vbNullString  ' flush
 undopara = .undopara
 undomode = .undomode
 undopos = .undopos
@@ -3263,7 +3263,7 @@ With MultiRedo(b)
 .undomode = Redomode
 .undopos = Redopos
 Redopos = ParaSelStart
-Redotext = ""
+Redotext = vbNullString
 Redopara = mDoc.MarkParagraphID
 Redomode = -1
 End With
@@ -3273,7 +3273,7 @@ Private Function PopRedo() As Boolean
 If NeoRedo < 1 Then Exit Function
 With MultiRedo(NeoRedo)
 Redotext = .undotext
-.undotext = ""  ' flush
+.undotext = vbNullString  ' flush
 Redopara = .undopara
 Redomode = .undomode
 Redopos = .undopos
@@ -3324,7 +3324,7 @@ a$ = Space$(Len(c$))
 While glistN.UserControlTextWidth(a$) < maxw
 a$ = a$ + " "
 Wend
-c$ = ""
+c$ = vbNullString
 
 Else
 tr$ = String$(Len(Trim$(c$)), "0")
@@ -3373,7 +3373,7 @@ mDoc1.EmptyDoc
 NoHeadwrap = True
 mDoc1.textDoc = Title$ + a$
 End If
-glistN.HeadLine = "" ' reset
+glistN.HeadLine = vbNullString ' reset
 glistN.HeadLine = " " ' give a fake headline
 onelineheight = glistN.HeadlineHeight
 glistN.HeadlineHeight = mDoc1.DocLines * onelineheight
@@ -3399,7 +3399,7 @@ On Error Resume Next
         cc = "¶"
         DrawText mHdc, StrPtr(cc), -1, r, mway
     End If
-    cc = ""
+    cc = vbNullString
     CM = c
     For i = items& To 0 Step -1
         c = ww$(i)
@@ -3458,7 +3458,7 @@ cc$(wc&) = Mid$(c$, bb(w&))
 Else
 cc$(wc&) = Mid$(c$, bb(w&), bb(w& + 2) - bb(w&))
 End If
-If cc$(wc&) = "" Then
+If cc$(wc&) = vbNullString Then
 wc& = wc& - 1
 SplitStringUsingArray = cc$()
 Exit Function
@@ -3468,7 +3468,7 @@ Next w&
 If bb(w&) > 0 Then
 cc$(wc&) = Mid$(c$, bb(w&))
 End If
-If cc$(wc&) = "" Then wc& = wc& - 1
+If cc$(wc&) = vbNullString Then wc& = wc& - 1
 SplitStringUsingArray = cc$()
 End Function
 Function M2000(ch As Variant) As Long
@@ -3521,12 +3521,12 @@ End Function
 Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional pos As Long = 1) As String
 Dim b$, part$, w$, Level&, pos2 As Long, word$
 
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 If pos = 0 Then pos = 1
 Do While pos <= Len(a$)
 
     w$ = Mid$(a$, pos, 1)
-    If part$ = "" And w$ = "0" Then
+    If part$ = vbNullString And w$ = "0" Then
         If pos + 2 <= Len(a$) Then
             If LCase(Mid$(a$, pos, 2)) Like "0[x÷]" Then
             'hexadecimal literal number....
@@ -3550,7 +3550,7 @@ Do While pos <= Len(a$)
         If part$ <> "" Then
         b$ = b$ & part$
         End If
-        If Not (part$ = "" Or part$ = "o") Then Exit Do
+        If Not (part$ = vbNullString Or part$ = "o") Then Exit Do
         part$ = "S"
         pos = pos + 1
         Do While pos <= Len(a$)
@@ -3575,7 +3575,7 @@ Do While pos <= Len(a$)
             ' after
             ElseIf Right$(b$, 1) = "a" Then
             b$ = Left$(b$, Len(b$) - 1)
-            part$ = ""
+            part$ = vbNullString
             Else
             part$ = "N"
               
@@ -3584,18 +3584,18 @@ Do While pos <= Len(a$)
         If Not BlockParam2(a$, pos) Then Exit Do
         
        If Mid$(a$, pos + 1, 1) <> "." Then b$ = b$ & part$
-        part$ = ""
+        part$ = vbNullString
         
     ElseIf w$ = "{" Then
 
     
-           ''If b$ & part$ = "" Or Not part$ = "N" Then '' Or part$ = "S" Or part$ = "o" Or part$ = "l"
-             ''  If b$ & part$ = "" Or part$ = "S" Or part$ = "o" Then  '' Or part$ = "l"
+           ''If b$ & part$ = VbNullString Or Not part$ = "N" Then '' Or part$ = "S" Or part$ = "o" Or part$ = "l"
+             ''  If b$ & part$ = VbNullString Or part$ = "S" Or part$ = "o" Then  '' Or part$ = "l"
  
     If part$ <> "" Then
         b$ = b$ & part$
         End If
-              ''  If Not (part$ = "" Or part$ <> "o") Then Exit Do
+              ''  If Not (part$ = VbNullString Or part$ <> "o") Then Exit Do
         If b$ <> "" Then Exit Do
         part$ = "S"
         
@@ -3610,12 +3610,12 @@ Do While pos <= Len(a$)
         Case ","  ' bye bye
         Exit Do
         Case "%"
-            If part$ = "" Then
+            If part$ = vbNullString Then
             ' lathos
             End If
         Case "$"
-            If part$ = "" Then
-                If b$ = "" Then
+            If part$ = vbNullString Then
+                If b$ = vbNullString Then
                     part$ = "N"
                 ElseIf Right$(b$, 1) = "o" Then
                     part$ = "N"
@@ -3626,14 +3626,14 @@ Do While pos <= Len(a$)
                 End If
             ElseIf part$ = "N" Then
                     b$ = b$ & "Sa"
-                    part$ = ""
+                    part$ = vbNullString
             End If
         Case "-"
         If Mid$(a$, pos + 1, 1) = ">" Then
         Exit Do
         Else
                     b$ = b$ & part$
-                    If b$ = "" Then
+                    If b$ = vbNullString Then
                         part$ = "o"
                     Else
                     
@@ -3642,7 +3642,7 @@ Do While pos <= Len(a$)
         End If
         Case "+", "|"
                     b$ = b$ & part$
-                    If b$ = "" Then
+                    If b$ = vbNullString Then
                         part$ = "o"
                     Else
                     
@@ -3670,10 +3670,10 @@ Do While pos <= Len(a$)
   Exit Do
   End Select
   End If
-        word$ = ""
+        word$ = vbNullString
             If part$ <> "" Then
             b$ = b$ & part$
-            part$ = ""
+            part$ = vbNullString
             Else
             'skip
             End If
@@ -3686,7 +3686,7 @@ Do While pos <= Len(a$)
             part$ = "N"
             End If
         Case "&"
-        If part$ = "" Then
+        If part$ = vbNullString Then
         part$ = "S"
         Else
         b$ = part$
@@ -3705,7 +3705,7 @@ Do While pos <= Len(a$)
         Case "=", ">", "<", "~"
                 If b$ & part$ <> "" Then
                 w$ = Replace(b$ & part$, "a", "")
-            part$ = ""
+            part$ = vbNullString
                If srink Then
                   Do
                 b$ = w$
@@ -3835,7 +3835,7 @@ End Sub
 Private Function ISSTRINGA(a$, r$) As Boolean
 If Len(a$) < 2 Then ISSTRINGA = False: Exit Function
 Dim q$, w As Long
-r$ = ""
+r$ = vbNullString
 q$ = Chr(34)
 w = 1
 Do

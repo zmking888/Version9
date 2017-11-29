@@ -377,7 +377,7 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
     ' let's first ty to get the name
     ' of the member by using the current TypeInfo
     hRet = CallPointer(oTypeInfo.GetNames, pTypeInfo, dispid, VarPtr(strName), 1, VarPtr(pcNames))
-    If Len(strName) > 0 Then first$ = strName$: strName = ""
+    If Len(strName) > 0 Then first$ = strName$: strName = vbNullString
     hRet = CallPointer(oTypeInfo.GetContainingTypeLib, pTypeInfo, VarPtr(pTypeLib), VarPtr(dwIndex))
     If hRet Then GoTo finalize
 
@@ -403,7 +403,7 @@ finalize:
         ' instead return the dispip
         If first$ <> "" Then
             GetMemberName = first$
-             first$ = ""
+             first$ = vbNullString
         Else
             GetMemberName = dispid
         End If

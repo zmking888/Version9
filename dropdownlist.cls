@@ -226,7 +226,7 @@ Dim l As Boolean
 If Not AutoComplete Then Exit Sub
 Dim f As Long
 Iam = True
-If ThatString = "" And Textbox.glistN.LastLinePart <> "" Then
+If ThatString = vbNullString And Textbox.glistN.LastLinePart <> "" Then
 f = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
 
 Else
@@ -246,11 +246,11 @@ If UseOnlyTheList Then
 l = Textbox.glistN.enabled
 Textbox.glistN.enabled = False
 Textbox.glistN.LastLinePart = Textbox.vartext + Textbox.glistN.LastLinePart
-ThatString = ""
+ThatString = vbNullString
 setpos = 0
 Textbox.glistN.enabled = l
 Else
-Textbox.glistN.LastLinePart = ""
+Textbox.glistN.LastLinePart = vbNullString
 End If
 End If
 End Sub
@@ -260,7 +260,7 @@ Text = Textbox.vartext + Textbox.glistN.LastLinePart
 End Property
 
 Public Property Let Text(ByVal RHS As String)
- Textbox.glistN.LastLinePart = ""
+ Textbox.glistN.LastLinePart = vbNullString
 Textbox.vartext = RHS
 
 End Property

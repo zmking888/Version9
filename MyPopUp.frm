@@ -85,11 +85,11 @@ MyDoEvents
 End Sub
 Public Sub UpGui(that As Object, x As Variant, y As Variant, thistitle$)
 If thistitle$ <> "" Then
-gList1.HeadLine = ""
+gList1.HeadLine = vbNullString
 gList1.HeadLine = thistitle$
 gList1.HeadlineHeight = gList1.HeightPixels
 Else
-gList1.HeadLine = ""
+gList1.HeadLine = vbNullString
 gList1.HeadlineHeight = 0
 End If
 x = x + that.Left
@@ -299,8 +299,8 @@ If Button = 1 Then
 End If
 End Sub
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -329,7 +329,7 @@ Else
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
@@ -368,7 +368,7 @@ Else
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -431,7 +431,7 @@ If gList1.ListIndex = -1 Then gList1.ListindexPrivateUse = lastitem
 If ((KeyCode >= vbKey0 And KeyCode <= vbKey9) Or (KeyCode >= vbKeyNumpad0 And KeyCode <= vbKeyNumpad9)) And gList1.EditFlag = False And gList1.ListIndex = 0 Then
                         lastitem = 0
                     gList1.PromptLineIdent = Len(part1)
-                    gList1.list(0) = ""
+                    gList1.list(0) = vbNullString
                     gList1.SelStart = 3
                     gList1.EditFlag = True
 

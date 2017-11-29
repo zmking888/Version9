@@ -95,7 +95,7 @@ End Select
 Next i
 PushStage objref, 0
 Set mS = Nothing
-here$ = ""
+here$ = vbNullString
 If subHash.ExistKey(myUcase(modulename$, True)) Then
     probe = interpret(objref, modulename$)
 Else
@@ -129,7 +129,7 @@ Set oldsoros = Nothing
 here$ = ohere$
 End Sub
 Public Sub CallModule(modulename$, ParamArray a())
-Static Once As Boolean, where As Long, what
+Static once As Boolean, where As Long, what
 If Status <> 0 Then Exit Sub
 If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
 'MyEr "Not Found", "Δεν Βρέθηκε"
@@ -157,9 +157,9 @@ If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
 Exit Sub
 End If
 
-If Once Then Exit Sub
+If once Then Exit Sub
 Dim ohere$
-Once = True
+once = True
 ohere$ = here$
 here$ = full$
 
@@ -272,7 +272,7 @@ PopStage objref
 Set objref.Sorosref = oldsoros
 Set oldsoros = Nothing
 here$ = ohere$
-Once = False
+once = False
 End Sub
 
 Public Sub ExecuteStatement(ByVal code$)
@@ -280,9 +280,9 @@ Dim what$, pos As Long, func As Boolean, param$
 If Status <> 0 Then Exit Sub
 If IsLabelOnly(code$, what$) > 4 Then
     func = True
-ElseIf what$ = "" Then
+ElseIf what$ = vbNullString Then
     Exit Sub
-ElseIf LTrim$(code$) = "" Then
+ElseIf LTrim$(code$) = vbNullString Then
 ' one call
 Call Run(what$)
 Exit Sub
@@ -290,7 +290,7 @@ End If
 Do
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
-  If drop$ = "" And pos > Len(code$) Then Exit Sub
+  If drop$ = vbNullString And pos > Len(code$) Then Exit Sub
   If param$ <> "" Then
   param$ = param$ + ", " + Left$(code$, pos - 1)
   Else
@@ -308,7 +308,7 @@ Public Function Eval(code$) As Variant
 Dim pos As Long, p As Double, s As String, drop$
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
-  If drop$ = "" And pos > Len(code$) Then Exit Function
+  If drop$ = vbNullString And pos > Len(code$) Then Exit Function
   If InStr(drop$, "N") Then
   If IsExp(objref, Left$(code$, pos), p) Then
   If Not objref.lastobj Is Nothing Then
@@ -348,8 +348,8 @@ MOUT = False
 ResetBreak
 Run = True
         LastErNum = 0: LastErNum1 = 0
-        LastErName = ""
-        LastErNameGR = ""
+        LastErName = vbNullString
+        LastErNameGR = vbNullString
 
 If Execute(objref, code$, False) <> 1 Then
 Run = fasle
@@ -436,8 +436,8 @@ Public Sub Reset()
 
     NERR = False
         LastErNum = 0: LastErNum1 = 0
-        LastErName = ""
-        LastErNameGR = ""
+        LastErName = vbNullString
+        LastErNameGR = vbNullString
  
 
         
@@ -446,7 +446,7 @@ End Sub
 Private Sub Class_Initialize()
         Set objref = New basetask
         Set objref.Owner = Form1.DIS
-        mineHere$ = "" 'HERE$
+        mineHere$ = vbNullString 'HERE$
 End Sub
 
 Private Sub Class_Terminate()

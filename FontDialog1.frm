@@ -150,7 +150,7 @@ gList3.VerticalCenterText = True
 gList3.restrictLines = 1
 gList3.PanPos = 0
 gList2.CapColor = rgb(255, 160, 0)
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 gList2.FloatList = True
 gList2.MoveParent = True
 gList3.NoPanRight = False
@@ -270,8 +270,8 @@ gList1.ListindexPrivateUse = i
 Exit For
 End If
 Next i
-If ReturnSize >= 6 Then gList4.List(4) = "  " & CStr(ReturnSize)
-gList4.List(6) = "  " & CStr(ReturnCharset)
+If ReturnSize >= 6 Then gList4.list(4) = "  " & CStr(ReturnSize)
+gList4.list(6) = "  " & CStr(ReturnCharset)
 gList4.enabled = True
 gList2.TabStop = False
 gList1.ShowMe
@@ -308,8 +308,8 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
@@ -325,7 +325,7 @@ If dr Then
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / (8145 * DYP / 15) > 0.4 And ((Width + addX) / (3690 * DXP / 15)) > 0.4 Then
@@ -365,7 +365,7 @@ If dr Then
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -410,7 +410,7 @@ gList3.Font.name = Screen.Fonts(item - 1)
 gList3.Font.Italic = gList4.ListSelected(2)
 gList3.FontSize = 11.25 * lastfactor
 gList3.FontBold = gList4.ListSelected(1)
-gList3.Font.charset = Trim$(gList4.List(6))
+gList3.Font.charset = Trim$(gList4.list(6))
 TEXT1 = Screen.Fonts(item - 1)
 End Sub
 
@@ -419,7 +419,7 @@ gList3.Font.name = Screen.Fonts(item - 1)
 gList3.Font.Italic = gList4.ListSelected(2)
 gList3.FontSize = 11.25 * lastfactor
 gList3.FontBold = gList4.ListSelected(1)
-gList3.Font.charset = Trim$(gList4.List(6))
+gList3.Font.charset = Trim$(gList4.list(6))
 TEXT1 = Screen.Fonts(item - 1)
 End Sub
 
@@ -475,14 +475,14 @@ End Sub
 
 Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If gList3.EditFlag Then Exit Sub
-    If gList3.List(0) = "" Then
+    If gList3.list(0) = vbNullString Then
     gList3.BackColor = &H808080
     gList3.ShowMe2
     Exit Sub
     End If
  
 If Button = 1 Then
-  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.List(0)) / Screen.TwipsPerPixelX
+  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.list(0)) / Screen.TwipsPerPixelX
        gList3.BackColor = rgb(0, 160, 0)
     gList3.ShowMe2
 Else
@@ -507,12 +507,12 @@ End Sub
 
 Private Sub glist3_PanLeftRight(Direction As Boolean)
 
-If TEXT1 = "" Then Exit Sub
+If TEXT1 = vbNullString Then Exit Sub
 If Direction Then
 ReturnBold = gList4.ListSelected(1)
 ReturnItalic = gList4.ListSelected(2)
-ReturnSize = val(Trim$(gList4.List(4)))
-ReturnCharset = val(Trim$(gList4.List(6)))
+ReturnSize = val(Trim$(gList4.list(4)))
+ReturnCharset = val(Trim$(gList4.list(6)))
 If gList1.ListIndex > -1 Then ReturnFontName = Screen.Fonts(gList1.ListIndex)
 Unload Me
 End If
@@ -648,14 +648,14 @@ Dim content1 As Single
 If item = 4 Then
 content1 = val("0" & Trim$(content))
 If content1 > 144 Then
-content = gList4.List(item)
+content = gList4.list(item)
 Else
 content = "  " & CStr(content1)
 End If
 ElseIf item = 6 Then
 content1 = val("0" & Trim$(content))
 If content1 > 255 Then
-content = gList4.List(item)
+content = gList4.list(item)
 Else
 content = "  " & CStr(content1)
 End If
@@ -670,7 +670,7 @@ End Sub
 
 Private Sub gList4_LostFocus()
 If gList4.EditFlag Then
-If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+If val(Trim$(gList4.list(4))) < 6 Then gList4.list(4) = "  6"
 End If
 gList4.EditFlag = False
 gList4.NoCaretShow = True
@@ -702,18 +702,18 @@ If Not gList4.EditFlag Then
  gList4.EditFlag = True
  gList4.NoCaretShow = False
  gList4.ShowMe2
- If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+ If val(Trim$(gList4.list(4))) < 6 Then gList4.list(4) = "  6"
 End If
  Else
  gList4.EditFlag = False
  gList4.NoCaretShow = True
  End If
-gList3.Font.charset = Trim$(gList4.List(6))
+gList3.Font.charset = Trim$(gList4.list(6))
 
 End Sub
 Private Sub gList4_Selected2(item As Long)
 Dim t$()
-If val(Trim$(gList4.List(4))) < 6 Then gList4.List(4) = "  6"
+If val(Trim$(gList4.list(4))) < 6 Then gList4.list(4) = "  6"
 If item = 4 Or item = 6 Then
 If Not gList4.EditFlag Then
  gList4.EditFlag = True
@@ -726,11 +726,11 @@ Else
  gList4.EditFlag = False
   gList4.NoCaretShow = False
  If item > 7 And item < 17 Then
- t$() = Split(gList4.List(item), " - ")
- gList4.List(6) = "  " + t$(UBound(t$()))
+ t$() = Split(gList4.list(item), " - ")
+ gList4.list(6) = "  " + t$(UBound(t$()))
  gList4.ShowMe2
  ElseIf item > 17 Then
- gList4.List(4) = gList4.List(item)
+ gList4.list(4) = gList4.list(item)
  gList4.ShowMe2
  End If
 End If

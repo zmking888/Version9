@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Public Event MayQuit(yes)
+Public Event MayQuit(Yes)
 Public Event BreakLine(data$, datanext$)
 Public Event Lastline()
 Public Event ColorDataEvent(thispara As Long, data$, col() As Variant, feedback As Long)
@@ -49,7 +49,7 @@ Public ListLoadedType As Long
 Private Declare Function CompareString Lib "KERNEL32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private words$, Unique As Long
+Private words$, unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
@@ -142,11 +142,11 @@ Sub WritePara(ParaNum As Long, ByVal data$)
    End If
     
     RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
-    If NeoData$ = "" Then NeoData$ = data$: data$ = ""
+    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
-    NeoData$ = ""
-    Loop Until data$ = ""
+    NeoData$ = vbNullString
+    Loop Until data$ = vbNullString
 End Sub
 Sub WriteParaOneline(ParaNum As Long, ByVal NeoData$)
     ReDim para(ParaNum).content(1 To 1)
@@ -168,7 +168,7 @@ lenfinal = Len(final$)
 If lenfinal = 0 Then final$ = ";": lenfinal = 1
     If mNum = 0 Then Exit Sub
     data$ = TextParagraph(mNum)
-    If Trim(data$) = "" Then
+    If Trim(data$) = vbNullString Then
         lookthis = DocParaBack(mNum)
         If lookthis > 0 Then
                     If para(lookthis).startfrom > 0 And UBound(para(lookthis).colordata()) = 2 Then
@@ -293,11 +293,11 @@ Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = Fa
     ReDim Preserve para(ParaNum).content(1 To thatmax)
     End If
     RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
-    If NeoData$ = "" Then NeoData$ = data$: data$ = ""
+    If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
     para(ParaNum).content(neolines) = NeoData$
     para(ParaNum).lines = neolines
-    NeoData$ = ""
-    Loop Until data$ = ""
+    NeoData$ = vbNullString
+    Loop Until data$ = vbNullString
      If Not skipcolor Then
             ColorThis (ParaNum)
         
@@ -566,11 +566,11 @@ Dim mlines As Long, NeoData As String
 mycur = DocParaNext(0)
 textHtmlDoc = Space$(500)
 Do While mycur <> 0
-    NeoData = ""
+    NeoData = vbNullString
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
-If NeoData = "" Then
+If NeoData = vbNullString Then
 If thiscur <> 0 Then NeoData = "<p>" Else thiscur = 1
 Else
 ' put color here
@@ -581,7 +581,7 @@ a$ = ReplaceStr("  ", Chr$(7) + Chr$(7), a$)
 a$ = ReplaceStr(Chr$(7) + " ", Chr$(7) + Chr$(7), a$)
 If UBound(para(mycur).colordata()) > 1 Then
 mcolor() = para(mycur).colordata()
-NeoData = ""
+NeoData = vbNullString
 l = 1
 If mcolor(l) > 1 Then mcolor(l) = 1
 Do
@@ -695,7 +695,7 @@ Dim i As Long, k As Long, j As Long, ii As Long
         If k = j Then
         t_text = t(k)
         Else
-        t_text = ""
+        t_text = vbNullString
         For ii = k To j
         If Len(t(ii)) = 0 Then
         t_text = t_text + Space(tabwidth)
@@ -712,11 +712,11 @@ Dim i As Long, k As Long, j As Long, ii As Long
     End If
     
     i = i + 1
-    If t_text = "" And i > UBound(a()) Then
+    If t_text = vbNullString And i > UBound(a()) Then
     
     If b$ <> "" Then
         ReWritePara ParaNum, TextParagraph(ParaNum) + b$, True
-        b$ = ""
+        b$ = vbNullString
     End If
     Exit Do
     End If
@@ -732,7 +732,7 @@ Dim i As Long, k As Long, j As Long, ii As Long
            ReWritePara ParaNum, b$ & t_text, True
             fromPos = Len(b$ & t_text) + 1
             
-            b$ = ""
+            b$ = vbNullString
         Else
         If fromPos <= 0 Then fromPos = 1
         
@@ -1266,7 +1266,7 @@ End Property
 Property Get TextParagraph(ByVal ParaNum As Long) As String
 If InvalidPara(ParaNum) Then Exit Property
     Dim mlines As Long, NeoData As String
-    If ParaNum = 0 Then TextParagraph = "": Exit Property
+    If ParaNum = 0 Then TextParagraph = vbNullString: Exit Property
     For mlines = 1 To para(ParaNum).lines
         NeoData = NeoData + para(ParaNum).content(mlines)
     Next mlines
@@ -1274,7 +1274,7 @@ If InvalidPara(ParaNum) Then Exit Property
 End Property
 Property Get TextParagraphKey(ByVal ParaNum As Long) As String
     Dim mlines As Long, NeoData As String
-    If ParaNum = 0 Then TextParagraphKey = "": Exit Property
+    If ParaNum = 0 Then TextParagraphKey = vbNullString: Exit Property
     For mlines = 1 To para(ParaNum).lines
         NeoData = NeoData + para(ParaNum).content(mlines)
     Next mlines
@@ -1292,7 +1292,7 @@ End Property
 Property Get TextParagraphLen(ByVal ParaNum As Long) As Long
 ' without addition of 2 chars vbcrlf
     Dim mlines As Long, neodatalen As Long
-    If ParaNum = 0 Then TextParagraphLen = "": Exit Property
+    If ParaNum = 0 Then TextParagraphLen = vbNullString: Exit Property
     For mlines = 1 To para(ParaNum).lines
         neodatalen = neodatalen + Len(para(ParaNum).content(mlines))
     Next mlines
@@ -1382,7 +1382,7 @@ Function TextParagraphLine2(ByVal lineno As Long, thistext As String, ParaNum As
         End If
         
     Else
-        thistext = ""
+        thistext = vbNullString
         ParaNum = 0
     End If
 End Function
@@ -1411,7 +1411,7 @@ Function TextParagraphLine(ByVal lineno As Long, thistext As String, ParaNum As 
         End If
         
     Else
-        thistext = ""
+        thistext = vbNullString
         ParaNum = 0
     End If
 End Function
@@ -1872,7 +1872,7 @@ If Not Append Then
 If Not NeoUnicodeFile(FileName) Then Exit Function
 End If
 f$ = GetDosPath(FileName)
-If Err.Number > 0 Or f$ = "" Then Exit Function
+If Err.Number > 0 Or f$ = vbNullString Then Exit Function
 w = FreeFile
 Open f$ For Binary As w
 ' mode2save
@@ -2073,7 +2073,7 @@ nobom = 1
 ' code from Schmidt, member of vbforums
 ' this code changed for Document Class
 ' Change to read line by line, so no two copies needed
-If FileName = "" Then Exit Sub
+If FileName = vbNullString Then Exit Sub
 If Not Merge Then EmptyDoc
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
@@ -2281,8 +2281,8 @@ If uLCID = -1 Then uLCID = sortmlcid
 words$ = textDoc
 End If
 If uLCID = 0 Then uLCID = &H800
-Unique = CountWords2(words$, uLCID)
-UniqueWords = Unique
+unique = CountWords2(words$, uLCID)
+UniqueWords = unique
 End Function
 Private Function CountWords2(a$, uLCID As Long) As Long
 Dim l As Long
@@ -2373,13 +2373,13 @@ CopyMemory ByVal StrPtr(MakeString), ByVal copythat, lSize * 2
 End Function
 Function ExportWords(Optional usenumbers As Boolean = True) As String()
 Dim a() As String
-If Unique = 0 Then
+If unique = 0 Then
 ExportWords = Split(mWordMap(textDoc))
 Exit Function
 Else
-ReDim a(1 To Unique)
+ReDim a(1 To unique)
 Dim i As Long
-For i = 1 To Unique
+For i = 1 To unique
 a(i) = MakeString(pos(i), SLen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 ExportWords = a()
@@ -2388,7 +2388,7 @@ End Function
 Sub ExportWords2ObjectAddItem(ThisObject As Object, Optional usenumbers As Boolean = True)
 Dim a() As String, i As Long
 
-If Unique = 0 Then
+If unique = 0 Then
 a() = Split(mWordMap(textDoc))
 QuickSortString a(), LBound(a()), UBound(a())
 For i = LBound(a()) To UBound(a())
@@ -2397,11 +2397,11 @@ Next i
 Exit Sub
 Else
 If usenumbers Then
-For i = 1 To Unique
+For i = 1 To unique
 ThisObject.additem MakeString(pos(i), SLen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 Else
-For i = 1 To Unique
+For i = 1 To unique
 ThisObject.additem MakeString(pos(i), SLen(i))
 Next i
 
@@ -2410,10 +2410,10 @@ End If
 End If
 End Sub
 Public Sub ResetWords()
-words$ = ""
+words$ = vbNullString
 p3 = 0
 ReDim pos(1 To 1) As Long, SLen(1 To 1) As Long, hit(1 To 1) As Long
-Unique = 0
+unique = 0
 End Sub
 Public Sub QuickSortString(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long

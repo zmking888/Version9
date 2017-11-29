@@ -107,13 +107,13 @@ Function NumberofDrives() As Integer
     DriveCount = 0
 ' Search for a null -- which separates the drives
     For i = 1 To BuffLen
-        If AscW(Mid(Buffer, i, 1)) = 0 Then _
+        If AscW(Mid$(Buffer, i, 1)) = 0 Then _
           DriveCount = DriveCount + 1
     Next i
     NumberofDrives = DriveCount
 End Function
 
-Function DriveName(Index As Integer) As String
+Function DriveName(index As Integer) As String
     
     Dim Buffer As String * 255
     Dim BuffLen As Long
@@ -121,18 +121,18 @@ Function DriveName(Index As Integer) As String
     Dim DriveCount As Integer, i As Integer
    
     BuffLen = GetLogicalDriveStrings(Len(Buffer), Buffer)
-    TheDrive = ""
+    TheDrive = vbNullString
     DriveCount = 0
     For i = 1 To BuffLen
-        If AscW(Mid(Buffer, i, 1)) <> 0 Then _
-          TheDrive = TheDrive & Mid(Buffer, i, 1)
-        If AscW(Mid(Buffer, i, 1)) = 0 Then 'null separates drives
+        If AscW(Mid$(Buffer, i, 1)) <> 0 Then _
+          TheDrive = TheDrive & Mid$(Buffer, i, 1)
+        If AscW(Mid$(Buffer, i, 1)) = 0 Then 'null separates drives
             DriveCount = DriveCount + 1
-            If DriveCount = Index Then
+            If DriveCount = index Then
                 DriveName = UCase(Left(TheDrive, 1))
                 Exit Function
             End If
-            TheDrive = ""
+            TheDrive = vbNullString
         End If
     Next i
 End Function
@@ -144,15 +144,15 @@ Set oshell = CreateObject("Shell.Application")
 If Not oshell Is Nothing Then
 Set oFolder = oshell.NameSpace(NET_HOOD)
 For Each ofile In oFolder.items
-If ofile.name = "" Then
-If all = "" Then
+If ofile.name = vbNullString Then
+If all = vbNullString Then
 all = "(" + ofile.GetLink.path + ")"
 Else
      all = all + vbCrLf + "(" + ofile.GetLink.path + ")"
      End If
 
 Else
-If all = "" Then
+If all = vbNullString Then
 all = "(" + ofile.name + ")"
 Else
      all = all + vbCrLf + "(" + ofile.name + ")"

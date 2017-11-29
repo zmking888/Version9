@@ -1032,7 +1032,7 @@ If zf <= 0 Then
     last_zf = zf
     ' gdiflush
 End Sub
-Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetx As Long = 0, Optional ByVal offsety As Long, Optional ByVal border As Long = 0, Optional ByVal rtxy As Double = 1#, Optional pname As String = "")
+Public Sub ThumbnailPaintPrinter(copiesNUM As Long, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetx As Long = 0, Optional ByVal offsety As Long, Optional ByVal border As Long = 0, Optional ByVal rtxy As Double = 1#, Optional pname As String = vbNullString)
    Dim oldSc As Long, dummy1 As Boolean, dummy2 As Boolean, sw As Long, sh As Long
    Dim swProbe As Long, shProbe As Long, osh As Double
    Dim Myleft As Long, mytop As Long, mywidth As Long, myheight As Long
@@ -1312,7 +1312,7 @@ Public Sub ThumbnailPartPaint(DestPic As Object, _
                     Optional ByVal yPos As Long, _
                     Optional border As Boolean = False, _
                     Optional ThumbnailDist As Long = 16, _
-                    Optional ByVal lText As String = "", _
+                    Optional ByVal lText As String = vbNullString, _
                     Optional offsetx As Long = 0, _
                     Optional offsety As Long = 0)
                     Dim ThumbnailDistY As Long, zf As Single, ofsize As Single
@@ -1330,7 +1330,7 @@ Public Sub ThumbnailPartPaint(DestPic As Object, _
    If mS > 2 Then
    If Len(lText) > mS Then lText = Left$(lText, mS - 2) & ".."
     Else
-        lText = ""
+        lText = vbNullString
      ThumbnailDistY = 0
 End If
 
@@ -1441,7 +1441,7 @@ CopyMemory ByVal VarPtrArray(bDib), 0&, 4
 End Sub
 Public Sub loadDIB(f As String)
 Dim fl As Long, fmem() As Byte, fh As Long, ff As BITMAPFILEHEADER
-If GetDosPath(f) = "" Then Exit Sub
+If GetDosPath(f) = vbNullString Then Exit Sub
 fl = FileLen(GetDosPath(f))
 
 If fl > 0 Then
@@ -1957,13 +1957,13 @@ Sub PageView(where As Object, Optional how As Long = -1, Optional vso As Object 
 Dim redX As Long, redY As Long, ss As Single, aa As Single
 
 Dim VredX As Long, VredY As Long
-Static Once As Boolean
+Static once As Boolean
 
-If Once Then Exit Sub
+If once Then Exit Sub
 If where.ScaleHeight < DXP Or where.ScaleWidth < DYP Then Exit Sub
 If how = -1 Then how = m_PageStyle
 m_PageStyle = how
-Once = True
+once = True
 'On Error GoTo there1
 If Not vso Is Nothing Then
  redX = vso.Width
@@ -2161,7 +2161,7 @@ where.gonia(gid).Visible = vso.Visible And hso.Visible
 End If
 End If
 where.Refresh
-Once = False
+once = False
 End Sub
 
 Public Sub ThumbnailPaintdib(DestPic As cDIBSection, Optional ByVal zf As Single = -1, Optional ByVal FitToPic As Boolean = True, Optional CROP As Boolean = False, Optional over As Boolean = False, Optional ByVal fr As Long = 0, Optional ByVal offsetx As Long = 0, Optional ByVal offsety As Long, Optional ByVal border As Long = 0, Optional ByVal rtxy As Double = 1#)

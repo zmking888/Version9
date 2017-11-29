@@ -424,10 +424,10 @@ Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As L
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
-    f = Mid(a, c + 1)
+    f = Mid$(a, c + 1)
     g = InStr(1, f, " ")
     wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid(f, g)) 'height
+    wHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function MovieHeight() As Long
     'Returns the size parameters of the m"+cstr(myID)+"
@@ -440,9 +440,9 @@ Public Function MovieHeight() As Long
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
-    f = Mid(a, c + 1)
+    f = Mid$(a, c + 1)
     g = InStr(1, f, " ")
-       MovieHeight = val(Mid(f, g)) 'height
+       MovieHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     'Returns the default size of the m"+cstr(myID)+" even if the size
@@ -456,10 +456,10 @@ Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     a = getDefaultSize
     b = InStr(1, a, " ") '2
     c = InStr(b + 1, a, " ") '4
-    f = Mid(a, c + 1) '9
+    f = Mid$(a, c + 1) '9
     g = InStr(1, f, " ")
     wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid(f, g)) 'height
+    wHeight = val(Mid$(f, g)) 'height
 End Function
 Public Function getBitsPerPixel()
     'Will get the m"+cstr(myID)+" bitsperpixel
@@ -653,7 +653,7 @@ Private Function getThisTime(ByVal timein As Long) As String
     If conH > 0 Then
         strRetTime = LTrim(Str(conH)) & ":"
     Else
-        strRetTime = ""
+        strRetTime = vbNullString
     End If
     If conM >= 10 Then
         strRetTime = strRetTime & LTrim(Str(conM))

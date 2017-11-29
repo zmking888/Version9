@@ -154,7 +154,7 @@ firstpath = False
 nopreview = False
 oldLeftMarginPixels = 0
 gList2.CapColor = rgb(255, 160, 0)
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 
 gList2.FloatList = True
 gList2.MoveParent = True
@@ -287,7 +287,7 @@ LastWidth = -1
 End If
 ScaleDialog lastfactor, DialogPreview, LastWidth
 ''UserFileName = .Mydir.ExtractName(UserFileName)
-UserFileName = ""
+UserFileName = vbNullString
 .FileTypesToDisplay = FileTypesShow
 .Mydir.Nofiles = FolderOnly
 .Mydir.TopFolder = TopFolder
@@ -298,7 +298,7 @@ UserFileName = .Mydir.ExtractName(ReturnFile)
 gList3.ShowMe
 .FilePath = ExtractPath(ReturnFile)
 If .TEXT1 <> .Mydir.ExtractName(ReturnFile) Then .TEXT1 = .Mydir.ExtractName(ReturnFile)
-ReturnFile = ""
+ReturnFile = vbNullString
 Else
 .FilePath = ExtractPath(TopFolder)
 End If
@@ -357,8 +357,8 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
@@ -375,7 +375,7 @@ If dr Then
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
@@ -424,7 +424,7 @@ If dr Then
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -435,17 +435,17 @@ Private Sub Form_Unload(Cancel As Integer)
 DestroyCaret
 Dim i As Long, filetosave As String
 If mySelector.mselChecked Then
-ReturnListOfFiles = ""
+ReturnListOfFiles = vbNullString
 With mySelector
 For i = 0 To .Mydir.listcount - 1
 ' prepare list for files
 If .Mydir.ReadMark(i) Then
     If .recnowchecked Then
- filetosave = .Mydir.FindFolder(i) + .Mydir.List(i)
+ filetosave = .Mydir.FindFolder(i) + .Mydir.list(i)
     Else
-    filetosave = .Mydir.path + .Mydir.List(i)
+    filetosave = .Mydir.path + .Mydir.list(i)
     End If
-If ReturnListOfFiles = "" Then
+If ReturnListOfFiles = vbNullString Then
 ReturnListOfFiles = filetosave
 Else
 ReturnListOfFiles = ReturnListOfFiles & "#" & filetosave
@@ -456,7 +456,7 @@ End With
 ElseIf FolderOnly Then
 If ReturnFile <> "" Then
 If Not mySelector.Mydir.isdir(ReturnFile) Then MakeFolder ReturnFile
-If Not mySelector.Mydir.isdir(ReturnFile) Then ReturnFile = ""
+If Not mySelector.Mydir.isdir(ReturnFile) Then ReturnFile = vbNullString
 End If
 End If
 Set Image1.image = Nothing
@@ -499,7 +499,7 @@ Private Sub FlipList()
                 dirlistindex = gList1.ListIndex
                 mySelector.NostateDir = True
                 gList1.LeftMarginPixels = oldLeftMarginPixels
-                gList1.HeadLine = "" ' reset
+                gList1.HeadLine = vbNullString ' reset
                 gList1.HeadLine = SetUp
                 gList1.ScrollTo 0
                 gList1.ListindexPrivateUse = 1
@@ -511,14 +511,14 @@ Private Sub FlipList()
                 gList1.ScrollTo dirlistindex
                 gList1.ListindexPrivateUse = dirlistindex
                 gList1.LeftMarginPixels = 0
-                gList1.HeadLine = ""
+                gList1.HeadLine = vbNullString
                 gList1.HeadLine = " "
                 mySelector.ResetHeightSelector
                 gList1.PrepareToShow
                 Else
                 mySelector.NostateDir = False
                 gList1.LeftMarginPixels = 0
-                gList1.HeadLine = ""
+                gList1.HeadLine = vbNullString
                 gList1.HeadLine = " "
                 mySelector.reload
                 mySelector.ResetHeightSelector
@@ -566,7 +566,7 @@ gList1.ScrollTo 0
 Case 16
 With mySelector
 .AbordAll
-.selectedFile = ""
+.selectedFile = vbNullString
 End With
 CancelDialog = True
 Unload Me
@@ -615,14 +615,14 @@ End Sub
 
 Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If gList3.EditFlag Then Exit Sub
-    If gList3.List(0) = "" Then
+    If gList3.list(0) = vbNullString Then
     gList3.BackColor = &H808080
     gList3.ShowMe2
     Exit Sub
     End If
  
 If Button = 1 Then
-  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.List(0)) / Screen.TwipsPerPixelX
+  gList3.LeftMarginPixels = gList3.WidthPixels - gList3.UserControlTextWidth(gList3.list(0)) / Screen.TwipsPerPixelX
        gList3.BackColor = rgb(0, 160, 0)
     gList3.ShowMe2
 Else
@@ -706,14 +706,14 @@ End Sub
 
 Private Sub glist3_PanLeftRight(Direction As Boolean)
 Dim that As New recDir, TT As Integer
-If TEXT1 = "" Then Exit Sub
+If TEXT1 = vbNullString Then Exit Sub
 
 If Direction Then
-If mySelector.Mydir.path = "" Then
+If mySelector.Mydir.path = vbNullString Then
 If gList2.HeadLine = SelectFolderCaption And TEXT1 <> "" And TEXT1 <> ".." Then
 ReturnFile = TEXT1 & "\"
 Else
-ReturnFile = ""
+ReturnFile = vbNullString
 End If
 mySelector.AbordAll
 Unload Me
@@ -727,13 +727,13 @@ TEXT1 = mySelector.Mydir.CleanName(TEXT1.Text)
         ElseIf TEXT1.glistN.EditFlag Then
             ReturnFile = mySelector.GetPath + TEXT1 & "\"
         ElseIf mySelector.glistN.ListIndex >= 0 Then
-            ReturnFile = Mid$(mySelector.Mydir.List(mySelector.glistN.ListIndex), 2) & "\"
+            ReturnFile = Mid$(mySelector.Mydir.list(mySelector.glistN.ListIndex), 2) & "\"
         Else
          ReturnFile = mySelector.GetPath + TEXT1 & "\"
     End If
     Else
 
-        ReturnFile = mySelector.GetPath + gList3.List(0)
+        ReturnFile = mySelector.GetPath + gList3.list(0)
         
     End If
 
@@ -810,7 +810,7 @@ End Sub
 Private Sub mySelector_NewHeadline(newpath As String)
 If firstpath = 0 Then
 Else
-If Not SaveDialog Then TEXT1 = ""
+If Not SaveDialog Then TEXT1 = vbNullString
  Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.BackColor, BF
 
 Set LoadApicture = LoadPicture("")
@@ -839,7 +839,7 @@ Image1.Width = aImage.Width
 End Property
 Private Sub mySelector_TraceFile(file As String)
 If Not DialogPreview Then
-TEXT1 = mySelector.Mydir.List(mySelector.glistN.ListIndex)
+TEXT1 = mySelector.Mydir.list(mySelector.glistN.ListIndex)
 Refresh
 Else
 Dim aImage As StdPicture, sc As Single
@@ -854,13 +854,13 @@ On Error Resume Next
 Err.Clear
 'If FileLen(file) > 1500000 Then Image1.refresh
 Set aImage = LoadPicture(GetDosPath(file))
-If file = "" Or Err.Number > 0 Then Exit Sub
+If file = vbNullString Or Err.Number > 0 Then Exit Sub
 ihave = True
  Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.BackColor, BF
 
 Set LoadApicture = LoadPicture(GetDosPath(file))
 Refresh
-TEXT1 = mySelector.Mydir.List(mySelector.glistN.ListIndex)
+TEXT1 = mySelector.Mydir.list(mySelector.glistN.ListIndex)
 mySelector.glistN.enabled = True
 
 ihave = False
@@ -978,7 +978,7 @@ Sub GetSettings()
 Dim s As String, i As Long
 For i = 0 To gList1.listcount - 1
 If gList1.ListSelected(i) = True Then
-If s = "" Then s = gList1.Id(i) Else s = s & "," & gList1.Id(i)
+If s = vbNullString Then s = gList1.Id(i) Else s = s & "," & gList1.Id(i)
 End If
 Next i
 Settings = s

@@ -28,16 +28,16 @@ mLib = Left$(vNewValue, l - 1)
 mFunction = Mid$(vNewValue, l + 1)
 Else
 mLib = vNewValue
-mFunction = "" ' what about that??
+mFunction = vbNullString ' what about that??
 End If
 mConctruct = paramList
 If InStr(vNewValue, ".dll") > 0 Then
 mLib = mLib + ".dll"
 End If
 If mFunction Like "dll.*" Then
-mFunction = Mid(mFunction, 5)
+mFunction = Mid$(mFunction, 5)
 ElseIf mFunction Like "dll*" Then
-mFunction = Mid(mFunction, 4)
+mFunction = Mid$(mFunction, 4)
 End If
 Do While paramList <> ""
 
@@ -65,7 +65,7 @@ If IsArrayItem(paramnum) Then
 If Not FastSymbol(paramList, ")") Then Exit Do
 End If
 If Not FastSymbol(paramList, ",") Then Exit Do
-If check$ = "" Then Exit Do
+If check$ = vbNullString Then Exit Do
 If paramnum = 63 Then Exit Do
 Loop
 paramList = Trim$(paramList)   ' if we have somethig then that is an error

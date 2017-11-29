@@ -51,8 +51,8 @@ End Sub
  Set glistN = Pad.Controls(1)
  End If
  With Pad
-.gList2.HeadLine = ""
-.gList2.HeadLine = ""
+.gList2.HeadLine = vbNullString
+.gList2.HeadLine = vbNullString
 .gList2.HeadlineHeight = .gList2.HeightPixels
 End With
  Set Textbox = New myTextBox
@@ -76,8 +76,8 @@ End Sub
  End If
  With Pad
  .Controls(0).Visible = 0
- .gList2.HeadLine = ""
-.gList2.HeadLine = ""
+ .gList2.HeadLine = vbNullString
+.gList2.HeadLine = vbNullString
 .gList2.HeadlineHeight = .gList2.HeightPixels
 End With
  Set Textbox = New myTextBox
@@ -643,7 +643,7 @@ Dim l As Boolean
 If Not AutoComplete Then Exit Sub
 Dim f As Long
 Iam = True
-If ThatString = "" And Textbox.glistN.LastLinePart <> "" Then
+If ThatString = vbNullString And Textbox.glistN.LastLinePart <> "" Then
 f = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
 
 Else
@@ -669,11 +669,11 @@ If UseOnlyTheList Then
 l = Textbox.glistN.enabled
 Textbox.glistN.enabled = False
 Textbox.glistN.LastLinePart = Textbox.vartext + Textbox.glistN.LastLinePart
-ThatString = ""
+ThatString = vbNullString
 setpos = 0
 Textbox.glistN.enabled = l
 Else
-Textbox.glistN.LastLinePart = ""
+Textbox.glistN.LastLinePart = vbNullString
 End If
 End If
 End Sub
@@ -685,7 +685,7 @@ End Property
 Public Property Let Text(ByVal RHS As String)
 On Error Resume Next
 If glistN Is Nothing Then Exit Property
- Textbox.glistN.LastLinePart = ""
+ Textbox.glistN.LastLinePart = vbNullString
 Textbox.vartext = RHS
 
 End Property
@@ -716,11 +716,11 @@ End Sub
 Public Sub MenuItem(a$, Optional enabledthis As Boolean = True, Optional checked As Boolean = False, Optional radiobutton As Boolean = False, Optional firstate As Boolean = False, Optional IdD)
 Dim item
 mMenuStyle = True
-If Not a$ = "" Then
+If Not a$ = vbNullString Then
 glistN.additemFast a$
 End If
 item = glistN.listcount
-If a$ = "" Then
+If a$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -736,11 +736,11 @@ Public Sub MenuRadio(a$, Optional enabledthis As Boolean = True, Optional firsta
 Dim item, checked As Boolean
 checked = False
 mMenuStyle = True
-If Not a$ = "" Then
+If Not a$ = vbNullString Then
 glistN.additemFast a$
 End If
 item = glistN.listcount
-If a$ = "" Then
+If a$ = vbNullString Then
 glistN.AddSep
 Else
 If IsMissing(IdD) Then
@@ -932,7 +932,7 @@ Public Property Let MenuStyle(ByVal vNewValue As Variant)
 mMenuStyle = vNewValue
 If mMenuStyle Then
 glistN.BorderStyle = 1
-Textbox.vartext = ""
+Textbox.vartext = vbNullString
 End If
 End Property
 

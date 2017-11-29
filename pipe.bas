@@ -171,7 +171,7 @@ Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
  
 Function PurifyPath(Spath$) As String
 Dim a$(), i
-If Spath$ = "" Then Exit Function
+If Spath$ = vbNullString Then Exit Function
 a$() = Split(Spath, "\")
 If isdir(a$(LBound(a$()))) Then i = i + 1
 For i = LBound(a$()) + i To UBound(a$())
@@ -206,7 +206,7 @@ If Left$(s$, 1) = "." And Mid$(s$, 2, 1) <> "." Then
 s$ = mcd + Mid$(s$, 2)
 End If
 frm$ = ExtractPath(s$)
-If frm$ = "" Or Left$(s$, 2) = ".." Then
+If frm$ = vbNullString Or Left$(s$, 2) = ".." Then
     s$ = mcd + s$
 Else
     If Left$(frm$, 2) = "\\" Or Mid$(frm$, 2, 1) = ":" Then
@@ -220,8 +220,8 @@ End Sub
 Public Function RenameFile(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
 Dim f$, fd$, flag As Long
 If Not CanKillFile(sSourceFile) Then Exit Function
-If ExtractType(sSourceFile) = "" Then sSourceFile = sSourceFile + ".gsb"
-If ExtractType(sDesFile) = "" Then
+If ExtractType(sSourceFile) = vbNullString Then sSourceFile = sSourceFile + ".gsb"
+If ExtractType(sDesFile) = vbNullString Then
 If ExtractNameOnly(sDesFile) = ExtractNameOnly(sSourceFile) Then
 sDesFile = ExtractNameOnly(sDesFile) + ".bck"
 Else
@@ -229,7 +229,7 @@ sDesFile = ExtractNameOnly(sDesFile) + ".gsb"
 End If
 End If
 sSourceFile = CFname(sSourceFile)
-If sSourceFile = "" Or CFname(sDesFile) <> "" Then
+If sSourceFile = vbNullString Or CFname(sDesFile) <> "" Then
 BadFilename
 Exit Function
 Else
@@ -338,10 +338,10 @@ End Function
 
 Sub PlaySoundNew(f As String)
 
-If f = "" Then
+If f = vbNullString Then
 PlaySound 0&, 0&, SND_PURGE
 Else
-If ExtractType(f) = "" Then f = f & ".WAV"
+If ExtractType(f) = vbNullString Then f = f & ".WAV"
 f = CFname(f)
 PlaySound StrPtr(f), ByVal 0&, SND_FILENAME Or SND_ASYNC
 End If
@@ -391,7 +391,7 @@ Function validpipename(ByVal a$) As String
 Dim b$
 a$ = myUcase(a$)
 b$ = Left$(a$, InStr(1, a$, "\pipe\", vbTextCompare))
-If b$ = "" Then
+If b$ = vbNullString Then
 validpipename = "\\" & strMachineName & "\pipe\" & a$
 Else
 validpipename = a$
@@ -405,7 +405,7 @@ Dim what As Long
 Dim st&, pa&, po&
 st& = 1
 
-If simple$ = "" Then
+If simple$ = vbNullString Then
 Included = ExtractName(afile$)
 Else
     Sleep 1

@@ -117,9 +117,9 @@ If TypeOf Screen.ActiveForm Is GuiM2000 Then Screen.ActiveForm.UNhookMe
 
 Dim INFOONLY As Boolean
 k1 = 0
-If AskTitle$ = "" Then AskTitle$ = MesTitle$
-If AskCancel$ = "" Then INFOONLY = True
-If AskOk$ = "" Then AskOk$ = "OK"
+If AskTitle$ = vbNullString Then AskTitle$ = MesTitle$
+If AskCancel$ = vbNullString Then INFOONLY = True
+If AskOk$ = vbNullString Then AskOk$ = "OK"
 If Form1.Visible Then
 MyDoEvents1 Form1
 Sleep 1
@@ -204,7 +204,7 @@ ProcTask2 bstack
 NOEXECUTION = False
 Wend
 BLOCKkey = False
-AskTitle$ = ""
+AskTitle$ = vbNullString
 Dim z As Form
  Set z = Nothing
 
@@ -224,17 +224,17 @@ Dim z As Form
 If INFOONLY Then
 NeoASK = 1
 Else
-NeoASK = Abs(AskCancel$ = "") + 1
+NeoASK = Abs(AskCancel$ = vbNullString) + 1
 End If
 If NeoASK = 1 Then
 If AskInput Then
 bstack.soros.PushStr AskStrInput$
 End If
 End If
-AskCancel$ = ""
+AskCancel$ = vbNullString
 once = False
 ASKINUSE = False
-INK$ = ""
+INK$ = vbNullString
 On Error Resume Next
 If Not bstack.Owner Is Nothing Then
 If bstack.Owner.Visible Then
@@ -462,7 +462,7 @@ End If
 If Form1.Visible And Not IsSelectorInUse Then
 'Form1.ZOrder
 If Not trace Then reopen2 = False
-If vH_title$ = "" Then reopen4 = False
+If vH_title$ = vbNullString Then reopen4 = False
 If reopen4 Then Form4.Show , Form1: Form4.Visible = True
 If reopen2 Then Form2.Show , Form1: Form2.Visible = True
    For Each x In Forms

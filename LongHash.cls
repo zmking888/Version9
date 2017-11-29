@@ -110,7 +110,7 @@ If index > -1 Then
     HasCollision = (Hash(PriveSpace(index).lastpos) - 1 <> index) Or (PriveSpace(index).Pleft > 0)
 End If
 End Property
-Public Sub AddKey(RHS As Long, Optional aValue As String = "", Optional aInfo As String = "")
+Public Sub AddKey(RHS As Long, Optional aValue As String = vbNullString, Optional aInfo As String = vbNullString)
     index = -1
     lastkey = RHS
     Done = False

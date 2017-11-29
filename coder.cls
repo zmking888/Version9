@@ -24,7 +24,7 @@ For i = 1 To Len(item)
 ' possible problem..decode a greek coded file but Asc() use other than greek language.
 ' so a password must be in latin (standard language) to used everywhere.
 
-Mid(item, i, 1) = ChrW(AscW(Mid$(item, i, 1)) Xor Asc(Mid$(Key, (counter Mod j) + 1)))
+Mid$(item, i, 1) = ChrW(AscW(Mid$(item, i, 1)) Xor Asc(Mid$(Key, (counter Mod j) + 1)))
 
 counter = counter + 1
 Next i
@@ -69,7 +69,7 @@ Private Function UINT(ByVal a As Long) As Long
 Private Function ReduceKey(Key As String) As Boolean
 Dim i As Long, j As Long, c1 As Long, c2 As Long, noANSI As Boolean
 On Error Resume Next
-If (Len(Key) Mod 2 = 1) Or Key = "" Then Exit Function
+If (Len(Key) Mod 2 = 1) Or Key = vbNullString Then Exit Function
 noANSI = Not ((UINT(AscW(Mid$(Key, 2, 1))) And &H4000) = 0 Or (UINT(AscW(Mid$(Key, i + 1, 1))) And &H4000) = 0)
 If noANSI Then
 For i = 1 To Len(Key) - 1 Step 2
@@ -88,7 +88,7 @@ ReduceKey = noANSI
 End Function
 Private Function ReduceKey1(Key As String) As Boolean
 Dim i As Long, j As Long
-If (Len(Key) Mod 2 = 1) Or Key = "" Then Exit Function
+If (Len(Key) Mod 2 = 1) Or Key = vbNullString Then Exit Function
 For i = 1 To Len(Key) - 1 Step 2
 Mid$(Key, i \ 2 + 1, 1) = Chr((Asc(Mid$(Key, i, 1)) And &H78) \ 8 + (Asc(Mid$(Key, i + 1, 1)) And &H78) * 2)
 Next i
@@ -99,7 +99,7 @@ Private Function Bad(ByRef counter As Long, Key As String, item As String) As St
 Dim i As Long, j As Long
 j = Len(Key)
 For i = 1 To Len(item)
-Mid(item, i, 1) = ChrW(AscW(Mid$(item, i, 1)) Xor Asc(Mid$(Key, (counter Mod j) + 1)))
+Mid$(item, i, 1) = ChrW(AscW(Mid$(item, i, 1)) Xor Asc(Mid$(Key, (counter Mod j) + 1)))
 
 counter = counter + 1
 Next i

@@ -233,7 +233,7 @@ On Error Resume Next
 Set aa = mstack.item(where)
 Select Case aa.Typename
 Case "N", "S"
-StackItemTypeObjectType = ""
+StackItemTypeObjectType = vbNullString
 Case "*"
 Set bb = aa.ObjectRef
 If TypeOf bb Is mHandler Then
@@ -378,7 +378,7 @@ End Function
 Public Function PopType() As String
 On Error Resume Next
 If mstack.Count = 0 Then
-PopType = ""
+PopType = vbNullString
 Else
 PopType = mstack.item(1).Typename
 End If
@@ -540,12 +540,12 @@ End If
 End Sub
 Public Sub MergeBottomCopyArray(a As mArray)
 If a.Count = 0 Then Exit Sub
-Dim X1 As Long, vvl As Variant, aa As Object
+Dim x1 As Long, vvl As Variant, aa As Object
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- For X1 = 0 To a.Count - 1
+ For x1 = 0 To a.Count - 1
                                         
-                    If a.MyIsObject(a.item(X1)) Then
-                    Set vvl = a.item(X1)
+                    If a.MyIsObject(a.item(x1)) Then
+                    Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
                         CopyGroup subgroup, sub2
@@ -566,26 +566,26 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set vvl = Nothing
                         Set aa = Nothing
                     Else
-                        If a.MyIsNumeric(a.item(X1)) Then
+                        If a.MyIsNumeric(a.item(x1)) Then
                         
-                            DataVal a.item(X1)
+                            DataVal a.item(x1)
                         Else
-                            DataStr a.item(X1)
+                            DataStr a.item(x1)
                         End If
                      End If
     
-                Next X1
+                Next x1
 
 
 End Sub
 Public Sub MergeTopCopyArray(a As mArray)
 If a.Count = 0 Then Exit Sub
-Dim X1 As Long, vvl As Variant, aa As Object
+Dim x1 As Long, vvl As Variant, aa As Object
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- For X1 = 0 To a.Count - 1
+ For x1 = 0 To a.Count - 1
                                         
-                    If a.MyIsObject(a.item(X1)) Then
-                    Set vvl = a.item(X1)
+                    If a.MyIsObject(a.item(x1)) Then
+                    Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
                         CopyGroup subgroup, sub2
@@ -606,14 +606,14 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set vvl = Nothing
                         Set aa = Nothing
                     Else
-                        If a.MyIsNumeric(a.item(X1)) Then
-                            PushVal a.item(X1)
+                        If a.MyIsNumeric(a.item(x1)) Then
+                            PushVal a.item(x1)
                         Else
-                            PushStr a.item(X1)
+                            PushStr a.item(x1)
                         End If
                      End If
     
-                Next X1
+                Next x1
 
 
 End Sub
@@ -665,7 +665,7 @@ Private Sub Class_Terminate()
 Flush
 End Sub
 Sub CopyGroup(myobject As Object, myobject2 As Object)
- Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, X1 As Long, ss$
+ Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
              With myobject
@@ -673,8 +673,8 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
          
                  .PeekItem 1, vvl
                  myobject2.BeginFloat vvl + 2
-                 For X1 = 0 To vvl * 2 + 3
-                    .PeekItem X1, vvl
+                 For x1 = 0 To vvl * 2 + 3
+                    .PeekItem x1, vvl
                     If Typename(vvl) = "Group" Then
                     Set subgroup = vvl
                     CopyGroup subgroup, sub2
@@ -691,9 +691,9 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set mySecondArray = Nothing
                     End If
                     End If
-                    myobject2.PokeItem X1, vvl
+                    myobject2.PokeItem x1, vvl
      
-                Next X1
+                Next x1
                 End If
 
                 myobject2.HasStrValue = .HasStrValue

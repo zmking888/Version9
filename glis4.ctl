@@ -152,7 +152,7 @@ Private Const DT_VCENTER As Long = &H4&
 Private Const DT_WORDBREAK As Long = &H10&
 Private Const DT_WORD_ELLIPSIS As Long = &H40000
 
-Const m_def_Text = ""
+Const m_def_Text = vbNullString
 Const m_def_BackColor = &HFFFFFF
 Const m_def_ForeColor = 0
 Const m_def_Enabled = False
@@ -161,7 +161,7 @@ Const m_def_BorderStyle = 0
 Const m_def_dcolor = &H333333
 Const m_def_CapColor = &HAAFFBB
 Const m_def_Showbar = True
-Const m_def_sync = ""
+Const m_def_sync = vbNullString
 
 Dim m_sync As String
 Dim m_backcolor As Long
@@ -384,7 +384,7 @@ End If
 End Property
 
 Public Property Let HeadLine(ByVal RHS As String)
-If mHeadline = "" Then
+If mHeadline = vbNullString Then
 ' reset headlineheight
 mHeadline = RHS
 HeadlineHeight = UserControlTextHeight() / scrTwips
@@ -472,7 +472,7 @@ If Left$(b$, 1) <> "_" Then
 additemFast b$
 Else
 b$ = Mid$(b$, 2)
-If b$ = "" Then
+If b$ = vbNullString Then
 AddSep
 Else
 additemFast b$
@@ -869,7 +869,7 @@ Else
             If EditFlag And KeyAscii > 32 And KeyAscii <> 127 Then
             If UKEY$ <> "" Then
             kk$ = UKEY$
-            UKEY$ = ""
+            UKEY$ = vbNullString
             Else
   kk$ = GetKeY(KeyAscii)
   End If
@@ -1389,7 +1389,7 @@ i = val(mynum$)
 Else
 i = val(mynum$)
 End If
-mynum$ = ""
+mynum$ = vbNullString
 Else
 i = GetLastKeyPressed
 End If
@@ -1397,7 +1397,7 @@ End If
  If i <> -1 And i <> 94 Then
  UKEY$ = ChrW(i)
  Else
-UKEY$ = ""
+UKEY$ = vbNullString
  End If
  
 End Sub
@@ -2708,7 +2708,7 @@ If visibleme Then
  CalcAndShowBar1
 Timer1.enabled = True: Exit Sub
 End If
-If listcount = 0 And HeadLine = "" Then
+If listcount = 0 And HeadLine = vbNullString Then
     Repaint
     Exit Sub
 End If
@@ -2831,7 +2831,7 @@ End If
     '
 j = topitem + lines
 If j >= listcount Then j = listcount - 1
-'Text1 = ""
+'Text1 = VbNullString
 
 
     If listcount = 0 Then
@@ -2875,7 +2875,7 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
                  PrintLineControlSingle UserControl.hDC, list(i), nr
                  Me.ForeColor = fg
              Else
-                 If ListSep(i) And list(i) = "" Then
+                 If ListSep(i) And list(i) = vbNullString Then
                    hnr.Left = 0
                    hnr.Right = nr.Right
                    hnr.top = nr.top + mytPixels \ 2
@@ -2977,7 +2977,7 @@ Public Sub ShowMe2()
 Dim YYT As Long, nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long, hnr As RECT, nfg As Long
  Dim REALX As Long, REALX2 As Long, myt1
 barwidth = UserControlTextWidth("W")
-If listcount = 0 And HeadLine = "" Then
+If listcount = 0 And HeadLine = vbNullString Then
 Repaint
 HideCaret (hWnd)
 Exit Sub
@@ -3087,7 +3087,7 @@ CurrentY = 0
  Else
     nfg = fg
   RaiseEvent SpecialColor(nfg)
- If ListSep(i) And list(i) = "" Then
+ If ListSep(i) And list(i) = vbNullString Then
  hnr.Left = 0
  hnr.Right = nr.Right
  hnr.top = nr.top + mytPixels \ 2
@@ -3376,15 +3376,15 @@ End If
 End Sub
 Private Function GetStrUntilB(pos As Long, ByVal sStr As String, fromStr As String, Optional RemoveSstr As Boolean = True) As String
 Dim i As Long
-If fromStr = "" Then GetStrUntilB = "": Exit Function
+If fromStr = vbNullString Then GetStrUntilB = vbNullString: Exit Function
 If pos <= 0 Then pos = 1
 If pos > Len(fromStr) Then
-    GetStrUntilB = ""
+    GetStrUntilB = vbNullString
 Exit Function
 End If
 i = InStr(pos, fromStr, sStr)
 If (i < 1 + pos) And Not ((i > 0) And RemoveSstr) Then
-    GetStrUntilB = ""
+    GetStrUntilB = vbNullString
     pos = Len(fromStr) + 1
 Else
     GetStrUntilB = Mid$(fromStr, pos, i - pos)
@@ -3943,7 +3943,7 @@ If dropkey Then shift = 0: KeyCode = 0: Exit Sub
 Dim i&
 If shift = 4 Then
 If KeyCode = 18 Then
-If mynum$ = "" Then mynum$ = "0"
+If mynum$ = vbNullString Then mynum$ = "0"
 KeyCode = 0
 Exit Sub
 End If
@@ -3958,16 +3958,16 @@ Case vbKeyA To vbKeyF
 If Left$(mynum$, 1) = "&" Then
 mynum$ = mynum$ + Chr$(KeyCode - vbKeyNumpad0 + 65)
 Else
-mynum$ = ""
+mynum$ = vbNullString
 End If
 Case Else
-mynum$ = ""
+mynum$ = vbNullString
 End Select
 
 Exit Sub
 End If
 
-mynum$ = ""
+mynum$ = vbNullString
 If shift <> 0 And KeyCode = 0 Then Exit Sub
 RaiseEvent KeyDown(KeyCode, shift)
 If (KeyCode = 0) Or Not (enabled Or state) Then Exit Sub
@@ -4357,7 +4357,7 @@ probeX = probeX - LeftMarginPixels * scrTwips + 2 * scrTwips
 End If
 
 If probeX > n Then
-If s$ = "" Then
+If s$ = vbNullString Then
 realpos = 0
 usedCharLength = 1
 Else
@@ -4437,7 +4437,7 @@ If Len(data) > 0 Then
     End If
     
     i = 1
-    If data <> aSpace$ Or data$ = "" Then
+    If data <> aSpace$ Or data$ = vbNullString Then
     While Left$(data, i) = aSpace$
     i = i + 1
     Wend
@@ -4458,7 +4458,7 @@ n = UserControlTextWidth(s$)
 probeX = probeX - 2 * LeftMarginPixels * scrTwips - 2 * scrTwips
 
 If probeX > n Then
-If s$ = "" Then
+If s$ = vbNullString Then
 realpos = 0
 usedCharLength = 1
 Else
@@ -4745,7 +4745,7 @@ Loop
 If (Epos - pos - 1) > 0 Then
 this$ = Mid$(mline$, pos + 1, Epos - pos - 1)
 RaiseEvent WordMarked(this$)
-If this = "" Then Exit Sub
+If this = vbNullString Then Exit Sub
 oldselstart = SelStart
 MarkNext = 0
 If (oldselstart - pos - 1) > (Epos - oldselstart) Then

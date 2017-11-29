@@ -106,7 +106,7 @@ gList1.CapColor = rgb(255, 160, 0)
 gList1.LeftMarginPixels = 4
 Set Label1 = New TextViewer
 Set Label1.Container = gList1
-Label1.FileName = ""
+Label1.FileName = vbNullString
 Label1.glistN.DropEnabled = False
 Label1.glistN.DragEnabled = Not abt
 Label1.NoMark = True
@@ -117,7 +117,7 @@ Label1.enabled = False    '' true before
 Label1.glistN.FloatList = True
 Label1.glistN.MoveParent = True
 With Label1.glistN
-If FeedbackExec$ = "" Or Not abt Then
+If FeedbackExec$ = vbNullString Or Not abt Then
 .WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
 .WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
 .WordCharRightButIncluded = "(" + ChrW(160) ' so aaa(sdd) give aaa( as word
@@ -302,7 +302,7 @@ Private Sub glist1_getpair(a As String, b As String)
 If mHelp Or abt Then
 gList1.EditFlag = False
     MKEY$ = MKEY$ & a
-    a = ""
+    a = vbNullString
 End If
 End Sub
 
@@ -342,7 +342,7 @@ Else
 If Not mHelp Then ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
 
 End If
-ThisWord = ""
+ThisWord = vbNullString
 
 End Sub
 Public Sub FillThereMyVersion2(thathDC As Long, thatRect As Long, thatbgcolor As Long)

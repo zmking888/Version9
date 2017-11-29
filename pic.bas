@@ -1158,7 +1158,7 @@ Set cDIBbuffer1 = Nothing
 End Sub
 '
 Public Function RotateDib(bstack As basetask, cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
-    Optional bckColor As Long = -1, Optional pic As Boolean = False, Optional alpha As Long = 100, Optional BACKx As Long, Optional BACKy As Long, Optional amask$ = "")
+    Optional bckColor As Long = -1, Optional pic As Boolean = False, Optional alpha As Long = 100, Optional BACKx As Long, Optional BACKy As Long, Optional amask$ = vbNullString)
 Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
@@ -1623,7 +1623,7 @@ Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
     End If
      DeleteObject hRgn
 End Function
-Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal ROT As Single = 0, Optional bb$ = "") As Long
+Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal ROT As Single = 0, Optional bb$ = vbNullString) As Long
 Dim photo As Object, myRgn As Long, oldobj As Long
 Dim photo2 As Object
  oldobj = FindSpriteByTag(Priority)
@@ -1847,7 +1847,7 @@ If k = 0 Then Exit Sub  ' there is no such a player
     Next i
 End If
 End Sub
-Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, ROT As Single, Optional bb$ = "") ' before take from priority the original sprite
+Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, ROT As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
 Dim photo As Object, myRgn As Long
 Dim photo2 As Object
 If s < 1 Or s > PobjNum Then Exit Sub
@@ -2150,7 +2150,7 @@ Dim i As Long, v$, nomore As Boolean, yesvol As Boolean, probe2play As Integer
 ss$ = ss$ & " "
 note2play = 0
 i = 1
-If Trim$(ss$) = "" Then note2play = 0: Exit Function
+If Trim$(ss$) = vbNullString Then note2play = 0: Exit Function
 If Asc(ss$) <> 32 Then
 v$ = Mid$(ss$, i, 2)
 probe2play = InStr(Face$, UCase(v$))
@@ -2171,7 +2171,7 @@ If Mid$(ss$, i, 1) = "@" Then
      End If
      If Mid$(ss$, i, 1) = "V" Then
             i = i + 1
-            v$ = ""
+            v$ = vbNullString
         Do While InStr("1234567890", Mid$(ss$, i, 1)) > 0 And (Mid$(ss$, i, 1) <> "")
         v$ = v$ & Mid$(ss$, i, 1)
         i = i + 1
@@ -2206,7 +2206,7 @@ If Mid$(ss$, i, 1) <> "" Then
     End If
          If Mid$(ss$, i, 1) = "V" Then
             i = i + 1
-            v$ = ""
+            v$ = vbNullString
         Do While InStr("1234567890", Mid$(ss$, i, 1)) > 0 And (Mid$(ss$, i, 1) <> "")
         v$ = v$ & Mid$(ss$, i, 1)
         i = i + 1
@@ -2323,7 +2323,7 @@ Public Function SimpleHtmlData(ByVal sText As String)
 Dim lFormatId As Long, bb() As Byte
 lFormatId = RegisterCF
 If lFormatId <> 0 Then
-If sText = "" Then Exit Function
+If sText = vbNullString Then Exit Function
 bb() = HTML(sText)
 If CBool(OpenClipboard(0)) Then
    
@@ -2537,7 +2537,7 @@ End If
         AskOk$ = "OK"
         Else
         AskOk$ = "OK"
-        AskCancel$ = ""
+        AskCancel$ = vbNullString
         End If
         AskText$ = a$ + "..?" + vbCrLf
     Else
@@ -2549,7 +2549,7 @@ End If
         ElseIf v = vbOKCancel Then
          AskOk$ = "емтанеи"
         Else
-        AskCancel$ = ""
+        AskCancel$ = vbNullString
         AskOk$ = "емтанеи"
         End If
         AskText$ = a$ + "..;" + vbCrLf
@@ -2929,7 +2929,7 @@ Private Function IsNumberQuery(a$, fr As Long, r As Double, lR As Long, skipdeci
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 
 ' ti kanei to e$
-If a$ = "" Then IsNumberQuery = False: Exit Function
+If a$ = vbNullString Then IsNumberQuery = False: Exit Function
 SG = 1
 sng = fr - 1
     Do While sng < Len(a$)
@@ -2988,7 +2988,7 @@ Else
         End If
         Case "E", "e" ' ************check it
         If skipdecimals Then Exit Do
-             If ex$ = "" Then
+             If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
         Else
@@ -2997,7 +2997,7 @@ Else
    
                Case "е", "Е" ' ************check it
                If skipdecimals Then Exit Do
-                         If ex$ = "" Then
+                         If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
         Else
@@ -3020,7 +3020,7 @@ Else
         sng = sng - Len(ex$)
         End If
     End If
-    If ig$ = "" Then
+    If ig$ = vbNullString Then
     IsNumberQuery = False
     lR = 1
     Else
@@ -3067,17 +3067,17 @@ r1 = 1
 Dim v As Double, b$
 If final Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
- r1 = (r1 And Len(a$) <= r) Or (a$ = "")
+ r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
  
 Else
-If (a$ = "-") Or a$ = "" Then
+If (a$ = "-") Or a$ = vbNullString Then
 r1 = True
 Else
  r1 = IsNumberQuery(a$, r1, v, r, cutdecimals)
     If a$ <> "" Then
          If r < 2 Then
                 r1 = Not (r <= Len(a$))
-                a$ = ""
+                a$ = vbNullString
         Else
                 r1 = r1 And Not r <= Len(a$)
                 a$ = Mid$(a$, 1, r - 1)
@@ -3100,7 +3100,7 @@ End Function
 Private Function IsNumberOnly(a$, fr As Long, r As Double, lR As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
-If a$ = "" Then IsNumberOnly = False: Exit Function
+If a$ = vbNullString Then IsNumberOnly = False: Exit Function
 SG = 1
 sng = fr - 1
     Do While sng < Len(a$)
@@ -3159,7 +3159,7 @@ Else
         End If
         Case "E", "e" ' ************check it
         If skipdecimals Then Exit Do
-             If ex$ = "" Then
+             If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
         Else
@@ -3168,7 +3168,7 @@ Else
    
                Case "е", "Е" ' ************check it
                If skipdecimals Then Exit Do
-                         If ex$ = "" Then
+                         If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
         Else
@@ -3191,7 +3191,7 @@ Else
         sng = sng - Len(ex$)
         End If
     End If
-    If ig$ = "" Then
+    If ig$ = vbNullString Then
     IsNumberOnly = False
     lR = 1
     Else
@@ -3267,7 +3267,7 @@ Function IsLabelAnew(where$, a$, r$, lang As Long) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, gr As Boolean
-r$ = ""
+r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
@@ -3285,7 +3285,7 @@ p2 = StrPtr(a$): l = l - 1
     If p3 = 10 Then
     IsLabelAnew = 1234
     If i + 6 > p4 Then
-    a$ = ""
+    a$ = vbNullString
     Else
     i = i + 4
     Do While i < p4
@@ -3316,7 +3316,7 @@ p2 = StrPtr(a$): l = l - 1
    Exit For
   End Select
   Next i
-    If i > p4 Then a$ = "": IsLabelAnew = 0: Exit Function
+    If i > p4 Then a$ = vbNullString: IsLabelAnew = 0: Exit Function
   For i = i To p4 Step 2
   GetMem2 i, p1
   If p1 < 256 Then
@@ -3325,12 +3325,12 @@ p2 = StrPtr(a$): l = l - 1
             If i < p4 And r$ <> "" Then
                 GetMem2 i + 2, p1
                 where$ = r$
-                r$ = ""
+                r$ = vbNullString
             Else
               IsLabelAnew = 0: a$ = Mid$(a$, (i - p2) \ 2): Exit Function
             End If
         Case "?"
-        If r$ = "" Then
+        If r$ = vbNullString Then
             r$ = "?"
             i = i + 4
         Else
@@ -3361,7 +3361,7 @@ p2 = StrPtr(a$): l = l - 1
                 rr& = 1
             End If
       Case "&"
-            If r$ = "" Then
+            If r$ = vbNullString Then
             rr& = 2
             'a$ = Mid$(a$, 2)
             End If
@@ -3456,7 +3456,7 @@ i1233:
 
 
     Next i
-  If i > p4 Then a$ = "" Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
+  If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
        r$ = myUcase(r$, gr)
        lang = 1 + CLng(gr)
 
@@ -3468,8 +3468,8 @@ Public Function IsLabelDotSub(where$, a$, rrr$, r$, lang As Long, Optional p1 As
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
-rrr$ = ""
-r$ = ""
+rrr$ = vbNullString
+r$ = vbNullString
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p4 As Long  '', excludesp As Long
   l = Len(a$): If l = 0 Then IsLabelDotSub = 0: lang = 1: Exit Function
@@ -3484,7 +3484,7 @@ p2 = StrPtr(a$): l = l - 1
     If p3 = 10 Then
     IsLabelDotSub = 1234
     If i + 6 > p4 Then
-    a$ = ""
+    a$ = vbNullString
     Else
     i = i + 4
     Do While i < p4
@@ -3516,7 +3516,7 @@ p2 = StrPtr(a$): l = l - 1
   End Select
   Next i
   
-  If i > p4 Then a$ = "": IsLabelDotSub = 0: Exit Function
+  If i > p4 Then a$ = vbNullString: IsLabelDotSub = 0: Exit Function
   
   For i = i To p4 Step 2
   GetMem2 i, p1
@@ -3527,8 +3527,8 @@ p2 = StrPtr(a$): l = l - 1
             GetMem2 i + 2, p1
             If ChrW(p1) <> "(" Then
               where$ = myUcase(r$, gr)
-            r$ = ""
-            rrr$ = ""
+            r$ = vbNullString
+            rrr$ = vbNullString
             Else
               IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
             End If
@@ -3536,7 +3536,7 @@ p2 = StrPtr(a$): l = l - 1
               IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
             End If
     Case "?"
-        If r$ = "" And firstdot$ = "" Then
+        If r$ = vbNullString And firstdot$ = vbNullString Then
         rrr$ = "?"
         r$ = rrr$
         i = i + 4
@@ -3547,7 +3547,7 @@ p2 = StrPtr(a$): l = l - 1
       
         Exit Function
     
-        ElseIf firstdot$ = "" Then
+        ElseIf firstdot$ = vbNullString Then
         IsLabelDotSub = 1
         lang = 1 + CLng(gr)
         If lang = 1 Then
@@ -3672,7 +3672,7 @@ i123:
     End If
   Next i
   If i > p4 Then
-  a$ = "": p1 = 0
+  a$ = vbNullString: p1 = 0
   Else
   If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
   End If

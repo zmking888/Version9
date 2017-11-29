@@ -214,7 +214,7 @@ End If
 End Sub
 
 Public Sub MoveNameDot(a$)
-If a$ = "" Then Exit Sub
+If a$ = vbNullString Then Exit Sub
 If curdotcol < dotcolmax Then
     curdotcol = curdotcol + 1
     dotcol(curdotcol) = a$
@@ -244,7 +244,7 @@ Else
 newrun:
 If curdotcol < dotnum Then
 '' wrong
-If UseGroupname = "" Then
+If UseGroupname = vbNullString Then
 
 Else
 
@@ -510,7 +510,7 @@ If Me.IamChild Then
 If Not Me.Parent Is Nothing Then
 ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(lang))
 Else
-ThreadsStr = ""
+ThreadsStr = vbNullString
 End If
 Else
 ThreadsStr = Trim$(a$)
@@ -682,7 +682,7 @@ Public Property Let GroupName(ByVal vNewValue As String)
 
 ''If InStr(vNewValue, "..") > 0 Then Stop
 If vNewValue <= "." Then
-mGroupName = ""
+mGroupName = vbNullString
 Else
 ''''If Right$(vNewValue, 1) <> "." Then Stop
 mGroupName = vNewValue

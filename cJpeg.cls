@@ -1600,7 +1600,7 @@ Public Function SaveFile(FileName As String) As Long
         SaveFile = 1         'FileName not given
     Else
    
-        If False Then  ' ''FileName = "" Then
+        If False Then  ' ''FileName = VbNullString Then
       ''      SaveFile = 2     'File already exists
         Else
 

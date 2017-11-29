@@ -568,7 +568,7 @@ End Property
 Public Property Let Title(ByVal vNewValue As Variant)
 Dim onelineheight As Long
 mTitle = vNewValue
-glistN.HeadLine = ""
+glistN.HeadLine = vbNullString
 If mTitle <> "" Then
 glistN.HeadLine = mTitle
 onelineheight = glistN.HeadlineHeight

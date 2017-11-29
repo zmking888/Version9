@@ -521,8 +521,8 @@ End If
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
-Dim addX As Long, addy As Long, factor As Single, Once As Boolean
-If Once Then Exit Sub
+Dim addX As Long, addy As Long, factor As Single, once As Boolean
+If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
 If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
@@ -551,7 +551,7 @@ Else
 
         
   
-        Once = True
+        once = True
         If Height > ScrY() Then addy = -(Height - ScrY()) + addy
         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
@@ -590,7 +590,7 @@ Else
         ly = y
    
 End If
-Once = False
+once = False
 End Sub
 
 Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
@@ -725,7 +725,7 @@ cc.ClassKey = HKEY_CURRENT_USER
     cc.SectionKey = basickey
     cc.ValueKey = "FONT"
         cc.ValueType = REG_SZ
-        If cc.Value = "" Then
+        If cc.Value = vbNullString Then
         cc.Value = "Verdana"
         End If
         MYFONT = cc.Value
@@ -788,7 +788,7 @@ tbPen.enabled = True
         
         
         
-         If cc.Value = "" Then
+         If cc.Value = vbNullString Then
         cc.Value = "GREEK"
         
         End If
@@ -802,7 +802,7 @@ End If
         combo3.additem "DARK"
         cc.ValueKey = "HTML"
         cc.ValueType = REG_SZ
-        If cc.Value = "" Then
+        If cc.Value = vbNullString Then
         cc.Value = "DARK"
         End If
         combo3.Text = cc.Value
@@ -964,7 +964,7 @@ Form1.AutoRedraw = True
 a$ = ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962)
 lastfactor = ScaleDialogFix(SizeDialog)
 ScaleDialog lastfactor, LastWidth
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 If TweakLang = 0 Then
 gList2.HeadLine = "Ρυθμίσεις"
 Else
@@ -1249,7 +1249,7 @@ Private Sub TBLineSpacing_ValidString(ThatString As String, setpos As Long)
 Dim a As Long, k As String
 On Error Resume Next
 k = tbLineSpacing
-If ThatString = "" Then ThatString = "0"
+If ThatString = vbNullString Then ThatString = "0"
 a = CLng(ThatString)
 
 If Err.Number > 0 Then
@@ -1277,7 +1277,7 @@ Private Sub tbPaper_ValidString(ThatString As String, setpos As Long)
 Dim a As Long, k As String
 On Error Resume Next
 k = tbPaper
-If ThatString = "" Then ThatString = "0"
+If ThatString = vbNullString Then ThatString = "0"
 a = CLng(ThatString)
 If a = CLng(tbPen) Or Err.Number > 0 Then
 
@@ -1304,7 +1304,7 @@ Private Sub tbpen_ValidString(ThatString As String, setpos As Long)
 Dim a As Long, k As String
 On Error Resume Next
 k = tbPen
-If ThatString = "" Then ThatString = "0"
+If ThatString = vbNullString Then ThatString = "0"
 a = CLng(ThatString)
 If a = CLng(tbPaper) Or Err.Number > 0 Then
 ThatString = k: setpos = 1: tbPen.ResetPan
@@ -1328,7 +1328,7 @@ Private Sub tbsize_ValidString(ThatString As String, setpos As Long)
 Dim a As Long, k As String
 On Error Resume Next
 k = tbSize
-If ThatString = "" Then Exit Sub  'special here
+If ThatString = vbNullString Then Exit Sub  'special here
 a = CLng(ThatString)
 
 If Err.Number > 0 Then

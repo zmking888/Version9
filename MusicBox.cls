@@ -181,7 +181,7 @@ Private Property Get TaskInterface_busy() As Boolean
 TaskInterface_busy = mybusy
 End Property
 Public Property Get TaskInterface_CodeData() As String
-TaskInterface_CodeData = ""
+TaskInterface_CodeData = vbNullString
 End Property
 ' DELEGATED METHODS
 

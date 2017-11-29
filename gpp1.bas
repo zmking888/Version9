@@ -334,7 +334,7 @@ FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
 EXT = "." & Replace(UCase(EXT), ".", "")
-If FileName = "" Then Exit Sub
+If FileName = vbNullString Then Exit Sub
 b.regwrite "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName), FileName
 b.regwrite "HKCR\" & EXT & "\", FileType
 b.regwrite "HKCR\" & FileType & "\", EXT & " M2000 file"  'EXT & "_auto_file"
@@ -357,7 +357,7 @@ FileName = mylcasefILE(FileName)
 Dim b As Object
 Set b = CreateObject("wscript.shell")
 EXT = "." & ReplaceStr(".", "", EXT)
-If FileName = "" Then Exit Sub
+If FileName = vbNullString Then Exit Sub
 b.regdelete "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" & ExtractNameOnly(FileName)
 b.regdelete "HKCR\" & EXT & "\" ', FileType
 b.regdelete "HKCR\" & FileType & "\shell\open\command\" ', Filename & " ""&l"" "

@@ -67,11 +67,11 @@ Friend Sub ReduceHash(newTop As Long, v())
     
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
-            .Key = ""
+            .Key = vbNullString
             .Pleft = 0
         Else
             Hash(.lastpos) = 0
-            .Key = ""
+            .Key = vbNullString
         End If
         If .KeyType = 0 And .ndx >= 0 Then
             If IsObject(v(.ndx)) Then

@@ -292,7 +292,7 @@ gList4.NoCaretShow = True
 gList4.restrictLines = 3
 gList4.CenterText = True
 gList2.CapColor = rgb(255, 160, 0)
-gList2.HeadLine = ""
+gList2.HeadLine = vbNullString
 
 gList2.FloatList = True
 gList2.FloatLimitTop = ScrY() - players(0).Yt * 2
@@ -304,7 +304,7 @@ gList1.AutoPanPos = True
 Set testpad = New TextViewer
 gList1.NoWheel = True
 Set testpad.Container = gList1
-testpad.FileName = ""
+testpad.FileName = vbNullString
 testpad.glistN.LeftMarginPixels = 8
 testpad.NoMark = True
 testpad.NoColor = False
@@ -459,7 +459,7 @@ gList4.SetFocus
 If index < 2 Then
 abt = False
 
-vH_title$ = ""
+vH_title$ = vbNullString
 s$ = Label(index)
 If index = 1 Then
    
@@ -508,10 +508,14 @@ End If
 Else
 If index = 0 Then
 Dim aa As Long
-If subHash.Find(s$, aa) Then
-
+aa = MyBaseTask.OriginalCode
+If aa > 0 Then
 sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
 vHelp Not Form4.Visible
+ElseIf subHash.Find(s$, aa) Then
+sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+vHelp Not Form4.Visible
+
 ElseIf subHash.Find(subHash.LastKnown, aa) Then
 sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
 vHelp Not Form4.Visible

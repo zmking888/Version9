@@ -353,14 +353,14 @@ Public Sub NoOperatorForThatObject(ss$)
 End Sub
 Public Sub MyEr(er$, ergr$)
 If Left$(LastErName, 1) = Chr(0) Then
-    LastErName = ""
-    LastErNameGR = ""
+    LastErName = vbNullString
+    LastErNameGR = vbNullString
 End If
-If er$ = "" Then
+If er$ = vbNullString Then
 LastErNum = 0
 LastErNum1 = 0
-LastErName = ""
-LastErNameGR = ""
+LastErName = vbNullString
+LastErNameGR = vbNullString
 Else
  er$ = Split(er$, ChrW(&H1FFF))(0)
 ergr$ = Split(ergr$, ChrW(&H1FFF))(0)
@@ -596,13 +596,13 @@ If t& = 1 Then
        CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), dqq.ScaleY(.Yt - .uMineLineSpace * 2, 1, 3)
         SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY(.currow * .Yt + .uMineLineSpace, 1, 3)
         On Error Resume Next
-        If Not extreme Then If INK$ = "" Then dqq.Refresh
+        If Not extreme Then If INK$ = vbNullString Then dqq.Refresh
 Else
     CreateCaret dqq.hWnd, 0, dqq.ScaleX(.Xt, 1, 3), .Yt \ DYP \ 6 + 1
         
             SetCaretPos dqq.ScaleX(.curpos * .Xt, 1, 3), dqq.ScaleY((.currow + 1) * .Yt - .uMineLineSpace, 1, 3) - .Yt \ DYP \ 6 - 1
         On Error Resume Next
-        If Not extreme Then If INK$ = "" Then dqq.Refresh
+        If Not extreme Then If INK$ = vbNullString Then dqq.Refresh
 End If
 dqq.DrawMode = vbCopyPen
 dqq.CurrentX = .curpos * .Xt
@@ -706,7 +706,7 @@ On Error Resume Next
       Set p = dib.Picture
     Set dib = Nothing
  Else
-        If ExtractType(f, 0) = "" Then
+        If ExtractType(f, 0) = vbNullString Then
         f = f + ".bmp"
         End If
         FixPath f
@@ -776,7 +776,7 @@ If Not cDib(f, raster) Then
     End If
 End If
 If raster.Width = 0 Then
- BACKSPRITE = ""
+ BACKSPRITE = vbNullString
 Set raster = Nothing
 Set d1 = Nothing
 Exit Sub
@@ -810,8 +810,8 @@ Exit Sub
         
     End If
     If i > 0 Then i = QBColor(i) Else i = -i
-    If sp = 0 Or f = "" Then
-         BACKSPRITE = ""
+    If sp = 0 Or f = vbNullString Then
+         BACKSPRITE = vbNullString
     Exit Sub
     End If
 
@@ -833,7 +833,7 @@ If Not cDib(f, raster) Then
     End If
 End If
 If raster.Width = 0 Then
- BACKSPRITE = ""
+ BACKSPRITE = vbNullString
 Set raster = Nothing: Exit Sub
 End If
 
@@ -853,7 +853,7 @@ MyDoEvents1 d1
 Set d1 = Nothing
 Exit Sub
 SPerror:
- BACKSPRITE = ""
+ BACKSPRITE = vbNullString
 Set raster = Nothing
 End Sub
 Sub ThumbImage(d1 As Object, x1 As Long, y1 As Long, f As String, border As Long, tpp As Long, ttl$)
@@ -931,7 +931,7 @@ Public Sub MyPrintNew(ddd As Object, UAddTwipsTop, s$, Optional cr As Boolean = 
 
 Dim nr As RECT, nl As Long, mytop As Long
 mytop = ddd.CurrentY
-If s$ = "" Then
+If s$ = vbNullString Then
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, " ", nr
 nr.Left = ddd.CurrentX / dv15
@@ -970,7 +970,7 @@ Public Sub MyPrintOLD(ddd As Object, mb As basket, s$, Optional cr As Boolean = 
 
 Dim nr As RECT, nl As Long
 With mb
-If s$ = "" Then
+If s$ = vbNullString Then
 
 nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, " ", nr
@@ -1001,7 +1001,7 @@ ddd.CurrentY = nl + .uMineLineSpace
 ddd.CurrentX = 0
 Else
 If lastpart Then
-If Trim$(s$) = "" Then
+If Trim$(s$) = vbNullString Then
 ddd.CurrentX = ((nr.Right * dv15 + .Xt \ 2) \ .Xt) * .Xt
 Else
 ddd.CurrentX = ((nr.Right * dv15 + .Xt \ 1.2) \ .Xt) * .Xt
@@ -1017,7 +1017,7 @@ End Sub
 
 Public Sub MyPrint(ddd As Object, s$)
 Dim nr As RECT, nl As Long
-If s$ = "" Then
+If s$ = vbNullString Then
     nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
     CalcRect ddd.hDC, " ", nr
     nr.Left = ddd.CurrentX / dv15
@@ -1098,7 +1098,7 @@ Do While Len(what) >= .mx - PX And (.mx - PX) > 0
  FillBack ddd.hDC, nr2, ddd.BackColor
  End If
  For r = 0 To Len(p$) - 1
-If ONELINE And nocr And PX > .mx Then what = "": Exit For
+If ONELINE And nocr And PX > .mx Then what = vbNullString: Exit For
  c$ = Mid$(p$, r + 1, 1)
 
 If c$ >= " " Then ddd.CurrentX = ddd.CurrentX + .Xt: PrintUnicodeStandardWidthAddXT ddd, c$, nr
@@ -1232,7 +1232,7 @@ With mybasket
             Do
            '  If ddd.CurrentX = 0 And clearline Then ddd.Line (0&, PY * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (PY) * .Yt + .Yt - 1 * DYP), .Paper, BF
 
-            If ONELINE And nocr And PX > .mx Then what = "": Exit Do
+            If ONELINE And nocr And PX > .mx Then what = vbNullString: Exit Do
             c$ = Mid$(WHAT1$, r + 1, 1)
       
             If c$ >= " " Then
@@ -1491,7 +1491,7 @@ Else
         some = (wi - TextWidth(dd, whNoSpace) - Len(whSpace) * Displ) \ st  ' ((Displ - MinDispl) * Len(whSpace)) \ st
         magicratio = some / Len(whNoSpace)
         whsp = Len(whSpace)
-                whNoSpace$ = ""
+                whNoSpace$ = vbNullString
                 
         For i = 1 To Len(wh$)
             If Mid$(wh$, i, 1) = " " Then
@@ -1500,7 +1500,7 @@ Else
                If whNoSpace$ <> "" Then
                whl = Len(whNoSpace$) * magicratio + whl
                     MyPrintNew dd, mb.uMineLineSpace, whNoSpace$, , fake
-                whNoSpace$ = ""
+                whNoSpace$ = vbNullString
                 End If
                 If some > 0 Then
                 '
@@ -1562,14 +1562,14 @@ Else
    End If
      
     
-                whNoSpace$ = ""
+                whNoSpace$ = vbNullString
         For i = 1 To Len(wh$)
             If Mid$(wh$, i, 1) = " " Then
             whSpace$ = Mid$(whSpace$, 2)
             
                If whNoSpace$ <> "" Then
                  MyPrintNew dd, mb.uMineLineSpace, whNoSpace$, , fake
-                whNoSpace$ = ""
+                whNoSpace$ = vbNullString
                 
                 End If
               dd.CurrentX = dd.CurrentX + Displ
@@ -1595,7 +1595,7 @@ Dim PX As Long, PY As Long, ttt As Long, ruller&
 Dim buf$, b$, npy As Long ', npx As long
 With mb
 PlaceBasket ddd, mb
-If what = "" Then Exit Sub
+If what = vbNullString Then Exit Sub
 PX = .curpos
 PY = .currow
 If .mx - PX < wi& Then wi& = .mx - PX
@@ -1615,7 +1615,7 @@ For ttt = 1 To Len(what)
     MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
     
     
-    buf$ = ""
+    buf$ = vbNullString
     Hi& = Hi& - 1
     npy = npy + 1
     LCTbasket ddd, mb, npy, PX
@@ -1639,7 +1639,7 @@ Dim buf$, b$, npy As Long, kk&, lCount As Long, SCRnum2stop As Long, itnd As Lon
 Dim nopr As Boolean, nohi As Long, spcc As Long
 Dim dv2x15 As Long
 dv2x15 = dv15 * 2
-If what = "" Then Exit Sub
+If what = vbNullString Then Exit Sub
 With mybasket
 If Not nosettext Then
 PX = .curpos
@@ -1742,7 +1742,7 @@ kk& = (help1 + help2) < (w2 - kkl)
          If b$ = "." Or b$ = "_" Or b$ = "," Then
          kk& = Len(buf$) + 1
        buf$ = buf$ & b$
-       b$ = ""
+       b$ = vbNullString
          End If
        End If
         If kk& > 0 And kk& < Len(buf$) Then
@@ -1864,7 +1864,7 @@ End If
 End If
 last = False
 
-buf$ = ""
+buf$ = vbNullString
 '''''''''''''''''''''''''
 If isAcolumn Then Exit Sub
 If skip < 0 Or scrollme Then
@@ -1945,7 +1945,7 @@ If Not nopr Then
 MyPrintNew ddd, mybasket.uMineLineSpace, buf$, , nowait     ';   '************************************************************************************
 
 res = ddd.CurrentX
-        If Trim$(buf$) = "" Then
+        If Trim$(buf$) = vbNullString Then
         ddd.CurrentX = ((ddd.CurrentX + .Xt \ 2) \ .Xt) * .Xt
         Else
         ddd.CurrentX = ((ddd.CurrentX + .Xt \ 1.2) \ .Xt) * .Xt
@@ -2120,7 +2120,7 @@ End With
 what$ = ReplaceStr(vbCrLf, vbCr, what) + vbCr
 Do While what$ <> ""
 If Left$(what$, 1) = vbCr Then
-fline$ = ""
+fline$ = vbNullString
 what$ = Mid$(what$, 2)
 Else
 fline$ = GetStrUntil(vbCr, what$)
@@ -2264,7 +2264,7 @@ Public Sub SetText(dq As Object, Optional alinespace As Long = -1, Optional Rese
 Dim mymul As Long
 On Error Resume Next
 With players(GetCode(dq))
-If .FontName = "" Or alinespace = -2 Then
+If .FontName = vbNullString Or alinespace = -2 Then
 ' we have to make it
 If alinespace = -2 Then alinespace = 0
 ResetColumns = True
@@ -2426,8 +2426,8 @@ dq.FontTransparent = False
 LCTbasket dq, mybasket, y&, x&
 Dim o$
 o$ = a$
-If a$ = "" Then a$ = " "
-INK$ = ""
+If a$ = vbNullString Then a$ = " "
+INK$ = vbNullString
 
 Dim XX&
 XX& = x&
@@ -2443,7 +2443,7 @@ b$ = InputBoxN("Εισαγωγή Μεταβλητής", MesTitle$, a$)
 Else
 b$ = InputBoxN("Input Variable", MesTitle$, a$)
 End If
-If b$ = "" Then b$ = a$
+If b$ = vbNullString Then b$ = a$
 If Trim$(b$) < "A" Then b$ = Right$(String$(cLast&, " ") + b$, cLast&) Else b$ = Left$(b$ + String$(cLast&, " "), cLast&)
 gf$ = b$
 If XX& < .mx Then
@@ -2778,7 +2778,7 @@ End Function
 Sub Original(bstack As basetask, COM$)
 Dim d As Object, b$
 
-If COM$ <> "" Then QUERYLIST = ""
+If COM$ <> "" Then QUERYLIST = vbNullString
 If Form1.Visible Then REFRESHRATE = 25
 If bstack.toprinter Then
 bstack.toprinter = False
@@ -3188,7 +3188,7 @@ Set Form1.Point2Me = Nothing
 UnHook Form1.hWnd
 Form1.KeyPreview = True
 
-INK$ = ""
+INK$ = vbNullString
 escok = oldesc
 Set d = Nothing
 End With
@@ -3220,7 +3220,7 @@ With Form1.TEXT1
 'MyDoEvents
 ProcTask2 bstack
 Hook Form1.hWnd, Nothing
-'.Filename = ""
+'.Filename = VbNullString
 .AutoNumber = Not Form1.EditTextWord
 
 If maxchar > 0 Then
@@ -3237,8 +3237,8 @@ Else
 .glistN.SkipForm = True
 End If
 
-.glistN.HeadLine = ""
-.glistN.HeadLine = ""
+.glistN.HeadLine = vbNullString
+.glistN.HeadLine = vbNullString
 .glistN.LeftMarginPixels = 1
 .glistN.maxchar = maxchar
 .nowrap = True
@@ -3265,7 +3265,7 @@ End If
 If Form1.EditTextWord Then
 .glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^", "$", "%", "_", "@")
 .glistN.WordCharRight = ConCat(".", ":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^", "$", "%", "_")
-.glistN.WordCharRightButIncluded = ""
+.glistN.WordCharRightButIncluded = vbNullString
 
 Else
 .glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^", "@")
@@ -3331,7 +3331,7 @@ If a$ <> "" Then
 If .Text <> a$ Then .LastSelStart = 0
 .Text = a$
 Else
-.Text = ""
+.Text = vbNullString
 .LastSelStart = 0
 End If
 '.glistN.NoFreeMoveUpDown = True
@@ -3429,21 +3429,21 @@ Form1.KeyPreview = True
 If maxchar > 0 Then Form1.TEXT1.glistN.DragEnabled = ot
 
 UnHook Form1.hWnd
-INK$ = ""
+INK$ = vbNullString
 
 escok = oldesc
 Set d = Nothing
 End Sub
 
-Function blockCheck(ByVal s$, ByVal lang As Long, countlines As Long, Optional ByVal sbname$ = "") As Boolean
-If s$ = "" Then blockCheck = True: Exit Function
+Function blockCheck(ByVal s$, ByVal lang As Long, countlines As Long, Optional ByVal sbname$ = vbNullString) As Boolean
+If s$ = vbNullString Then blockCheck = True: Exit Function
 Dim i As Long, j As Long, c As Long, b$, resp&
 Dim openpar As Long, oldi As Long
 countlines = 1
 lang = Not lang
 Dim a1 As Boolean
 Dim jump As Boolean
-If Trim(s$) = "" Then Exit Function
+If Trim(s$) = vbNullString Then Exit Function
 c = Len(s$)
 a1 = True
 i = 1
@@ -3624,7 +3624,7 @@ If LEVCOLMENU < 3 Then .ForeColor = d.BackColor
 If d.Visible = False Then d.Visible = True
 .StickBar = True
 s$ = .HeadLine
-.HeadLine = ""
+.HeadLine = vbNullString
 .HeadLine = s$
 .enabled = False
 If .Visible Then
@@ -3666,7 +3666,7 @@ End If
 NOEDIT = False
 .Tag = a$
 
-If a$ = "" Then
+If a$ = vbNullString Then
     drop = mouse
     MyDoEvents
     ' Form1.KeyPreview = False
@@ -3717,7 +3717,7 @@ oldh = .HeadlineHeight
      .FloatLimitLeft = Form1.Width - prive.Xt * 2
     MyDoEvents
     End With
-If a$ = "" Then
+If a$ = vbNullString Then
     Do
         If bstack.TaskMain Or TaskMaster.Processing Then
             If TaskMaster.QueueCount > 0 Then
@@ -3749,13 +3749,13 @@ MOUT = False: NOEXECUTION = False
     If Form1.List1.ListIndex >= 0 Then
     a$ = Form1.List1.list(Form1.List1.ListIndex)
     Else
-    a$ = ""
+    a$ = vbNullString
     End If
    Form1.List1.enabled = False
     Else
         Form1.List1.enabled = True
     
-  If a$ = "" Then
+  If a$ = vbNullString Then
   Form1.List1.SetFocus
   Form1.List1.LeaveonChoose = True
   Else
@@ -3886,7 +3886,7 @@ Set z = Nothing
 
 BLOCKkey = False
 escok = oldesc
-INK$ = ""
+INK$ = vbNullString
 
 Form1.KeyPreview = True
 Targets = ot
@@ -4019,7 +4019,7 @@ End If
 .MAXXGRAPH = dd.Width
 .MAXYGRAPH = dd.Height
 .FTEXT = 0
-.FTXT = ""
+.FTXT = vbNullString
 
 Form1.MY_BACK.ClearUp
 If dd.Visible Then
@@ -4049,7 +4049,7 @@ If MKEY$ <> "" Then ' κοιτάει να αδειάσει τον προσωρινό χώρο MKEY$
 ' αν έχει κάτι τότε το λαμβάνει τον αδείαζε βάζοντας τον στο τέλος του INK$
 ' και αδείαζουμε το MKEY$
     INK$ = MKEY$ & INK$
-    MKEY$ = ""
+    MKEY$ = vbNullString
 End If
 ' τώρα θα ασχοληθούμε με το INK$ αν έχει τίποτα
 If INK$ <> "" Then
@@ -4066,14 +4066,14 @@ If INK$ <> "" Then
     End If
 Else
     'Αν δεν έχουμε τίποτα...δεν κάνουμε τίποτα...γυρίζουμε το τίποτα!
-    INKEY$ = ""
+    INKEY$ = vbNullString
 End If
 
 End Function
 Function UINKEY$()
 ' mink$ used for reinput keystrokes
 ' MINK$ = MINK$ & UINK$
-If UKEY$ <> "" Then MINK$ = MINK$ + UKEY$: UKEY$ = ""
+If UKEY$ <> "" Then MINK$ = MINK$ + UKEY$: UKEY$ = vbNullString
 If MINK$ <> "" Then
 If AscW(MINK$) = 0 Then
     UINKEY$ = Left$(MINK$, 2)
@@ -4083,18 +4083,18 @@ Else
     MINK$ = Mid$(MINK$, 2)
 End If
 Else
-    UINKEY$ = ""
+    UINKEY$ = vbNullString
 End If
 
 End Function
 
-Function QUERY(bstack As basetask, Prompt$, s$, m&, Optional USELIST As Boolean = True, Optional endchars As String = vbCr, Optional excludechars As String = "", Optional checknumber As Boolean = False) As String
+Function QUERY(bstack As basetask, Prompt$, s$, m&, Optional USELIST As Boolean = True, Optional endchars As String = vbCr, Optional excludechars As String = vbNullString, Optional checknumber As Boolean = False) As String
 'NoAction = True
 On Error Resume Next
 Dim dX As Long, dy As Long, safe$
 
-If excludechars = "" Then excludechars = Chr$(0)
-If QUERYLIST = "" Then QUERYLIST = Chr$(13): LASTQUERYLIST = 1
+If excludechars = vbNullString Then excludechars = Chr$(0)
+If QUERYLIST = vbNullString Then QUERYLIST = Chr$(13): LASTQUERYLIST = 1
 Dim q1 As Long, sp$, once As Boolean, dq As Object
  
 Set dq = bstack.Owner
@@ -4138,11 +4138,11 @@ dq.Refresh
 
  
 
-INK$ = ""
+INK$ = vbNullString
 dq.FontTransparent = False
 
 Dim a$
-s$ = ""
+s$ = vbNullString
 oldLCTCB dq, prive, 0
 Do
 If Not once Then
@@ -4153,7 +4153,7 @@ If USELIST Then
   Else
   If Not bstack.IamChild Then Sleep 1
   End If
- ''If MKEY$ = "" Then Dq.refresh
+ ''If MKEY$ = VbNullString Then Dq.refresh
 Else
 If Not bstack.IamThread Then
 
@@ -4182,7 +4182,7 @@ If Not QRY Then HideCaret dq.hWnd:   Exit Do
 
  If QUERYLIST <> "" Then  ' up down
  
-    If INK = "" Then MyDoEvents
+    If INK = vbNullString Then MyDoEvents
 If clickMe = 38 Then
 
  If Len(QUERYLIST) < LASTQUERYLIST Then LASTQUERYLIST = 2
@@ -4190,7 +4190,7 @@ If clickMe = 38 Then
          If q1 < 2 Or q1 <= LASTQUERYLIST Then
          q1 = 1: LASTQUERYLIST = 1
          End If
-        MKEY$ = ""
+        MKEY$ = vbNullString
         INK = String$(RealLen(s$), 8) + Mid$(QUERYLIST, LASTQUERYLIST, q1 - LASTQUERYLIST)
         LASTQUERYLIST = q1 + 1
 
@@ -4205,7 +4205,7 @@ If clickMe = 38 Then
          LASTQUERYLIST = InStrRev(QUERYLIST, vbCr, q1 - 1) + 1
          If LASTQUERYLIST < 2 Then LASTQUERYLIST = 2
          
-        MKEY$ = ""
+        MKEY$ = vbNullString
         INK = String$(RealLen(s$), 8) + Mid$(QUERYLIST, LASTQUERYLIST, q1 - LASTQUERYLIST)
    LASTQUERYLIST = q1 + 1
 
@@ -4215,7 +4215,7 @@ If clickMe = 38 Then
  End If
  
  ElseIf INK <> "" Then
- MKEY$ = ""
+ MKEY$ = vbNullString
  Else
  clickMe = 0
  once = False
@@ -4226,7 +4226,7 @@ If clickMe = 38 Then
 againquery:
  a$ = INKEY$
  
-If a$ = "" Then
+If a$ = vbNullString Then
 If TaskMaster Is Nothing Then Set TaskMaster = New TaskMaster
     If TaskMaster.QueueCount > 0 Then
   ProcTask2 bstack
@@ -4316,7 +4316,7 @@ End If
         
       LCTCB dq, prive, -1: DestroyCaret
  oldLCTCB dq, prive, 0
-    s$ = ""
+    s$ = vbNullString
     'If ExTarget Then End
 
     Exit Do
@@ -4339,7 +4339,7 @@ DE$ = " "
             If .currow < .mysplit Then
                 ScrollDownNew dq, prive
                 PlainBaSket dq, prive, Right$(Prompt$ & s$, .mx - 1), , , 0
-                DE$ = ""
+                DE$ = vbNullString
             End If
         End If
 
@@ -4363,12 +4363,12 @@ If RealLen(a$, True) = 0 Then
 If Asc(a$) = 63 And s$ <> "" Then
 s$ = s$ & a$: a$ = s$: ExcludeOne s$: a$ = Mid$(a$, Len(s$) + 1)
 s$ = s$ + a$
-MKEY$ = ""
-'UINK = ""
+MKEY$ = vbNullString
+'UINK = VbNullString
 safe$ = a$
 INK = Chr$(8)
 Else
-If s$ = "" Then a$ = " "
+If s$ = vbNullString Then a$ = " "
 GoTo cont12345
 End If
 Else
@@ -4378,8 +4378,8 @@ cont12345:
     Else
             If checknumber Then
                     fr1 = 1
-                    If (s$ = "" And a$ = "-") Or IsNumberQuery(s$ + a$, fr1, p, fr2) Then
-                            If fr2 - 1 = RealLen(s$) + 1 Or (s$ = "" And a$ = "-") Then
+                    If (s$ = vbNullString And a$ = "-") Or IsNumberQuery(s$ + a$, fr1, p, fr2) Then
+                            If fr2 - 1 = RealLen(s$) + 1 Or (s$ = vbNullString And a$ = "-") Then
    If ShowCaret(dq.hWnd) <> 0 Then DestroyCaret
                 If a$ = "." Then
                 If Not NoUseDec Then
@@ -4405,7 +4405,7 @@ GdiFlush
             Else
             If ShowCaret(dq.hWnd) <> 0 Then DestroyCaret
                    If safe$ <> "" Then
-        a$ = safe$: safe$ = ""
+        a$ = safe$: safe$ = vbNullString
 End If
  If InStr(endchars, a$) = 0 Then PlainBaSket dq, prive, a$, , , 0: s$ = s$ & a$
               If .curpos >= .mx Then
@@ -4444,7 +4444,7 @@ Loop
 
 
  
-If Not QRY Then s$ = ""
+If Not QRY Then s$ = vbNullString
 dq.FontTransparent = True
 QRY = False
 
@@ -4605,7 +4605,7 @@ If vH_title$ = lastAboutHTitle Then Exit Sub
 vH_title$ = lastAboutHTitle
 vH_doc$ = LastAboutText
 Else
-If vH_title$ = "" Then Exit Sub
+If vH_title$ = vbNullString Then Exit Sub
 End If
 If Not Form4.Visible Then Form4.Show , Form1: bypassshow = True
 If bypassshow Then
@@ -4655,7 +4655,7 @@ With Form4.Label1
 If abt Then
 .glistN.WordCharLeft = "["
 .glistN.WordCharRight = "]"
-.glistN.WordCharRightButIncluded = ""
+.glistN.WordCharRightButIncluded = vbNullString
 Else
 .glistN.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^")
 .glistN.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "=", ">", "<", "'", """", " ", "+", "-", "/", "*", "^")
@@ -4678,7 +4678,7 @@ Dim i As Long, fs, b
     'Get
     GetTempPath 200, StrPtr(strTemp)
     strTemp = LONGNAME(mylcasefILE(Left$(strTemp, InStr(strTemp, Chr(0)) - 1)))
-    If strTemp = "" Then
+    If strTemp = vbNullString Then
      strTemp = mylcasefILE(Left$(strTemp, InStr(strTemp, Chr(0)) - 1))
      If Right$(strTemp, 1) <> "\" Then strTemp = strTemp & "\"
     End If
@@ -4694,7 +4694,7 @@ Dim i As Long, fs, b
     KillFile strTemp & "dummy." & extension
 End Function
 Function mylcasefILE(ByVal a$) As String
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 If casesensitive Then
 ' no case change
 mylcasefILE = a$
@@ -4706,7 +4706,7 @@ End Function
 
 Function myUcase(ByVal a$, Optional Convert As Boolean = False) As String
 Dim i As Long
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
  If AscW(a$) > 255 Or Convert Then
  For i = 1 To Len(a$)
  Select Case AscW(Mid$(a$, i, 1))
@@ -4749,9 +4749,9 @@ myUcase = UCase(a$)
 End Function
 
 Function myLcase(ByVal a$) As String
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 a$ = Trim$(LCase(a$))
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
  If AscW(a$) > 255 Then
 a$ = a$ & Chr(0)
 ' Here are greek letters for proper case conversion
@@ -4777,8 +4777,8 @@ End Function
 Function MesTitle$()
 On Error Resume Next
 If ttl Then
-If Form1.Caption = "" Then
-If here$ = "" Then
+If Form1.Caption = vbNullString Then
+If here$ = vbNullString Then
 MesTitle$ = "M2000"
 ' IDE
 Else
@@ -4795,7 +4795,7 @@ Else
 If Typename$(Screen.ActiveForm) = "GuiM2000" Then
 MesTitle$ = Screen.ActiveForm.Title
 Else
-If here$ = "" Or LASTPROG$ = "" Then
+If here$ = vbNullString Or LASTPROG$ = vbNullString Then
 MesTitle$ = "M2000"
 Else
 MesTitle$ = ExtractNameOnly(LASTPROG$) & " " & here$
@@ -4851,10 +4851,10 @@ If s$ <> "" Then
                 STEXIT = False
                 STbyST = True
                 Form2.Show , Form1
-                Form2.Label1(0) = ""
-                Form2.Label1(1) = ""
-                Form2.Label1(2) = ""
-                 TestShowSub = ""
+                Form2.Label1(0) = vbNullString
+                Form2.Label1(1) = vbNullString
+                Form2.Label1(2) = vbNullString
+                 TestShowSub = vbNullString
  TestShowStart = 0
    
                 stackshow basestack1
@@ -4872,7 +4872,7 @@ If s$ <> "" Then
                     
                cc.Value = "Monospac821Greek BT"
             ElseIf d$ = "SEC" Then
-                    cc.ValueKey = "SECURENAMES"
+                    cc.ValueKey = "NEWSECURENAMES"
                 cc.ValueType = REG_DWORD
                 cc.Value = 0
                 SecureNames = False
@@ -4980,10 +4980,10 @@ If IsLabel(basestack1, s$, d$) > 0 Then
             STEXIT = False
             STbyST = True
             Form2.Show , Form1
-            Form2.Label1(0) = ""
-            Form2.Label1(1) = ""
-            Form2.Label1(2) = ""
-             TestShowSub = ""
+            Form2.Label1(0) = vbNullString
+            Form2.Label1(1) = vbNullString
+            Form2.Label1(2) = vbNullString
+             TestShowSub = vbNullString
  TestShowStart = 0
 
             stackshow basestack1
@@ -4997,7 +4997,7 @@ If IsLabel(basestack1, s$, d$) > 0 Then
             cc.ValueType = REG_SZ
             If ISSTRINGA(s$, w$) Then cc.Value = w$
             ElseIf d$ = "SEC" Then
-                    cc.ValueKey = "SECURENAMES"
+                    cc.ValueKey = "NEWSECURENAMES"
                 cc.ValueType = REG_DWORD
                 cc.Value = -1
                 SecureNames = True
@@ -5162,11 +5162,11 @@ End Function
 Public Function aheadstatus(a$, Optional srink As Boolean = True, Optional pos As Long = 1) As String
 Dim b$, part$, w$, pos2 As Long, Level&
 
-If a$ = "" Then Exit Function
+If a$ = vbNullString Then Exit Function
 If pos = 0 Then pos = 1
 Do While pos <= Len(a$)
     w$ = Mid$(a$, pos, 1)
-    If part$ = "" And w$ = "0" Then
+    If part$ = vbNullString And w$ = "0" Then
         If pos + 2 <= Len(a$) Then
             If LCase(Mid$(a$, pos, 2)) Like "0[xχ]" Then
             'hexadecimal literal number....
@@ -5220,7 +5220,7 @@ again:
             End If
             ElseIf Right$(b$, 1) = "a" Then
             b$ = Left$(b$, Len(b$) - 1)
-            part$ = ""
+            part$ = vbNullString
             Else
             part$ = "N"
               
@@ -5233,7 +5233,7 @@ again22:
         pos = pos + 1: GoTo again22
         End If
        If Mid$(a$, pos + 1, 1) <> "." Then b$ = b$ & part$
-        part$ = ""
+        part$ = vbNullString
         
     ElseIf w$ = "{" Then
 
@@ -5254,11 +5254,11 @@ again22:
         Case ","  ' bye bye
         Exit Do
         Case "%"
-            If part$ = "" Then
+            If part$ = vbNullString Then
             End If
         Case "$"
-            If part$ = "" Then
-                If b$ = "" Then
+            If part$ = vbNullString Then
+                If b$ = vbNullString Then
                     part$ = "N"
                 ElseIf Right$(b$, 1) = "o" Then
                     part$ = "N"
@@ -5269,11 +5269,11 @@ again22:
             ElseIf part$ = "N" Then
                     b$ = b$ & "Sa"
                     If Mid$(a$, pos + 1, 1) = "." Then pos = pos + 1
-                    part$ = ""
+                    part$ = vbNullString
             End If
         Case "+", "-", "|"
                     b$ = b$ & part$
-                    If b$ = "" Then
+                    If b$ = vbNullString Then
                     Else
                     
                 part$ = "o"
@@ -5286,7 +5286,7 @@ again22:
         Case " ", ChrW(160)
             If part$ <> "" Then
             b$ = b$ & part$
-            part$ = ""
+            part$ = vbNullString
             Else
             'skip
             End If
@@ -5299,7 +5299,7 @@ again22:
             part$ = "N"
             End If
         Case "&"
-        If part$ = "" Then
+        If part$ = vbNullString Then
         part$ = "S"
         Else
         b$ = part$
@@ -5319,7 +5319,7 @@ again22:
             If Len(a$) >= pos + 1 Then
             If Mid$(a$, pos, 2) = Mid$(a$, pos, 1) Then
                 b$ = b$ & part$
-                If b$ = "" Then
+                If b$ = vbNullString Then
                         Else
                         
                     part$ = "o"
@@ -5338,7 +5338,7 @@ again22:
 there1:
                 If b$ & part$ <> "" Then
                 w$ = Replace(b$ & part$, "a", "")
-            part$ = ""
+            part$ = vbNullString
                If srink Then
                   Do
                 b$ = w$
@@ -5723,7 +5723,7 @@ Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte
 Dim mLof As Long, nobom As Long
 nobom = 1
 ' code from Schmidt, member of vbforums
-If FileName = "" Then Exit Function
+If FileName = vbNullString Then Exit Function
 On Error GoTo ErrHandler
   BLen = FileLen(GetDosPath(FileName))
   If BLen = 0 Then Exit Function
@@ -5827,7 +5827,7 @@ Else
 If Not CanKillFile(FileName$) Then Exit Function
 End If
 f$ = GetDosPath(FileName)
-If Err.Number > 0 Or f$ = "" Then Exit Function
+If Err.Number > 0 Or f$ = vbNullString Then Exit Function
 w = FreeFile
 MyDoEvents
 Open f$ For Binary As w
@@ -5963,7 +5963,7 @@ Public Sub getUniStringComma(f As Long, s As String)
 ' 2 bytes a time... stop to line end and advance to next line
 ' use numbers with . as decimal not ,
 Dim a() As Byte, s1 As String, ss As Long, inside As Boolean
-s = ""
+s = vbNullString
 
 a = " "
 On Error GoTo a1115
@@ -5988,7 +5988,7 @@ s = s + s1
 
 Else
 If s1 = """" Then
-If s = "" Then ' is the first we have empty string
+If s = vbNullString Then ' is the first we have empty string
 inside = False
 Else
 ' look if we have one  more
@@ -6035,7 +6035,7 @@ Public Sub getAnsiStringComma(f As Long, s As String)
 ' 2 bytes a time... stop to line end and advance to next line
 ' use numbers with . as decimal not ,
 Dim a As Byte, s1 As String, ss As Long, inside As Boolean
-s = ""
+s = vbNullString
 
 On Error GoTo a1111
 
@@ -6059,7 +6059,7 @@ s = s + s1
 
 Else
 If s1 = """" Then
-If s = "" Then ' is the first we have empty string
+If s = vbNullString Then ' is the first we have empty string
 inside = False
 Else
 ' look if we have one  more
@@ -6209,7 +6209,7 @@ ii = ii + 1
                     If (AscW(s1$) And &HFFFF0000) = &HFFFF0000 Then
                     Else
                     If l$ = s1$ Then
-                        If LLL$ = "" Then LL = LL + 1
+                        If LLL$ = vbNullString Then LL = LL + 1
                         LLL$ = l$
                     Else
                         l$ = Mid$(s$, ii, 1)
@@ -6221,7 +6221,7 @@ ii = ii + 1
                  End If
             
         Else
-        LLL$ = ""
+        LLL$ = vbNullString
         End If
        
         
@@ -6261,7 +6261,7 @@ mm = LL
    End If
 If LL < 0 Then
 PopOne = s$
-s$ = ""
+s$ = vbNullString
 ElseIf mm > 0 Then
     PopOne = Left$(s$, mm)
     s$ = Right$(s$, LL)
@@ -6289,19 +6289,19 @@ ctype = CT_CTYPE3
       End If
        LL = LL - 1
        If LL <= 0 Then
-       s$ = ""
+       s$ = vbNullString
        Else
        
         s$ = Left$(s$, LL)
         End If
       Else
-      s$ = ""
+      s$ = vbNullString
       
    End If
 End Sub
 Function Tcase(s$) As String
 Dim a() As String, i As Long
-If s$ = "" Then Exit Function
+If s$ = vbNullString Then Exit Function
 a() = Split(s$, " ")
 For i = 0 To UBound(a())
 a(i) = myUcase(Left$(a(i), 1), True) + Mid$(myLcase(a(i)), 2)
@@ -6487,7 +6487,7 @@ Public Sub oxiforforms()
 MyEr "Not allowed this command for forms", "Δεν επιτρέπεται αυτή η εντολή για φόρμες"
 End Sub
 Public Sub SyntaxError()
-If LastErName = "" Then
+If LastErName = vbNullString Then
 MyEr "Syntax Error", "Συντακτικό Λάθος"
 Else
 If LastErNum = 0 Then LastErNum = -1 ' general

@@ -81,7 +81,7 @@ mS.DataVal CDbl(a(i))
 End Select
 Next i
 objref.soros.MergeTop mS
-here$ = ""
+here$ = vbNullString
 Call CallEvent(objref, "", 1, VarIndex)
 Set mS = Nothing
 here$ = ohere$
@@ -157,14 +157,14 @@ Friend Sub ReduceHash(newTop As Long)
        With PriveSpace(i)
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
-            .Key = ""
+            .Key = vbNullString
             .Pleft = 0
         Else
             Hash(.lastpos) = 0
-            .Key = ""
+            .Key = vbNullString
         End If
 
-        .ndx = ""
+        .ndx = vbNullString
             
         End With
 
@@ -224,7 +224,7 @@ Count = toplim + 1
 End Property
 Friend Function Find(Key As String, func As String) As Boolean
 Dim k As Long
-func = ""
+func = vbNullString
 'If Right$(Key, 2) = "()" Then Stop
 If Len(Key) = 0 Then Exit Function
 k = Hash(HashFunc(Key)) - 1

@@ -31,15 +31,15 @@ If basestack1.Owner Is Nothing Then Exit Sub
 elevatestatus = 1
 ohere$ = here$
 here$ = mineHere$
-If LoadFileAndSwitches$ = "" Then newshow objref
+If LoadFileAndSwitches$ = vbNullString Then newshow objref
 NoAction = True
 NOEXECUTION = False
 objref.toprinter = False
 MOUT = False
 ResetBreak
 LastErNum = 0: LastErNum1 = 0
-LastErName = ""
-LastErNameGR = ""
+LastErName = vbNullString
+LastErNameGR = vbNullString
 s$ = LoadFileAndSwitches$
 If Not ISSTRINGA(s$, cLine) Then
 cLine = mylcasefILE(Trim(s$))
@@ -49,7 +49,7 @@ End If
 While Left$(cLine, 1) = Chr(34) And Right$(cLine, 1) = Chr(34) And Len(cLine) > 2
 cLine = Mid$(cLine, 2, Len(cLine) - 2)
 Wend
-If ExtractType(cLine) <> "gsb" Then cLine = ""
+If ExtractType(cLine) <> "gsb" Then cLine = vbNullString
 If cLine <> "" Then
 para$ = ExtractPath(cLine) + ExtractName(cLine)
 para$ = Trim$(Mid$(cLine, Len(para$) + 1))
@@ -90,9 +90,9 @@ Public Sub ExecuteStatement(ByVal code$)
 Dim what$, pos As Long, func As Boolean, param$
 If IsLabelOnly(code$, what$) > 4 Then
     func = True
-ElseIf what$ = "" Then
+ElseIf what$ = vbNullString Then
     Exit Sub
-ElseIf LTrim$(code$) = "" Then
+ElseIf LTrim$(code$) = vbNullString Then
 ' one call
 Call Run(what$)
 Exit Sub
@@ -100,7 +100,7 @@ End If
 Do
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
-  If drop$ = "" And pos > Len(code$) Then Exit Sub
+  If drop$ = vbNullString And pos > Len(code$) Then Exit Sub
   If param$ <> "" Then
   param$ = param$ + ", " + Left$(code$, pos - 1)
   Else
@@ -118,7 +118,7 @@ Public Function Eval(code$) As Variant
 Dim pos As Long, p As Double, s As String, drop$
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
-  If drop$ = "" And pos > Len(code$) Then Exit Function
+  If drop$ = vbNullString And pos > Len(code$) Then Exit Function
   If InStr(drop$, "N") Then
   If IsExp(objref, Left$(code$, pos), p) Then
   If Not objref.lastobj Is Nothing Then
@@ -158,8 +158,8 @@ MOUT = False
 ResetBreak
 Run = True
         LastErNum = 0: LastErNum1 = 0
-        LastErName = ""
-        LastErNameGR = ""
+        LastErName = vbNullString
+        LastErNameGR = vbNullString
 If Execute(objref, code$, False) <> 1 Then
         Run = fasle
                  MOUT = True
@@ -224,8 +224,8 @@ Public Sub Reset()
 elevatestatus = 0
     NERR = False
         LastErNum = 0: LastErNum1 = 0
-        LastErName = ""
-        LastErNameGR = ""
+        LastErName = vbNullString
+        LastErNameGR = vbNullString
  'If Not App.StartMode = vbSModeStandalone Then
  
 NeoSubMain
@@ -239,7 +239,7 @@ Private Sub Class_Initialize()
  If Not l_complete Then NeoSubMain
         Set objref = New basetask
         Set objref.Owner = Form1.DIS
-        mineHere$ = "" 'HERE$
+        mineHere$ = vbNullString 'HERE$
 End Sub
 
 Private Sub Class_Terminate()

@@ -99,11 +99,11 @@ mSortstyle = vbDatabaseCompare
 End Sub
 
 
-Public Sub AddKey2(Rhs, Optional aValue As Variant)
+Public Sub AddKey2(RHS, Optional aValue As Variant)
 IamBusy = True
     index = -1
-    lastkey = Rhs
-    If Len(lastkey) = 0 Then Rhs = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = Rhs
+    lastkey = RHS
+    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
     Done = False
     
     If Not IsMissing(aValue) Then
@@ -121,10 +121,10 @@ IamBusy = True
     
 IamBusy = False
 End Sub
-Public Sub AddKey(Rhs, Optional aValue As Variant)
+Public Sub AddKey(RHS, Optional aValue As Variant)
     index = -1
-    lastkey = Rhs
-    If Len(lastkey) = 0 Then Rhs = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = Rhs
+    lastkey = RHS
+    If Len(lastkey) = 0 Then RHS = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0): lastkey = RHS
     Done = False
     If Not IsMissing(aValue) Then
     
@@ -161,9 +161,9 @@ ReHash
 End Sub
 
 
-Public Sub ToKey(Rhs)
-    Done = Find(Rhs)
-    If Done Then lastkey = Rhs
+Public Sub ToKey(RHS)
+    Done = Find(RHS)
+    If Done Then lastkey = RHS
 End Sub
 Public Sub RemoveWithNoFind()
 If AllowSameKey Then Exit Sub
@@ -210,24 +210,24 @@ here:
   ReduceHash toplim
 End If
 End Sub
-Public Sub drop(Rhs)
+Public Sub drop(RHS)
 If Not AllowSameKey Then Exit Sub
-Rhs = Rhs - 1
-If (toplim - Rhs) >= 0 And (Rhs >= 0) Then
+RHS = RHS - 1
+If (toplim - RHS) >= 0 And (RHS >= 0) Then
 Dim i As Long
-For i = toplim To Rhs Step -1
+For i = toplim To RHS Step -1
        With PriveSpace(i)
         If .Pleft > 0 Then
             Hash(.lastpos) = .Pleft
-            .Key = ""
+            .Key = vbNullString
             .iValue = CDbl(0)
             .Pleft = 0
         Else
             Hash(.lastpos) = 0
-            .Key = ""
+            .Key = vbNullString
         End If
         End With
-toplim = Rhs - 1
+toplim = RHS - 1
   ReduceHash toplim
 Next i
 Else
@@ -239,12 +239,12 @@ Else
 End If
 
 End Sub
-Public Sub Remove(Rhs)
+Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
 Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub  ' previus stop
 top1 = toplim
-If Find2(Rhs, Parndx, ndx) Then
+If Find2(RHS, Parndx, ndx) Then
         Done = True
         index = ndx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
@@ -296,22 +296,22 @@ Done = False
 End If
 End Sub
 
-Property Let Value(Rhs As Variant)
+Property Let Value(RHS As Variant)
 Done = False
 If index = -1 Then
-ItemCreator lastkey, Rhs
+ItemCreator lastkey, RHS
 
 Else
-    PriveSpace(index).iValue = Rhs
+    PriveSpace(index).iValue = RHS
 End If
 Done = True
 End Property
-Property Set ValueObj(Rhs As Variant)
+Property Set ValueObj(RHS As Variant)
 Done = False
 If index = -1 Then
-    ItemCreator lastkey, Rhs
+    ItemCreator lastkey, RHS
 Else
-    Set PriveSpace(index).iValue = Rhs
+    Set PriveSpace(index).iValue = RHS
 End If
 Done = True
 End Property
@@ -323,11 +323,11 @@ Else
     sValue = PriveSpace(index).sValue
 End If
 End Property
-Property Let sValue(Rhs As Long)
+Property Let sValue(RHS As Long)
 If index = -1 Then
 Else
     Done = True
-    PriveSpace(index).sValue = Rhs
+    PriveSpace(index).sValue = RHS
 End If
 End Property
 Property Get Value() As Variant
@@ -395,7 +395,7 @@ Private Function CheckHash() As Boolean
     Dim i As Long
     For i = 0 To toplim
         If PriveSpace(i).Pleft > 0 Then
-        If PriveSpace(PriveSpace(i).Pleft - 1).Key = "" Then Exit Function
+        If PriveSpace(PriveSpace(i).Pleft - 1).Key = vbNullString Then Exit Function
         If i = (PriveSpace(i).Pleft - 1) Then Exit Function
         End If
     Next i
@@ -490,11 +490,11 @@ If Done Then
     End If
 End If
 End Sub
-Sub SwapByIndex(Rhs As Long)
+Sub SwapByIndex(RHS As Long)
 On Error Resume Next
 If Done Then
-    SwapVariant PriveSpace(Rhs).iValue, PriveSpace(index).iValue
-    index = Rhs
+    SwapVariant PriveSpace(RHS).iValue, PriveSpace(index).iValue
+    index = RHS
 End If
 End Sub
 
@@ -524,9 +524,9 @@ IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 
-Function Find(Rhs) As Boolean
+Function Find(RHS) As Boolean
 Dim k As Long, Key As String, k1 As Long
-Key = Rhs
+Key = RHS
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 ParentIndex = -1
 Done = False
@@ -556,9 +556,9 @@ End If
 End If
 
 End Function
-Private Function Find2(Rhs, Parndx As Long, ndx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
 Dim k As Long, Key As String, k1 As Long
-Key = Rhs
+Key = RHS
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 Parndx = -1
 k = Hash(HashFunc(Key)) - 1
@@ -586,10 +586,10 @@ End If
 End If
 End Function
 
-Function ExistKey0(Rhs) As Boolean
+Function ExistKey0(RHS) As Boolean
 If AllowSameKey Then Exit Function
 Dim k As Long, Key As String, k1 As Long
-Key = Rhs
+Key = RHS
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 k1 = -2
@@ -613,9 +613,9 @@ If k >= 0 Then
     End If
 End If
 End Function
-Function ExistKey(Rhs) As Boolean
+Function ExistKey(RHS) As Boolean
 Dim k As Long, k1 As Long, Key As String
-Key = Rhs
+Key = RHS
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k = Hash(HashFunc(Key)) - 1
 k1 = -2
@@ -639,9 +639,9 @@ If k >= 0 Then
     End If
 End If
 End Function
-Function ExistKey3(Rhs) As Boolean
+Function ExistKey3(RHS) As Boolean
 Dim k As Long, k1 As Long, Key As String
-Key = Rhs
+Key = RHS
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
 k1 = -2
 k = Hash(HashFunc(Key)) - 1
