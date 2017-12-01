@@ -65,8 +65,9 @@ Private Type SAFEARRAY1D
     cElements As Long
     lLBound As Long
 End Type
-Public index As Long
+Public index As Long, final As Boolean
 Public Sub Compute0(p As Double, ss$)
+If final Then CantAssignValue: Exit Sub
 Dim v As Long
 On Error Resume Next
 v = 0
@@ -113,6 +114,7 @@ Loop
 
 End Sub
 Public Sub Compute(p As Double, ss$)
+If final Then CantAssignValue: Exit Sub
 Dim v As Long
 On Error Resume Next
 v = 0
@@ -149,6 +151,7 @@ Loop
 
 End Sub
 Public Sub Compute2(p As Double, ss$)
+If final Then CantAssignValue: Exit Sub
 Dim v As Long
 On Error Resume Next
 v = 0
@@ -178,6 +181,7 @@ Loop
 End Sub
 Public Sub Compute3(ss$)
 Dim v As Long
+If final Then CantAssignValue: Exit Sub
 On Error Resume Next
 v = 0
 Do While v <= Me.UpperMonoLimit
@@ -504,6 +508,7 @@ Set k.GroupRef = Me.GroupRef
 k.Arr = Me.Arr
 k.IHaveGui = Me.IHaveGui
 k.IHaveClass = Me.IHaveClass
+k.final = Me.final
 End Sub
 
 Public Function UpperMonoLimit()
@@ -753,9 +758,20 @@ there1:
 End Property
 
 Public Property Let item(curitem As Long, item As Variant)
+
 On Error Resume Next
 If curitem < 0 Then
 
+ElseIf final Then
+If Not MyIsObject(actualdata(curitem)) Then
+If VarType(actualdata(curitem)) = vbEmpty Then
+actualdata(curitem) = item
+Else
+CantAssignValue
+End If
+Else
+CantAssignValue
+End If
 ElseIf Not IsObject(actualdata(curitem)) Then
 actualdata(curitem) = item
 Else
@@ -773,6 +789,7 @@ End If
 
 End Property
 Public Property Set item(curitem As Long, item As Variant)
+If final Then CantAssignValue: Exit Property
 On Error Resume Next
 If curitem < 0 Then
 If Not GroupRef Is Nothing Then

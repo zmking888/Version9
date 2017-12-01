@@ -73,6 +73,7 @@ Friend Sub ReduceHash(newTop As Long, v() As modfun)
             v(.ndx).sbc = 0
             v(.ndx).sbgroup = vbNullString
             v(.ndx).goodname = vbNullString
+            v(.ndx).locked = False
             Set v(.ndx).subs = Nothing
             End If
         .KeyType = 0

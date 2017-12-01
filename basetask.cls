@@ -16,6 +16,7 @@ Option Explicit
 ' This is a utility soros for passing parammeters to functions
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
+Public finalFlag As Boolean
 Public IFCTRL As Boolean, jump As Boolean
 Public Vars As Long
 Public usestack As Boolean
