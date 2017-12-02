@@ -349,6 +349,7 @@ Public Sub WrongOperator()
 MyEr "Wrong operator", "λάθος τελεστής"
 End Sub
 Public Sub NoOperatorForThatObject(ss$)
+If ss$ = "g" Then ss$ = "<="
     MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
 End Sub
 Public Sub MyEr(er$, ergr$)
