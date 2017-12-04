@@ -209,7 +209,7 @@ Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, 
 Dim height1 As Long, width1 As Long
 Dim doubleclick As Long
 
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim EXECUTED As Boolean
 Dim stolemodalid As Variant
 Public Property Set Process(mBtask As basetask)
@@ -295,8 +295,8 @@ gList2.CapColor = rgb(255, 160, 0)
 gList2.HeadLine = vbNullString
 
 gList2.FloatList = True
-gList2.FloatLimitTop = ScrY() - players(0).Yt * 2
-gList2.FloatLimitLeft = ScrX() - players(0).Xt * 2
+gList2.FloatLimitTop = VirtualScreenHeight() - players(0).Yt * 2
+gList2.FloatLimitLeft = VirtualScreenWidth() - players(0).Xt * 2
 gList2.MoveParent = True
 'gList2.enabled = True
 gList1.DragEnabled = False
@@ -404,13 +404,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -514,14 +514,14 @@ If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
 End If
 If aa > 0 Then
-sHelp s$, aaa, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+sHelp s$, aaa, (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
 vHelp Not Form4.Visible
 ElseIf subHash.Find(s$, aa) Then
-sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+sHelp s$, SBcode(aa), (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
 vHelp Not Form4.Visible
 
 ElseIf subHash.Find(subHash.LastKnown, aa) Then
-sHelp s$, SBcode(aa), (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+sHelp s$, SBcode(aa), (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
 vHelp Not Form4.Visible
 Else
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
@@ -562,7 +562,7 @@ b.Right = gList4.WidthPixels
              End If
              'EXECUTED = False
               SetTextColor thisHDC, 0
-              b.top = b.Bottom - 1 * lastfactor
+              b.Top = b.Bottom - 1 * lastfactor
        
             FillBack thisHDC, b, &H777777
            
@@ -570,7 +570,7 @@ b.Right = gList4.WidthPixels
           
           
     SetTextColor thisHDC, gList4.ForeColor
-    b.top = b.Bottom - 1
+    b.Top = b.Bottom - 1
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
@@ -688,8 +688,8 @@ Else
         
   
         once = True
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
@@ -746,11 +746,11 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = itemWidth * 2 / 5
 itemwidth2 = itemWidth * 3 / 5 - borderleft
-Move Left, top, allwidth, allheight
+Move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.Move borderleft, bordertop, itemWidth, bordertop * 3
-gList2.FloatLimitTop = ScrY() - bordertop - bordertop * 3
-gList2.FloatLimitLeft = ScrX() - borderleft * 3
+gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 gList3(0).Move borderleft, bordertop * 5, itemwidth2, bordertop * 4
 gList3(1).Move borderleft, bordertop * 9, itemwidth2, bordertop * 4
 gList3(2).Move borderleft, bordertop * 13, itemwidth2, bordertop * 4

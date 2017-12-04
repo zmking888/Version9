@@ -41,16 +41,16 @@ Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As 
 Private Declare Function GetProcAddress Lib "KERNEL32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 
 
-Private Declare Function GetWindowLongA Lib "user32" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+Private Declare Function GetWindowLongA Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long) As Long
 
 
-Private Declare Function SetWindowLongA Lib "user32" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongA Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowLongW Lib "user32" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongW Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowTextW Lib "user32" (ByVal hWnd As Long, ByVal lpString As Long) As Long
+Private Declare Function SetWindowTextW Lib "User32" (ByVal hWND As Long, ByVal lpString As Long) As Long
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 
@@ -71,7 +71,7 @@ ttl = True
         ' the default Unicode window procedure
         WndProc = GetProcAddress(GetModuleHandleW(StrPtr("user32")), "DefWindowProcW")
         ' window procedure of this form
-        VBWndProc = GetWindowLongA(hWnd, GWL_WNDPROC)
+        VBWndProc = GetWindowLongA(hWND, GWL_WNDPROC)
     End If
     ' ensure we got them
 
@@ -79,11 +79,11 @@ ttl = True
     If WndProc <> 0 Then
         ' replace form's window procedure with t
         '     he default Unicode one
-        SetWindowLongW hWnd, GWL_WNDPROC, WndProc
+        SetWindowLongW hWND, GWL_WNDPROC, WndProc
         ' change form's caption
-        SetWindowTextW hWnd, StrPtr(m_Caption)
+        SetWindowTextW hWND, StrPtr(m_Caption)
         ' restore the original window procedure
-        SetWindowLongA hWnd, GWL_WNDPROC, VBWndProc
+        SetWindowLongA hWND, GWL_WNDPROC, VBWndProc
     Else
         ' no Unicode for us
         Caption = m_Caption
@@ -120,18 +120,24 @@ k1 = 0
 If AskTitle$ = vbNullString Then AskTitle$ = MesTitle$
 If AskCancel$ = vbNullString Then INFOONLY = True
 If AskOk$ = vbNullString Then AskOk$ = "OK"
+
+
 If Form1.Visible Then
 MyDoEvents1 Form1
 Sleep 1
+MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show , Form1
 Else
 If TypeOf bstack.Owner Is GuiM2000 Then
+MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show , bstack.Owner
 ElseIf form5iamloaded Then
 MyDoEvents1 Form5
 Sleep 1
+MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show , Form5
 Else
+MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show
 End If
 End If
@@ -449,8 +455,8 @@ Form5.Visible = True
 End If
 If Not ttl Then
 ttl = True
-z = Form1.top
-Form1.top = 0
+z = Form1.Top
+Form1.Top = ScrInfo(Console).Top
 If Not IsSelectorInUse Then Form1.Show , Form5
 Else
 If Not IsSelectorInUse Then Form1.Show , Form5

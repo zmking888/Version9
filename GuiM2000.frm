@@ -45,22 +45,14 @@ Begin VB.Form GuiM2000
       TabStop         =   0   'False
       Top             =   0
       Width           =   9180
-      _ExtentX        =   16193
-      _ExtentY        =   873
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   161
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Backcolor       =   3881787
-      ForeColor       =   16777215
-      CapColor        =   16777215
+      _extentx        =   16193
+      _extenty        =   873
+      max             =   1
+      vertical        =   -1  'True
+      font            =   "GuiM2000.frx":000C
+      backcolor       =   3881787
+      forecolor       =   16777215
+      capcolor        =   16777215
    End
 End
 Attribute VB_Name = "GuiM2000"
@@ -69,8 +61,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function DestroyCaret Lib "user32" () As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function DestroyCaret Lib "User32" () As Long
 Dim setupxy As Single
 Dim Lx As Single, ly As Single, dr As Boolean
 Dim scrTwips As Long
@@ -118,7 +110,7 @@ mModalId = RHS
 End Property
 
 Public Property Let Enablecontrol(RHS As Boolean)
-If RHS = False Then UnHook hWnd '  And Not Me Is Screen.ActiveForm Then UnHook hWnd
+If RHS = False Then UnHook hWND '  And Not Me Is Screen.ActiveForm Then UnHook hWnd
 If Len(MyName$) = 0 Then Exit Property
 'If rhs = Fals Then UnHook hWnd
 If mEnabled = False And RHS = True Then Me.enabled = True
@@ -240,25 +232,25 @@ If PopupOn Then PopupOn = False
 If novisible Then Hide: Unload Me
 If gList2.HeadLine <> "" Then If ttl Then Form3.CaptionW = gList2.HeadLine: Form3.Refresh
 MarkSize = 4
-ResizeMark.Width = MarkSize * dv15
+ResizeMark.width = MarkSize * dv15
 ResizeMark.Height = MarkSize * dv15
-ResizeMark.Left = Width - MarkSize * dv15
-ResizeMark.top = Height - MarkSize * dv15
+ResizeMark.Left = width - MarkSize * dv15
+ResizeMark.Top = Height - MarkSize * dv15
 
-ResizeMark.BackColor = GetPixel(Me.hDC, 0, 0)
+ResizeMark.BackColor = GetPixel(Me.hdc, 0, 0)
 ResizeMark.Visible = Sizable
 If Sizable Then ResizeMark.ZOrder 0
 
 If Typename(ActiveControl) = "gList" Then
-Hook hWnd, ActiveControl
+Hook hWND, ActiveControl
 Else
-Hook hWnd, Nothing
+Hook hWND, Nothing
 End If
 
 End Sub
 Private Sub Form_Deactivate0()
 If PopupOn Then
-UnHook hWnd
+UnHook hWND
 
 Exit Sub
 End If
@@ -276,14 +268,14 @@ Else
             On Error Resume Next
             Me.SetFocus
         Else
-        UnHook hWnd
+        UnHook hWND
             If mModalId <> 0 Then ModalId = 0
  
             
         End If
     
     Else
-    UnHook hWnd
+    UnHook hWND
     End If
    
     End If
@@ -291,7 +283,7 @@ End Sub
 
 
 Private Sub Form_Deactivate()
-            UnHook hWnd
+            UnHook hWND
 If PopupOn Then
 
 Exit Sub
@@ -347,20 +339,20 @@ Else
     Callback MyName$ + ".LostFocus()"
 End If
 If HOOKTEST <> 0 Then
-UnHook hWnd
+UnHook hWND
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Relax Then
 
 
 
 Relax = True
 If mIndex > -1 Then
-    Callback MyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback MyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-    Callback MyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback MyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 
 
@@ -369,29 +361,29 @@ Relax = False
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Relax Then
 Relax = True
 
 If mIndex > -1 Then
-Callback MyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback MyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback MyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback MyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
 
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not Relax Then
 
 Relax = True
 
 If mIndex > -1 Then
-Callback MyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback MyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 Else
-Callback MyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback MyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(X) + "," + CStr(Y) + ")"
 End If
 Relax = False
 End If
@@ -420,8 +412,8 @@ End If
 End Sub
 
 Private Sub Form_Resize()
-gList2.MoveTwips 0, 0, Me.Width, gList2.HeightTwips
-ResizeMark.Move Width - ResizeMark.Width, Height - ResizeMark.Height
+gList2.MoveTwips 0, 0, Me.width, gList2.HeightTwips
+ResizeMark.Move width - ResizeMark.width, Height - ResizeMark.Height
 End Sub
 
 
@@ -448,8 +440,8 @@ FillThereMyVersion thisHDC, thisrect, &H999999
 skip = True
 End If
 End Sub
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
-If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+If gList2.DoubleClickCheck(Button, item, X, Y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
     ByeBye
 End If
 End Sub
@@ -500,8 +492,8 @@ CtrlFont.name = .name
 CtrlFont.Size = .Size
 CtrlFont.bold = .bold
 End With
-gList2.FloatLimitTop = ScrY() - 600
-gList2.FloatLimitLeft = ScrX() - 450
+gList2.FloatLimitTop = VirtualScreenHeight() - 600
+gList2.FloatLimitLeft = VirtualScreenWidth() - 450
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
@@ -543,13 +535,13 @@ If setupxy - b < 0 Then b = setupxy \ 4 + 1
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5 * lastfactor
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 End Sub
@@ -612,13 +604,13 @@ SetTrans Me, CInt(Abs(mAlpha)) Mod 256, CLng(mycolor(mlColor)), CBool(mTRMODE)
 End Sub
 Public Sub Hold()
 MY_BACK.ClearUp
-If MY_BACK.Create(Form1.Width / DXP, Form1.Height / DYP) Then
-MY_BACK.LoadPictureBlt hDC
+If MY_BACK.Create(Form1.width / DXP, Form1.Height / DYP) Then
+MY_BACK.LoadPictureBlt hdc
 If MY_BACK.bitsPerPixel <> 24 Then Conv24 MY_BACK
 End If
 End Sub
 Public Sub Release()
-MY_BACK.PaintPicture hDC
+MY_BACK.PaintPicture hdc
 End Sub
 
 
@@ -687,29 +679,29 @@ End Sub
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
 End Sub
-Public Sub PopUp(vv As Variant, ByVal x As Variant, ByVal y As Variant)
-Dim var1() As Variant, retobject As Object, that As Object
+Public Sub PopUp(vv As Variant, ByVal X As Variant, ByVal Y As Variant)
+Dim var1() As Variant, retobject As Object, that As Object, hmonitor As Long
 ReDim var1(0 To 1)
 Dim var2() As String
 ReDim var2(0 To 0)
-
-x = x + Left
-y = y + top
+hmonitor = FindMonitorFromPixel(Y, Y)
+X = X + Left
+Y = Y + Top
 Set that = vv
 If Me Is that Then Exit Sub
 If that.Visible Then
 If Not that.enabled Then Exit Sub
 End If
-If x + that.Width > ScrX() Then
-If y + that.Height > ScrY() Then
-that.Move ScrX() - that.Width, ScrY() - that.Height
+If X + that.width > ScrInfo(hmonitor).width Then
+If Y + that.Height > ScrInfo(hmonitor).Height Then
+that.Move ScrInfo(hmonitor).width - that.width, ScrInfo(hmonitor).Height - that.Height
 Else
-that.Move ScrX() - that.Width, y
+that.Move ScrInfo(hmonitor).width - that.width, Y
 End If
-ElseIf y + that.Height > ScrY() Then
-that.Move x, ScrY() - Height
+ElseIf Y + that.Height > ScrInfo(hmonitor).Height Then
+that.Move X, ScrInfo(hmonitor).Height - Height
 Else
-that.Move x, y
+that.Move X, Y
 End If
 var1(1) = 1
 Set var1(0) = Me
@@ -721,25 +713,26 @@ Set var1(0) = Nothing
 MyDoEvents
 
 End Sub
-Public Sub PopUpPos(vv As Variant, ByVal x As Variant, ByVal y As Variant, ByVal y1 As Variant)
-Dim that As Object
-x = x + Left
-y = y + top + y1
+Public Sub PopUpPos(vv As Variant, ByVal X As Variant, ByVal Y As Variant, ByVal y1 As Variant)
+Dim that As Object, hmonitor As Long
+X = X + Left
+Y = Y + Top + y1
+hmonitor = FindMonitorFromPixel(Y, Y)
 Set that = vv
 If Me Is that Then Exit Sub
 If that.Visible Then
 If Not that.enabled Then Exit Sub
 End If
-If x + that.Width > ScrX() Then
-If y + that.Height > ScrY() Then
-that.Move ScrX() - that.Width, y - that.Height - y1
+If X + that.width > ScrInfo(hmonitor).width Then
+If Y + that.Height > ScrInfo(hmonitor).Height Then
+that.Move ScrInfo(hmonitor).width - that.width, Y - that.Height - y1
 Else
-that.Move ScrX() - that.Width, y
+that.Move ScrInfo(hmonitor).width - that.width, Y
 End If
-ElseIf y + that.Height > ScrY() Then
-that.Move x, y - that.Height - y1
+ElseIf Y + that.Height > ScrInfo(hmonitor).Height Then
+that.Move X, Y - that.Height - y1
 Else
-that.Move x, y
+that.Move X, Y
 End If
 that.ShowmeALL
 'If ModalId <> 0 Then
@@ -758,16 +751,16 @@ MyDoEvents1 Me
 'ProcTask2 basestack1
 End Sub
 
-Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Sizable And Not dr Then
-    x = x + ResizeMark.Left
-    y = y + ResizeMark.top
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    X = X + ResizeMark.Left
+    Y = Y + ResizeMark.Top
+    If (Y > Height - 150 And Y < Height) And (X > width - 150 And X < width) Then
     
     dr = Button = 1
     ResizeMark.mousepointer = vbSizeNWSE
-    Lx = x
-    ly = y
+    Lx = X
+    ly = Y
     If dr Then Exit Sub
     
     End If
@@ -775,21 +768,21 @@ If Sizable And Not dr Then
 End If
 End Sub
 
-Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addy As Single, addX As Single
 If Not Relax Then
-    x = x + ResizeMark.Left
-    y = y + ResizeMark.top
+    X = X + ResizeMark.Left
+    Y = Y + ResizeMark.Top
     If Button = 0 Then If dr Then Me.mousepointer = 0: dr = False: Relax = False: Exit Sub
     Relax = True
     If dr Then
-         If y < (Height - 150) Or y >= Height Then addy = (y - ly) Else addy = dv15 * 5
-         If x < (Width - 150) Or x >= Width Then addX = (x - Lx) Else addX = dv15 * 5
-         If Width + addX >= 1800 And Width + addX < ScrX() Then
-             If Height + addy >= 1800 And Height + addy < ScrY() Then
-                Lx = x
-                ly = y
-                Move Left, top, Width + addX, Height + addy
+         If Y < (Height - 150) Or Y >= Height Then addy = (Y - ly) Else addy = dv15 * 5
+         If X < (width - 150) Or X >= width Then addX = (X - Lx) Else addX = dv15 * 5
+         If width + addX >= 1800 And width + addX < VirtualScreenWidth() Then
+             If Height + addy >= 1800 And Height + addy < VirtualScreenHeight() Then
+                Lx = X
+                ly = Y
+                Move Left, Top, width + addX, Height + addy
                 If mIndex > -1 Then
                     Callback MyName$ + ".Resize(" + CStr(index) + ")"
                 Else
@@ -801,11 +794,11 @@ If Not Relax Then
         Exit Sub
     Else
         If Sizable Then
-            If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+            If (Y > Height - 150 And Y < Height) And (X > width - 150 And X < width) Then
                     dr = Button = 1
                     ResizeMark.mousepointer = vbSizeNWSE
-                    Lx = x
-                    ly = y
+                    Lx = X
+                    ly = Y
                     If dr Then Relax = False: Exit Sub
                 Else
                     ResizeMark.mousepointer = 0
@@ -834,9 +827,9 @@ Public Property Let SizerWidth(ByVal vNewValue As Variant)
 If vNewValue \ dv15 > 1 Then
     MarkSize = vNewValue \ dv15
     With ResizeMark
-    .Width = MarkSize * dv15
+    .width = MarkSize * dv15
     .Height = MarkSize * dv15
-    .Move Width - .Width, Height - .Height
+    .Move width - .width, Height - .Height
     End With
 End If
 End Property
@@ -856,7 +849,7 @@ Me.SetFocus
 End Sub
 Public Sub UNhookMe()
 Set LastGlist = Nothing
-UnHook hWnd
+UnHook hWND
 End Sub
 
 Public Property Get Quit() As Variant

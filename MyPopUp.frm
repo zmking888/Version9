@@ -66,17 +66,17 @@ x = CSng(MOUSEX())
 y = CSng(MOUSEY())
 Else
 x = x + Form1.Left
-y = y + Form1.top
+y = y + Form1.Top
 End If
 
-If x + Width > ScrX() Then
-If y + Height > ScrY() Then
-Move ScrX() - Width, ScrY() - Height
+If x + Width > VirtualScreenWidth() Then
+If y + Height > VirtualScreenHeight() Then
+Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
 Else
-Move ScrX() - Width, y
+Move VirtualScreenWidth() - Width, y
 End If
-ElseIf y + Height > ScrY() Then
-Move x, ScrY() - Height
+ElseIf y + Height > VirtualScreenHeight() Then
+Move x, VirtualScreenHeight() - Height
 Else
 Move x, y
 End If
@@ -93,17 +93,17 @@ gList1.HeadLine = vbNullString
 gList1.HeadlineHeight = 0
 End If
 x = x + that.Left
-y = y + that.top
+y = y + that.Top
 
 
-If x + Width > ScrX() Then
-If y + Height > ScrY() Then
-Move ScrX() - Width, ScrY() - Height
+If x + Width > VirtualScreenWidth() Then
+If y + Height > VirtualScreenHeight() Then
+Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
 Else
-Move ScrX() - Width, y
+Move VirtualScreenWidth() - Width, y
 End If
-ElseIf y + Height > ScrY() Then
-Move x, ScrY() - Height
+ElseIf y + Height > VirtualScreenHeight() Then
+Move x, VirtualScreenHeight() - Height
 Else
 Move x, y
 End If
@@ -330,8 +330,8 @@ Else
         
   
         once = True
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / height1)
@@ -628,7 +628,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 ''MyForm Me, Left, top, allwidth, allheight, True, factor
 
-Move Left, top, allwidth, allheight
+Move Left, Top, allwidth, allheight
   
 gList1.addpixels = 4 * factor
 
@@ -636,8 +636,8 @@ gList1.Move borderleft, bordertop, itemWidth, allheight - bordertop * 2
 
 gList1.CalcAndShowBar
 gList1.ShowBar = False
-gList1.FloatLimitTop = ScrY() - bordertop - bordertop * 3
-gList1.FloatLimitLeft = ScrX() - borderleft * 3
+gList1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 End Sub
 

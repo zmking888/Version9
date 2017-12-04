@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -223,7 +223,7 @@ Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 
 Public ShadowMarks As Boolean
 Private nochange As Boolean
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
-Private Declare Function EmptyClipboard Lib "user32" () As Long
+Private Declare Function EmptyClipboard Lib "User32" () As Long
 Public MY_BACK As New cDIBSection
 Private mynum$
 Dim OneOnly As Boolean
@@ -236,10 +236,10 @@ Private DisStack As basetask
 Private MeStack As basetask
 Dim lookfirst As Boolean, look1 As Boolean
 Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "User32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -247,7 +247,7 @@ Const WM_KEYFIRST = &H100
     y As Long
 End Type
  Private Type Msg
-    hWnd As Long
+    hWND As Long
     Message As Long
     wParam As Long
     lParam As Long
@@ -333,7 +333,7 @@ If Form1.Visible Then releasemouse = True: If lockme Then hookme TEXT1.glistN
 End Sub
 
 Private Sub Form_Deactivate()
-UnHook hWnd
+UnHook hWND
 End Sub
 
 Private Sub Form_GotFocus()
@@ -491,7 +491,7 @@ i = .SelLength
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.top
+MyPopUp.Up x + gList1.Left, y + gList1.Top
 myButton = 0
 End Sub
 
@@ -1607,11 +1607,10 @@ Private Sub iForm_Resize()
 DIS.Move 0, 0, ScaleWidth, ScaleHeight
 End Sub
 Public Sub Up()
-UpdateWindow hWnd
+UpdateWindow hWND
 End Sub
 
 Sub something()
-
 Set basestack1.Owner = DIS
 Set DisStack.Owner = DIS
 NOEXECUTION = False
@@ -1632,14 +1631,19 @@ Sleep 10
 FK$(13) = "ΣΥΓΓΡΑΦΕΑΣ"
 'Me.WindowState = 2
 ''Hide
+Console = FindFormSScreen(Me)
+
 Me.WindowState = 0
 'Sleep 10
 If Me.WindowState = 0 Then
+With ScrInfo(Console)
 If IsWine Then
-Me.Move 0, ScrY(), (ScrX() - 1), (ScrY() - 1)
+'Me.Move .Left, ScrY(), (ScrX() - 1), (ScrY() - 1)
+Me.Move .Left, VirtualScreenHeight(), .width - 1, .Height - 1
 Else
-Me.Move 0, ScrY(), ScrX(), ScrY()
+Me.Move .Left, VirtualScreenHeight(), .width, .Height
 End If
+End With
 End If
 'Sleep 10
 
@@ -1651,7 +1655,6 @@ basestack1.myCharSet = 0
    ' List2.Font.CharSet = basestack1.myCharSet
 
 basestack1.Owner.Move 0, 0, ScaleWidth, ScaleHeight
-
 
 ''mmx = basestack1.Owner.Width
 ''mmy = basestack1.Owner.Height
@@ -1674,7 +1677,7 @@ LASTPROG$ = cLine
 If ttl = False Then Load Form3
 Form3.Timer1.enabled = False
 mywait basestack1, 100
-Form3.Visible = True: Form3.Move -48000, 48000
+Form3.Visible = True: Form3.Move VirtualScreenWidth() - 2000, -2000
 mywait basestack1, 100
 Form3.CaptionW = ExtractNameOnly(cLine)
 'ProcTitle basestack1, Chr$(34) + ExtractNameOnly(cLine) + Chr$(34) + ", 0", 0
@@ -1684,7 +1687,7 @@ Else
 
 If Not ttl Then
 
-Form3.Visible = True: If Form3.WindowState = 0 Then Form3.Move -48000, 48000
+Form3.Visible = True: If Form3.WindowState = 0 Then Form3.Move VirtualScreenWidth() - 2000, -2000
 Form3.SetFocus
 Form3.CaptionW = "M2000"
 End If
@@ -1813,7 +1816,7 @@ Else
    Load Form3: Form3.Timer1 = False
    mywait basestack1, 200
    Form3.WindowState = 0
-   Form3.Move -48000, 48000
+   Form3.Move VirtualScreenWidth() - 2000, -2000
    Form3.Visible = True
    
     Form3.CaptionW = "M2000"
@@ -1869,18 +1872,18 @@ If NERR Then Exit Do
                         crNew basestack1, mybasket
                         If basestack1.Owner.Font.charset <> 161 Then
                         
-                        wwPlain basestack1, mybasket, " ? " & LastErName, basestack1.Owner.Width, 1000, True
-                        If Left$(FK$(13), 4) = "EDIT" Then crNew basestack1, mybasket: wwPlain basestack1, mybasket, "Use SHIFT F1, edit, ESC to return", basestack1.Owner.Width, 1000, True
+                        wwPlain basestack1, mybasket, " ? " & LastErName, basestack1.Owner.width, 1000, True
+                        If Left$(FK$(13), 4) = "EDIT" Then crNew basestack1, mybasket: wwPlain basestack1, mybasket, "Use SHIFT F1, edit, ESC to return", basestack1.Owner.width, 1000, True
                         Else
-                        wwPlain basestack1, mybasket, " ? " & LastErNameGR, basestack1.Owner.Width, 1000, True
-                        If Left$(FK$(13), 4) = "EDIT" Then crNew basestack1, mybasket: wwPlain basestack1, mybasket, "Με το SHIFT F1 διορθώνεις, ESC επιστρέφεις", basestack1.Owner.Width, 1000, True
+                        wwPlain basestack1, mybasket, " ? " & LastErNameGR, basestack1.Owner.width, 1000, True
+                        If Left$(FK$(13), 4) = "EDIT" Then crNew basestack1, mybasket: wwPlain basestack1, mybasket, "Με το SHIFT F1 διορθώνεις, ESC επιστρέφεις", basestack1.Owner.width, 1000, True
                         End If
                             
                             LastErName = "?" & LastErName
                             LastErNameGR = "?" & LastErNameGR
                 Else
                         mybasket = players(DisForm)
-                        wwPlain basestack1, mybasket, " ? " & qq$, basestack1.Owner.Width, 1000, True
+                        wwPlain basestack1, mybasket, " ? " & qq$, basestack1.Owner.width, 1000, True
                 End If
         End If
         crNew basestack1, mybasket
@@ -2475,9 +2478,9 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .top = IEY
+    .Top = IEY
     .Left = IEX
-    .Width = IESizeX
+    .width = IESizeX
     .Height = IESizeY
     .Refresh
     .Refresh2

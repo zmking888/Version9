@@ -33,37 +33,37 @@ Public Function MoveFile(pOldPath As String, pNewPath As String)
     MoveFileW StrPtr(pOldPath), StrPtr(pNewPath)
     
 End Function
-Public Function isdir(f$) As Boolean
+Public Function isdir(F$) As Boolean
 On Error Resume Next
 Dim mm As New recDir
 Dim lookfirst As Boolean
 Dim Pad$
-If f$ = vbNullString Then Exit Function
-If f$ = "." Then f$ = mcd
-If InStr(f$, "\..") > 0 Or f$ = ".." Or Left$(f$, 3) = "..\" Then
-If Right$(f$, 1) <> "\" Then
-Pad$ = ExtractPath(f$ & "\", True, True)
+If F$ = vbNullString Then Exit Function
+If F$ = "." Then F$ = mcd
+If InStr(F$, "\..") > 0 Or F$ = ".." Or Left$(F$, 3) = "..\" Then
+If Right$(F$, 1) <> "\" Then
+Pad$ = ExtractPath(F$ & "\", True, True)
 Else
-Pad$ = ExtractPath(f$, True, True)
+Pad$ = ExtractPath(F$, True, True)
 End If
 If Pad$ = vbNullString Then
-If Right$(f$, 1) <> "\" Then
-Pad$ = ExtractPath(mcd + f$ & "\", True)
+If Right$(F$, 1) <> "\" Then
+Pad$ = ExtractPath(mcd + F$ & "\", True)
 Else
-Pad$ = ExtractPath(mcd + f$, True)
+Pad$ = ExtractPath(mcd + F$, True)
 End If
 End If
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then f$ = Pad$
+If lookfirst Then F$ = Pad$
 Else
-f$ = mylcasefILE(f$)
-lookfirst = mm.isdir(f$)
+F$ = mylcasefILE(F$)
+lookfirst = mm.isdir(F$)
 If Not lookfirst Then
 
-Pad$ = mcd + f$
+Pad$ = mcd + F$
 
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then f$ = Pad$
+If lookfirst Then F$ = Pad$
 
 End If
 End If
@@ -71,11 +71,12 @@ isdir = lookfirst
 End Function
 Public Sub fHelp(bstack As basetask, d$, Optional Eng As Boolean = False)
 Dim sql$, b$, p$, c$, gp$, r As Double, bb As Long, i As Long
-Dim cd As String, doriginal$
+Dim cd As String, doriginal$, monitor As Long
 d$ = Replace(d$, " ", ChrW(160))
 On Error GoTo E5
 'ON ERROR GoTo 0
-If HelpLastWidth > ScrX() Then HelpLastWidth = -1
+monitor = FindFormSScreen(Form4)
+If HelpLastWidth > ScrInfo(monitor).width Then HelpLastWidth = -1
 doriginal$ = d$
 d$ = Replace(d$, "'", "")
 If d$ <> "" Then If Right$(d$, 1) = "(" Then d$ = d$ + ")"
@@ -91,9 +92,9 @@ If gp$ <> "" Then gp$ = b$ + ", " + gp$ Else gp$ = b$
 Wend
 If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf Else b$ = vbNullString
 If Eng Then
-        sHelp "User Modules/Functions [F12]", b$ & gp$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+        sHelp "User Modules/Functions [F12]", b$ & gp$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 Else
-        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ & gp$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ & gp$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 End If
 vHelp Not Form4.Visible
 Exit Sub
@@ -123,7 +124,7 @@ Dim ss$
     Else
      ss$ = SBcode(i)
      End If
-        sHelp d$, c$ + "  " & b$ & ss$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+        sHelp d$, c$ + "  " & b$ & ss$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
 Exit Sub
@@ -189,7 +190,7 @@ Dim sec$
         End If
         If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf & b$ Else b$ = vbCrLf & b$
         
-        sHelp gp$, sec$ + c$ & "  " & b$, (ScrX() - 1) * 3 / 5, (ScrY() - 1) * 4 / 7
+        sHelp gp$, sec$ + c$ & "  " & b$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
         End If
@@ -1298,7 +1299,7 @@ End If
 End Sub
 Public Sub NewTable(bstackstr As basetask, r$)
 'BASE As String, tablename As String, ParamArray flds()
-Dim base As String, tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
+Dim base As String, tablename As String, fs As String, i&, N As Double, l As Double, ok As Boolean
 ok = False
 If IsStrExp(bstackstr, r$, base) Then
 If FastSymbol(r$, ",") Then
@@ -1392,18 +1393,18 @@ End If
                         If IsStrExp(bstackstr, r$, fs) Then
                         one_ok = True
                                 If FastSymbol(r$, ",") Then
-                                        If IsExp(bstackstr, r$, n) Then
+                                        If IsExp(bstackstr, r$, N) Then
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
-                                                If n = 8 Then n = 7: l = 0
-                                                If n = 10 Then n = 202
-                                                If n = 12 Then n = 203: l = 0
+                                                If N = 8 Then N = 7: l = 0
+                                                If N = 10 Then N = 202
+                                                If N = 12 Then N = 203: l = 0
                                                     If l <> 0 Then
                                                 
-                                                     .Append fs, n, l
+                                                     .Append fs, N, l
                                                     Else
-                                                     .Append fs, n
+                                                     .Append fs, N
                                            
                                                     End If
                                         

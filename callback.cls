@@ -79,7 +79,7 @@ If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.top >= ScrY() Then Form1.Move 0, 0
+If Form1.Top >= ScrY() Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
 If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False

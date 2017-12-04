@@ -99,7 +99,7 @@ ElseIf IsMissing(h) Then
 Else
 .glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
-Pad.Move Pad.Left, Pad.top, .glistN.widthtwips, .glistN.HeightTwips * 5
+Pad.Move Pad.Left, Pad.Top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
 glistN.restrictLines = 5
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
@@ -397,13 +397,13 @@ If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipPr
      Else
 Pad.Width = CLng(Callback.Controls(CtrlName).Width / 1.618 * dv15) \ dv15
 End If
-If Callback.Controls(CtrlName).Height * gl < ScrY() * 2 / 3 Then
+If Callback.Controls(CtrlName).Height * gl < VirtualScreenHeight() * 2 / 3 Then
 
 Pad.Height = Callback.Controls(CtrlName).Height * gl
 glistN.restrictLines = gl
 
 Else
-glistN.restrictLines = (ScrY() * 2 / 3) \ Callback.Controls(CtrlName).Height
+glistN.restrictLines = (VirtualScreenHeight() * 2 / 3) \ Callback.Controls(CtrlName).Height
 Pad.Height = Callback.Controls(CtrlName).Height * glistN.restrictLines
 
 End If
@@ -439,10 +439,10 @@ glistN.ShowPan
 End If
 'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top, Callback.Controls(CtrlName).Height
+    Callback.PopUpPos Pad, Left, Top, Callback.Controls(CtrlName).Height
     Else
 
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top, Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, Top, Callback.Controls(CtrlName).Height
 End If
 
 ElseIf KeyCode = vbKeyTab Then
@@ -569,13 +569,13 @@ If mMenuStyle Then
 Pad.Width = CLng(Callback.Controls(CtrlName).Width / 1.618 * dv15) \ dv15
 End If
 
-If Callback.Controls(CtrlName).Height * gl < ScrY() * 2 / 3 Then
+If Callback.Controls(CtrlName).Height * gl < VirtualScreenHeight() * 2 / 3 Then
 
 Pad.Height = Callback.Controls(CtrlName).Height * gl
 glistN.restrictLines = gl
 
 Else
-glistN.restrictLines = (ScrY() * 2 / 3) \ Callback.Controls(CtrlName).Height
+glistN.restrictLines = (VirtualScreenHeight() * 2 / 3) \ Callback.Controls(CtrlName).Height
 Pad.Height = Callback.Controls(CtrlName).Height * glistN.restrictLines
 
 End If
@@ -610,9 +610,9 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
     End If
 'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
-    Callback.PopUpPos Pad, Left, top, Callback.Controls(CtrlName).Height
+    Callback.PopUpPos Pad, Left, Top, Callback.Controls(CtrlName).Height
     Else
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, top, Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, Top, Callback.Controls(CtrlName).Height
 End If
 
 
@@ -624,43 +624,43 @@ End If
 
 End Sub
 Private Sub glistN_SyncKeyboard(item As Integer)
-Static f As Long
-f = glistN.FindItemStartWidth(Chr$(item), Not NoCaseSensitive, f + 1)
-If f >= 0 Then
-glistN.ScrollTo f - glistN.lines / 2, f + 1
+Static F As Long
+F = glistN.FindItemStartWidth(Chr$(item), Not NoCaseSensitive, F + 1)
+If F >= 0 Then
+glistN.ScrollTo F - glistN.lines / 2, F + 1
     If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PickOther(" + Str(mIndex) + ",{" + glistN.ListValue + "})"
    Else
       Callback.Callback mesCtrlName + ".PickOther({" + glistN.ListValue + "})"
       End If
 Else
-f = -1
+F = -1
 End If
 End Sub
 
 Private Sub TextBox_ValidString(ThatString As String, setpos As Long)
 Dim l As Boolean
 If Not AutoComplete Then Exit Sub
-Dim f As Long
+Dim F As Long
 Iam = True
 If ThatString = vbNullString And Textbox.glistN.LastLinePart <> "" Then
-f = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
+F = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
 
 Else
-f = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
+F = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
 End If
-If f >= 0 Then
-If Not NoCaseSensitive Then ThatString = Myleft$(glistN.list(f), Len(ThatString))
-Textbox.glistN.LastLinePart = Mid$(glistN.list(f), Len(ThatString) + 1)
+If F >= 0 Then
+If Not NoCaseSensitive Then ThatString = Myleft$(glistN.list(F), Len(ThatString))
+Textbox.glistN.LastLinePart = Mid$(glistN.list(F), Len(ThatString) + 1)
 'RaiseEvent AutoCompleteDone(glistN.List(f))
    If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".AutoCompleteDone(" + Str(mIndex) + ",{" + glistN.list(f) + "})"
+   Callback.Callback mesCtrlName + ".AutoCompleteDone(" + Str(mIndex) + ",{" + glistN.list(F) + "})"
    Else
-      Callback.Callback mesCtrlName + ".AutoCompleteDone({" + glistN.list(f) + "})"
+      Callback.Callback mesCtrlName + ".AutoCompleteDone({" + glistN.list(F) + "})"
       End If
 
 glistN.enabled = False
-glistN.ScrollTo f - glistN.lines / 2, f + 1
+glistN.ScrollTo F - glistN.lines / 2, F + 1
 glistN.enabled = True
 glistN.ShowMe
 
@@ -868,11 +868,11 @@ End Property
 Public Property Let Left(ByVal RHS As Variant)
 Callback.Controls(CtrlName).Left = RHS
 End Property
-Public Property Get top() As Variant
-top = Callback.Controls(CtrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(CtrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(CtrlName).Top = RHS
 End Property
 Public Sub Sort(Optional SkipChar As Long = 1)
 If glistN.listcount < 2 Then Exit Sub

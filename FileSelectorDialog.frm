@@ -106,11 +106,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private noChangeColorGlist3 As Boolean
 Public WithEvents mySelector As FileSelector
 Attribute mySelector.VB_VarHelpID = -1
-Private Declare Function DestroyCaret Lib "user32" () As Long
+Private Declare Function DestroyCaret Lib "User32" () As Long
 Dim height1 As Long, width1 As Long
 Public TEXT1 As myTextBox
 Attribute TEXT1.VB_VarHelpID = -1
@@ -118,7 +118,7 @@ Private Type myImage
     image As StdPicture
     Height As Long
     Width As Long
-    top As Long
+    Top As Long
     Left As Long
 End Type
 Dim Image1 As myImage
@@ -140,7 +140,7 @@ Dim dirlisttop As Long
 Private Sub Form_Load()
 height1 = 8145 * DYP / 15
 width1 = 3690 * DXP / 15
-UnHook3 hWnd
+UnHook3 hWND
 loadfileiamloaded = True
 scrTwips = Screen.TwipsPerPixelX
 ' clear data...
@@ -376,12 +376,12 @@ If dr Then
         
   
         once = True
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
 
         If addy <> 0 Then
-         If ((addy + Height) / height1) > ScrY() Then
+         If ((addy + Height) / height1) > VirtualScreenHeight() Then
       addX = 0
       addy = 0
          Else
@@ -463,7 +463,7 @@ Set Image1.image = Nothing
 Image1.Width = 0
 
 selectorLastX = Left
-selectorLastY = top
+selectorLastY = Top
 Sleep 200
 loadfileiamloaded = False
 End Sub
@@ -881,10 +881,10 @@ b = CLng(Rnd * 3) + setupxy / 3
 
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - setupxy
-a.top = b
+a.Top = b
 a.Bottom = b + setupxy / 5
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + setupxy / 5 + setupxy / 10
+a.Top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
 
@@ -895,13 +895,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1036,8 +1036,8 @@ End If
 itemWidth = (NewWidth - 2 * borderleft)
 allwidth = NewWidth 'itemWidth + 2 * borderleft
 Dim allheight As Long
-gList2.FloatLimitTop = ScrY() - bordertop - heightTop
-gList2.FloatLimitLeft = ScrX() - borderleft * 3
+gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - heightTop
+gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 If PreviewFile Then
 allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + HeightPreview + bordertop + HeightBottom + bordertop
 Else
@@ -1045,7 +1045,7 @@ allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + Hei
 
 End If
 
-Move Left, top, allwidth, allheight
+Move Left, Top, allwidth, allheight
 gList2.Move borderleft, bordertop, itemWidth, heightTop
 gList1.Move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
 gList3.Move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom

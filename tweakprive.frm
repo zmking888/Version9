@@ -450,7 +450,7 @@ Attribute checkbox2.VB_VarHelpID = -1
 Dim myCommand As myButton
 Dim myUnicode As myButton
 Dim myCancel As myButton
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
@@ -484,7 +484,7 @@ End Sub
 
 
 Private Sub Form_Load()
-Hook hWnd, Nothing
+Hook hWND, Nothing
 DIS.enabled = True
 AutoRedraw = True
 Form_Load1
@@ -552,8 +552,8 @@ Else
         
   
         once = True
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
@@ -611,11 +611,11 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-Move Left, top, allwidth, allheight
+Move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.Move borderleft, bordertop, itemWidth, bordertop * 3
-gList2.FloatLimitTop = ScrY() - bordertop - bordertop * 3
-gList2.FloatLimitLeft = ScrX() - borderleft * 3
+gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 gList1.Move borderleft, bordertop * 6, itemWidth, bordertop * 3
 gList3.Move borderleft + itemWidth * 2 / 5, bordertop * 9, itemWidth * 3 / 5, bordertop * 18
 gList9.Move borderleft, bordertop * 10, itemWidth * 2 / 5 - borderleft, bordertop * 3
@@ -1090,13 +1090,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1118,7 +1118,7 @@ End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 Set LastGlist = Nothing
-UnHook hWnd
+UnHook hWND
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

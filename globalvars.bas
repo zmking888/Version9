@@ -86,6 +86,7 @@ If inUse Then OpenColor = False: Exit Function
 inUse = True
 ExpandWidth = True
 ReturnColor = thiscolor
+MoveFormToOtherMonitor ColorDialog
 If Thisform Is Nothing Then
 ColorDialog.Show
 Else
@@ -106,6 +107,7 @@ Public Function OpenFont(bstack As basetask, Thisform As Object) As Boolean
 If inUse Then OpenFont = False: Exit Function
 inUse = True
 ExpandWidth = True
+MoveFormToOtherMonitor FontDialog
 If Thisform Is Nothing Then
 FontDialog.Show
 Else
@@ -153,6 +155,7 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
+MoveFormToOtherMonitor LoadFile
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
@@ -201,7 +204,7 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
-
+MoveFormToOtherMonitor LoadFile
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
@@ -212,7 +215,7 @@ If Not LoadFile.Visible Then
     LoadFile.Visible = True
     MyDoEvents
     End If
-Hook3 LoadFile.hWnd, Nothing
+Hook3 LoadFile.hWND, Nothing
 WaitDialog bstack
 
 Set LastGlist3 = Nothing
@@ -254,6 +257,7 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
+MoveFormToOtherMonitor LoadFile
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
@@ -314,6 +318,7 @@ ReturnFile = vbNullString
 Else
 TopFolder = TopDir
 End If
+MoveFormToOtherMonitor LoadFile
 If Thisform Is Nothing Then
 LoadFile.Show
 Else

@@ -144,13 +144,13 @@ Private Type myImage
     image As StdPicture
     Height As Long
     Width As Long
-    top As Long
+    Top As Long
     Left As Long
 End Type
 Dim Image1 As myImage
 'This is my new MsgBox
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function DestroyCaret Lib "user32" () As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function DestroyCaret Lib "User32" () As Long
 Dim iTop As Long, iLeft As Long, iwidth As Long, iheight As Long
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
@@ -328,7 +328,7 @@ Set myCancel = Nothing
 AskDIB$ = vbNullString
 AskOk$ = vbNullString
 AskLastX = Left
-AskLastY = top
+AskLastY = Top
 ''Sleep 200
 ASKINUSE = False
 End Sub
@@ -384,13 +384,13 @@ Else
         
   
         once = True
-         If Width > ScrX() Then addX = -(Width - ScrX()) + addX
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
+         If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
       
         If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then
-        If ((addy + Height) / height1) * width1 > ScrX() * 0.9 Then
+        If ((addy + Height) / height1) * width1 > VirtualScreenWidth() * 0.9 Then
         addy = 0: addX = 0
 
         Else
@@ -453,11 +453,11 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-Move Left, top, allwidth, allheight
+Move Left, Top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.Move borderleft, bordertop, itemWidth, bordertop * 3
-gList2.FloatLimitTop = ScrY() - bordertop - bordertop * 3
-gList2.FloatLimitLeft = ScrX() - borderleft * 3
+gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 gList1.Width = itemwidth3 * 2 + borderleft
  ListPad.WrapAgain: all = ListPad.DocLines
@@ -558,13 +558,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 

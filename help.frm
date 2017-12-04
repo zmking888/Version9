@@ -66,7 +66,7 @@ Private jump As Boolean
  Dim setupxy As Single
  Dim scrTwips As Long
 
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
@@ -142,14 +142,14 @@ If HelpLastWidth = 0 Then HelpLastWidth = -1
 Else
 HelpLastWidth = -1
 End If
-''Me.FontSize = Int((ScrY() - 1) / DYP / 70 + 0.5)
+''Me.FontSize = Int((VirtualScreenheight() - 1) / DYP / 70 + 0.5)
 ''Label1.FontSize = Me.FontSize
 ''setupxy = Me.FontSize * 20 / 15 * DYP / 15 + 4
 
 End Sub
 Public Sub MoveMe()
 ScaleDialog Helplastfactor, HelpLastWidth
-Hook2 hWnd, gList1
+Hook2 hWND, gList1
 Label1.glistN.SoftEnterFocus
 End Sub
 
@@ -160,7 +160,7 @@ If Button = 1 Then
     If Helplastfactor = 0 Then Helplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -168,7 +168,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -184,9 +184,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -195,11 +195,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If x < (width - 150) Or x > width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
     End If
     
 
@@ -211,34 +211,34 @@ Else
         
   
         once = True
-        If Height > ScrY() Then addy = -(Height - ScrY()) + addy
-        If Width > ScrX() Then addX = -(Width - ScrX()) + addX
-        If (addy + Height) / vH_y > 0.4 And ((Width + addX) / vH_x) > 0.4 Then
+        If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
+        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
+        If (addy + Height) / vH_y > 0.4 And ((width + addX) / vH_x) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / vH_y)
         Helplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((Width * Helplastfactor / factor + addX) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
-        addX = -Width * Helplastfactor / factor - 1
+        If ((width * Helplastfactor / factor + addX) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
+        addX = -width * Helplastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
         
-        If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
+        If Helplastfactor <> factor Then ScaleDialog Helplastfactor, width
 
         Lx = x
         
         Else
         Lx = x * Helplastfactor / factor
-             ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
+             ScaleDialog Helplastfactor, (width + addX) * Helplastfactor / factor
          
    
          End If
 
         
-        HelpLastWidth = Width
+        HelpLastWidth = width
 
 
 ''gList1.PrepareToShow
@@ -260,7 +260,7 @@ End Sub
 
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
-UnHook2 hWnd
+UnHook2 hWND
 Set LastGlist2 = Nothing
 End Sub
 
@@ -352,14 +352,14 @@ b = setupxy / 3
 CopyFromLParamToRect a, thatRect
 a.Right = a.Right - b
 a.Left = a.Right - setupxy - b
-a.top = b
+a.Top = b
 a.Bottom = b + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + setupxy / 5 + setupxy / 10
+a.Top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.top = b + 2 * (setupxy / 5 + setupxy / 10)
-a.Bottom = a.top + setupxy / 5
+a.Top = b + 2 * (setupxy / 5 + setupxy / 10)
+a.Bottom = a.Top + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
 
 End Sub
@@ -369,13 +369,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - b
 a.Right = a.Right - setupxy + b
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), gList1.dcolor
 b = 5
 a.Left = a.Left - 3
 a.Right = a.Right + 3
-a.top = b
+a.Top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), gList1.CapColor
 
@@ -418,7 +418,7 @@ End If
 allwidth = NewWidth  ''vH_x * factor
 allheight = vH_y * factor
 itemWidth = allwidth - 2 * borderleft
-MyForm Me, Left, top, allwidth, allheight, True, factor
+MyForm Me, Left, Top, allwidth, allheight, True, factor
 
   
 gList1.addpixels = 4 * factor
@@ -426,8 +426,8 @@ Label1.Move borderleft, bordertop, itemWidth, allheight - bordertop * 2
 
 Label1.NewTitle vH_title$, (4 + UAddPixelsTop) * factor
 Label1.Render
-gList1.FloatLimitTop = ScrY() - bordertop - bordertop * 3
-gList1.FloatLimitLeft = ScrX() - borderleft * 3
+gList1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
+gList1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 
 End Sub

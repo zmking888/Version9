@@ -38,11 +38,11 @@ dmPelsHeight As Long
 dmDisplayFlags As Long
 dmDisplayFrequency As Long
 End Type
-Private Declare Function EnumDisplaySettings Lib "user32" Alias "EnumDisplaySettingsA" (ByVal lpszDeviceName As Long, ByVal iModeNum As Long, lpDevMode As Any) As Boolean
-Private Declare Function ChangeDisplaySettings Lib "user32" Alias "ChangeDisplaySettingsA" (lpDevMode As Any, ByVal dwFlags As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Private Declare Function EnumDisplaySettings Lib "User32" Alias "EnumDisplaySettingsA" (ByVal lpszDeviceName As Long, ByVal iModeNum As Long, lpDevMode As Any) As Boolean
+Private Declare Function ChangeDisplaySettings Lib "User32" Alias "ChangeDisplaySettingsA" (lpDevMode As Any, ByVal dwFlags As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" (ByVal lpDriverName As String, ByVal lpDeviceName As String, ByVal lpOutput As String, ByVal lpInitData As Any) As Long
-Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
 Private oldx As Long, oldy As Long
 Private Const MAX_PATH As Long = 260
 Private Const MAX_PATH_UNICODE As Long = 260 * 2 - 1
@@ -67,9 +67,9 @@ End Type
 Private Declare Function FindFirstFile Lib "KERNEL32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) As Long
 
-Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
-Private Declare Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
-Private Declare Function CallWindowProc Lib "user32" Alias "CallWindowProcA" (ByVal lpPrevWndFunc As Long, ByVal hWnd As Long, ByVal Msg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+Private Declare Function GetWindowLong Lib "User32" Alias "GetWindowLongA" (ByVal hWND As Long, ByVal nIndex As Long) As Long
+Private Declare Function SetWindowLong Lib "User32" Alias "SetWindowLongA" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function CallWindowProc Lib "User32" Alias "CallWindowProcA" (ByVal lpPrevWndFunc As Long, ByVal hWND As Long, ByVal Msg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
 '
 Private Const GWL_WNDPROC = (-4)
 Private Const WM_MOUSEWHEEL = &H20A
@@ -82,14 +82,14 @@ Public LastGlist3 As gList
 
 Public HOOKTEST As Long
 
-Public Sub Hook3(hWnd As Long, a As gList)
+Public Sub Hook3(hWND As Long, a As gList)
 ' work in IDE but for development and a fear...of a crash...
 
 If m_bInIDE Then Exit Sub
 
    If defWndProc3 = 0 Then
 
-      defWndProc3 = SetWindowLong(hWnd, _
+      defWndProc3 = SetWindowLong(hWND, _
                                  GWL_WNDPROC, _
                                  AddressOf WindowProc3)
                                  MyDoEvents
@@ -97,24 +97,24 @@ If m_bInIDE Then Exit Sub
     End If
            Set LastGlist3 = a
 End Sub
-Public Sub UnHook3(hWnd As Long)
+Public Sub UnHook3(hWND As Long)
 
 If m_bInIDE Then Exit Sub
     If defWndProc3 > 0 Then
     
-      Call SetWindowLong(hWnd, GWL_WNDPROC, defWndProc3)
+      Call SetWindowLong(hWND, GWL_WNDPROC, defWndProc3)
       defWndProc3 = 0
    End If
   
 End Sub
-Public Sub Hook2(hWnd As Long, a As gList)
+Public Sub Hook2(hWND As Long, a As gList)
 ' work in IDE but for development and a fear...of a crash...
 
 If m_bInIDE Then Exit Sub
 
    If defWndProc2 = 0 Then
 
-      defWndProc2 = SetWindowLong(hWnd, _
+      defWndProc2 = SetWindowLong(hWND, _
                                  GWL_WNDPROC, _
                                  AddressOf WindowProc2)
                                  MyDoEvents
@@ -122,18 +122,18 @@ If m_bInIDE Then Exit Sub
     End If
            Set LastGlist2 = a
 End Sub
-Public Sub UnHook2(hWnd As Long)
+Public Sub UnHook2(hWND As Long)
 
 If m_bInIDE Then Exit Sub
     If defWndProc2 > 0 Then
     
-      Call SetWindowLong(hWnd, GWL_WNDPROC, defWndProc2)
+      Call SetWindowLong(hWND, GWL_WNDPROC, defWndProc2)
       defWndProc2 = 0
    End If
   
 End Sub
 
-Public Sub Hook(hWnd As Long, a As gList, Optional NoEvents As Boolean = False)
+Public Sub Hook(hWND As Long, a As gList, Optional NoEvents As Boolean = False)
 ' work in IDE but for development and a fear...of a crash...
 
 If HOOKTEST <> 0 Then
@@ -145,12 +145,12 @@ If HOOKTEST <> 0 Then
 Exit Sub
 End If
 'debug.Print "New Hook @" + CStr(hWnd)
-HOOKTEST = hWnd
+HOOKTEST = hWND
 If m_bInIDE Then Exit Sub
 
    If defWndProc = 0 Then
 
-      defWndProc = SetWindowLong(hWnd, _
+      defWndProc = SetWindowLong(hWND, _
                                  GWL_WNDPROC, _
                                  AddressOf WindowProc)
                              If Not NoEvents Then MyDoEvents
@@ -159,9 +159,9 @@ If m_bInIDE Then Exit Sub
     End If
            Set LastGlist = a
 End Sub
-Public Sub UnHook(hWnd As Long)
+Public Sub UnHook(hWND As Long)
 
-If HOOKTEST <> hWnd Then
+If HOOKTEST <> hWND Then
 'Debug.Print "Can't delete hook hWnd isn't mine, exit now"
 Exit Sub
 End If
@@ -170,12 +170,12 @@ HOOKTEST = 0
 If m_bInIDE Then Exit Sub
     If defWndProc > 0 Then
     
-      Call SetWindowLong(hWnd, GWL_WNDPROC, defWndProc)
+      Call SetWindowLong(hWND, GWL_WNDPROC, defWndProc)
       defWndProc = 0
    End If
     
 End Sub
-Public Function WindowProc3(ByVal hWnd As Long, _
+Public Function WindowProc3(ByVal hWND As Long, _
                            ByVal uMsg As Long, _
                            ByVal wParam As Long, _
                            ByVal lParam As Long) As Long
@@ -215,7 +215,7 @@ On Error GoTo there3:
       Case Else
 there3:
          WindowProc3 = CallWindowProc(defWndProc3, _
-                                     hWnd, _
+                                     hWND, _
                                      uMsg, _
                                      wParam, _
                                      lParam)
@@ -223,7 +223,7 @@ there3:
     
 End Function
 
-Public Function WindowProc2(ByVal hWnd As Long, _
+Public Function WindowProc2(ByVal hWND As Long, _
                            ByVal uMsg As Long, _
                            ByVal wParam As Long, _
                            ByVal lParam As Long) As Long
@@ -263,14 +263,14 @@ On Error GoTo there2:
       Case Else
 there2:
          WindowProc2 = CallWindowProc(defWndProc2, _
-                                     hWnd, _
+                                     hWND, _
                                      uMsg, _
                                      wParam, _
                                      lParam)
    End Select
     
 End Function
-Public Function WindowProc(ByVal hWnd As Long, _
+Public Function WindowProc(ByVal hWND As Long, _
                            ByVal uMsg As Long, _
                            ByVal wParam As Long, _
                            ByVal lParam As Long) As Long
@@ -310,7 +310,7 @@ Public Function WindowProc(ByVal hWnd As Long, _
       Case Else
       
          WindowProc = CallWindowProc(defWndProc, _
-                                     hWnd, _
+                                     hWND, _
                                      uMsg, _
                                      wParam, _
                                      lParam)
@@ -330,8 +330,11 @@ End Function
 Public Sub ChangeScreenRes(x As Long, y As Long)
 ' this is a modified version that i found in internet
 Static once As Boolean
+
 Dim DevM As DEVMODE, erg As Long, BITS As Long, nDc As Long
 On Error GoTo abort
+If VirtualScreenWidth() = ScrX() And VirtualScreenHeight() = ScrY() Then
+
 If Not once Then
 oldx = ScrX() / Screen.TwipsPerPixelX
 oldy = ScrY() / Screen.TwipsPerPixelY
@@ -346,6 +349,7 @@ DevM.dmPelsHeight = y
 DevM.dmBitsPerPel = BITS
 erg = ChangeDisplaySettings(DevM, CDS_TEST)
 DeleteDC nDc
+End If
 abort:
 End Sub
 Sub StartingRes()
