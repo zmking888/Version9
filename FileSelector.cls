@@ -44,7 +44,7 @@ Dim filetypes As String
 Dim ReturnFile As String
 Private Declare Function GetDriveType Lib "KERNEL32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
 Private Declare Function GetVolumeInformation Lib "KERNEL32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Text1Dir As String
 Private topoffsetpixel As Long
 
@@ -106,7 +106,11 @@ End If
 End If
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glistN_CtrlPlusF1()
+'
+End Sub
+
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If NostateDir Then
 ' as a setup menu
 Else
@@ -114,12 +118,13 @@ If Not mselChecked Then Exit Sub
 If Mydir.list(item) = "..." Or Mid$(Mydir.list(item), 1) = Chr$(2) Or item < 0 Then Exit Sub
 If Button = 1 Then
 
-If x < 20 * lastfactor And y < 20 * lastfactor Then
+If X < 20 * lastfactor And Y < 20 * lastfactor Then
 If Mydir.ReadMark(item) Then
 Mydir.unMarkLevel item
 Else
 Mydir.MarkLevel item
 End If
+glistN.FreeMouse = False
 glistN.ShowMe2
 Button = 0
 End If
@@ -173,7 +178,7 @@ If Mydir.abort Then where = -1: Exit Sub
 End Sub
 
 
-Private Sub glistN_ScrollSelected(item As Long, y As Long)
+Private Sub glistN_ScrollSelected(item As Long, Y As Long)
 Dim m As Double
 If NostateDir Then
 ' as a setup menu
@@ -404,36 +409,41 @@ If Not skip Then FillBack thisHDC, b, glistN.CapColor
 
 
 ElseIf Left$(Mydir.list(item), 1) = Chr$(2) Then
-                'DrawFrameControl thisHDC, a, 0, item
-                a.Left = a.Left + 1
-                
-              a.top = a.top + topoffsetpixel
-                
-                   If item = glistN.ListIndex And Not glistN.ListSep(item) Then
-            'SetTextColor thisHDC, 0
-                 ' b.Top = b.Bottom - 1
-                FillBack thisHDC, b, &HBFBFBB
-                SetTextColor thisHDC, &HF0F0FF
-                   Else
-                 FillBack thisHDC, b, &H999999
-                SetTextColor thisHDC, &HDDDDDD 'glistN.ForeColor
-                End If
-       
-                 If Mydir.path = vbNullString Then
-                 a.Left = a.Left + 1
-                 If (Mydir.ReadLevel(item) - 1) > 0 Then SetTextColor thisHDC, &H666666 ' &H999999
-                 PrintItem thisHDC, Mid$(Mydir.list(item), 2), a
-                 Else
-                 a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
-                PrintItem thisHDC, "\" + Mydir.ExtractName(Mydir.list(item)), a
-                End If
+        a.Left = a.Left + 1
+        a.top = a.top + topoffsetpixel
+        If item = glistN.ListIndex And Not glistN.ListSep(item) Then
+            FillBack thisHDC, b, &HBFBFBB
+            SetTextColor thisHDC, &HF0F0FF
+        Else
+            FillBack thisHDC, b, &H999999
+            SetTextColor thisHDC, &HDDDDDD 'glistN.ForeColor
+        End If
+        If Mydir.path = vbNullString Then
+            a.Left = a.Left + 1
+        If (Mydir.ReadLevel(item) - 1) > 0 Then SetTextColor thisHDC, &H666666 ' &H999999
+            PrintItem thisHDC, Mid$(Mydir.list(item), 2), a
+        Else
+            a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
+            PrintItem thisHDC, "\" + Mydir.ExtractName(Mydir.list(item)), a
+        End If
 Else
     If item = glistN.ListIndex Then
     
-             If Mydir.ReadMark(item) And multifileselection Then
+            If Mydir.ReadMark(item) And multifileselection Then
             FillBack thisHDC, b, &HFF '&HFFFF00
+            Select Case Mydir.list(item)
+             Case "..", ".", ""
+             Case Else
+             If multifileselection And Not Mydir.Nofiles Then FillBackSmall thisHDC, b, &HFF6622
+             End Select
             Else
              FillBack thisHDC, b, 0
+             Select Case Mydir.list(item)
+             Case "..", ".", ""
+             Case Else
+             If multifileselection And Not Mydir.Nofiles Then FillBackSmall thisHDC, b, &H66AAFF
+             End Select
+            
             End If
             SetTextColor thisHDC, &HF0F0FF ' 0
               b.top = b.Bottom - 1
@@ -441,18 +451,16 @@ Else
             FillBack thisHDC, b, &H777777
            
     Else
-          If Mydir.ReadMark(item) And multifileselection Then
-            FillBack thisHDC, b, &HAA
+            If Mydir.ReadMark(item) And multifileselection Then
+                FillBack thisHDC, b, &HAA
             End If
-    SetTextColor thisHDC, glistN.ForeColor
-    b.top = b.Bottom - 1
-   FillBack thisHDC, b, 0
+            SetTextColor thisHDC, glistN.ForeColor
+            b.top = b.Bottom - 1
+            FillBack thisHDC, b, 0
     End If
     a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
-     a.top = a.top + topoffsetpixel
+    a.top = a.top + topoffsetpixel
     PrintItem thisHDC, Mydir.ExtractName(Mydir.list(item)), a
-
-    
 End If
 skip = True
 End If
@@ -555,6 +563,18 @@ my_brush = CreateSolidBrush(bgcolor)
 FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
+Private Sub FillBackSmall(thathDC As Long, there As RECT, bgcolor As Long)
+' create brush
+Dim my_brush As Long, one As RECT
+one = there
+one.Left = one.Left + 1
+one.top = one.top + 2
+one.Right = one.Left + 4 + (one.Bottom - one.top) \ 5
+one.Bottom = one.top + 2 + (one.Bottom - one.top) \ 5
+my_brush = CreateSolidBrush(bgcolor)
+FillRect thathDC, one, my_brush
+DeleteObject my_brush
+End Sub
 Private Sub myDir2_DirFinished()
 Dim findit As Long, a$(), b$
 
@@ -567,12 +587,14 @@ glistN.ShowMe
 netdisplay = False
 If Mydir.path = vbNullString Then
 SetPath "My Computer"
+If Not IsWine Then
 netdisplay = True
 b$ = FindNetworkFoldersNames
 While b$ <> ""
 Mydir.AddAFile (Chr$(2) + GetStrUntil(vbCrLf, b$, True)), 0
 fakeitemcount = fakeitemcount + 1
 Wend
+End If
 Else
 SetPath Mydir.path
 End If

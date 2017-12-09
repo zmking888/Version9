@@ -173,7 +173,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -243,8 +243,8 @@ Private Declare Function PeekMessageW Lib "User32" (lpMsg As Msg, ByVal hWND As 
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
-    x As Long
-    y As Long
+    X As Long
+    Y As Long
 End Type
  Private Type Msg
     hWND As Long
@@ -294,7 +294,7 @@ Dim Message As Msg
     Exit Function
 End Function
 
-Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -310,7 +310,7 @@ If lockme Then TEXT1.SetFocus: Exit Sub
 
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -373,7 +373,7 @@ DestroyCaret
 UseEsc = False
 End Sub
 
-Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, X As Single, Y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -475,7 +475,7 @@ If KeyAscii = 9 Then KeyAscii = 0: Exit Sub
 If KeyAscii = 13 Then KeyAscii = 0: Exit Sub
 End Sub
 
-Private Sub gList1_OutPopUp(x As Single, y As Single, myButton As Integer)
+Private Sub gList1_OutPopUp(X As Single, Y As Single, myButton As Integer)
 Dim i As Long
 
 If Not gList1.enabled Then Exit Sub
@@ -491,7 +491,7 @@ i = .SelLength
 .Form1rthisEnabled = .Form1mscatEnabled
 End With
 MyPopUp.feedlabels TEXT1, EditTextWord
-MyPopUp.Up x + gList1.Left, y + gList1.Top
+MyPopUp.Up X + gList1.Left, Y + gList1.top
 myButton = 0
 End Sub
 
@@ -910,7 +910,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Not NoAction Then
 NoAction = True
 Dim sel&
@@ -918,7 +918,7 @@ If Button > 0 And Targets Then
 
 If Button = 1 Then
     MOUB = Button
-    sel& = ScanTarget(q(), CLng(x), CLng(y), 0)
+    sel& = ScanTarget(q(), CLng(X), CLng(Y), 0)
     If sel& >= 0 Then
         Select Case q(sel&).Id Mod 100
         Case Is < 10
@@ -942,7 +942,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If lockme Then Exit Sub
 
 MOUB = Button
@@ -953,7 +953,7 @@ Me.KeyPreview = True
 End If
 End Sub
 
-Private Sub DIS_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 
 If lockme Then
 If Not NOEDIT Then TEXT1.SetFocus
@@ -967,7 +967,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
  MOUB = Button
@@ -983,7 +983,7 @@ With players(p)
 
         If Button > 0 And Targets Then
 
-        sel& = ScanTarget(q(), CLng(x), CLng(y), index)
+        sel& = ScanTarget(q(), CLng(X), CLng(Y), index)
             If sel& >= 0 Then
                 If Button = 1 Then
                 '' If QRY Then LCTC dSprite(Index), oy&, ox&, ins& Else LCT dSprite(Index), oy&, ox&
@@ -1007,7 +1007,7 @@ End If
 
 End Sub
 
-Private Sub dSprite_MouseMove(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseMove(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 If lockme Then Exit Sub
 MOUB = Button
 If NOEDIT = True And (exWnd = 0 Or Button) Then
@@ -1015,7 +1015,7 @@ Me.KeyPreview = True
 End If
 End Sub
 
-Private Sub dSprite_MouseUp(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseUp(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
 If lockme Then Exit Sub
 MOUB = 0
 End Sub
@@ -1542,13 +1542,13 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
 
 If Button > 0 And Targets Then
-sel& = ScanTarget(q(), CLng(x), CLng(y), -1)
+sel& = ScanTarget(q(), CLng(X), CLng(Y), -1)
 
 If sel& >= 0 Then
 
@@ -1580,7 +1580,7 @@ clickMe2 = -1
 
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 If lockme Then Exit Sub
 If Button > 0 Then MOUB = Button
 'moux = x
@@ -1591,7 +1591,7 @@ Me.KeyPreview = True
 End If
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If lockme Then Exit Sub
  MOUB = 0
 'moux = x
@@ -1639,9 +1639,9 @@ If Me.WindowState = 0 Then
 With ScrInfo(Console)
 If IsWine Then
 'Me.Move .Left, ScrY(), (ScrX() - 1), (ScrY() - 1)
-Me.Move .Left, VirtualScreenHeight(), .width - 1, .Height - 1
+Me.Move .Left, ScrY(), .width - 1, .Height - 1
 Else
-Me.Move .Left, VirtualScreenHeight(), .width, .Height
+Me.Move .Left, ScrY(), .width, .Height
 End If
 End With
 End If
@@ -1843,12 +1843,12 @@ MOUT = False
 ClearLabels
 If Not interpret(basestack1, qq$) Then
 mybasket = players(DisForm)
-                Dim x As Form
-                    For Each x In Forms
+                Dim X As Form
+                    For Each X In Forms
              
-                    If Typename$(x) = "GuiM2000" Then Unload x
+                    If Typename$(X) = "GuiM2000" Then Unload X
                     Next
-                     Set x = Nothing
+                     Set X = Nothing
 If NERR Then Exit Do
     basestack1.toprinter = False
     If MOUT Then
@@ -2478,7 +2478,7 @@ If IsWine Then
 With view1
 On Error Resume Next
     .Visible = True
-    .Top = IEY
+    .top = IEY
     .Left = IEX
     .width = IESizeX
     .Height = IESizeY
@@ -2593,12 +2593,12 @@ End Function
 
 Public Sub myBreak(basestack As basetask)
 ''Dim pagio$
-       Dim x As Form
-                    For Each x In Forms
+       Dim X As Form
+                    For Each X In Forms
              
-                    If Typename$(x) = "GuiM2000" Then Unload x
+                    If Typename$(X) = "GuiM2000" Then Unload X
                     Next
-                     Set x = Nothing
+                     Set X = Nothing
 Dim cc As Object
 Set cc = New cRegistry
 

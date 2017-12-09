@@ -168,44 +168,44 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, X As Single, Y As Single)
 If Button = 1 Then
 
 If lastfactor = 0 Then lastfactor = 1
 
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+If (Y > Height - 150 And Y < Height) And (X > width - 150 And X < width) Then
 dr = True
 mousepointer = vbSizeNWSE
-Lx = x
-ly = y
+Lx = X
+ly = Y
 End If
 
 Else
-If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+If (Y > Height - bordertop And Y < Height) And (X > width - borderleft And X < width) Then
 dr = True
 mousepointer = vbSizeNWSE
-Lx = x
-ly = y
+Lx = X
+ly = Y
 End If
 
 End If
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
+If (Y > Height - 150 And Y < Height) And (X > width - 150 And X < width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
+ If (Y > Height - bordertop And Y < Height) And (X > width - borderleft And X < width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
 End If
 
 If dr Then
-    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-    If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+    If Y < (Height - bordertop) Or Y > Height Then addy = (Y - ly)
+    If X < (width - borderleft) Or X > width Then addX = (X - Lx)
     
    If Not ExpandWidth Then addX = 0
         If lastfactor = 0 Then lastfactor = 1
@@ -215,31 +215,31 @@ If dr Then
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
-        If (addy + Height) / 8145 > 0.4 And ((Width + addX) / 3690) > 0.4 Then
+        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
+        If (addy + Height) / 8145 > 0.4 And ((width + addX) / 3690) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / (8145 * DYP / 15))
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (3690 / 8145) Then
-        addX = -Width * lastfactor / factor - 1
+        If ((width * lastfactor / factor + addX) / Height * lastfactor / factor) < (3690 / 8145) Then
+        addX = -width * lastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
-        If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = x
+        If lastfactor <> factor Then ScaleDialog lastfactor, width
+        Lx = X
         
         Else
-        Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
+        Lx = X * lastfactor / factor
+         ScaleDialog lastfactor, (width + addX) * lastfactor / factor
          End If
 
         
          
         
-        LastWidth = Width
+        LastWidth = width
         gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
       
@@ -249,14 +249,14 @@ If dr Then
         'End If
         End If
         Else
-        Lx = x
-        ly = y
+        Lx = X
+        ly = Y
    
 End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, X As Single, Y As Single)
 If dr Then Me.mousepointer = 0
 dr = False
 End Sub
@@ -264,7 +264,7 @@ End Sub
 Private Sub Form_Unload(Cancel As Integer)
 DestroyCaret
 selectorLastX = Left
-selectorLastY = Top
+selectorLastY = top
 Sleep 200
 loadfileiamloaded = False
 End Sub
@@ -319,7 +319,7 @@ End Sub
 
 
 
-Private Sub gList1_ScrollSelected(item As Long, y As Long)
+Private Sub gList1_ScrollSelected(item As Long, Y As Long)
 TEXT1 = Right$("00000" & Hex$(item - 1), 6)
 End Sub
 
@@ -333,9 +333,9 @@ Refresh
 glist3_PanLeftRight True
 End Sub
 
-Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 
-If gList2.DoubleClickCheck(Button, item, x, y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
+If gList2.DoubleClickCheck(Button, item, X, Y, 10 * lastfactor, 10 * lastfactor, 8 * lastfactor, -1) Then
                 gList1.enabled = False  '??
                     gList3.enabled = False
             Unload Me
@@ -366,7 +366,7 @@ realitem = UNPACKLNG(Mid$(v$ & v$, 3, 6))
 End Select
 FillBack thisHDC, a, realitem
 gList1.ForeColor = &HFFFFFF - realitem
-a.Top = a.Top + 2
+a.top = a.top + 2
 PrintItem thisHDC, Right$("00000" & Hex$(item), 6), a
 End If
 End Sub
@@ -406,7 +406,7 @@ End If
 End If
 End Sub
 
-Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+Private Sub glist3_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
 If gList3.EditFlag Then Exit Sub
     If gList3.list(0) = vbNullString Then
     gList3.BackColor = &H808080
@@ -523,10 +523,10 @@ b = CLng(Rnd * 3) + setupxy / 3
 
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - setupxy
-a.Top = b
+a.top = b
 a.Bottom = b + setupxy / 5
 FillThere thathDC, VarPtr(a), thatbgcolor
-a.Top = b + setupxy / 5 + setupxy / 10
+a.top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 FillThere thathDC, VarPtr(a), thatbgcolor
 
@@ -538,13 +538,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -567,8 +567,8 @@ End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
 gList2.FontSize = 14.25 * factor * dv15 / 15
 factor = gList2.FontSize / 14.25 / dv15 * 15
-gList1.FontSize = 11.25 * factor * dv15 / 15
-factor = gList1.FontSize / 11.25 / dv15 * 15
+gList1.FontSize = 26 * factor * dv15 / 15
+factor = gList1.FontSize / 26 / dv15 * 15
 ScaleDialogFix = factor
 End Function
 Sub ScaleDialog(ByVal factor As Single, Optional NewWidth As Long = -1)
@@ -608,7 +608,7 @@ gList2.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
 allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + HeightBottom + bordertop
 
-Move Left, Top, allwidth, allheight
+Move Left, top, allwidth, allheight
 gList2.Move borderleft, bordertop, itemWidth, heightTop
 gList1.Move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
 gList3.Move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom

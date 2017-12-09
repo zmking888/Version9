@@ -21,6 +21,8 @@ Public IFCTRL As Boolean, jump As Boolean
 Public Vars As Long
 Public usestack As Boolean
 Public commnum As Long
+Public strfunnum As Long
+Public numfunnum As Long
 Public connectnow As Boolean
 Public LastExecute As Long
 Public LastOnce As Boolean
@@ -148,40 +150,40 @@ If Not StaticCollection.Find(name$) Then Exit Function
             End With
    AlterVar = True
 End Function
-Function MyRound(ByVal x, Optional d As Double = 0) As Double
-Dim i, n
+Function MyRound(ByVal X, Optional d As Double = 0) As Double
+Dim i, N
   i = Abs(Int(d)): If i > 13 Then i = 13
-  n = Sgn(x) * 0.5
+  N = Sgn(X) * 0.5
 
 Select Case i
 Case 0
-MyRound = Fix(x + n)
+MyRound = Fix(X + N)
 Case 1
-MyRound = Fix(x * 10# + n) / 10#
+MyRound = Fix(X * 10# + N) / 10#
 Case 2
-MyRound = Fix(x * 100# + n) / 100#
+MyRound = Fix(X * 100# + N) / 100#
 Case 3
-MyRound = Fix(x * 1000# + n) / 1000#
+MyRound = Fix(X * 1000# + N) / 1000#
 Case 4
-MyRound = Fix(x * 10000# + n) / 10000#
+MyRound = Fix(X * 10000# + N) / 10000#
 Case 5
-MyRound = Fix(x * 100000# + n) / 100000#
+MyRound = Fix(X * 100000# + N) / 100000#
 Case 6
-MyRound = Fix(x * 1000000# + n) / 1000000#
+MyRound = Fix(X * 1000000# + N) / 1000000#
 Case 7
-MyRound = Fix(x * 10000000# + n) / 10000000#
+MyRound = Fix(X * 10000000# + N) / 10000000#
 Case 8
-MyRound = Fix(x * 100000000# + n) / 100000000#
+MyRound = Fix(X * 100000000# + N) / 100000000#
 Case 9
-MyRound = Fix(x * 1000000000# + n) / 1000000000#
+MyRound = Fix(X * 1000000000# + N) / 1000000000#
 Case 10
-MyRound = Fix(x * 10000000000# + n) / 10000000000#
+MyRound = Fix(X * 10000000000# + N) / 10000000000#
 Case 11
-MyRound = Fix(x * 100000000000# + n) / 100000000000#
+MyRound = Fix(X * 100000000000# + N) / 100000000000#
 Case 12
-MyRound = Fix(x * 1000000000000# + n) / 1000000000000#
+MyRound = Fix(X * 1000000000000# + N) / 1000000000000#
 Case 13
-MyRound = Fix(x * 10000000000000# + n) / 10000000000000#
+MyRound = Fix(X * 10000000000000# + N) / 10000000000000#
 End Select
 End Function
 Public Function ExistVar(ByVal name$) As Boolean
@@ -205,12 +207,12 @@ Public Sub ReadVar(ByVal name$, var As Variant)
         End If
     End With
 End Sub
-Public Sub DropNdot(n As Long)
-If n = 0 Then Exit Sub
-If curdotcol - n < 0 Then
+Public Sub DropNdot(N As Long)
+If N = 0 Then Exit Sub
+If curdotcol - N < 0 Then
     curdotcol = 0
 Else
-    curdotcol = curdotcol - n
+    curdotcol = curdotcol - N
 End If
 End Sub
 
