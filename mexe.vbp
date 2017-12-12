@@ -14,7 +14,7 @@ HelpContextID="0"
 CompatibleMode="0"
 MajorVer=1
 MinorVer=0
-RevisionVer=3
+RevisionVer=4
 AutoIncrementVer=0
 ServerSupportFiles=0
 VersionComments="M2000.dll loader"
@@ -37,4 +37,4 @@ MaxNumberOfThreads=1
 DebugStartupOption=0
 
 [VBCompiler]
-LinkSwitches=/STACK:30000000
+LinkSwitches=/STACK:32180000

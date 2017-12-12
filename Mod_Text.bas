@@ -14,12 +14,13 @@ Attribute VB_Name = "Module1"
 'limitations under the License.
 
 Option Explicit
+Global startaddress As Long, stacksize As Long, findstack As Long
 Const a123 = "={"
 Const thislabel$ = "[!" + vbCr + "'\]"
 Dim ObjectCatalog As FastCollection
 Public rndbase As rndvars
 Public LastUse As Long
-Private funcno As Long
+Private funcno As Long, ua As Double, UB As Double
 Private simplestack1 As rndvars
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWND As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
 Private Declare Function ShowCursor Lib "User32" (ByVal bShow As Long) As Long
@@ -75,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2810,7 +2811,7 @@ PopStage bstack
 Exit Sub
 End If
 End If
-If ok Then CopyGroup var(where), bstack
+If ok Then Set bstack.lastobj = CopyGroupObj(var(where))
 bstack.DropNdot 2
 PopStage bstack
 End Sub
@@ -2883,7 +2884,7 @@ Dim safegroup As Object
 Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant, subsfc As FastCollection
 Vars = var2used: VName = varhash.Count
 subs = sb2used: snames = subHash.Count
-Dim mm As mStiva, tempRef As Object, bs As New basetask
+Dim mm As mStiva, tempRef As Object
 If Prefix = "VAL" Then
 ' we stand as right value...
 If pppp Is Nothing Then Exit Function
@@ -2899,10 +2900,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         Set safegroup = pppp.item(v)
         ' check for iamglobal ??
         If Not safegroup.IamFloatGroup Then
-   
-        CopyGroup safegroup, bstack
-        Set safegroup = bstack.lastobj
-        Set bstack.lastobj = Nothing
+         Set safegroup = CopyGroupObj(safegroup)
         End If
         UnFloatGroup bstack, w$, y1, safegroup, , True
         Set safegroup = pppp.item(v)
@@ -2920,15 +2918,13 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
          
             SpeedGroup = 1
             If pppp.Arr Then
-                CopyGroup var(y1), bs
                 Set tempRef = pppp.GroupRef   'pppp.item(v).Link
-                Set pppp.item(v) = bs.lastobj
-                Set pppp.item(v).LinkRef = pppp.GroupRef
+                Set pppp.item(v) = CopyGroupObj(var(y1))
+                If TypeOf pppp.item(v) Is Group Then Set pppp.item(v).LinkRef = pppp.GroupRef
             Else
-                CopyGroup0 var(y1), bs, safegroup
+                CopyGroup1 var(y1), safegroup
             End If
             
-            'Set bs.lastobj = Nothing
                If bstack.lastobj Is Nothing Then
                         bstack.LastValue = r
                 Else
@@ -2983,17 +2979,15 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
                  If IsStrExp(bstack, w$ + "$", bb$) Then GoTo conthere
             End If
 conthere:
-            SpeedGroup = 1
+           SpeedGroup = 1
             If safegroup.IamFloatGroup Then
-            CopyGroup var(y1), bs
+                Set pppp.item(v) = CopyGroupObj(var(y1))
             Else
-            
-            CopyGroup0 var(y1), bs, safegroup
+                Set pppp.item(v) = CopyGroup0Obj(var(y1), safegroup)
             End If
             Set tempRef = pppp.GroupRef   'pppp.item(v).Link
-            Set pppp.item(v) = bs.lastobj
+            
             Set pppp.item(v).LinkRef = tempRef
-            Set bs.lastobj = Nothing
              If bstack.lastobj Is Nothing Then
                    bstack.LastValue = bb$
                Else
@@ -3008,9 +3002,9 @@ conthere:
         End If
         
        SpeedGroup = Execute(bstack, b$, True)
-        ' CopyGroup var(y1), bstack
+        ' CopyGroupObj var(y1), bstack
    If SpeedGroup <> 0 Then
-        CopyGroup0 var(y1), bs, pppp.item(v)
+        CopyGroup1 var(y1), pppp.item(v)
         If bstack.lastobj Is Nothing Then
         MyEr "Internal Error", "Εσωτερικό Λάθος"
             bstack.LastValue = vbNullString
@@ -3367,33 +3361,29 @@ jump1234:
             End If
   End If
 breakexit:
+' maybe is always nothing here, i have to check
+        Set bstack.lastobj = Nothing
         While mm.Total > 0
         y1 = mm.PopVal
         v = mm.PopVal
         Set pppp = mm.PopObj
         If v <> -1 Then
-                If v <> -100 Then
-                        CopyGroup var(y1), bstack
-                     Else
-                            
-                            
-                            If pppp.Arr Then
-                            v = 0
-                            CopyGroup0 var(y1), bstack, pppp.item(v)
-                            Else
-                            
-                            CopyGroup var(y1), bstack
-                            
-                            End If
-                        End If
-                         Set tempRef = pppp.GroupRef  '  pppp.item(v).Link
-                        Set pppp.item(v) = bstack.lastobj
-                         Set bstack.lastobj = Nothing
-                         If Not pppp.IsEmpty Then Set pppp.item(v).LinkRef = tempRef
-
-      
+            If v <> -100 Then
+                Set pppp.item(v) = CopyGroupObj(var(y1))
+            Else
+                If pppp.Arr Then
+                    v = 0
+                    Set pppp.item(v) = CopyGroup1(var(y1), pppp.item(v))
+                Else
+                    Set pppp.item(v) = CopyGroupObj(var(y1))
+                End If
+            End If
+            Set tempRef = pppp.GroupRef  '  pppp.item(v).Link
+            If Not pppp.IsEmpty Then
+            If TypeOf pppp.item(v) Is Group Then Set pppp.item(v).LinkRef = tempRef
+            End If
         End If
-        Wend
+    Wend
 normalexit:
                 bstack.DropNdot depth + 1
 Else
@@ -3449,13 +3439,11 @@ If LastErNum <> 0 Then
 
 If FK$(13) = vbNullString Then FK$(13) = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     End If
-                      ' CopyGroup var(y1), bstack
+                    
                        Set safegroup.LinkRef = Nothing
-                        CopyGroup var(y1), bstack
                         Set tempRef = pppp.GroupRef
-                        Set pppp.item(v) = bstack.lastobj
+                        Set pppp.item(v) = CopyGroupObj(var(y1))
                         Set safegroup.LinkRef = tempRef
-                        Set bstack.lastobj = Nothing
                         Set var(y1) = New Group
 End If
 
@@ -5833,7 +5821,7 @@ End If
 Select Case V1&
 Case 1
 If Not numid.Find(v$, w1) Then GoTo LOOKFORVARNUM
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92
 num82:
 IsNumber = 0
 InternalError
@@ -6512,8 +6500,16 @@ num86: ' Case "STACK", "ΣΩΡΟΣ"
     r = 0
     IsNumber = True
     Exit Function
-
-
+num91: 'MONITOR.STACK - ΕΛΕΓΧΟΣ.ΣΩΡΟΥ
+    r = SG * CurrentStackSize()
+    IsNumber = True
+    Exit Function
+Exit Function
+num92: 'MONITOR.STACK.SIZE - ΕΛΕΓΧΟΣ.ΜΕΓΕΘΟΣ.ΣΩΡΟΥ
+    r = SG * stacksize
+    IsNumber = True
+    Exit Function
+Exit Function
 LOOKFORVARNUM:
 
 If GetVar(bstack, v$, VR) Then
@@ -6563,7 +6559,7 @@ foundprivate:
                 Else
                     If var(VR).HasStrValue Then
                         r = 0
-                        CopyGroup var(VR), bstack
+                        Set bstack.lastobj = CopyGroupObj(var(VR))
                     Else
                         r = 0
                         W3 = Len(N$) - rinstr(N$, ".") + 1
@@ -6578,7 +6574,7 @@ foundprivate:
            ' If var(VR).IamSuperClass Then
 
 
-          '      bstack.soros.CopyGroup var(VR).SuperClassList, anything
+          '      bstack.soros.CopyGroupObj var(VR).SuperClassList, anything
            ' Set bstack.lastobj = anything
           '  Set bstack.lastobj.SuperClassList = var(VR).SuperClassList
          ' Else
@@ -7017,16 +7013,17 @@ olamazi
 
 r = SG * Form3.NeoASK(bstack)
 AskInput = False
-If IsWine Then
-If bstack.Owner.Visible Then
-If Not Screen.ActiveForm Is Nothing Then
-If GetForegroundWindow = Screen.ActiveForm.hWND Then
-Screen.ActiveForm.SetFocus
-End If
-End If
+'If GetForegroundWindow = Screen.ActiveForm.hwnd Then
+'Screen.ActiveForm.SetFocus
+'End If
+'If IsWine Then
+'If bstack.Owner.Visible Then
+'If Not Screen.ActiveForm Is Nothing Then
 
-End If
-End If
+'End If
+
+'End If
+'End If
     IsNumber = FastSymbol(a$, ")", True)
 End If
 Exit Function
@@ -10211,7 +10208,7 @@ contgroup2:
                                  r = SG * bstack.LastValue
                         
                         Else
-                            bstack.soros.CopyGroup pppp.item(w2), anything
+                            bstack.soros.CopyGroupObj pppp.item(w2), anything
                              Set bstack.lastobj = anything
                         End If
             End If
@@ -10544,7 +10541,7 @@ conthereGroupValue:
                     
                     If var(VR).HasStrValue Then
                         r = 0
-                        CopyGroup var(VR), bstack
+                        Set bstack.lastobj = CopyGroupObj(var(VR))
                     Else
                         r = 0
                         InternalEror
@@ -10841,22 +10838,22 @@ End If
 End Select
 ElseIf k < 5 Then
         If GetVar(bstack, N$, pos1, , , True) Then
-        If Typename(var(pos1)) = "lambda" Then
-        Dim aaa As lambda
-        var(pos1).CopyTo aaa, var()
-        Set dummy = aaa
-            body.FeedNonLocal N$, dummy, var()
-            Set dummy = Nothing
-            dummy = Empty
-            Set aaa = Nothing
-        ElseIf Typename(var(pos1)) = "Group" Then
-        CopyGroup var(pos1), bstack
-        Set dummy = bstack.lastobj
-        body.FeedNonLocal N$, dummy, var()
-        Set dummy = Nothing
-        Else
-            body.FeedNonLocal N$, var(pos1), var()
-        End If
+            If Typename(var(pos1)) = "lambda" Then
+            Dim aaa As lambda
+            var(pos1).CopyTo aaa, var()
+            Set dummy = aaa
+                body.FeedNonLocal N$, dummy, var()
+                Set dummy = Nothing
+                dummy = Empty
+                Set aaa = Nothing
+            ElseIf Typename(var(pos1)) = "Group" Then
+                Set dummy = CopyGroupObj(var(pos1))
+                body.FeedNonLocal N$, dummy, var()
+                Set bstack.lastobj = dummy
+                Set dummy = Nothing
+            Else
+                body.FeedNonLocal N$, var(pos1), var()
+            End If
         Else
             body.FeedNonLocal N$, dummy, var()
         End If
@@ -13719,7 +13716,7 @@ foundprivate:
                             End If
                         Else
                             r$ = vbNullString
-                            CopyGroup var(w), bstackstr
+                            Set bstackstr.lastobj = CopyGroupObj(var(w))
                         End If
                     ElseIf TypeOf var(w) Is Document Then
                         r$ = var(w)
@@ -17240,6 +17237,13 @@ PROCESSCOMMAND:
             Select Case w$
         Dim y1 As Long
         Dim x2 As Long, y2 As Long, SBR$, nd&
+          Case "CALL", "ΚΑΛΕΣΕ"
+        ' CHECK FOR NUMBER...
+        NeoCall objptr(bstack), b$, lang, ok
+        If Not ok Then
+        interpret = 0
+        Exit Function
+        End If
             Case " ", ChrW(160)
             ' nothing
           '  SSS = Len(B$)
@@ -17357,7 +17361,15 @@ err123456:
                     wwPlain bstack, prive, LONGNAME(strTemp), bstack.Owner.width, 1000, True
                     wwPlain bstack, prive, "Current directory", bstack.Owner.width, 1000, True
                     wwPlain bstack, prive, mcd, bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Setting for Function Recursion " + CStr(funcdeep), bstack.Owner.width, 1000, True
+                    If m_bInIDE Then
+                    wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 2948 - 1), bstack.Owner.width, 1000, True
+                    wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 1772 - 1), bstack.Owner.width, 1000, True
+                    wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 1254 - 1), bstack.Owner.width, 1000, True
+                    Else
+                    wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 9832 - 1), bstack.Owner.width, 1000, True
+                    wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 5864), bstack.Owner.width, 1000, True
+                    wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 5004), bstack.Owner.width, 1000, True
+                    End If
                     If OverideDec Then wwPlain bstack, prive, "Locale Overide " + CStr(cLid), bstack.Owner.width, 1000, True
                     If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
                     If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
@@ -17372,7 +17384,7 @@ err123456:
                     wwPlain bstack, prive, "Screens:" + Str$(DisplayMonitorCount()) + "  Primary is:" + Str$(FindPrimary + 1), bstack.Owner.width, 1000, True
                     wwPlain bstack, prive, "This form is in screen:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.width, 1000, True
                     wwPlain bstack, prive, "Console is in screen:" + Str$(Console + 1), bstack.Owner.width, 1000, True
-                    
+
                     players(GetCode(di)) = prive
                     Else
                     BadCommand
@@ -17481,6 +17493,14 @@ Case "RETURN", "ΕΠΙΣΤΡΟΦΗ"
                             interpret = False
                             End If
                             here$ = ohere$: Exit Function
+                            ElseIf bstack.callx1 > 0 Then
+                            If Not ProcModuleEntry(bstack, "", 0, b$, lang) Then
+                                          If MOUT And b$ = vbNullString Then
+                                Else
+                                    MyErMacro b$, "unknown identifier " & w$, "’γνωστο αναγνωριστικό " & w$
+                                End If
+                            End If
+                       '''     funcno = funcno - 1
                     End If
                     
                 End Select
@@ -18346,6 +18366,7 @@ Loop
 Set Parent = Nothing
 End Sub
 Function Execute(bstack As basetask, b$, once As Boolean, Optional linebyline As Boolean, Optional loopthis As Boolean = False) As Long
+' MsgBox CurrentStackSize()
 Dim di As Object, nchr As Integer
 If Not bstack.IamAnEvent Then
 If mybreakkey Then
@@ -18740,7 +18761,7 @@ myerr1:
               GoTo parsecommand
                End If
         ElseIf v <> 0 Then
-                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, VarOnly
+                On v GoTo contif, ContElse, contElseIf, contSelect, ContTry, ForCont, contNext, contRefr, contWhile, ContRepeat, ContGoto, contSub, autogosub, ContOn, contLoop, contBreak, ContContinue, ContRestart, ContReturn, ContEnd, ContExit, ContInline, contUpdate, contThread, contAfter, contPart, contStatic, contEvery, contTask, ContScan, contTarg, BypassGlobalComm, BypassComm, contNegLocal, contNegGlobal, makeconst, VarOnly, contCall
                 Execute = 0: Exit Function
                 
 BypassGlobalComm:
@@ -19617,6 +19638,14 @@ contNext:
         End If
         Else
               NoNext
+        Execute = 0
+        Exit Function
+        End If
+        Case "CALL", "ΚΑΛΕΣΕ"
+        ' CHECK FOR NUMBER...
+contCall:
+        NeoCall objptr(bstack), b$, lang, ok
+        If Not ok Then
         Execute = 0
         Exit Function
         End If
@@ -21561,6 +21590,15 @@ conthere111:
     If LastErNum1 = -1 And bstack.IamThread Then Execute = 1 Else Execute = 0
     Exit Function
 Else
+    If bstack.callx1 > 0 Then
+    If Not ProcModuleEntry(bstack, "", 0, b$, lang) Then
+                  If MOUT And b$ = vbNullString Then
+        Else
+            MyErMacro b$, "unknown identifier " & w$, "’γνωστο αναγνωριστικό " & w$
+        End If
+    End If
+   ''' funcno = funcno - 1
+    End If
     iscom = False
 conthere222:
     If bstack.connectnow Then
@@ -22975,8 +23013,8 @@ LONGERR:
 End Function
 Function GoFunc(mystack As basetask, what$, rest$, vl As Variant, Optional recursive As Long, Optional ByVal choosethis As Long = -1, Optional ByVal strg As Boolean = False, Optional skiplastpar As Boolean = False) As Boolean
 Dim p As Double, i As Long, F As Long, it As Long, pa$
-Dim x1 As Long, frm$, par As Boolean, ohere$, w$
-Dim Vars As Long, VName As Long, subs As Long, snames As Long
+Dim x1 As Long, frm$, par As Boolean, ohere$, w$, bb$, loopthis As Boolean, S3 As Long, ec$
+Dim Vars As Long, VName As Long, subs As Long, snames As Long, once As Boolean, RetStackSize As Long, subspoint As Boolean, subsfc As FastCollection
 Dim threads As Long, vvv As Variant
 
 Dim basestack As basetask
@@ -22985,7 +23023,7 @@ Set basestack = mystack.Parent
 If basestack Is Nothing Then Set basestack = mystack
 ohere$ = here$
 'if iRVAL(here$, 1) > funcdeep Then
-If iRVAL(here$, 1) > funcdeep Then
+If CurrentStackSize > stacksize Then
     MyEr "Function's Stack is Full - 15", "Η στοίβα των συναρτήσεων έχει γεμίσει - 15"
     Set basestack = Nothing
     GoFunc = False: Exit Function
@@ -22997,7 +23035,7 @@ If Not PushParamGeneralV7(mystack, rest$) Then
     mystack.Look2Parent = False
     Exit Function
 End If
-funcno = funcno + 1
+'''funcno = funcno + 1
 mystack.strg = strg
 mystack.fHere = here$
 mystack.Look2Parent = False
@@ -23120,8 +23158,182 @@ Else
     End If
     frm$ = Mid$(sbf(x1).sb, i)
     it = 1
+    RetStackSize = mystack.RetStackTotal
 againstream:
-Call executeblock(it, mystack, frm$, False, ok)
+
+
+
+
+' Call executeblock(it, mystack, frm$, False, ok)
+
+ec$ = vbCrLf + frm$
+  
+        If Len(ec$) > 2 Then
+                it = 1
+                ok = False
+                once = True
+                i = 1
+                Do
+                    bb$ = Mid$(ec$, i)
+subsentry10:
+                    ok = False
+                    Select Case Execute(mystack, bb$, ok, False, loopthis)   ' this is a major point
+                    Case 0
+                            frm$ = bb$ & frm$
+                            it = 0
+                            Set mystack.lastobj = Nothing
+                            GoTo normalexit
+                    Case 1
+                        If LastErNum <> 0 Then
+                   frm$ = vbNullString
+                    End If
+
+                                  
+                                   If once Then Exit Do
+                                   
+                                    here$ = ohere$
+                                   Exit Do
+                      Case 2
+                            If Not ok Then
+                                      i = 1
+                    If bb$ <> "" Then
+                            If bb$ = Chr$(0) Then
+                                       If RetStackSize = mystack.RetStackTotal And mystack.RetStack.LookTopVal < 0 Then
+                                        ' this is a return form other block
+                                         it = 2
+                                        frm$ = bb$
+                                        GoTo fastexit
+                                        End If
+                                    If mystack.IsInRetStackNumber(p) Then
+                                                       If LastErNum = -1 Then
+                                                                mystack.RetStack.PushVal p
+                                                                it = 0
+                                                                GoTo fastexit
+                                                        End If
+                                                        If p < -1 Then
+                                                              subspoint = True
+                                                              mystack.IsInRetStackNumber p
+                                                              bb$ = Mid$(sbf(Abs(mystack.Parent.OriginalCode)).sb, Len(sbf(Abs(mystack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                        ElseIf p < 0 Then
+                                                                subspoint = False
+                                                        
+                                                                mystack.IsInRetStackNumber p
+                                                        If mystack.RetStackTotal - RetStackSize <= 5 Then
+                                                        i = Len(ec$) - CLng(p) + 1
+     
+                                                       bb$ = Mid$(ec$, i)
+                                       
+
+                                                        Else
+                                                          If mystack.OriginalCode = 0 Then
+                                                            
+                                                                   bb$ = Mid$(sbf(Abs(mystack.Parent.OriginalCode)).sb, Len(sbf(Abs(mystack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                          Else
+                                                            
+                                                                 bb$ = Mid$(sbf(Abs(mystack.OriginalCode)).sb, Len(sbf(Abs(mystack.OriginalCode)).sb) - CLng(p) + 1)
+                                                               End If
+                                                               End If
+                                                              
+                                                              
+                                                        End If
+                                                
+                                               
+                                                              PopStage mystack
+                                       GoTo subsentry10
+                                       
+                                       
+                                    
+                                                                ElseIf mystack.IsInRetStackString(bb$) Then
+                                    
+                                                                 If InStr(bb$, " ") > 0 Then
+                                                                       
+                                                              If subspoint Then mystack.RetStack.PushVal -2 Else mystack.RetStack.PushVal -1
+                                                              
+                                                               S3 = mystack.OriginalCode
+                                                                        If searchsub(S3, bb$, i, S3) Then
+                                                                          subspoint = False
+                                                                            If bb$ <> "" Then
+                                                                                    bb$ = "Read NEW " + bb$ + vbCrLf + Mid$(sbf(S3).sb, i)
+                                                                            Else
+                                                                                    bb$ = Mid$(sbf(S3).sb, i)
+                                                                            End If
+                                                       
+                                                                            ok = False
+                                                                            GoTo subsentry10
+                                                                        ElseIf mystack.IamChild Then
+                                                                        If searchsub(FindPrevOriginal(mystack), bb$, i, S3) Then
+                                                                         subspoint = True
+                                                                            If bb$ <> "" Then
+                                                                                    bb$ = "Read NEW " + bb$ + vbCrLf + Mid$(sbf(S3).sb, i)
+                                                                            Else
+                                                                                    bb$ = Mid$(sbf(S3).sb, i)
+                                                                            End If
+                                                       
+                                                                            ok = False
+                                                                            GoTo subsentry10
+                                                                            
+                                                                                   Else
+                                                              
+                                                              mystack.RetStack.drop 6
+                                                                                    Exit Do
+                                                                        End If
+                                                                        Else
+                                                              
+                                                              mystack.RetStack.drop 6
+                                                                                    Exit Do
+                                                                        End If
+                                                        End If
+                                    End If
+                             Else
+                                If subsfc Is Nothing Then
+                                        Set subsfc = New FastCollection
+                                End If
+                                If subsfc.ExistKey(bb$) Then
+                                        i = subsfc.Value
+                                        GoTo jump1234
+                                Else
+                                i = PosLabel(bb$, ec$)
+                                subsfc.AddKey bb$, i
+jump1234:
+                                If i = 0 Or i > Len(ec$) Then
+                                    frm$ = bb$
+                                    it = 2
+                                    Exit Do
+                                Else
+                                    bb$ = Mid$(ec$, i)
+                                    GoTo subsentry10
+                                End If
+                               End If
+                            End If
+                            Else
+                            loopthis = False
+                            End If
+                                               Else
+                                               If ok Then frm$ = "BREAK"
+                                  once = ok
+                                
+                                it = 2: Set mystack.lastobj = Nothing
+                                  GoTo breakexit
+                    End If
+
+                            Case Else
+                                    
+      
+                                   If once Then Exit Do
+                                    
+                                    here$ = ohere$
+                                   Exit Do
+                            
+                            End Select
+                            here$ = ohere$
+                              If myexit(mystack) Then it = 1: Exit Do
+                            Loop
+            Else
+              it = 1
+            End If
+breakexit:
+normalexit:
+fastexit:
     Select Case it ''Execute(mystack, frm$, False)
     Case 0
     Set mystack.lastobj = Nothing
@@ -23318,7 +23530,7 @@ Else
 rest$ = what$ & " " & rest$
 GoFunc = False
 End If
-funcno = funcno - 1
+''''funcno = funcno - 1
 End Function
 Sub stackshow(b As basetask)
 Dim p As Double, r$, AL$, s$, dl$, dl2$  ', X As Index
@@ -23367,8 +23579,8 @@ End If
 
 
 
-Dim Stack As mStiva
-Set Stack = b.soros
+Dim stack As mStiva
+Set stack = b.soros
 
 If Form2.Compute <> "" Then
 dl$ = Form2.Compute
@@ -23442,21 +23654,21 @@ Dim i As Long
 
 Do
 i = i + 1
-If Stack.Total < i Or Len(AL$) > 400 Then Exit Do
-If Stack.StackItemType(i) = "N" Or Stack.StackItemType(i) = "L" Then
-AL$ = AL$ & CStr(Stack.StackItem(i)) & " "
-ElseIf Stack.StackItemType(i) = "S" Then
-r$ = Stack.StackItem(i)
+If stack.Total < i Or Len(AL$) > 400 Then Exit Do
+If stack.StackItemType(i) = "N" Or stack.StackItemType(i) = "L" Then
+AL$ = AL$ & CStr(stack.StackItem(i)) & " "
+ElseIf stack.StackItemType(i) = "S" Then
+r$ = stack.StackItem(i)
     If Len(r$) > 78 Then
     AL$ = AL$ & Chr(34) + Left$(r$, 75) & "..." & Chr(34)
     Else
     AL$ = AL$ & Chr(34) + r$ & Chr(34)
     End If
-ElseIf Stack.StackItemType(i) = "*" Then
+ElseIf stack.StackItemType(i) = "*" Then
 
-AL$ = AL$ & Stack.StackItemTypeObjectType(i, var()) & " "
+AL$ = AL$ & stack.StackItemTypeObjectType(i, var()) & " "
 Else  '??
-AL$ = AL$ & Stack.StackItemTypeObjectType(i, var()) & " "
+AL$ = AL$ & stack.StackItemTypeObjectType(i, var()) & " "
 End If
 Loop
 With Form2
@@ -24070,9 +24282,6 @@ Exit Function
 Case "LET", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ"  'ok
 Identifier = MyLet(basestack, rest$, lang)
 Exit Function
-Case "CALL", "ΚΑΛΕΣΕ"
-' CHECK FOR NUMBER...
-NeoCall objptr(basestack), rest$, lang, Identifier
 Case "COMMIT", "ΑΝΕΘΕΣΕ"
 Identifier = MyRead(3, basestack, rest$, lang)
 Exit Function
@@ -24660,7 +24869,7 @@ conthereplease:
             End If
             x1 = y1
             If Len(what$) = 0 Then Identifier = False: Exit Function
-            funcno = funcno + 1
+            '''funcno = funcno + 1
             what$ = myUcase(what$):   MakeThisSub basestack, what$
             ohere$ = here$
             If it = 0 Then
@@ -24678,23 +24887,15 @@ conthereplease:
             Else
                 here$ = ohere$ + "." & what$
             End If
-            'Debug.Print here$
-            'Debug.Print ">>>>>>" + ohere$
             If here$ <> ohere$ Then
-
-            If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
-                    funcno = funcno - 1
+            basestack.callohere = ohere$
+            basestack.callx1 = x1
+            'If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
+                '    funcno = funcno - 1
+                Identifier = True
+          Exit Function
             Else
-                    funcno = funcno - 1
-            ' these lines give module call in object recuirsive without call command
-'            If basestack.UseGroupname <> "" Then
- '           If Left$(here$, Len(basestack.UseGroupname)) = basestack.UseGroupname Then
-  '          If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
-  
-   '         Identifier = True
-    '        Exit Function
-     '       End If
-          ' End If
+               ''    funcno = funcno - 1
           If what$ = here$ Then
           MyErMacro rest$, "Use Call command to call recuirsive in module", "Χρησιμοποίησε την Κάλεσε για αναδρομική κλήση τμήματος"
           
@@ -24703,12 +24904,7 @@ conthereplease:
           Exit Function
           End If
 NERR:
-          
-                    '    If Err.Number = 6 Then
-                     '           Err.Clear
-                      '          MyErMacro rest$, "Overflow long, expect lower than (2147483648)", "Υπερχείλιση ακεραίου, περιμένω μικρότερο από (2147483648)"
-                       ' Else
-                        '        Err.Clear
+
                         If MOUT And rest$ = vbNullString Then
                         Else
                                 MyErMacro rest$, "unknown identifier " & what$, "’γνωστο αναγνωριστικό " & what$
@@ -27589,6 +27785,7 @@ bb$ = bb$ & "   Τμηματα  [μας δείχνει τα τμήματα στη μνήμη και το δίσκο]" & vbCr
 bb$ = bb$ & "   ΒΟΗΘΕΙΑ κατι  {μας δίνει βοήθεια σε ξεχωριστό παράθυρο)" & vbCrLf
 bb$ = bb$ & "   ? ή ΤΥΠΩΣΕ τυπώνει" & vbCrLf
 bb$ = bb$ & "   δώσε την εντολή ΡΥΘΜΙΣΕΙΣ η ctrl+U για να αλλάξει την εξ ορισμού γραμματοσειρά και τα χρώματα" & vbCrLf
+bb$ = bb$ & "   δώσε την εντολή ΕΛΕΓΧΟΣ για να δεις στοιχεία του διερμηνευτή" & vbCrLf
 
 Else
 bb$ = "   GREEK or LATIN for choose the codepage for errors display" & vbCrLf
@@ -27605,7 +27802,7 @@ bb$ = bb$ & "   MODULES for a list of modules in memory and on dik" & vbCrLf
 bb$ = bb$ & "   use HELP writesomething [to find some help, open the help form]" & vbCrLf
 bb$ = bb$ & "   ? or PRINT for printing" & vbCrLf
 bb$ = bb$ & "   type SETTINGS or ctrl+U to change the default font and colors" & vbCrLf
-
+bb$ = bb$ & "   type MONITOR for info about current state of Interpreter" & vbCrLf
 End If
 wwPlain bstack, players(GetCode(bstack.Owner)), bb$, di.width, 1000, True
 crNew bstack, players(GetCode(bstack.Owner))
@@ -30936,6 +31133,14 @@ Set bstack.lastobj = bb
 Set aa = Nothing
 Set bb = Nothing
 End Sub
+Public Function CopyHandlerObj(F As Variant) As Object
+Dim aa As mHandler, bb As mHandler
+Set aa = F
+aa.CopyTo bb
+Set CopyHandlerObj = bb
+Set aa = Nothing
+Set bb = Nothing
+End Function
 Public Sub CopyLambdaAny(F As Variant, obj As Object)
 Dim aa As lambda, bb As lambda
 Set aa = F
@@ -30996,9 +31201,7 @@ Set vvl = bstack.lastobj
 Set bstack.lastobj = Nothing
 k.PokeItem j + 1, vvl
 ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
-CopyHandler var(val(b$(1))), bstack
-Set vvl = bstack.lastobj
-Set bstack.lastobj = Nothing
+Set vvl = CopyHandlerObj(var(val(b$(1))))
 k.PokeItem j + 1, vvl
 Else
 k.PokeItem j + 1, var(val(b$(1)))
@@ -31045,6 +31248,82 @@ Set k.SuperClassList = .SuperClassList
 End With
 Set bstack.lastobj = k
 End Sub
+Public Function CopyGroupObj(mg As Variant) As Object
+Dim mgroup As Group
+Set mgroup = mg
+If mgroup.IamSuperClass Then
+    Set CopyGroupObj = mg
+    
+    Exit Function
+End If
+Dim name$, k As Group, i As Long, j As Long, s$, v As Variant, W3 As Long
+Dim b$(), vvl As Variant, delme As Document, myArray As mArray, mySecondArray As mArray
+Dim c$(), arrIndex As Long, choose$
+Set k = New Group
+Set k.Sorosref = mgroup.soros.Copy
+Dim BI As Long
+BI = 1
+
+i = mgroup.soros.Total
+k.BeginFloat i + 2
+k.PokeItem 0, "Variables-Arrays"
+k.PokeItem 1, i
+For j = 2 To i * 2 + 1 Step 2
+'Debug.Print k.soros.StackItem(BI)
+b$() = Split(k.soros.StackItem(BI), " ")
+If Right$(b$(0), 1) = ")" Then
+b$(0) = Left$(b$(0), Len(b$(0)) - 1)
+
+End If
+If Right$(b$(0), 1) <> "(" Then
+
+k.PokeItem j, b$(0)
+
+If Typename(var(val(b$(1)))) = doc Then 'preserve Documents
+ MakeitObject vvl
+ vvl.EmptyDoc
+ vvl.textDoc = var(val(b$(1))).textDoc
+ k.PokeItem j + 1, vvl
+ElseIf Typename(var(val(b$(1)))) = "Group" Then
+vvl = -1
+Set vvl = CopyGroupObj(var(val(b$(1))))
+k.PokeItem j + 1, vvl
+ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
+Set vvl = CopyHandlerObj(var(val(b$(1))))
+k.PokeItem j + 1, vvl
+Else
+k.PokeItem j + 1, var(val(b$(1)))
+End If
+Else
+
+
+If val(b$(1)) = 0 Then
+Set vvl = New mArray
+ElseIf Typename$(var(val(b$(1)))) = "Empty" Then
+Else
+Set vvl = var(val(b$(1)))
+
+End If
+k.PokeItem j, b$(0) + ")"
+ k.PokeItem j + 1, vvl
+Set vvl = Nothing
+
+
+End If
+BI = BI + 1
+Next j
+With mgroup
+k.PokeItem j, mgroup.LocalList
+k.PokeItem j + 1, GetFunctionList(.FuncList)
+k.HasStrValue = .HasStrValue
+k.HasValue = .HasValue
+k.HasSet = .HasSet
+k.HasParameters = .HasParameters
+k.HasParametersSet = .HasParametersSet
+Set k.SuperClassList = .SuperClassList
+End With
+Set CopyGroupObj = k
+End Function
 Public Sub CopyGroup(mg As Variant, bstack As basetask)
 Dim mgroup As Group
 Set mgroup = mg
@@ -31125,6 +31404,7 @@ Set k.SuperClassList = .SuperClassList
 End With
 Set bstack.lastobj = k
 End Sub
+
 Public Sub CopyGroup0(mg As Variant, bstack As basetask, usethisk As Variant)
 Dim mgroup As Group, grgroup As Group
 Set mgroup = mg
@@ -31209,6 +31489,143 @@ Next j
 'End If
 Set bstack.lastobj = k
 End Sub
+
+Public Function CopyGroup0Obj(mg As Variant, usethisk As Variant) As Object
+Dim mgroup As Group, grgroup As Group
+Set mgroup = mg
+Dim name$, k As Group, i As Long, j As Long, s$, v As Variant, W3 As Long
+Dim b$(), vvl As Variant, delme As Document, myArray As mArray, mySecondArray As mArray
+Dim c$(), arrIndex As Long, choose$
+If TypeOf usethisk Is Group Then
+Set k = usethisk
+Else
+Set k = New Group
+End If
+'Set mgroup.LinkRef = Nothing
+'Set k.Sorosref = mgroup.soros.Copy
+
+Dim BI As Long
+BI = 1
+i = mgroup.soros.Total
+If Not k.IamFloatGroup Then Exit Function
+'k.BeginFloat2 i + 2
+k.PokeItem 0, "Variables-Arrays"
+'k.PokeItem 1, i
+
+For j = 2 To i * 2 + 1 Step 2
+'Debug.Print k.soros.StackItem(BI)
+b$() = Split(mgroup.soros.StackItem(BI), " ")
+If Right$(b$(0), 1) = ")" Then
+b$(0) = Left$(b$(0), Len(b$(0)) - 1)
+
+End If
+If Right$(b$(0), 1) <> "(" Then
+
+'k.PokeItem j, b$(0)
+
+If Typename(var(val(b$(1)))) = doc Then 'preserve Documents
+
+ElseIf Typename(var(val(b$(1)))) = "Group" Then
+vvl = -1
+
+k.PeekItem j + 1, vvl
+CopyGroup0Obj var(val(b$(1))), vvl
+
+ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
+Set vvl = CopyHandlerObj(var(val(b$(1))))
+k.PokeItem j + 1, vvl
+Else
+k.PokeItem j + 1, var(val(b$(1)))
+End If
+Else
+
+
+If val(b$(1)) = 0 Then
+Set vvl = New mArray
+ElseIf Typename$(var(val(b$(1)))) = "Empty" Then
+Else
+Set vvl = var(val(b$(1)))
+
+End If
+k.PokeItem j, b$(0) + ")"
+ k.PokeItem j + 1, vvl
+Set vvl = Nothing
+
+
+End If
+BI = BI + 1
+Next j
+Set CopyGroup0Obj = k
+
+End Function
+Public Function CopyGroup1(mg As Variant, usethisk As Variant) As Object
+Dim mgroup As Group, grgroup As Group
+Set mgroup = mg
+Dim name$, k As Group, i As Long, j As Long, s$, v As Variant, W3 As Long
+Dim b$(), vvl As Variant, delme As Document, myArray As mArray, mySecondArray As mArray
+Dim c$(), arrIndex As Long, choose$
+If TypeOf usethisk Is Group Then
+Set k = usethisk
+Else
+Set k = New Group
+End If
+'Set mgroup.LinkRef = Nothing
+'Set k.Sorosref = mgroup.soros.Copy
+
+Dim BI As Long
+BI = 1
+i = mgroup.soros.Total
+If Not k.IamFloatGroup Then Exit Function
+'k.BeginFloat2 i + 2
+k.PokeItem 0, "Variables-Arrays"
+'k.PokeItem 1, i
+
+For j = 2 To i * 2 + 1 Step 2
+'Debug.Print k.soros.StackItem(BI)
+b$() = Split(mgroup.soros.StackItem(BI), " ")
+If Right$(b$(0), 1) = ")" Then
+b$(0) = Left$(b$(0), Len(b$(0)) - 1)
+
+End If
+If Right$(b$(0), 1) <> "(" Then
+
+'k.PokeItem j, b$(0)
+
+If Typename(var(val(b$(1)))) = doc Then 'preserve Documents
+
+ElseIf Typename(var(val(b$(1)))) = "Group" Then
+vvl = -1
+
+k.PeekItem j + 1, vvl
+Set CopyGroup1 = CopyGroup1(var(val(b$(1))), vvl)
+
+ElseIf Typename(var(val(b$(1)))) = "mHandler" Then
+'CopyHandler var(val(b$(1))), bstack
+Set vvl = CopyHandlerObj(var(val(b$(1))))
+k.PokeItem j + 1, vvl
+Else
+k.PokeItem j + 1, var(val(b$(1)))
+End If
+Else
+
+
+If val(b$(1)) = 0 Then
+Set vvl = New mArray
+ElseIf Typename$(var(val(b$(1)))) = "Empty" Then
+Else
+Set vvl = var(val(b$(1)))
+
+End If
+k.PokeItem j, b$(0) + ")"
+ k.PokeItem j + 1, vvl
+Set vvl = Nothing
+
+
+End If
+BI = BI + 1
+Next j
+Set CopyGroup1 = k
+End Function
 Sub UnFloatGroup(bstack As basetask, what$, i As Long, myobject As Object, Optional glob As Boolean = False, Optional Temp As Boolean = False)
 'temp = False
 While Right$(what$, 1) = "."
@@ -31306,9 +31723,7 @@ With myobject
                                             End If
                             GoTo conthere2
                             ElseIf Typename(vvl) = "mHandler" Then
-                            CopyHandler vvl, bstack
-                            Set vvl = bstack.lastobj
-                            Set bstack.lastobj = Nothing
+                            Set vvl = CopyHandlerObj(vvl)
                             GoTo conthere1
                             ElseIf Typename(vvl) = "mEvent" Then
                             CopyEvent vvl, bstack
@@ -31656,9 +32071,7 @@ If myobject Is Nothing Then GoTo exithere1
                                                         
                                                                     
                                                                     If Typename(vvl) = "mHandler" Then
-                                                                    CopyHandler vvl, bstack
-                                                                    Set vvl = bstack.lastobj
-                                                                    Set bstack.lastobj = Nothing
+                                                                    Set vvl = CopyHandlerObj(vvl)
                                                                     ElseIf Typename(vvl) = "mEvent" Then
                                                                     
                                                                     CopyEvent vvl, bstack
@@ -32321,7 +32734,27 @@ End If
 
 End Function
 Function procMotionW(bstack As basetask, rest$) As Boolean
-Dim x As Double, y As Double
+Dim x As Double, y As Double, myform As GuiM2000, where As Long
+If TypeOf bstack.Owner Is GuiM2000 Then
+
+Set myform = bstack.Owner
+where = FindFormSScreen(myform)
+  If Not IsExp(bstack, rest$, x) Then x = myform.Left
+    If FastSymbol(rest$, ",") Then
+        If Not IsExp(bstack, rest$, y) Then procMotionW = False: Exit Function
+        Else
+        
+        y = myform.Top
+    End If
+    If FastSymbol(rest$, ";") Then
+    x = ((ScrInfo(where).width - 1) - myform.width) / 2 + ScrInfo(where).Left
+    y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).Top
+    If x < ScrInfo(where).Left Then x = ScrInfo(where).Left
+    If y < ScrInfo(where).Top Then y = ScrInfo(where).Top
+    End If
+    
+myform.Move x, y
+Else
 If Not Form1.Visible Then Exit Function
 procMotionW = True
 Form1.Visible = True
@@ -32354,6 +32787,8 @@ Console = FindFormSScreen(Form1)
     If FastSymbol(rest$, ";") Then
     x = ((ScrInfo(Console).width - 1) - Form1.width) / 2 + ScrInfo(Console).Left
     y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
+    If x < ScrInfo(where).Left Then x = ScrInfo(where).Left
+    If y < ScrInfo(where).Top Then y = ScrInfo(where).Top
     If IsWine Then Form1.Visible = False
         If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
         If IsWine Then
@@ -32370,6 +32805,7 @@ Form1.Up
 If IsWine Then Sleep 10
 
 'Form1.Refresh
+End If
 End If
 End Function
 Function procLineSpace(bstack As basetask, rest$) As Boolean
@@ -32864,7 +33300,8 @@ Dim W3 As Long, W4 As Long, sx As Double, adjustlinespace As Boolean, SZ As Sing
 Dim monitor As Long
 
 Set scr = basestack.Owner
-monitor = FindFormSScreenCorner(scr)
+'monitor = FindFormSScreen(scr)
+
 Dim basketcode As Long, mAddTwipsTop As Long
 
 
@@ -32934,9 +33371,9 @@ End If
 If FastSymbol(rest$, ";") And scr.name = "DIS" Then
 adjustlinespace = False
 If IsWine Then
-    Form1.Move ScrInfo(monitor).Left, ScrInfo(monitor).Top, ScrInfo(monitor).width - 1, ScrInfo(monitor).Height - 1
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
 Else
-    Form1.Move ScrInfo(monitor).Left, ScrInfo(monitor).Top, ScrInfo(monitor).width, ScrInfo(monitor).Height
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width, ScrInfo(Console).Height
 End If
     Form1.BackColor = players(-1).Paper
     
@@ -33018,32 +33455,30 @@ End If
 ElseIf FastSymbol(rest$, ";") And scr.name = "DIS" Then
 
 If IsWine Then Form1.Visible = False
-If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(monitor).Top
-If IsWine And True Then
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
+If IsWine Then
 Sleep 10
 Form1.Up
 
- Form1.Move ScrInfo(monitor).Left, ScrInfo(monitor).Top, ScrInfo(monitor).width - 1, ScrInfo(monitor).Height - 1
+ Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
+ Form1.Up
     Form1.Cls
-   
-        Form1.Visible = True
-        
- If Not (Form1.Left = ScrInfo(monitor).Left) Or Not (Form1.Top = ScrInfo(monitor).Top) Then
-        
-        Form1.Move Form1.Left, , scr.width - Form1.Left, scr.Height - Form1.Top
-        Form1.Cls
-        Form1.Move Form1.Left, , scr.width - Form1.Left, scr.Height - Form1.Top
-        
-        With players(GetCode(scr))
-        FrameText scr, .SZ, scr.width + ScrInfo(monitor).Left - Form1.Left, scr.Height + ScrInfo(monitor).Top - Form1.Top, .Paper, True
-        
-        Form1.Move Form1.Left, , scr.width - Form1.Left, scr.Height - Form1.Top
-        
-        End With
 
-        End If
+        Form1.Visible = True
+        Sleep 40
+        Form1.Up
+  
+  ''monitor = FindFormSScreen(Form1)
+ If Not (Form1.Left = ScrInfo(Console).Left) Or Not (Form1.Top = ScrInfo(Console).Top) Then
+ 
+ 
+         Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
+        Form1.Cls
+          Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
+
+   End If
 Else
-    Form1.Move ScrInfo(monitor).Left, ScrInfo(monitor).Top, ScrInfo(monitor).width, ScrInfo(monitor).Height
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width, ScrInfo(Console).Height
     
 End If
 Form1.BackColor = players(-1).Paper
@@ -33060,12 +33495,12 @@ ElseIf scr.name = "DIS" Then
 W3 = Form1.Left + scr.Left
 W4 = Form1.Top + scr.Top
 If IsWine Then Form1.Visible = False
-If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(monitor).Top: W4 = Form1.Top + scr.Top
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top: W4 = Form1.Top + scr.Top
 If IsWine Then
     Sleep 10
     Form1.Up
     scr.Move 0, 0
-    Form1.Move ScrInfo(monitor).Left, ScrInfo(monitor).Top, ScrInfo(monitor).width - 1, ScrInfo(monitor).Height - 1
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
     Form1.Cls
     Form1.Up
     Sleep 10
@@ -33260,12 +33695,12 @@ vH_title$ = s$
            
                 Form4.Show , Form1
                 
-                MyForm Form4, ScrInfo(Console).width - CLng(x * Helplastfactor), ScrInfo(Console).Height - CLng(y * Helplastfactor), CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, 1  'Helplastfactor
+                myform Form4, ScrInfo(Console).width - CLng(x * Helplastfactor), ScrInfo(Console).Height - CLng(y * Helplastfactor), CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, 1  'Helplastfactor
                 HelpLastWidth = x
         ElseIf i <> 0 Then
                 Form4.Show , Form1
                 
-                MyForm Form4, Form4.Left, Form4.Top, CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
+                myform Form4, Form4.Left, Form4.Top, CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
         End If
        
         Form4.Line (0, 0)-(Form4.ScaleWidth - dv15, Form4.ScaleHeight - dv15), Form4.BackColor, BF
@@ -34387,9 +34822,14 @@ Dim subs As Long, snames As Long, VName As Long, vvv As Variant, S3 As Long
 
 Dim subspoint As Boolean
 'LastErName = VbNullString: LastErNameGR = VbNullString
-
+If CurrentStackSize > stacksize Then
+    MyEr "Function's Stack is Full - 15", "Η στοίβα των συναρτήσεων έχει γεμίσει - 15"
+    ProcModuleEntry = False:
+    here$ = ohere$
+    Exit Function
+End If
 ' ******************************************* module entry..............
-
+If x1 = 0 Then x1 = basestack.callx1: ohere$ = basestack.callohere: basestack.callx1 = 0
 i = 1
         Set bs = New basetask
        With bs
@@ -35102,6 +35542,7 @@ End With
 End Function
 
 Function executeblock(Exec As Long, bstack As basetask, b$, once As Boolean, kolpo As Boolean, Optional stepbystep As Boolean = False) As Boolean
+' MsgBox CurrentStackSize()
 executeblock = True
 'bstack.LastComm = VbNullString
 Dim i As Long, ec$, ec1$, LL As Long, oldLL As Long, bb$, p As Double, x2 As Long, y2 As Long, monce As Long, W3 As Long, removebracket As Boolean
@@ -35224,15 +35665,6 @@ ALFA12:
                                          Exec = 2
                                         b$ = bb$
                                         Exit Function
-                                        'ElseIf bstack.RetStack.StackItemType(1) = "S" Then
-                                       ' If InStr(bstack.RetStack.StackItem(1), " ") = 0 Then
-                                       ' bstack.RetStack.drop 2
-                                       ' Exec = 2
-                                       ' b$ = bb$
-                                       ' Exit Function
-                                        
-                                        'End If
-                                        
                                         End If
                                         End If
                                                 i = 1
@@ -35250,7 +35682,6 @@ from123:
                                                         bstack.IsInRetStackNumber p
                                                         If p < 0 Then
                                                         Exec = 0
-                                                      '  Stop
                                                       If RetStackSize <> bstack.RetStackTotal Then
                                                         MyEr "Problem in return stack", "Πρόβλημα στο σωρό επιστροφής"
                                                       End If
@@ -36177,7 +36608,7 @@ wwPlain bstack, players(prive), txt$, scr.width, 100000, True
 If players(prive).curpos > 0 Then crNew bstack, players(prive)
 End Sub
 Sub ProcWindow(bstack As basetask, rest$, scr As Object, ifier As Boolean)
-Dim x1 As Long, y1 As Long, p As Double
+Dim x1 As Long, y1 As Long, p As Double, useScreen As Long
 If scr.name = "GuiM2000" Then
     Else
 If scr.name = "Form1" Then
@@ -36196,36 +36627,49 @@ If .double Then SetNormal scr
             If FastSymbol(rest$, ",") Then
                 If IsExp(bstack, rest$, p) Then
                     x1 = CLng(p)
+again:
                     If x1 >= 0 And x1 <= DisplayMonitorCount - 1 And scr.name = "DIS" Then
+                    
                     Console = x1
                     If Not Form1.WindowState = 0 Then Form1.WindowState = 0: Form1.Refresh
-                    
-                    If IsWine Then Form1.Visible = False
+                     
+                    If IsWine Then Form1.Visible = False: Form1.Left = ScrInfo(Console).Left: Form1.Top = ScrInfo(Console).Top
                     If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
                     If IsWine Then
                     SleepWait3 10
-                    Form1.Up
+                      Form1.Up
                     End If
-                    Form1.Top = ScrInfo(Console).Top
-                    Form1.Move ScrInfo(Console).Left, Form1.Top, ScrInfo(Console).width, ScrInfo(Console).Height - Form1.Top
+                     
+                  
+                    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).width - 1, ScrInfo(Console).Height - 1
                     If IsWine Then
+                    Sleep 10
+                    Form1.Up
                     Form1.Visible = True
+                    Form1.Move ScrInfo(Console).Left + 1, ScrInfo(Console).Top + 1
                     End If
                     FrameText scr, .SZ, CLng(Form1.width), CLng(Form1.Height), .Paper
                     players(-1).MAXXGRAPH = .MAXXGRAPH
                     players(-1).MAXYGRAPH = .MAXYGRAPH
+                   ' Console = FindFormSScreen(Form1)
                     Exit Sub
-        Else
+        ElseIf x1 > 3000 Then
+        
                     y1 = CLng(x1 * ScrInfo(Console).Height / ScrInfo(Console).width)
+            Else
+                
+                x1 = 0
+                 GoTo again
         End If
 End If
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = CLng(p)
 End If
 If scr.name = "GuiM2000" Then
+useScreen = FindMonitorFromMouse
  Set scr.Picture = LoadPicture("")
                If FastSymbol(rest$, ";") Then 'CENTER
                             FrameText scr, .SZ, x1, y1, .Paper, True
-                            scr.Move (ScrInfo(Console).width - .MAXXGRAPH) / 2, (ScrInfo(Console).Height - .MAXYGRAPH) / 2
+                            scr.Move (ScrInfo(useScreen).width - .MAXXGRAPH) / 2, (ScrInfo(useScreen).Height - .MAXYGRAPH) / 2
                             
                 Else
                 If x1 = 0 Then x1 = 14000
@@ -36252,21 +36696,26 @@ ElseIf scr.name = "dSprite" Then
 Else
     If FastSymbol(rest$, ";") Then 'CENTER
         Form1.WindowState = 0
-        If IsWine Then Form1.Visible = False
+        If IsWine And Not ttl Then Form1.Visible = False
         If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
-    
-        
         FrameText scr, .SZ, x1, y1, .Paper
       ''  Form1.Move 0, 0
-        Form1.Move (ScrInfo(Console).width - .MAXXGRAPH) / 2, (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        Form1.Move ScrInfo(Console).Left + (ScrInfo(Console).width - .MAXXGRAPH) / 2, ScrInfo(Console).Top + (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        
+        If IsWine Then 'SleepWait3 10
         Form1.Cls
-        If IsWine Then SleepWait3 10
+        If Not ttl Then Form1.Visible = True
         Form1.Up
-        If Not (Form1.Top = (ScrInfo(Console).Height - .MAXYGRAPH) / 2) Or Not (Form1.Left = (ScrInfo(Console).width - .MAXXGRAPH) / 2) Then
-        Form1.Move (ScrInfo(Console).width - .MAXXGRAPH) / 2, (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        Form1.Move ScrInfo(Console).Left + (ScrInfo(Console).width - .MAXXGRAPH) / 2, ScrInfo(Console).Top + (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        
         End If
+        Form1.Up
+        
+        'If Not (Form1.Top = (ScrInfo(Console).Height - .MAXYGRAPH) / 2) Or Not (Form1.Left = (ScrInfo(Console).width - .MAXXGRAPH) / 2) Then
+        'Form1.Move (ScrInfo(Console).width - .MAXXGRAPH) / 2, (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+        'End If
         scrMove00 scr
-        If IsWine Then Form1.Visible = True
+        ''''If IsWine Then Form1.Visible = True
        '''' Form1.follow IEX, IEY
         
         If ttl Then
@@ -36276,16 +36725,16 @@ Else
         End If
     Else
         Form1.WindowState = 0
-If IsWine Then Form1.Visible = False
-If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
-If IsWine Then
-SleepWait3 10
-Form1.Up
-End If
+        If IsWine Then Form1.Visible = False
+        If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
+        If IsWine Then
+            SleepWait3 10
+            Form1.Up
+        End If
         FrameText scr, .SZ, x1, y1, .Paper
         Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, .MAXXGRAPH, .MAXYGRAPH
         
-        If IsWine Then
+        If IsWine Then ' 88888888888888888888
         Form1.Cls
         Form1.Visible = True
         End If
@@ -36819,7 +37268,7 @@ tr = trace
 extr = extreme
 extreme = True
 If Rnd * 100 > 3 Then trace = False
-Dim N$, F$, F1$, bb As mStiva, uIndex As Long
+Dim N$, F$, f1$, bb As mStiva, uIndex As Long
 Dim bstack As basetask
 Set bstack = New basetask
 Set bstack.Owner = Form1.DIS
@@ -36833,7 +37282,7 @@ bstack.soros.DataVal CDbl(uIndex)
 uIndex = 1
 End If
 uIndex = uIndex + 1
-F1$ = gui.modulename$
+f1$ = gui.modulename$
 bstack.soros.DataObj gui
 
 Dim j As Long, k As Long, s1$, klm As Long, s2$
@@ -36852,7 +37301,7 @@ If a.enabled Then
             N$ = "Data " + N$ + " : ShiftBack Stack.Size" + vbCrLf
             End If
             End If
-            If F1$ <> "" Then F$ = myUcase(F1$ + "." + F$ + ")", True) Else F$ = myUcase(F$ + ")", True)
+            If f1$ <> "" Then F$ = myUcase(f1$ + "." + F$ + ")", True) Else F$ = myUcase(F$ + ")", True)
             If Not GetSub(F$, klm) Then
             PopStage bstack: CallEventFromGuiOne = False: GoTo conthere
             End If
@@ -36860,7 +37309,7 @@ If a.enabled Then
             If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
             End If
-            If F1$ <> "" Then s1$ = N$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
+            If f1$ <> "" Then s1$ = N$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
             If Execute(bstack, s1$, False, False) <> 1 Then
             bstack.soros.Flush
                 PopStage bstack
@@ -36888,7 +37337,7 @@ extr = extreme
 extreme = True
 tr = trace
 If Rnd * 100 > 3 Then trace = False
-Dim N$, F$, F1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
+Dim N$, F$, f1$, bb As mStiva, oldbstack As mStiva, nowtotal As Long
 Dim bstack As basetask
 Set bstack = New basetask
 Set bstack.Owner = Form1.DIS
@@ -36896,7 +37345,7 @@ bstack.IamAnEvent = True
 Dim i As Long
 If a Is Nothing Then GoTo conthere0
 i = a.VarIndex
-F1$ = gui.modulename$
+f1$ = gui.modulename$
 Set oldbstack = bstack.soros
 Dim j As Long, k As Long, s1$, klm As Long, s2$
 Dim ohere$
@@ -36931,7 +37380,7 @@ Set bstack.Sorosref = bb
             N$ = Left$(N$, Len(N$) - 1)
             If N$ <> "" Then N$ = "Push " + N$ + vbCrLf
          End If
-            If F1$ <> "" Then F$ = myUcase(F1$ + "." + F$ + ")", True) Else F$ = myUcase(F$ + ")", True)
+            If f1$ <> "" Then F$ = myUcase(f1$ + "." + F$ + ")", True) Else F$ = myUcase(F$ + ")", True)
   
             If Not GetSub(F$, klm) Then PopStage bstack: bb.Flush: CallEventFromGuiNow = False: GoTo conthere
             '' look for '11001EDIT
@@ -36939,7 +37388,7 @@ Set bstack.Sorosref = bb
             If Left$(s1$, 10) = "'11001EDIT" Then
             SetNextLine s1$
             End If
-            If F1$ <> "" Then s1$ = N$ + "Module " + F1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
+            If f1$ <> "" Then s1$ = N$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
             
           
             
@@ -43222,11 +43671,13 @@ With bstack.Owner
     it = .FontItalic
     .FontItalic = 0
     notweak = True
+    MoveFormToOtherMonitorOnly TweakForm
     If Not Form1.Visible Then
     TweakForm.Show , Form5
     Else
     TweakForm.Show 1, Form1
     End If
+   
     If Not notweak Then
         Form1.myBreak bstack
         Original bstack, ""
@@ -44619,7 +45070,7 @@ If FastSymbol(rest$, "#") Then
     End If
     MyLineInput = True
     If uni(F) Then
-    If Not getUniStringlINE(F, s$) Then MyLineInput = False: MyEr "Can;t input, not UTF16LE", "Δεν μπορώ να εισάγω, όχι UTF16LE": Exit Function
+    If Not getUniStringlINE(F, s$) Then MyLineInput = False: MyEr "Can't input, not UTF16LE", "Δεν μπορώ να εισάγω, όχι UTF16LE": Exit Function
     Else
     getAnsiStringlINE F, s$
     End If
@@ -46506,10 +46957,10 @@ ProcRecursionLimit = True
 If IsExp(basestack, rest$, p) Then
 deep = Abs(MyRound(p))
 If IsSymbol(rest$, ",") Then
-If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p))
+If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p))  ' obsolate
 End If
 ElseIf IsSymbol(rest$, ",") Then
-If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p))
+If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p)) ' obsolate
 Else
 prive = GetCode(basestack.Owner)
     If deep = 0 Then
@@ -46523,11 +46974,19 @@ prive = GetCode(basestack.Owner)
     If lang = 1 Then
         PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR SUBRUTINES " + CStr(deep)
          crNew basestack, players(prive)
-        PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR FUNCTIONS " + CStr(funcdeep)
+         If m_bInIDE Then
+         PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR FUNCTIONS " + CStr(stacksize \ 2948 - 1)
+         Else
+        PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR FUNCTIONS " + CStr(stacksize \ 9832 - 1)
+        End If
     Else
         PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΡΟΥΤΙΝΕΣ " + CStr(deep)
          crNew basestack, players(prive)
-        PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ " + CStr(funcdeep)
+          If m_bInIDE Then
+          PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ " + CStr(stacksize \ 2948 - 1)
+          Else
+        PlainBaSket basestack.Owner, players(prive), "ΟΡΙΟ ΑΝΑΔΡΟΜΗΣ ΣΤΙΣ ΣΥΝΑΡΤΗΣΕΙΣ " + CStr(stacksize \ 9832 - 1)
+        End If
     End If
     End If
       '  PlainBaSket basestack.Owner, players(prive), CStr(deep)
@@ -48155,7 +48614,7 @@ ArrBase = usethisbase
                             If Typename(basestack.lastobj) = "Group" Then
                             If basestack.lastobj.IamSuperClass Then
 
-                            pppp.CopyGroup basestack.lastobj.SuperClassList, pppp.GroupRef
+                            pppp.CopyGroupObj basestack.lastobj.SuperClassList, pppp.GroupRef
                                 Set pppp.GroupRef = basestack.lastobj.SuperClassList
                                 Set pppp.GroupRef.SuperClassList = basestack.lastobj.SuperClassList
                             Else
@@ -48202,7 +48661,7 @@ ArrBase = usethisbase
                                                      pppp.IHaveClass = False
                                                      If basestack.lastobj.IamSuperClass Then
                                                     Dim myobj As Object
-                                          pppp.CopyGroup basestack.lastobj.SuperClassList, myobj
+                                          pppp.CopyGroupObj basestack.lastobj.SuperClassList, myobj
                         
                                               Set myobj.SuperClassList = basestack.lastobj.SuperClassList
                                               Set pppp.item(i) = myobj
@@ -48313,7 +48772,7 @@ ArrBase = usethisbase
                                 pppp.FillLambda basestack
     ElseIf Typename(basestack.lastobj) = "Group" Then
                                    If basestack.lastobj.IamSuperClass Then
-                              pppp.CopyGroup basestack.lastobj.SuperClassList, pppp.GroupRef
+                              pppp.CopyGroupObj basestack.lastobj.SuperClassList, pppp.GroupRef
                                 Set pppp.GroupRef = basestack.lastobj.SuperClassList
                                 Set pppp.GroupRef.SuperClassList = basestack.lastobj.SuperClassList
                             Else
@@ -48832,7 +49291,6 @@ Dim v$
     CopyLambda ob, bstack
     rValue = 0
     ElseIf v$ = "mHandler" Then
-    
     CopyHandler ob, bstack
     rValue = 0
     ElseIf v$ = "mArray" Then
@@ -48932,12 +49390,12 @@ Set GetAnewEvent = bb
 End Function
 Public Function CallEventFromCOM(evCom As ComShinkEvent, aString$, what$, NumVar As Long, vrs(), exclude As Boolean) As Boolean
 Dim tr As Boolean, extr As Boolean, olescok As Boolean
-Dim F$, F1$, klm As Long
+Dim F$, f1$, klm As Long
 'olescok = escok
 'escok = False
 CallEventFromCOM = True
-F1$ = evCom.modulename$
-F$ = UCase(F1$ + "_" + aString$ + "()") ' No greek
+f1$ = evCom.modulename$
+F$ = UCase(f1$ + "_" + aString$ + "()") ' No greek
 'Debug.Print f$
 If Not subHash.Find(F$, klm) Then exclude = True: Exit Function
 extr = extreme
@@ -48951,7 +49409,7 @@ Set bstack.Owner = Form1.DIS
 bstack.IamAnEvent = True
 Dim i As Long
 i = evCom.VarIndex
-F1$ = evCom.modulename$
+f1$ = evCom.modulename$
 Set oldbstack = bstack.soros
 Dim j As Long, k As Long, s1$, s2$
 Dim ohere$
@@ -49350,18 +49808,17 @@ Dim s1$, W3 As Long, v$
      If bstack.UseGroupname <> "" Then
      s1$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
      If GetVar(bstack, s1$, W3) Then
-          CopyGroup var(W3), bstack
+          Set bstack.lastobj = CopyGroupObj(var(W3))
      ElseIf GetVar(bstack, bstack.fHere + "." + s1$, W3) Then
-          CopyGroup var(W3), bstack
+          Set bstack.lastobj = CopyGroupObj(var(W3))
     End If
     Else
     s1$ = ".DELETEME"
     If IsLabel(bstack, s1$, v$) < 0 Then
     If Len(v$) = 8 Then Exit Function
     v$ = Left$(v$, Len(v$) - 9)
-     If GetVar(bstack, v$, W3) Then
-          CopyGroup var(W3), bstack
-          
+        If GetVar(bstack, v$, W3) Then
+            Set bstack.lastobj = CopyGroupObj(var(W3))
     End If
     End If
     End If
@@ -50435,7 +50892,12 @@ If InStr(part$, ".") > 0 Then
 End If
 End If
 ElseIf iRVAL22(part$) > 0 Then
+If InStr(part$, "][") = 0 Then
+GetName = "" 'part$
+Exit Function
+Else
 part$ = sbf(iRVAL22(part$)).goodname
+End If
 GoTo again
 End If
 
@@ -50521,6 +50983,24 @@ Loop
 Set fromthis = Nothing
 
 End Sub
-
-
-
+Function CurrentStackSize() As Double
+Dim endaddress As Long
+ua = startaddress
+UB = VarPtr(endaddress)
+CurrentStackSize = uintnew(ua) - uintnew(UB) - 300 ' - (1 - m_bInIDE) * 93
+End Function
+Function ClaimStack() As Long
+Static once11 As Boolean
+ClaimStack = findstack
+If once11 Then Exit Function
+once11 = True
+repeatme
+ClaimStack = findstack
+End Function
+Function repeatme()
+On Error GoTo there
+findstack = CurrentStackSize()
+On Error GoTo there
+repeatme
+there:
+End Function

@@ -276,7 +276,7 @@ If Count > 0 Then
     Select Case Typename(Me.item(0))
     Case "Group"
     Set obj = Me.item(0)
-    CopyGroup obj, obj2
+    CopyGroupObj obj, obj2
     Set k.item(0) = obj2
     Set obj2 = Nothing
     Case "lambda"
@@ -338,7 +338,7 @@ If IsObject(Me.item(i)) Then
 Select Case Typename(Me.item(i))
 Case "Group"
 Set obj = Me.item(i)
-CopyGroup obj, obj2
+CopyGroupObj obj, obj2
 Set k.item(i - 1) = obj2
 Set obj2 = Nothing
 Case "lambda"
@@ -395,7 +395,7 @@ If IsObject(Me.item(i)) Then
 Select Case Typename(Me.item(i))
 Case "Group"
 Set obj = Me.item(i)
-CopyGroup obj, obj2
+CopyGroupObj obj, obj2
 Set k.item(i + fromhere) = obj2
 Set obj2 = Nothing
 Case "lambda"
@@ -420,7 +420,7 @@ If IsObject(Me.item(i)) Then
 Select Case Typename(Me.item(i))
 Case "Group"
 Set obj = Me.item(i)
-CopyGroup obj, obj2
+CopyGroupObj obj, obj2
 Set k.item(i + fromhere) = obj2
 Set obj2 = Nothing
 Case Else
@@ -459,7 +459,7 @@ If IsObject(Me.item(i)) Then
 Select Case Typename(Me.item(i))
 Case "Group"
 Set obj = Me.item(i)
-CopyGroup obj, obj2
+CopyGroupObj obj, obj2
 Set k.item(i) = obj2
 Set obj2 = Nothing
 Case "lambda"
@@ -485,7 +485,7 @@ If IsObject(Me.item(i)) Then
 Select Case Typename(Me.item(i))
 Case "Group"
 Set obj = Me.item(i)
-CopyGroup obj, obj2
+CopyGroupObj obj, obj2
 Set k.item(i) = obj2
 Set obj2 = Nothing
 Case "lambda"
@@ -820,7 +820,7 @@ If dnum > 0 Then
 Dim i As Long
 If IHaveClass Then
 For i = 0 To maxitems - 1
-CopyGroup GroupRef, aa
+CopyGroupObj GroupRef, aa
 Set actualdata(i) = aa
 Next i
 Else
@@ -852,7 +852,7 @@ Dim aa As Object
 Set aa = New Group
 Set var = aa
 End Sub
-Sub CopyGroup(myobject As Object, myobject2 As Object)
+Sub CopyGroupObj(myobject As Object, myobject2 As Object)
 'Special Copy
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
@@ -867,7 +867,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                     .PeekItem x1, vvl
                     If Typename(vvl) = "Group" Then
                     Set subgroup = vvl
-                    CopyGroup subgroup, sub2
+                    CopyGroupObj subgroup, sub2
                     Set subgroup = Nothing
                     Set vvl = sub2
                     Set sub2 = Nothing
@@ -923,13 +923,13 @@ Next j
 GetAnyName$ = ChrW(&H1FFF) + ss$
 End Function
 Function MyIsNumeric(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
-If n < 2 Then Exit Function
-MyIsNumeric = n < 8
+Dim N As Integer
+GetMem2 VarPtr(v), N
+If N < 2 Then Exit Function
+MyIsNumeric = N < 8
 End Function
 Function MyIsObject(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
-MyIsObject = n = 9
+Dim N As Integer
+GetMem2 VarPtr(v), N
+MyIsObject = N = 9
 End Function

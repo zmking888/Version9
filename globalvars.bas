@@ -86,12 +86,13 @@ If inUse Then OpenColor = False: Exit Function
 inUse = True
 ExpandWidth = True
 ReturnColor = thiscolor
-MoveFormToOtherMonitor ColorDialog
+
 If Thisform Is Nothing Then
 ColorDialog.Show
 Else
 ColorDialog.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly ColorDialog, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not ColorDialog.Visible Then
     ColorDialog.Visible = True
@@ -107,12 +108,13 @@ Public Function OpenFont(bstack As basetask, Thisform As Object) As Boolean
 If inUse Then OpenFont = False: Exit Function
 inUse = True
 ExpandWidth = True
-MoveFormToOtherMonitor FontDialog
+
 If Thisform Is Nothing Then
 FontDialog.Show
 Else
 FontDialog.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly FontDialog, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not FontDialog.Visible Then
     FontDialog.Visible = True
@@ -155,12 +157,13 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
-MoveFormToOtherMonitor LoadFile
+
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -204,12 +207,13 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
-MoveFormToOtherMonitor LoadFile
+
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -257,12 +261,13 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
-MoveFormToOtherMonitor LoadFile
+
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
  CancelDialog = False
  If Not LoadFile.Visible Then
     LoadFile.Visible = True
@@ -318,12 +323,13 @@ ReturnFile = vbNullString
 Else
 TopFolder = TopDir
 End If
-MoveFormToOtherMonitor LoadFile
+
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
 End If
+MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
     LoadFile.Visible = True

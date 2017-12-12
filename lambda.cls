@@ -94,18 +94,18 @@ Sub CopyFromVar(bstack As basetask, v() As Variant)
 Dim i As Long, aa As Group
 bstack.IamLambda = False
 refcount = refcount - 1
+' maybe not needed
+Set bstack.lastobj = Nothing
 If refcount = 0 Then
 For i = 0 To used - 1
+' check if is better with MyIsObject
     If IsObject(v(myVar(i).there)) Then
         If Typename(myVar(where).Value) = "Group" Then
-       
-             ' using copygroup from module1
-            Set bstack.lastobj = Nothing
-            CopyGroup v(myVar(i).there), bstack
-            Set myVar(where).Value = bstack.lastobj
+            Set myVar(where).Value = CopyGroupObj(v(myVar(i).there))
+            ' why not  Set v(myVar(i).there) = Nothing
         Else
-        Set myVar(i).Value = v(myVar(i).there)
-        Set v(myVar(i).there) = Nothing
+            Set myVar(i).Value = v(myVar(i).there)
+            Set v(myVar(i).there) = Nothing
         End If
         
     Else

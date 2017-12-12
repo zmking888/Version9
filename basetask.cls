@@ -14,6 +14,8 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
+Public callx1 As Long
+Public callohere As String
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
 Public finalFlag As Boolean
@@ -150,40 +152,40 @@ If Not StaticCollection.Find(name$) Then Exit Function
             End With
    AlterVar = True
 End Function
-Function MyRound(ByVal X, Optional d As Double = 0) As Double
+Function MyRound(ByVal x, Optional d As Double = 0) As Double
 Dim i, N
   i = Abs(Int(d)): If i > 13 Then i = 13
-  N = Sgn(X) * 0.5
+  N = Sgn(x) * 0.5
 
 Select Case i
 Case 0
-MyRound = Fix(X + N)
+MyRound = Fix(x + N)
 Case 1
-MyRound = Fix(X * 10# + N) / 10#
+MyRound = Fix(x * 10# + N) / 10#
 Case 2
-MyRound = Fix(X * 100# + N) / 100#
+MyRound = Fix(x * 100# + N) / 100#
 Case 3
-MyRound = Fix(X * 1000# + N) / 1000#
+MyRound = Fix(x * 1000# + N) / 1000#
 Case 4
-MyRound = Fix(X * 10000# + N) / 10000#
+MyRound = Fix(x * 10000# + N) / 10000#
 Case 5
-MyRound = Fix(X * 100000# + N) / 100000#
+MyRound = Fix(x * 100000# + N) / 100000#
 Case 6
-MyRound = Fix(X * 1000000# + N) / 1000000#
+MyRound = Fix(x * 1000000# + N) / 1000000#
 Case 7
-MyRound = Fix(X * 10000000# + N) / 10000000#
+MyRound = Fix(x * 10000000# + N) / 10000000#
 Case 8
-MyRound = Fix(X * 100000000# + N) / 100000000#
+MyRound = Fix(x * 100000000# + N) / 100000000#
 Case 9
-MyRound = Fix(X * 1000000000# + N) / 1000000000#
+MyRound = Fix(x * 1000000000# + N) / 1000000000#
 Case 10
-MyRound = Fix(X * 10000000000# + N) / 10000000000#
+MyRound = Fix(x * 10000000000# + N) / 10000000000#
 Case 11
-MyRound = Fix(X * 100000000000# + N) / 100000000000#
+MyRound = Fix(x * 100000000000# + N) / 100000000000#
 Case 12
-MyRound = Fix(X * 1000000000000# + N) / 1000000000000#
+MyRound = Fix(x * 1000000000000# + N) / 1000000000000#
 Case 13
-MyRound = Fix(X * 10000000000000# + N) / 10000000000000#
+MyRound = Fix(x * 10000000000000# + N) / 10000000000000#
 End Select
 End Function
 Public Function ExistVar(ByVal name$) As Boolean

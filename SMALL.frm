@@ -30,11 +30,18 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
+Private Enum BOOL
+    FALSE 
+    TRUE 
+End Enum
+#If False Then
+    Dim FALSE , TRUE 
+#End If
 Private hideme As Boolean
 Private foundform5 As Boolean
 Private reopen4 As Boolean, reopen2 As Boolean
+'Private Declare Function SetForegroundWindow Lib "user32" (ByVal hwnd As Long) As Long
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
-
 Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As Long) As Long
 
 
@@ -125,20 +132,27 @@ If AskOk$ = vbNullString Then AskOk$ = "OK"
 If Form1.Visible Then
 MyDoEvents1 Form1
 Sleep 1
-MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show , Form1
+'If IsWine Then
+'MoveFormToOtherMonitorCenter NeoMsgBox
+'Else
+MoveFormToOtherMonitorOnly NeoMsgBox
+
+
+
 Else
 If TypeOf bstack.Owner Is GuiM2000 Then
-MoveFormToOtherMonitor NeoMsgBox
+
 NeoMsgBox.Show , bstack.Owner
+MoveFormToOtherMonitorOnly NeoMsgBox, True
 ElseIf form5iamloaded Then
 MyDoEvents1 Form5
 Sleep 1
-MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show , Form5
+MoveFormToOtherMonitorOnly NeoMsgBox, True
 Else
-MoveFormToOtherMonitor NeoMsgBox
 NeoMsgBox.Show
+MoveFormToOtherMonitorOnly NeoMsgBox, True
 End If
 End If
 On Error Resume Next
@@ -211,20 +225,20 @@ NOEXECUTION = False
 Wend
 BLOCKkey = False
 AskTitle$ = vbNullString
-Dim z As Form
- Set z = Nothing
+Dim Z As Form
+ Set Z = Nothing
 
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
             If Not x.Enablecontrol Then x.TestModal mycode
-          If x.Enablecontrol Then Set z = x
+          If x.Enablecontrol Then Set Z = x
             End If
             Next x
              Set x = Nothing
-          If Typename(z) = "GuiM2000" Then
-            z.ShowmeALL
-            z.SetFocus
-            Set z = Nothing
+          If Typename(Z) = "GuiM2000" Then
+            Z.ShowmeALL
+            Z.SetFocus
+            Set Z = Nothing
           End If
           ModalId = oldcodeid
 If INFOONLY Then
@@ -246,9 +260,9 @@ If Not bstack.Owner Is Nothing Then
 If bstack.Owner.Visible Then
 If bstack.Owner.name = "DIS" Then
 If Form1.Visible Then Form1.SetFocus
+End If
 Else
 bstack.Owner.SetFocus
-End If
 End If
 End If
   escok = oldesc
@@ -440,7 +454,7 @@ End Sub
 
 Private Sub Timer1_Timer()
 ' On Error Resume Next
-Dim x As Form, z As Long
+Dim x As Form, Z As Long
 If DIALOGSHOW Or ASKINUSE Or ModalId <> 0 Then
 Timer1.enabled = False
 Exit Sub
@@ -455,7 +469,7 @@ Form5.Visible = True
 End If
 If Not ttl Then
 ttl = True
-z = Form1.Top
+Z = Form1.Top
 Form1.Top = ScrInfo(Console).Top
 If Not IsSelectorInUse Then Form1.Show , Form5
 Else

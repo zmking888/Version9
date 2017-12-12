@@ -12,9 +12,9 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'class for call back
-
 Private objref As basetask
 Private mineHere$
+Private setstacklimit As Boolean
 Public Event ErrorAtt(ByRef recover As Variant)
 Dim locked As Boolean
 Friend Sub NoPublic(bstack As basetask, where$)
@@ -24,8 +24,25 @@ Friend Sub NoPublic(bstack As basetask, where$)
         Set objref.Owner = bstack.Owner
         mineHere$ = where$
 End Sub
+Public Sub StackMax(stack As Long)
+If m_bInIDE Then ClaimStack: Exit Sub
+If stack = -12345 Then stacksize = 32000000: Exit Sub
+If stack > 1000000 Then
+ stacksize = stack - 100000
+ findstack = stack
+Else
+ClaimStack
+If findstack - 100000 > 0 Then
+    stacksize = findstack - 100000
+End If
+End If
+End Sub
 Public Sub Cli(LoadFileAndSwitches$, Optional Prompt$ = ">")
 Dim ohere$
+If findstack = 0 Then ClaimStack
+If findstack - 100000 > 0 Then
+    stacksize = findstack - 100000
+End If
 If elevatestatus Then Exit Sub
 If basestack1.Owner Is Nothing Then Exit Sub
 elevatestatus = 1
@@ -79,7 +96,7 @@ If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.Top >= ScrY() Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
+If Form1.Top >= VirtualScreenHeight Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
 If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
@@ -236,6 +253,9 @@ NeoSubMain
 End Sub
 
 Private Sub Class_Initialize()
+Dim anyname As Long
+startaddress = VarPtr(anyname)
+stacksize = 900000
  If Not l_complete Then NeoSubMain
         Set objref = New basetask
         Set objref.Owner = Form1.DIS

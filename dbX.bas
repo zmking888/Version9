@@ -75,7 +75,11 @@ Dim cd As String, doriginal$, monitor As Long
 d$ = Replace(d$, " ", ChrW(160))
 On Error GoTo E5
 'ON ERROR GoTo 0
+If Not Form4.Visible Then
+monitor = FindFormSScreen(Form1)
+Else
 monitor = FindFormSScreen(Form4)
+End If
 If HelpLastWidth > ScrInfo(monitor).width Then HelpLastWidth = -1
 doriginal$ = d$
 d$ = Replace(d$, "'", "")

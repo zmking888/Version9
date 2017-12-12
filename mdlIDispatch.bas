@@ -87,7 +87,7 @@ Public Function CallByNameFixParamArray _
     ' New by George
      ' pargs2() the names of arguments
      ' fixnamearg = the number of named arguments
-    
+    Dim myform As Form
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
     Dim params      As IDispatch.DISPPARAMS
@@ -189,23 +189,26 @@ jumphere:
             lngRet = 0
            If UCase(pstrProcName) = "SHOW" Then
             CallByName pobjTarget, "ShowmeALl", VbMethod
-            
+        
            If items = 0 Then
            CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+               Set myform = pobjTarget
+            MoveFormToOtherMonitorOnly myform
            ElseIf varArr(0) = 0 Then
            CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+            Set myform = pobjTarget
+            MoveFormToOtherMonitorOnly myform
            pobjTarget.Modal = 0
            pobjTarget.Modal = 0
 
            Else
-           
                Dim oldmoldid As Double, mycodeid As Double
                oldmoldid = ModalId
                mycodeid = Rnd * 1000000
             
                pobjTarget.Modal = mycodeid
                
-               Dim x As Form, z As Form
+               Dim x As Form, Z As Form
                
                If Not pobjTarget.IamPopUp Then
                
@@ -229,6 +232,9 @@ jumphere:
            ModalId = mycodeid
       
            CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+            Set myform = pobjTarget
+            MoveFormToOtherMonitorOnly myform, True
+
            pobjTarget.Refresh
                 Do While ModalId <> 0 And pobjTarget.Visible
                   '  ProcTask2 basestack1
@@ -242,17 +248,17 @@ jumphere:
       Else
       ModalId = mycodeid
            End If
-        Set z = Nothing
+        Set Z = Nothing
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
            x.TestModal mycodeid
-          If x.Enablecontrol Then Set z = x
+          If x.Enablecontrol Then Set Z = x
             End If
             Next x
-          If Typename(z) = "GuiM2000" Then
-            z.ShowmeALL
-            z.SetFocus
-            Set z = Nothing
+          If Typename(Z) = "GuiM2000" Then
+            Z.ShowmeALL
+            Z.SetFocus
+            Set Z = Nothing
           End If
           ModalId = oldmoldid
            End If

@@ -165,8 +165,9 @@ x1 = x \ dv15
 y1 = y \ dv15
 Dim i As Long
 For i = 0 To UBound(ScrInfo())
-If ScrInfo(i).handler = MonitorFromPoint(x, y, MONITOR_DEFAULTTONEAREST) Then FindMonitorFromPixel = i: Exit Function
+If ScrInfo(i).handler = MonitorFromPoint(x1, y1, MONITOR_DEFAULTTONEAREST) Then FindMonitorFromPixel = i: Exit Function
 Next i
+
 End Function
 Function FindMonitorFromMouse()
 '
@@ -182,9 +183,9 @@ Next i
 End Function
 Sub MoveFormToOtherMonitor(F As Form)
 Dim k As Long, Z As Long
-k = FindMonitorFromPixel(F.Left, F.Top)
+'k = FindMonitorFromPixel(F.Left, F.Top)
 Z = FindMonitorFromMouse
-If k <> Z Then
+'If k <> Z Then
 ' center to z
 If F.width > ScrInfo(Z).width Then
     If F.Height > ScrInfo(Z).Height Then
@@ -196,9 +197,91 @@ If F.width > ScrInfo(Z).width Then
 ElseIf F.Height > ScrInfo(Z).Height Then
     F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top
 Else
-   F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
+ ' F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
 
 End If
-End If
+'End If
 End Sub
+Sub MoveFormToOtherMonitorOnly(F As Form, Optional flag As Boolean)
+Dim k As Long, Z As Long
+Dim nowX As Long, nowY As Long
+k = FindMonitorFromPixel(F.Left, F.Top)
+Z = FindMonitorFromMouse
+If k = Z Then
+If flag Then
+Dim tp As POINTAPI
+GetCursorPos tp
+nowX = tp.x * dv15
+nowY = tp.y * dv15
+flag = False
+Else
+flag = False
+nowX = F.Left - ScrInfo(k).Left + ScrInfo(Z).Left
+nowY = F.Top - ScrInfo(k).Top + ScrInfo(Z).Top
+'Exit Sub
+End If
+Else
+nowX = F.Left - ScrInfo(k).Left + ScrInfo(Z).Left
+nowY = F.Top - ScrInfo(k).Top + ScrInfo(Z).Top
+End If
 
+If nowX > ScrInfo(Z).Left + ScrInfo(Z).width Then
+    nowX = ScrInfo(Z).Left + ScrInfo(Z).width * 2 / 3
+End If
+If nowX + F.width > ScrInfo(Z).Left + ScrInfo(Z).width Then
+    If F.width < ScrInfo(Z).width Then
+    nowX = ScrInfo(Z).Left + ScrInfo(Z).width - F.width
+    Else
+    nowX = ScrInfo(Z).Left
+    End If
+End If
+If nowY > ScrInfo(Z).Top + ScrInfo(Z).Height Then
+    nowY = ScrInfo(Z).Top + ScrInfo(Z).Height * 2 / 3
+End If
+If nowY + F.Height > ScrInfo(Z).Top + ScrInfo(Z).Height Then
+    If F.Height < ScrInfo(Z).Height Then
+    nowY = ScrInfo(Z).Top + ScrInfo(Z).Height - F.Height
+    Else
+    nowY = ScrInfo(Z).Top
+    End If
+End If
+
+If F.width > ScrInfo(Z).width Then
+    If F.Height > ScrInfo(Z).Height Then
+        nowX = ScrInfo(Z).Left
+        nowY = ScrInfo(Z).Top
+    Else
+        nowX = ScrInfo(Z).Left
+        nowY = ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
+    End If
+    
+ElseIf F.Height > ScrInfo(Z).Height Then
+    nowX = ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2
+    nowY = ScrInfo(Z).Top
+ElseIf flag Then
+    nowX = ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2
+    nowY = ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
+End If
+F.Move nowX, nowY
+End Sub
+Sub MoveFormToOtherMonitorCenter(F As Form)
+Dim k As Long, Z As Long
+'k = FindMonitorFromPixel(F.Left, F.Top)
+Z = FindMonitorFromMouse
+'If k <> Z Then
+' center to z
+If F.width > ScrInfo(Z).width Then
+    If F.Height > ScrInfo(Z).Height Then
+        F.Move ScrInfo(Z).Left, ScrInfo(Z).Top
+    Else
+        F.Move ScrInfo(Z).Left, ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
+    End If
+    
+ElseIf F.Height > ScrInfo(Z).Height Then
+    F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top
+Else
+ F.Move ScrInfo(Z).Left + (ScrInfo(Z).width - F.width) / 2, ScrInfo(Z).Top + (ScrInfo(Z).Height - F.Height) / 2
+
+End If
+'End If
+End Sub

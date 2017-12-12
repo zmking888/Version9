@@ -501,7 +501,7 @@ If Button = 1 Then
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -509,7 +509,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -525,9 +525,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -536,11 +536,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If x < (width - 150) Or x > width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
     End If
     
 
@@ -553,31 +553,31 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
-        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
+        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
+        If (addy + Height) / height1 > 0.4 And ((width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
-        addX = -Width * lastfactor / factor - 1
+        If ((width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -width * lastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
-        If lastfactor <> factor Then ScaleDialog lastfactor, Width
+        If lastfactor <> factor Then ScaleDialog lastfactor, width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
+         ScaleDialog lastfactor, (width + addX) * lastfactor / factor
          End If
 
         
          
         
-        LastWidth = Width
+        LastWidth = width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
       gList3.PrepareToShow
@@ -1078,7 +1078,6 @@ End If
   Set myCancel.Callback = Me
 myCancel.enabled = True
 MyFill
-
  playall
  End Sub
 

@@ -82,7 +82,7 @@ Select Case Typename(work)
 Case "Group"
     Set aa = New VarItem
     aa.Typename = "*"
-    CopyGroup work, mm
+    CopyGroupObj work, mm
     Set aa.ObjectRef = mm
 Case "lambda"
     Set aa = New VarItem
@@ -136,7 +136,7 @@ Select Case Typename(work)
 Case "Group"
     Set aa = New VarItem
     aa.Typename = "*"
-    CopyGroup work, mm
+    CopyGroupObj work, mm
     Set aa.ObjectRef = mm
 Case "lambda"
     Set aa = New VarItem
@@ -177,7 +177,7 @@ Select Case Typename(work)
 Case "Group"
     Set aa = New VarItem
     aa.Typename = "*"
-    CopyGroup work, mm
+    CopyGroupObj work, mm
     Set aa.ObjectRef = mm
 Case "lambda"
     Set aa = New VarItem
@@ -389,9 +389,9 @@ If mMany > 0 Then
 LookTopVal = mstack.item(1).ItemDouble
 End If
 End Property
-Public Property Get LookNVal(n As Long) As Double
+Public Property Get LookNVal(N As Long) As Double
 On Error Resume Next
-LookNVal = mstack.item(n).ItemDouble
+LookNVal = mstack.item(N).ItemDouble
 End Property
 
 Public Property Get PopVal() As Double
@@ -548,7 +548,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                     Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
-                        CopyGroup subgroup, sub2
+                        CopyGroupObj subgroup, sub2
                         Set subgroup = Nothing
                         Set vvl = sub2
                         Set sub2 = Nothing
@@ -588,7 +588,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                     Set vvl = a.item(x1)
                     If Typename(vvl) = "Group" Then
                         Set subgroup = vvl
-                        CopyGroup subgroup, sub2
+                        CopyGroupObj subgroup, sub2
                         Set subgroup = Nothing
                         Set vvl = sub2
                         Set sub2 = Nothing
@@ -664,7 +664,7 @@ End Sub
 Private Sub Class_Terminate()
 Flush
 End Sub
-Sub CopyGroup(myobject As Object, myobject2 As Object)
+Sub CopyGroupObj(myobject As Object, myobject2 As Object)
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
@@ -677,7 +677,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                     .PeekItem x1, vvl
                     If Typename(vvl) = "Group" Then
                     Set subgroup = vvl
-                    CopyGroup subgroup, sub2
+                    CopyGroupObj subgroup, sub2
                     Set subgroup = Nothing
                     Set vvl = sub2
                     Set sub2 = Nothing

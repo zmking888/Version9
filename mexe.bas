@@ -45,6 +45,7 @@ Exit Sub
 End If
 Debug.Assert (InIDECheck = True)
 m.Run "start"
+m.StackMax -12345
 a$ = commandW
 If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show: Exit Sub
 If m.Status = 0 Then
