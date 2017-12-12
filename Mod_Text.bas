@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -50984,12 +50984,18 @@ Set fromthis = Nothing
 
 End Sub
 Function CurrentStackSize() As Double
+'If IsWine Then Exit Function
+On Error GoTo 1000
 Dim endaddress As Long
 ua = startaddress
 UB = VarPtr(endaddress)
 CurrentStackSize = uintnew(ua) - uintnew(UB) - 300 ' - (1 - m_bInIDE) * 93
+Exit Function
+1000
+Err.Raise 8000
 End Function
 Function ClaimStack() As Long
+If IsWine Then Exit Function
 Static once11 As Boolean
 ClaimStack = findstack
 If once11 Then Exit Function

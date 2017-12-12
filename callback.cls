@@ -25,7 +25,18 @@ Friend Sub NoPublic(bstack As basetask, where$)
         mineHere$ = where$
 End Sub
 Public Sub StackMax(stack As Long)
-If m_bInIDE Then ClaimStack: Exit Sub
+If IsWine Then
+stacksize = 32000000
+findstack = stacksize - 100000
+Exit Sub
+End If
+If m_bInIDE Then
+ClaimStack
+If findstack - 100000 > 0 Then
+    stacksize = findstack - 100000
+End If
+Exit Sub
+End If
 If stack = -12345 Then stacksize = 32000000: Exit Sub
 If stack > 1000000 Then
  stacksize = stack - 100000
