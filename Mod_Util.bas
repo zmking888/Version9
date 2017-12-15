@@ -4170,7 +4170,7 @@ If USELIST Then
   If Not iamactive Then
   Sleep 1
   Else
-  If Not bstack.IamChild Then Sleep 1
+  If Not (bstack.IamChild Or bstack.IamAnEvent) Then Sleep 1
   End If
  ''If MKEY$ = VbNullString Then Dq.refresh
 Else
@@ -5847,6 +5847,7 @@ utf16conthere:
 ErrHandler:
 If FNr Then Close FNr
 If Err Then
+'MyEr Err.Description, Err.Description
 Err.Raise Err.Number, Err.Source & ".ReadUnicodeOrANSI", Err.Description
 End If
 End Function
@@ -6452,6 +6453,34 @@ If TypeOf obj Is mHandler Then
     
 End If
 If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandler = True: Exit Function
+Set obj = first
+End Function
+Public Function CheckLastHandlerOrIterator(obj As Object, vv() As Variant, lastindex As Long) As Boolean
+Dim oldobj As Object, first As Object
+If obj Is Nothing Then Exit Function
+Set first = obj
+lastindex = -1
+Dim kk As Long
+again:
+If kk > 20 Then Set obj = first: Exit Function
+If TypeOf obj Is mHandler Then
+        If obj.UseIterator Then lastindex = obj.index_cursor
+        If obj.indirect >= 0 And obj.indirect <= var2used Then
+                Set oldobj = obj
+                Set obj = vv(obj.indirect)
+                kk = kk + 1
+                GoTo again
+        Else
+                kk = kk + 1
+                Set oldobj = obj
+                Set obj = obj.objref
+                GoTo again
+        End If
+
+End If
+    
+
+If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandlerOrIterator = True: Exit Function
 Set obj = first
 End Function
 Public Function IfierVal()

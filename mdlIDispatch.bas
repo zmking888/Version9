@@ -77,7 +77,7 @@ Public Function CallByNameFixParamArray _
     (pobjTarget As Object, _
     ByVal pstrProcName As Variant, _
     ByVal CallType As cbnCallTypes, _
-     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0) As Variant
+     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0, Optional center2mouse As Boolean = False) As Variant
 
 
     ' pobjTarget    :   Class or form object that contains the procedure/property
@@ -233,7 +233,7 @@ jumphere:
       
            CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
             Set myform = pobjTarget
-            MoveFormToOtherMonitorOnly myform, True
+            MoveFormToOtherMonitorOnly myform, center2mouse
 
            pobjTarget.Refresh
                 Do While ModalId <> 0 And pobjTarget.Visible

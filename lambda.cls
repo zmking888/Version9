@@ -22,6 +22,7 @@ End Type
 Private Total As Long, fixed As Long, used As Long
 Private myVar() As Vars, myHash As New Hash, refcount As Long
 Public subs As FastCollection
+Public OriginalCode As Long, lastlen As Long
 Sub CopyToVar(bstack As basetask, glb As Boolean, v() As Variant)
 Dim i As Long, nm$, where As Long, dummy As Variant, x1 As Long
 bstack.IamLambda = True
@@ -184,6 +185,8 @@ Public Sub CopyTo(a As lambda, v() As Variant)
 Dim b As lambda, VR As Variant, where As Long
 Set a = New lambda
 a.code$ = Me.code$
+a.OriginalCode = Me.OriginalCode
+a.lastlen = Me.lastlen
 Dim i As Long
 If used > 0 Then
 For i = 0 To used - 1
