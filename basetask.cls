@@ -37,8 +37,6 @@ Private mtoprinter As Boolean
 Private mitalic As Boolean   ' todo
 Private mCharSet As Integer  ' todo
 Private mBold As Boolean   ' todo
-Private mSize As Single    ' TODO
-Private mFontname As String 'TODO
 Private Mchild As Boolean
 Private mtolayer As Long
 Private myRun As Boolean

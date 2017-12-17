@@ -15,6 +15,7 @@ Attribute VB_Exposed = False
 
 Dim VarRef As String
 Dim FuncRef As String
+Public oldFuncRef As String
 Dim LocalRef As String  ' used only for classes
 Dim OwnSoros As mStiva
 Dim mName As String

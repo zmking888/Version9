@@ -75,7 +75,7 @@ Private mNoWrap As Boolean
 Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, BlockTopline As Long
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
@@ -101,18 +101,18 @@ Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "user32" _
+Private Declare Function GetClipboardData Lib "User32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "user32" _
+    Private Declare Function SetClipboardData Lib "User32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "user32" _
-    (ByVal hWnd As Long) As Long
-Private Declare Function CloseClipboard Lib "user32" _
+    Private Declare Function OpenClipboard Lib "User32" _
+    (ByVal hWND As Long) As Long
+Private Declare Function CloseClipboard Lib "User32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
     (ByVal wFormat As Long) As Long
     Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 
@@ -664,7 +664,7 @@ FillBack thisHDC, b, glistN.CapColor
   
  '   PrintItem2 thisHDC, mDoc1.TextLine(i), A
     PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-    a.top = a.top + onelineheight
+    a.Top = a.Top + onelineheight
   Next i
   RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
   skip = True
@@ -672,7 +672,7 @@ FillBack thisHDC, b, glistN.CapColor
    
 Else
    a.Left = a.Left + 1
-    a.top = a.top + glistN.addpixels \ 2
+    a.Top = a.Top + glistN.addpixels \ 2
     pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
@@ -1732,7 +1732,7 @@ End Sub
 Private Sub ColorizeExpressions(ByVal a$, col(), k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
-Dim n$
+Dim N$
 again:
 If a$ = vbNullString Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1746,13 +1746,13 @@ If kind = 0 Then
         pos2 = k - Len(a$) + 1
     
     End If
-    n$ = a$
-    kind = IsLabelOnly(n$, drop$)
-    If kind = 0 And n$ <> a$ Then
+    N$ = a$
+    kind = IsLabelOnly(N$, drop$)
+    If kind = 0 And N$ <> a$ Then
     feedthis = 10
-    a$ = n$: Exit Sub
+    a$ = N$: Exit Sub
     End If
-    a$ = n$
+    a$ = N$
     
 End If
 
@@ -2973,11 +2973,11 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get top() As Long
-top = glistN.TopTwips
+Public Property Get Top() As Long
+Top = glistN.TopTwips
 End Property
 
-Public Property Let top(ByVal RHS As Long)
+Public Property Let Top(ByVal RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Get Height() As Long
@@ -3333,9 +3333,12 @@ End If
 End If
 Else
 a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
+If Len(a$) > Charpos Then a$ = ""
 End If
 Else
 a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
+If Len(a$) > Charpos Then a$ = ""
+
 End If
 
 If a$ <> "" Then

@@ -5609,7 +5609,9 @@ If TypeOf bstack.lastobj Is mHandler Then
 End If
         
 End Function
-
+Sub myesc(b$)
+MyErMacro b$, "Escape", "Διακοπή εκτέλεσης"
+End Sub
 Public Function MyDoEvents()
 On Error GoTo there
 If TaskMaster Is Nothing Then
@@ -6489,7 +6491,15 @@ End Function
 Public Sub OutOfLimit()
   MyEr "Out of limit", "Εκτός ορίου"
 End Sub
-
+Public Sub stackproblem()
+MyEr "Problem in return stack", "Προβλημα στον σωρό επιστροφής"
+End Sub
+Public Sub PlaceAcommaBefore()
+MyEr "Place a comma before", "Βάλε ένα κόμμα πριν"
+End Sub
+Public Sub unknownid(b$, w$)
+MyErMacro b$, "unknown identifier " & w$, "’γνωστο αναγνωριστικό " & w$
+End Sub
 Public Sub MissCdib()
   MyEr "Missing IMAGE", "Λείπει εικόνα"
 End Sub

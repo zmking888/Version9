@@ -221,12 +221,12 @@ ok = False
 If Not (task Is Nothing) Then
         Select Case code
         Case 0 ' hold
-            task.busy = True
+            task.Busy = True
         Case 1
             task.Dispose tmAllTasks
             ThrowOne Mes
         Case 2 ' Restart
-            task.busy = False
+            task.Busy = False
         Case 3
         task.Interval = param
         Case 4
@@ -261,6 +261,7 @@ Public Sub Dispose()
 End Sub
 
 Public Sub TimerTick()
+tickTimer = tickTimer + 1
 If tickdrop > 0 Then Exit Sub ' tickdrop = myMasterList.Count: Exit Sub
 Dim this As TaskInterface
   If myMasterList.Count = 0 Then Exit Sub
@@ -284,7 +285,7 @@ Dim this As TaskInterface
   Loop While this.Id < 0 And myMasterList.Count <> 0
   If this.Id < 0 Then Exit Sub
   
-  If Not this.busy And Not this.Done Then
+  If Not this.Busy And Not this.Done Then
 
   this.Tick
   End If
@@ -347,7 +348,7 @@ Dim this As TaskInterface
   Loop While this.Id < 0 And myMasterList.Count <> 0
   If this.Id < 0 Then tickdrop = 0: Exit Sub
   
-  If Not this.busy And Not this.Done Then
+  If Not this.Busy And Not this.Done Then
 
   this.Tick
   End If
@@ -406,7 +407,7 @@ Dim this As TaskInterface
   Loop While this.Id < 0 And myMasterList.Count <> 0
   If this.Id < 0 Then Exit Sub
   
-  If Not this.busy And Not this.Done Then
+  If Not this.Busy And Not this.Done Then
 
   this.Tick
   End If
@@ -459,6 +460,7 @@ End Sub
 ' PRIVATE ROUTINES
 
 Private Sub Class_Initialize()
+tickTimer = 0
   Set myMasterList = New Collection
   Set myRunningList = New Collection
 
@@ -468,6 +470,7 @@ End Sub
 
 
 Private Sub Class_Terminate()
+tickTimer = 0
   If QueueCount > 0 Then
     Dispose
   End If

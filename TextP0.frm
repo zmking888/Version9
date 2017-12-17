@@ -223,7 +223,7 @@ Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 
 Public ShadowMarks As Boolean
 Private nochange As Boolean
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
-Private Declare Function EmptyClipboard Lib "User32" () As Long
+Private Declare Function EmptyClipboard Lib "user32" () As Long
 Public MY_BACK As New cDIBSection
 Private mynum$
 Dim OneOnly As Boolean
@@ -236,10 +236,10 @@ Private DisStack As basetask
 Private MeStack As basetask
 Dim lookfirst As Boolean, look1 As Boolean
 Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "User32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -887,7 +887,6 @@ End Function
 
 Private Sub DIS_GotFocus()
 If lockme Then TEXT1.SetFocus: Exit Sub
-Dim dX As Long, dy As Long
 clickMe2 = -1
 End Sub
 
@@ -895,9 +894,6 @@ Private Sub DIS_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyPause Then
 Form_KeyDown KeyCode, shift
 End If
-If Not NOEDIT Then
-End If
-
 End Sub
 Public Sub GiveASoftBreak(Sorry As Boolean)
 clickMe2 = -1
