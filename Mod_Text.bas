@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -23453,7 +23453,7 @@ Set mystack.FuncObj = Nothing
 If InStr(mystack.UseGroupname, ChrW(&H1FFF)) > 0 Then
 pa$ = GetNextLine((sbf(Abs(mystack.OriginalCode)).sb))
 If InStr(pa$, ",") = 0 Then
-pa$ = "'11001EDIT " + GeModuleName(mystack, here$) + "," + Mid$(pa$, 11)
+pa$ = "'11001EDIT " + GetModuleName(mystack, here$) + "," + Mid$(pa$, 11)
 End If
 FK$(13) = Mid$(pa$, 7) + "-" + LTrim(Str(Len(NLtrim$(frm$))))
 If Right$(GetName(sbf(x1).goodname), 2) = "()" Then
@@ -23466,7 +23466,7 @@ GoTo there1234
 End If
 
         End If
-        pa$ = "EDIT " & GeModuleName(mystack, here$) & ", " + CStr(Len(sbf(x1).sb))
+        pa$ = "EDIT " & GetModuleName(mystack, here$) & ", " + CStr(Len(sbf(x1).sb))
         If Left$(sbf(x1).sb, 10) = "'11001EDIT" Then
           pa$ = Mid$(GetNextLine(sbf(x1).sb), 7) ''+ "+1"
              sbf(x1).sb = Mid$(sbf(x1).sb, 3) ' needed because we measure length...look the preparation of Shift F1 below
@@ -29310,12 +29310,12 @@ x1 = IsLabelA("", rest$, w$)
             
             If x1 = 1 Then
                 s$ = "}" + vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")"
-            rest$ = F$ + " {" + "'11001EDIT " + GeModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + ",'" + CStr(Len(s$) + 30) + vbCrLf + " group " + w$ + " {" + ss$ & s$ + rest$
+            rest$ = F$ + " {" + "'11001EDIT " + GetModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + ",'" + CStr(Len(s$) + 30) + vbCrLf + " group " + w$ + " {" + ss$ & s$ + rest$
             Else
             nm$ = w$
             w$ = Left$(w$, Len(w$) - 1)
             s$ = "}" + vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group$(" + nm$ + ")"
-            rest$ = F$ + " {" + "'11001EDIT " + GeModuleName(bstack, here$) + Str$(Len(rest$)) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 30) + vbCrLf + " group " + nm$ + " {" + ss$ + s$ + rest$
+            rest$ = F$ + " {" + "'11001EDIT " + GetModuleName(bstack, here$) + Str$(Len(rest$)) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 30) + vbCrLf + " group " + nm$ + " {" + ss$ + s$ + rest$
             End If
             nm$ = vbNullString
             w$ = vbNullString
@@ -29330,12 +29330,12 @@ x1 = IsLabelA("", rest$, w$)
            ' If Right$("  " + ss$, 2) <> vbCrLf Then ss$ = ss$ + vbCrLf
             If x1 = 1 Then
             s$ = "}" + vbCrLf + "Αν Τμήμα(" + w$ + "." + w$ + ") Τότε Κάλεσε! " + w$ + "." + w$ + vbCrLf + "=Ομάδα(" + w$ + ")"
-            rest$ = F$ + " {" + "'11001EDIT " + GeModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 29) + vbCrLf + " Ομάδα " + w$ + " {" + ss$ + s$ + rest$
+            rest$ = F$ + " {" + "'11001EDIT " + GetModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 29) + vbCrLf + " Ομάδα " + w$ + " {" + ss$ + s$ + rest$
             Else
             nm$ = w$
             w$ = Left$(w$, Len(w$) - 1)
             s$ = "}" + vbCrLf + "Αν Τμήμα(" + w$ + "." + w$ + ") Τότε Κάλεσε! " + w$ + "." + w$ + vbCrLf + "=Ομάδα$(" + nm$ + ")"
-            rest$ = F$ + " {" + "'11001EDIT " + GeModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 29) + vbCrLf + " Ομάδα " + nm$ + " {" + ss$ + s$ + rest$
+            rest$ = F$ + " {" + "'11001EDIT " + GetModuleName(bstack, here$) + ",-" + Str$(Len(rest$)) + "'" + CStr(Len(s$) + 29) + vbCrLf + " Ομάδα " + nm$ + " {" + ss$ + s$ + rest$
             End If
                     
             w$ = vbNullString
@@ -35065,7 +35065,7 @@ GoTo thh1
 End If
 
         End If
-                    pa$ = "EDIT " & GeModuleName(bs, here$) & ", " + CStr(Len(sbf(x1).sb))
+                    pa$ = "EDIT " & GetModuleName(bs, here$) & ", " + CStr(Len(sbf(x1).sb))
                     If ohere$ <> "" Then
                     
                     If Left$(sbf(x1).sb, 10) = "'11001EDIT" Then
@@ -37454,6 +37454,11 @@ If a.enabled Then
             End If
             If f1$ <> "" Then s1$ = N$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
             If Execute(bstack, s1$, False, False) <> 1 Then
+            If f1$ = "" Then
+            MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
+            Else
+            MyEr "Problem in Event " + aString$ + " in module " + f1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + f1$
+            End If
             bstack.soros.Flush
                 PopStage bstack
                 GoTo conthere
@@ -37536,7 +37541,7 @@ Set bstack.Sorosref = bb
           
             
             If Execute(bstack, s1$, False, False) <> 1 Then
-            
+           MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
             
             
                 PopStage bstack
@@ -43125,7 +43130,7 @@ MyFunction = True
                                                         End If
                                                 Else
                                                         If Left$(ss$, 10) <> "'11001EDIT" Then
-                                                                s$ = "'11001EDIT " & GeModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
+                                                                s$ = "'11001EDIT " & GetModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
                                                         End If
                                                 End If
                                         bstack.IndexSub = GlobalSub(what$, s$ + ss$)
@@ -43180,7 +43185,7 @@ operators:
                                                         End If
                                                 Else
                                                         If Left$(ss$, 10) <> "'11001EDIT" Then
-                                                                s$ = "'11001EDIT " & GeModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
+                                                                s$ = "'11001EDIT " & GetModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
                                                         End If
                                                 End If
                                                 If frm$ <> "" Then
@@ -43316,7 +43321,7 @@ jump1:
                                                 SetNextLine what$
                                         Wend
                                         If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
-                                        what$ = "'11001EDIT " & GeModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf + what$
+                                        what$ = "'11001EDIT " & GetModuleName(bstack, ohere$) & ",-" & CStr(i - 2) + vbCrLf + what$
                                         If Not FastSymbol(rest$, "}") Then
                                                 MyFunction = False
                                         Else
@@ -43368,7 +43373,7 @@ jumpheretoo:
                                                         End If
                                                 Else
                                                         If Left$(ss$, 10) <> "'11001EDIT" Then
-                                                                s$ = "'11001EDIT " & GeModuleName(bstack, ohere$) & ",-" & CStr(i + 2 * (bstack.UseGroupname <> "")) + vbCrLf
+                                                                s$ = "'11001EDIT " & GetModuleName(bstack, ohere$) & ",-" & CStr(i + 2 * (bstack.UseGroupname <> "")) + vbCrLf
                                                         End If
                                                 End If
                                                 If frm$ <> "" Then
@@ -47395,7 +47400,7 @@ BYPASS1:
                                 If here$ = "" Then
                                 ElseIf basestack.OriginalCode > 0 Then
                                 If notloaded Then
-                                s$ = "'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
+                                s$ = "'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i - 2) + vbCrLf
                                 End If
                                 End If
                         End If
@@ -47477,7 +47482,7 @@ JUMP0:
                                         SetNextLine what$
                                 Wend
                                 If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
-                                s$ = "'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i - 2)
+                                s$ = "'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i - 2)
                                   If frm$ <> "" Then
                                 If lang = 1 Then
                                 what$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf + what$
@@ -47539,7 +47544,7 @@ jumpheretoo:
                                         End If
                                 Else
                                         If Left$(ss$, 10) <> "'11001EDIT" Then
-                                                s$ = "'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i - 2) + IIf(Right$(ss$, 2) <> vbCrLf, vbCrLf, "")
+                                                s$ = "'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i - 2) + IIf(Right$(ss$, 2) <> vbCrLf, vbCrLf, "")
                                         End If
                                 End If
                                 If frm$ <> "" Then
@@ -48132,10 +48137,10 @@ Case 1
               i = Len(rest$)
               If lang = 1 Then
               s$ = vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")"
-                     rest$ = w$ + "{'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
+                     rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                 Else
                 s$ = "Αν Τμήμα(" + w$ + "." + w$ + ") Τότε Κάλεσε! " + w$ + "." + w$ + vbCrLf + "=Ομάδα(" + w$ + ")"
-                      rest$ = w$ + "{'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ομαδα " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
+                      rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ομαδα " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                 End If
                 ProcClass = MyFunction(1, basestack, rest$, lang)
          Else
@@ -48155,10 +48160,10 @@ w2$ = Left$(w$, Len(w$) - 1)
                 i = Len(rest$)
                If lang = 1 Then
                s$ = "if module(" + w2$ + "." + w2$ + ") then call! " + w2$ + "." + w2$ + vbCrLf + "=group$(" + w2$ + ")"
-                        rest$ = w$ + "{'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
+                        rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                Else
                 s$ = "Αν Τμήμα(" + w2$ + "." + w2$ + ") Τότε Κάλεσε! " + w2$ + "." + w2$ + vbCrLf + "=Ομάδα$(" + w2$ + ")"
-                      rest$ = w$ + "{'11001EDIT " & GeModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ομαδα " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
+                      rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ομαδα " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                 End If
                 ProcClass = MyFunction(1, basestack, rest$, lang)
          Else
@@ -51263,11 +51268,15 @@ On Error GoTo there
 repeatme
 there:
 End Function
-Function GeModuleName(b As basetask, where$) As String
+Function GetModuleName(b As basetask, where$) As String
 If SecureNames Then
-    GeModuleName = GetName(sbf(b.OriginalCode).goodname)
+If b.OriginalCode < 0 Then
+    GetModuleName = GetName(var(-b.OriginalCode).name)
 Else
-    GeModuleName = GetName(StripRVAL(where$))
+    GetModuleName = GetName(sbf(b.OriginalCode).goodname)
+    End If
+Else
+    GetModuleName = GetName(StripRVAL(where$))
 End If
 End Function
 Private Function compareStr4(a$, b$) As Long   ' here is not byval as in fastcollection
@@ -51304,7 +51313,7 @@ For i = 1 To j
                     compareStr4 = Sgn(Len(a1$) - Len(b1$))
                 End If
                 Exit Function
-            End If
+             End If
             Exit Function
         Else
         a$ = Mid$(a$, i)

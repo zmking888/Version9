@@ -241,7 +241,7 @@ jumphere:
                      mywait basestack1, 1, True
                      Sleep 1
                      'SleepWaitEdit2 1
-                     If ExTarget Then Exit Do
+                     If ExTarget Or LastErNum <> 0 Then Exit Do
                 Loop
                  ModalId = mycodeid
               
