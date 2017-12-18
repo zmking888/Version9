@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 27
+Global Const Revision = 28
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -13702,8 +13702,9 @@ lit28: '    Case "KEY$", " œÃ$"
                  If bstackstr.Owner.Visible Then bstackstr.Owner.Refresh
                   End If
                 r$ = INKEY$  ' (inkey$ has autorepeat...)
-                Loop Until r$ <> ""
+                Loop Until r$ <> "" Or LastErNum <> 0
               ''  UINK$ = UINK$ & r$   ' so we send it there
+              If LastErNum <> 0 And r$ = "" Then r$ = Chr$(0)
                 End If
                 IsStr1 = True
                 Exit Function

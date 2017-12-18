@@ -4184,7 +4184,11 @@ If Not bstack.IamThread Then
  End If
  k1 = 0: MyDoEvents1 Form1
  End If
-
+If LastErNum <> 0 Then
+      LCTCB dq, prive, -1: DestroyCaret
+ oldLCTCB dq, prive, 0
+Exit Do
+End If
  Else
  
 LCTbasketCur dq, prive                       ' here
