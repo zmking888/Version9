@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 28
+Global Const Revision = 29
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3398,11 +3398,19 @@ breakexit:
         Set pppp = mm.PopObj
         If v <> -1 Then
             If v <> -100 Then
+            If Not MyIsObject(pppp.item(v)) Then
+                Set pppp.item(v) = CopyGroupObj(var(y1), pppp.IHaveClass)
+            Else
                 Set pppp.item(v) = CopyGroupObj(var(y1), Not pppp.item(v).Link Is Nothing)
+                End If
             Else
                 If pppp.Arr Then
                     v = 0
+                    If Not MyIsObject(pppp.item(v)) Then
+                    Set pppp.item(v) = CopyGroupObj(var(y1))
+                    Else
                     Set pppp.item(v) = CopyGroup1(var(y1), pppp.item(v))
+                    End If
                 Else
                     Set pppp.item(v) = CopyGroupObj(var(y1))
                 End If

@@ -695,12 +695,13 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
      
                 Next x1
                 End If
-
+        
                 myobject2.HasStrValue = .HasStrValue
                 myobject2.HasValue = .HasValue
                 myobject2.HasSet = .HasSet
                 myobject2.HasParameters = .HasParameters
                       '' Set myobject2.LinkRef = Nothing ' .Link
+             Set myobject2.SuperClassList = .SuperClassList
             End With
 End Sub
 Function Copy() As mStiva
