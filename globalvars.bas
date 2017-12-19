@@ -99,6 +99,10 @@ If Not ColorDialog.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 OpenColor = Not CancelDialog
 thiscolor = ReturnColor
 ExpandWidth = False
@@ -121,6 +125,10 @@ If Not FontDialog.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 If ReturnFontName <> "" Then OpenFont = Not CancelDialog
 ExpandWidth = False
 inUse = False
@@ -170,6 +178,10 @@ If Not LoadFile.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 If ReturnListOfFiles <> "" Or ReturnFile <> "" Then OpenImage = Not CancelDialog
 inUse = False
 
@@ -221,7 +233,10 @@ If Not LoadFile.Visible Then
     End If
 Hook3 LoadFile.hWND, Nothing
 WaitDialog bstack
-
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 Set LastGlist3 = Nothing
 If ReturnListOfFiles <> "" Or ReturnFile <> "" Then OpenDialog = Not CancelDialog
 inUse = False
@@ -274,6 +289,10 @@ MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
     MyDoEvents
     End If
 WaitDialog bstack
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 If ReturnFile <> "" Then SaveAsDialog = Not CancelDialog
 inUse = False
 End Function
@@ -336,6 +355,10 @@ If Not LoadFile.Visible Then
     MyDoEvents
     End If
 WaitDialog bstack
+If Not Thisform Is Nothing Then
+          If Typename(Thisform) = "GuiM2000" Then Thisform.ShowmeALL
+          If Thisform.Visible Then Thisform.SetFocus
+End If
 If ReturnFile <> "" Then FolderSelector = Not CancelDialog
 inUse = False
 End Function

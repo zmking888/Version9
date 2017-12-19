@@ -208,7 +208,8 @@ jumphere:
             
                pobjTarget.Modal = mycodeid
                
-               Dim x As Form, Z As Form
+               Dim x As Form, z As Form, zz As Form
+               Set zz = Screen.ActiveForm
                
                If Not pobjTarget.IamPopUp Then
                
@@ -248,17 +249,20 @@ jumphere:
       Else
       ModalId = mycodeid
            End If
-        Set Z = Nothing
+        Set z = Nothing
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
            x.TestModal mycodeid
-          If x.Enablecontrol Then Set Z = x
+          If x.Enablecontrol Then Set z = x
             End If
             Next x
-          If Typename(Z) = "GuiM2000" Then
-            Z.ShowmeALL
-            Z.SetFocus
-            Set Z = Nothing
+            If Not zz Is Nothing Then Set z = zz
+          If Typename(z) = "GuiM2000" Then
+            z.ShowmeALL
+            z.SetFocus
+            Set z = Nothing
+            ElseIf Not z Is Nothing Then
+            If z.Visible Then z.SetFocus
           End If
           ModalId = oldmoldid
            End If

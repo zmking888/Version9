@@ -3848,7 +3848,8 @@ NOEDIT = False
     Dim mycode As Double, oldcodeid As Double
 mycode = Rnd * 1233312231
 oldcodeid = ModalId
-Dim x As Form
+Dim x As Form, zz As Form
+Set zz = Screen.ActiveForm
 For Each x In Forms
         If x.Visible And x.name = "GuiM2000" Then
                                    If x.Enablecontrol Then
@@ -3864,14 +3865,14 @@ Next x
             mywait11 bstack, 5
       Sleep 1
     
-    Loop Until loadfileiamloaded = False Or NOEDIT = True
+    Loop Until loadfileiamloaded = False Or NOEDIT = True Or LastErNum <> 0
     ModalId = mycode
     MOUT = False
     Do
     drop = mouse Or KeyPressed(&H1B)
     MyDoEvents
 
-    Loop Until drop = 0 Or MOUT Or NOEDIT = True
+    Loop Until drop = 0 Or MOUT Or NOEDIT = True Or LastErNum <> 0
  NOEDIT = True
  BLOCKkey = True
 While KeyPressed(&H1B) ''And UseEsc
@@ -3884,17 +3885,13 @@ Set Z = Nothing
 
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
-            
-   '        x.TestModal mycode
-            If Not x.Enablecontrol Then x.TestModal mycode
-          If x.Enablecontrol Then Set Z = x
+                If Not x.Enablecontrol Then
+                        x.TestModal mycode
+               ' Else
+                '        Set Z = x
+                End If
             End If
             Next x
-          If Typename(Z) = "GuiM2000" Then
-            Z.ShowmeALL
-            Z.SetFocus
-            Set Z = Nothing
-          End If
           ModalId = oldcodeid
 
 BLOCKkey = False
@@ -4269,7 +4266,11 @@ LCTbasket dq, prive, .currow, .curpos
  
    LCTCB dq, prive, 0
   End If
-If Not bstack.IamThread Then MyDoEvents1 Form1  'SleepWait 1
+If Not bstack.IamThread Then
+
+MyDoEvents1 Form1  'SleepWait 1
+End If
+
  If Screen.ActiveForm Is Nothing Then
  iamactive = False:  If ShowCaret(dq.hWND) <> 0 Then HideCaret dq.hWND
 Else

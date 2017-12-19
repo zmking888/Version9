@@ -514,15 +514,21 @@ aaa = SBcode(aa)
 If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
 End If
+Dim monitor As Long
+If Not Form4.Visible Then
+monitor = FindFormSScreen(Form1)
+Else
+monitor = FindFormSScreen(Form4)
+End If
 If aa > 0 Then
-sHelp s$, aaa, (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
+sHelp s$, aaa, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 ElseIf subHash.Find(s$, aa) Then
-sHelp s$, SBcode(aa), (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
+sHelp s$, SBcode(aa), (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 
 ElseIf subHash.Find(subHash.LastKnown, aa) Then
-sHelp s$, SBcode(aa), (VirtualScreenWidth() - 1) * 3 / 5, (VirtualScreenHeight() - 1) * 4 / 7
+sHelp s$, SBcode(aa), (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 Else
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128

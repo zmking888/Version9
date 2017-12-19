@@ -18,6 +18,8 @@ Option Explicit
 Private Function GOOD(ByRef counter As Long, ByVal Key As String, ByVal item As String) As String
 Dim i As Long, j As Long
 j = Len(Key)
+If j = 0 Then GOOD = item: Exit Function
+
 If ReduceKey(item) Then
 For i = 1 To Len(item)
 ' old function - but needed to stay as is
