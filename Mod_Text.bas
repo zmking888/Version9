@@ -23,7 +23,7 @@ Public LastUse As Long
 Private funcno As Long, ua As Double, UB As Double
 Private simplestack1 As rndvars
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWND As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
-Private Declare Function ShowCursor Lib "User32" (ByVal bShow As Long) As Long
+Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
@@ -45,7 +45,7 @@ Private Declare Function CallWindowProc _
  ByVal lParam As Long) As Long
 Public ModalId As Double
 Public Okk As Boolean
-Private Declare Sub DisableProcessWindowsGhosting Lib "User32" ()
+Private Declare Sub DisableProcessWindowsGhosting Lib "user32" ()
 Public Interrupted As Boolean
 Dim NoOptimum As Boolean
 Dim zero As basket
@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -133,7 +133,7 @@ Public needset As Boolean
 Public cnt As Boolean
 Public exWnd As Long
 
-Public Declare Function GetForegroundWindow Lib "User32" () As Long
+Public Declare Function GetForegroundWindow Lib "user32" () As Long
 Public Declare Function FindExecutable Lib "shell32.dll" Alias "FindExecutableW" (ByVal lpFile As Long, ByVal lpDirectory As Long, ByVal lpResult As Long) As Long
 Public expl As Long
 
@@ -205,7 +205,7 @@ Public voices$(0 To 15), BEATS(0 To 15) As Double
 Const GFSR_SYSTEMRESOURCES = 0
 Const GFSR_GDIRESOURCES = 1
 Const GFSR_USERRESOURCES = 2
-Declare Function MessageBeep Lib "User32" (ByVal wType As Long) As Long
+Declare Function MessageBeep Lib "user32" (ByVal wType As Long) As Long
 
 
 Declare Function SetLocaleInfo Lib "KERNEL32" Alias "SetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As String) As Long
@@ -254,11 +254,11 @@ Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathF
 
 Public Declare Sub Sleep Lib "KERNEL32" (ByVal dwMilliseconds As Long)
 
-Public Declare Function SetTimer Lib "User32" _
+Public Declare Function SetTimer Lib "user32" _
        (ByVal hWND As Long, ByVal nIDEvent As Long, _
         ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
 
-Public Declare Sub KillTimer Lib "User32" _
+Public Declare Sub KillTimer Lib "user32" _
        (ByVal hWND As Long, ByVal nIDEvent As Long)
 'Public Type tagInitCommonControlsEx
  ' lngSize As Long
@@ -280,7 +280,7 @@ Public prof As New clsProfiler
 Public Declare Function GetACP Lib "KERNEL32" () As Long  ' 1253 in my computer
 
 Public Declare Function GetLocaleInfoW Lib "KERNEL32" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 Public OverideDec As Boolean
@@ -17340,7 +17340,7 @@ PROCESSCOMMAND:
         Dim x2 As Long, y2 As Long, SBR$, nd&
           Case "CALL", "йакесе"
         ' CHECK FOR NUMBER...
-        If bstack.norun Then
+        If bstack.NoRun Then
             bstack.callx1 = 0
             bstack.callohere = ""
             b$ = NLtrim(b$)
@@ -17561,7 +17561,7 @@ Case "RETURN", "епистяожг"
                                     here$ = ohere$: GoTo there1
                               Else
                               If bstack.callx1 > 0 Then
-                              If bstack.norun Then
+                              If bstack.NoRun Then
                               bstack.callx1 = 0
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
@@ -17616,7 +17616,7 @@ Case "RETURN", "епистяожг"
                             here$ = ohere$: GoTo there1
                             ElseIf bstack.callx1 > 0 Then
                              
-                              If bstack.norun Then
+                              If bstack.NoRun Then
                               bstack.callx1 = 0
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
@@ -25942,11 +25942,13 @@ ElseIf Not looklocalonly Then
             Exit Do
             End If
         Loop
+
         End If
     End If
+            
     End If
+    If Not GetVar Then i = 0
     End If
-    Else
     End If
     
 End If
@@ -48383,10 +48385,10 @@ End If
 
 End Function
 Function ProcLoad(basestack As basetask, rest$, lang As Long) As Boolean
-Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean, norun As Boolean
+Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean, NoRun As Boolean
 par1 = Not IsLabelSymbolNew(rest$, "мео", "NEW", lang)
 If par1 Then par1 = Not IsLabelSymbolNew(rest$, "меа", "NEW", lang)  ' PLURAL FOR GREEK
-norun = IsLabelSymbolNew(rest$, "тлглата", "MODULES", lang)
+NoRun = IsLabelSymbolNew(rest$, "тлглата", "MODULES", lang)
 ProcLoad = True
 Do
 x1 = Abs(IsLabelFileName(basestack, rest$, s$, , w$))
@@ -48531,9 +48533,9 @@ End If
 End If
 End If
 Loop Until MOUT Or Not IsSymbol(rest$, "&&", 2)
-basestack.norun = norun
+basestack.NoRun = NoRun
 ProcLoad = interpret(basestack, CStr(vvl), Len(here$) > 0)
-basestack.norun = False
+basestack.NoRun = False
 
 
 End Function
@@ -49705,7 +49707,7 @@ Dim p As Double, mm As MemBlock, w2 As Long
                   If Not TypeOf .objref Is MemBlock Then
                       Set basestack.lastobj = Nothing
                       Exit Function
-                  ElseIf .objref.norun Then
+                  ElseIf .objref.NoRun Then
                        Set basestack.lastobj = Nothing
                        Exit Function
                   End If
