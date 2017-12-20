@@ -4005,6 +4005,8 @@ Case "SHIFTBACK", "жеяеписы"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoShiftBack)
 Case "SHIFT", "жеяе"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoShift)
+Case "LOAD", "жоятысе"
+aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLoad)
 Case "DROP", "пета"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDrop)
 Case "IF", "ам"

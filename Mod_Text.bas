@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -17340,7 +17340,7 @@ PROCESSCOMMAND:
         Dim x2 As Long, y2 As Long, SBR$, nd&
           Case "CALL", "йакесе"
         ' CHECK FOR NUMBER...
-        If ByPass Then
+        If bstack.norun Then
             bstack.callx1 = 0
             bstack.callohere = ""
             b$ = NLtrim(b$)
@@ -17561,7 +17561,7 @@ Case "RETURN", "епистяожг"
                                     here$ = ohere$: GoTo there1
                               Else
                               If bstack.callx1 > 0 Then
-                              If ByPass Then
+                              If bstack.norun Then
                               bstack.callx1 = 0
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
@@ -17616,7 +17616,7 @@ Case "RETURN", "епистяожг"
                             here$ = ohere$: GoTo there1
                             ElseIf bstack.callx1 > 0 Then
                              
-                              If ByPass Then
+                              If bstack.norun Then
                               bstack.callx1 = 0
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
@@ -24540,7 +24540,7 @@ Case "DEF", "йаме"
     Identifier = ProcDef(basestack, rest$)
     Exit Function
 Case "LOAD", "жоятысе" '
-Identifier = ProcLoad(basestack, rest$)
+Identifier = ProcLoad(basestack, rest$, lang)
 Exit Function
 Case "SAVE", "сысе"
 Identifier = ProcSave(basestack, rest$, lang)
@@ -25915,7 +25915,38 @@ ElseIf Not looklocalonly Then
     If varhash.Find(nm$, cc) Then
     i = cc
     GetVar = True
+    ElseIf bstack.IamChild And SecureNames Then
+     cc = InStr(N$, ".")
+     
+    If cc > 1 Then
+    N$ = Left$(N$, cc - 1): nm$ = Mid$(nm$, cc + 1)
+    Dim m As Long
+    m = Abs(iRVAL22(here$))
+    i = 0
+   For cc = m - 1 To 1 Step -1
+   i = i - 1
+   If sbf(cc).goodname Like "*[.]" + N$ Then Exit For
+   Next cc
+   If cc > 0 Then
+   If cc > m + i Then i = 1
+    If varhash.Find(StripThis2(here$) + "[" + CStr(m + i) + "][" + CStr(cc) + "]" + "." + nm$, i) Then
+    
+    GetVar = True
+    Else
+        m = cc
+        Do While m > 1
+            m = m - 1
+            If varhash.Find(StripThis2(here$) + "[" + CStr(m) + "][" + CStr(cc) + "]" + "." + nm$, i) Then
+            GetVar = True
+            
+            Exit Do
+            End If
+        Loop
+        End If
     End If
+    End If
+    End If
+    Else
     End If
     
 End If
@@ -38237,6 +38268,9 @@ End Sub
 Sub NeoShiftBack(basestackLP As Long, rest$, lang As Long, resp As Boolean)
 resp = ProcShiftBack(ObjFromPtr(basestackLP), rest$)
 End Sub
+Sub NeoLoad(basestackLP As Long, rest$, lang As Long, resp As Boolean)
+resp = ProcLoad(ObjFromPtr(basestackLP), rest$, lang)
+End Sub
 Sub CallNext(basestack As basetask, rest$, resp As Boolean, V1 As Double, V2 As String)
 Dim i As Long, p As Double, par As Boolean, F As Long, b$
 Dim flag As Boolean, it As Long, what$, s$, x1 As Long, ss$, bs As basetask, vvl As Variant, x As Double
@@ -48348,9 +48382,11 @@ Exit Function
 End If
 
 End Function
-Function ProcLoad(basestack As basetask, rest$) As Boolean
-Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean
-par1 = Not IsLabelSymbolNew(rest$, "мео", "NEW", 1)
+Function ProcLoad(basestack As basetask, rest$, lang As Long) As Boolean
+Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean, norun As Boolean
+par1 = Not IsLabelSymbolNew(rest$, "мео", "NEW", lang)
+If par1 Then par1 = Not IsLabelSymbolNew(rest$, "меа", "NEW", lang)  ' PLURAL FOR GREEK
+norun = IsLabelSymbolNew(rest$, "тлглата", "MODULES", lang)
 ProcLoad = True
 Do
 x1 = Abs(IsLabelFileName(basestack, rest$, s$, , w$))
@@ -48495,7 +48531,9 @@ End If
 End If
 End If
 Loop Until MOUT Or Not IsSymbol(rest$, "&&", 2)
+basestack.norun = norun
 ProcLoad = interpret(basestack, CStr(vvl), Len(here$) > 0)
+basestack.norun = False
 
 
 End Function
@@ -49667,7 +49705,7 @@ Dim p As Double, mm As MemBlock, w2 As Long
                   If Not TypeOf .objref Is MemBlock Then
                       Set basestack.lastobj = Nothing
                       Exit Function
-                  ElseIf .objref.NoRun Then
+                  ElseIf .objref.norun Then
                        Set basestack.lastobj = Nothing
                        Exit Function
                   End If

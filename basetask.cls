@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Public LoadOnly As Boolean
+Public LoadOnly As Boolean, norun As Boolean
 Public callx1 As Long
 Public callohere As String
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
@@ -196,6 +196,7 @@ Public Function ExistVar2(ByVal name$) As Boolean
 End Function
 Public Sub ReadVar(ByVal name$, var As Variant)
     Dim i As Long, vv As Variant
+    If StaticCollection Is Nothing Then Exit Sub
     With StaticCollection
         If .Find(name$) Then
             If .IsObj Then
