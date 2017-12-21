@@ -664,7 +664,7 @@ FillBack thisHDC, b, glistN.CapColor
   
  '   PrintItem2 thisHDC, mDoc1.TextLine(i), A
     PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-    a.Top = a.Top + onelineheight
+    a.top = a.top + onelineheight
   Next i
   RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
   skip = True
@@ -672,7 +672,7 @@ FillBack thisHDC, b, glistN.CapColor
    
 Else
    a.Left = a.Left + 1
-    a.Top = a.Top + glistN.addpixels \ 2
+    a.top = a.top + glistN.addpixels \ 2
     pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
@@ -1944,18 +1944,34 @@ Exit Sub
   Next k
   
 End If
-If MaybeIsSymbol(a$, ":", "\", True) Then
-'pos2 = k - Len(a$) + 1
+If MaybeIsSymbol(a$, ":", "\") Then
+a$ = Mid$(a$, 2)
+If AscW(Left$(a$, 1) + " ") = 92 Then
+
+If col(UBound(col())) = 1 Or InStr(" #@.+-~^%$,!({'?|/&)}" + Chr$(34), Mid$(data, pos2 - 1, 1)) > 0 Then
+If pos2 > 0 Then
+addone col(), pos2, 14
+Else
+addone col(), 1, 14
+End If
+ pos2 = k - Len(a$) + 1
+GoTo novar
+End If
+a$ = Mid$(a$, 2)
+End If
+
 If Len(a$) > 1 Then
 If AscW(a$) <> 32 Then
 lastkind = 1
 GoTo again3
+
 End If
 Else
 'lastkind = 1
 'GoTo again3
 End If
 Else
+novar:
 While FastSymbol(a$, ":")
 If pos2 > 0 Then
 addone col(), pos2, 14
@@ -2973,11 +2989,11 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get Top() As Long
-Top = glistN.TopTwips
+Public Property Get top() As Long
+top = glistN.TopTwips
 End Property
 
-Public Property Let Top(ByVal RHS As Long)
+Public Property Let top(ByVal RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Get Height() As Long

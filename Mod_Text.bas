@@ -23,7 +23,7 @@ Public LastUse As Long
 Private funcno As Long, ua As Double, UB As Double
 Private simplestack1 As rndvars
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWND As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
-Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
+Private Declare Function ShowCursor Lib "User32" (ByVal bShow As Long) As Long
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
@@ -45,7 +45,7 @@ Private Declare Function CallWindowProc _
  ByVal lParam As Long) As Long
 Public ModalId As Double
 Public Okk As Boolean
-Private Declare Sub DisableProcessWindowsGhosting Lib "user32" ()
+Private Declare Sub DisableProcessWindowsGhosting Lib "User32" ()
 Public Interrupted As Boolean
 Dim NoOptimum As Boolean
 Dim zero As basket
@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 32
+Global Const Revision = 33
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -133,7 +133,7 @@ Public needset As Boolean
 Public cnt As Boolean
 Public exWnd As Long
 
-Public Declare Function GetForegroundWindow Lib "user32" () As Long
+Public Declare Function GetForegroundWindow Lib "User32" () As Long
 Public Declare Function FindExecutable Lib "shell32.dll" Alias "FindExecutableW" (ByVal lpFile As Long, ByVal lpDirectory As Long, ByVal lpResult As Long) As Long
 Public expl As Long
 
@@ -205,7 +205,7 @@ Public voices$(0 To 15), BEATS(0 To 15) As Double
 Const GFSR_SYSTEMRESOURCES = 0
 Const GFSR_GDIRESOURCES = 1
 Const GFSR_USERRESOURCES = 2
-Declare Function MessageBeep Lib "user32" (ByVal wType As Long) As Long
+Declare Function MessageBeep Lib "User32" (ByVal wType As Long) As Long
 
 
 Declare Function SetLocaleInfo Lib "KERNEL32" Alias "SetLocaleInfoA" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As String) As Long
@@ -254,11 +254,11 @@ Private Declare Function SHGetPathFromIDList Lib "shell32.dll" Alias "SHGetPathF
 
 Public Declare Sub Sleep Lib "KERNEL32" (ByVal dwMilliseconds As Long)
 
-Public Declare Function SetTimer Lib "user32" _
+Public Declare Function SetTimer Lib "User32" _
        (ByVal hWND As Long, ByVal nIDEvent As Long, _
         ByVal uElapse As Long, ByVal lpTimerFunc As Long) As Long
 
-Public Declare Sub KillTimer Lib "user32" _
+Public Declare Sub KillTimer Lib "User32" _
        (ByVal hWND As Long, ByVal nIDEvent As Long)
 'Public Type tagInitCommonControlsEx
  ' lngSize As Long
@@ -280,7 +280,7 @@ Public prof As New clsProfiler
 Public Declare Function GetACP Lib "KERNEL32" () As Long  ' 1253 in my computer
 
 Public Declare Function GetLocaleInfoW Lib "KERNEL32" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
 Public OverideDec As Boolean
@@ -4459,7 +4459,7 @@ Do
     Loop
 again:
     If logical(bstack, aa$, r, parenthesis) Then
-again2:
+AGAIN2:
         If Not bstack.lastobj Is Nothing Then
             If MaybeIsSymbol(aa$, "/*-+=~^&|<>?") Then
                 '' get operator
@@ -4493,7 +4493,7 @@ again2:
                                     Exit Function
                                 End If
                             End If
-                            If Not bstack.lastobj Is Nothing Then GoTo again2
+                            If Not bstack.lastobj Is Nothing Then GoTo AGAIN2
                             Set park = Nothing
                         Else
                              MyEr "Wrong Operator", "À‹ËÔÚ ‘ÂÎÂÛÙﬁÚ"
@@ -11496,10 +11496,10 @@ a$ = NLtrim$(a$)
              ElseIf r$ <> "" Then
             If Len(a$) > 1 Then
              
-            If Mid$(a$, 2, 1) <> "\" And Mid$(a$, 2, 2) <> vbCrLf Then
-            
-                    
+            If Mid$(a$, 2, 1) <> "\" Then
             Exit Do
+            ElseIf Mid$(a$, 2, 2) = vbCrLf Then
+                Exit Do
             End If
             End If
             
@@ -11841,10 +11841,10 @@ If Not NoSpace Then a$ = NLtrim$(a$) Else If AscW(a$) = 32 Then Exit Function
            
             ElseIf r$ <> "" Then
             If Len(a$) > 1 Then
-            If Mid$(a$, 2, 1) <> "\" And Mid$(a$, 2, 2) <> vbCrLf Then
-            
-                    
+            If Mid$(a$, 2, 1) <> "\" Then
             Exit Do
+            ElseIf Mid$(a$, 2, 2) = vbCrLf Then
+                Exit Do
             End If
             End If
             
@@ -11855,6 +11855,7 @@ If Not NoSpace Then a$ = NLtrim$(a$) Else If AscW(a$) = 32 Then Exit Function
             r$ = r$ & Left$(a$, 1)
             a$ = Mid$(a$, 2)
             rr& = 1
+'        Exit Do
             End If
             Else
             innerIsLabel = 0
@@ -12151,10 +12152,10 @@ a$ = NLtrim$(a$)
            
             ElseIf r$ <> "" Then
             If Len(a$) > 1 Then
-            If Mid$(a$, 2, 1) <> "\" And Mid$(a$, 2, 2) <> vbCrLf Then
-            
-                    
+            If Mid$(a$, 2, 1) <> "\" Then
             Exit Do
+            ElseIf Mid$(a$, 2, 2) = vbCrLf Then
+                Exit Do
             End If
             End If
             
@@ -16690,7 +16691,6 @@ If Not ByPass Then here$ = vbNullString
 bstack.LoadOnly = ByPass
 sss = Len(b$)
 Do While Len(b$) <> LLL
-
 If LastErNum <> 0 Then Exit Do
 LLL = Len(b$)
 
@@ -17367,6 +17367,11 @@ PROCESSCOMMAND:
             interpret = True
             here$ = ohere$
             GoTo there1
+            Case "GLOBAL", "√≈Õ… œ", "√≈Õ… «", "√≈Õ… ≈”", "LOCAL", "‘œ–… ¡", "‘œ–… «", "‘œ–… ≈”"
+           b$ = w$ + " " + b$
+           interpret = Execute(bstack, b$, True) = 1
+           GoTo there1
+            
             Case "USER", "◊—«”‘«”"
       
                ss$ = PurifyPath(GetStrUntil("\", Trim$(GetNextLine(b$) + "\")))
@@ -18790,7 +18795,7 @@ contconthere:
 NewStat = False: VarStat = False: sss = LLL: lbl = False: jump = False:  If sss = 0 Then sss = 2: b$ = vbCrLf
 End If
 
-again2:
+AGAIN2:
 If MaybeIsSymbol(b$, "@") Then w$ = vbNullString: GoTo parsecommand
 again3:
 Select Case IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
@@ -23110,7 +23115,7 @@ b$ = NLtrim$(b$)
            sss = (Len(b$) - nd&) + sss
            LLL = (Len(b$) - nd&) + LLL
         End If
-        GoTo again2
+        GoTo AGAIN2
 End If
 If MaybeIsSymbol(b$, ",-+*/_!@()[];<>|~`0123456789") Then
 SyntaxError
@@ -48483,8 +48488,9 @@ jumphere:
         If IsStrExp(basestack, rest$, w$) Then
                 ss$ = mycoder.decryptline(ss$, w$, (Len(ss$) / 2) Mod 33)
                 If Abs(IsLabel(basestack, ss$, w$)) Then
-                        If Not Left$(ss$, 3) = ":" & vbCrLf Then ProcLoad = False: Exit Function
+                        If Not (Left$(ss$, 3) = ":" & vbCrLf) Then ProcLoad = False: Exit Function
                         If lckfrm = 0 And Not NORUN1 Then lckfrm = sb2used + 1
+                        GoTo skipme2
                 End If
         End If
 End If
@@ -48502,9 +48508,8 @@ If (AscW(ss$) > 127 And myUcase(Left$(ss$, 5)) <> " À¡”«" And myUcase(Left$(ss$,
     ss$ = mycoder.must(ss$)
     If NORUN1 Then
         Clipboard.Clear
-        ''Clipboard.SetText SS$, vbCFText
-        
         SetTextData CF_UNICODETEXT, ss$
+        basestack.LoadOnly = True
     End If
 
     If IsLabelA("", ss$, w$) Then
@@ -48526,7 +48531,7 @@ skipme:
         End If
     End If
 End If
-
+skipme2:
 vvl = CStr(vvl) + vbCrLf + ss$ & vbCrLf
 
 End If
