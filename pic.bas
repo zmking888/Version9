@@ -1713,13 +1713,13 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
 x1 = Form1.dSprite(k).Left + Form1.dSprite(k).width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
+y1 = Form1.dSprite(k).top + Form1.dSprite(k).Height * (100 - Percent) / 200
 x2 = x1 + Form1.dSprite(k).width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 For i = Priority - 1 To 1 Step -1
 k = FindSpriteByTag(i)
 If k <> 0 Then
-If x2 < Form1.dSprite(k).Left Or x1 >= Form1.dSprite(k).Left + Form1.dSprite(k).width Or y2 <= Form1.dSprite(k).Top Or y1 > Form1.dSprite(k).Top + Form1.dSprite(k).Height Then
+If x2 < Form1.dSprite(k).Left Or x1 >= Form1.dSprite(k).Left + Form1.dSprite(k).width Or y2 <= Form1.dSprite(k).top Or y1 > Form1.dSprite(k).top + Form1.dSprite(k).Height Then
 Else
 suma = suma + 2 ^ (k - 1)
 End If
@@ -1750,7 +1750,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
 x1 = Form1.dSprite(k).Left + Form1.dSprite(k).width * (100 - Percent) / 200
-y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
+y1 = Form1.dSprite(k).top + Form1.dSprite(k).Height * (100 - Percent) / 200
 x2 = x1 + Form1.dSprite(k).width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
@@ -1797,7 +1797,7 @@ Function PosSpriteY(aPrior As Long) As Long ' before take from priority the orig
 Dim k As Long
 k = FindSpriteByTag(aPrior)
 If k < 1 Or k > PobjNum Then Exit Function
- PosSpriteY = Form1.dSprite(k).Top
+ PosSpriteY = Form1.dSprite(k).top
 End Function
 
 Sub PosSprite(aPrior As Long, ByVal x As Long, ByVal y As Long) ' ' before take from priority the original sprite
@@ -1898,7 +1898,7 @@ With Form1.dSprite(s)
 .Picture = photo.Picture(SZ)
 .Left = .Left + players(s).x - .width / 2
 players(s).x = .width / 2
-.Top = .Top + players(s).y - .Height / 2
+.top = .top + players(s).y - .Height / 2
 players(s).y = .Height / 2
 Call SetWindowRgn(.hWND, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
@@ -2723,14 +2723,14 @@ Private Function c_CreatePartialRegion(rgnRects() As RECT, ByVal lIndex As Long,
     ' cheat a little & use rectangles to store the header
     With rgnRects(lIndex - 2&) ' bytes 0-15
         .Left = 32                      ' length of region header in bytes
-        .Top = 1                        ' required cannot be anything else
+        .top = 1                        ' required cannot be anything else
         .Right = uIndex - lIndex + 1&   ' number of rectangles for the region
         .Bottom = .Right * 16&          ' byte size used by the rectangles;
     End With                            ' ^^ can be zero & Windows will calculate
     
     With rgnRects(lIndex - 1&) ' bytes 16-31 bounding rectangle identification
         .Left = leftOffset                  ' left
-        .Top = rgnRects(lIndex).Top         ' top
+        .top = rgnRects(lIndex).top         ' top
         .Right = leftOffset + cX            ' right
         .Bottom = rgnRects(uIndex).Bottom   ' bottom
     End With
@@ -3095,6 +3095,7 @@ Else
 ValidNum = r1
 End Function
 Function ValidNumberOnly(a$, r As Double, skipdec As Boolean) As Boolean
+r = 0
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
 Private Function IsNumberOnly(a$, fr As Long, r As Double, lR As Long, skipdecimals As Boolean) As Boolean

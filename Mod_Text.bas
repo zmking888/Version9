@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 34
+Global Const Revision = 35
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37626,9 +37626,9 @@ Set bstack.Sorosref = bb
             End If
             If f1$ <> "" Then s1$ = N$ + "Module " + f1$ + vbCrLf + sbf(klm).sb Else s1$ = N$ + sbf(klm).sb
             
-          
-            
-            If Execute(bstack, s1$, False, False) <> 0 Then
+          Dim nn As Long
+           
+            If Execute(bstack, s1$, False, False) = 0 Then
            MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
             
             
