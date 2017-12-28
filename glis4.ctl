@@ -62,7 +62,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-
 'm2000 ver 8.7
 Option Explicit
 Dim waitforparent As Boolean
@@ -126,7 +125,7 @@ Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Intege
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
 Public restrictLines As Long
-Private nowx As Single, nowy As Single
+Private nowX As Single, nowY As Single
 Private marvel As Boolean
 Private Const DT_BOTTOM As Long = &H8&
 Private Const DT_CALCRECT As Long = &H400&
@@ -1089,7 +1088,7 @@ End If
 
 If KeyCode = 93 Then
 ' you have to clear myButton, here keycode
-RaiseEvent OutPopUp(nowx, nowy, KeyCode)
+RaiseEvent OutPopUp(nowX, nowY, KeyCode)
 End If
 Select Case KeyCode
 Case vbKeyHome
@@ -1413,8 +1412,8 @@ End Sub
 Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 ' cut area
 If dropkey Then Exit Sub
-nowx = x
-nowy = y
+nowX = x
+nowY = y
 
 If (Button And 2) = 2 Then Exit Sub
 If myt = 0 Then Exit Sub
@@ -1730,8 +1729,8 @@ Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single
 If dropkey Then Exit Sub
 If Button = 1 Then mlx = CLng(x / scrTwips): mly = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
 If (Button And 2) = 2 Then
-x = nowx
-y = nowy
+x = nowX
+y = nowY
 End If
 useFloatList = False
 If myt = 0 Then Exit Sub
