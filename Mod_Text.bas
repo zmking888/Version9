@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 35
+Global Const Revision = 36
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -36878,6 +36878,8 @@ again:
         ElseIf x1 > 3000 Then
         
                     y1 = CLng(x1 * ScrInfo(Console).Height / ScrInfo(Console).width)
+                    ElseIf scr.name <> "DIS" Then
+                    
             Else
                 
                 x1 = 0
