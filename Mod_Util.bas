@@ -352,6 +352,9 @@ Public Sub NoOperatorForThatObject(ss$)
 If ss$ = "g" Then ss$ = "<="
     MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
 End Sub
+Public Sub NoStackObjectToMerge()
+    MyEr "Not stack object to merge", "Δεν βρήκα αντικείμενο σωρού να ενώσω"
+End Sub
 Public Sub MyEr(er$, ergr$)
 If Left$(LastErName, 1) = Chr(0) Then
     LastErName = vbNullString
