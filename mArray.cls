@@ -441,6 +441,7 @@ End Sub
 
 Public Sub CopyArray(k As mArray)
 'copy this to k
+If k Is Me Then Exit Sub
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 k.SerialItem v, Me.UpperMonoLimit, 8
 k.myarrbase = myarrbase

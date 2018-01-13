@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 36
+Global Const Revision = 37
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1625,7 +1625,7 @@ If MaybeIsSymbol2(rest$, "#", f) Then
                      If Not FastSymbol(rest$, ",") Then
                      s$ = vbNullString
                      pn& = 2
-                     GoTo isastring
+                     GoTo isAstring
                      End If
         Else
                      f = CLng(MyMod(p, 512))
@@ -1636,7 +1636,7 @@ If MaybeIsSymbol2(rest$, "#", f) Then
                      If Not FastSymbol(rest$, ",") Then
                      s$ = vbNullString
                      pn& = 2
-                     GoTo isastring
+                     GoTo isAstring
                      End If
                      
                      
@@ -2019,7 +2019,7 @@ Else
     If myobject.IsEmpty Then
         s$ = " "
         counter = counter + countDir
-        GoTo isastring
+        GoTo isAstring
     Else
             If Not IsNumeric(myobject.Value) Then
                 If MyIsObject(myobject.Value) Then
@@ -2030,7 +2030,7 @@ Else
 
                 
                 counter = counter + countDir
-                GoTo isastring
+                GoTo isAstring
             Else
                 p = myobject.Value
                 counter = counter + countDir
@@ -2122,7 +2122,7 @@ isanumber:
                 End If
                 
             End If
-isastring:
+isAstring:
 If par Then
 
     If .lastprint Then opn& = 5
@@ -17465,39 +17465,8 @@ err123456:
                 Case "MONITOR", "ΕΛΕΓΧΟΣ"
                     If IsSupervisor Then
                     prive = players(GetCode(di))
-                    wwPlain bstack, prive, "Default Code Page:" & GetACP, bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "App Path", bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, PathFromApp("m2000"), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Register gsb", bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, myRegister("gsb"), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Temporary", bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, LONGNAME(strTemp), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Current directory", bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, mcd, bstack.Owner.width, 1000, True
-                    If m_bInIDE Then
-                    wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 2948 - 1), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 1772 - 1), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 1254 - 1), bstack.Owner.width, 1000, True
-                    Else
-                    wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 9832 - 1), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 5864), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 5004), bstack.Owner.width, 1000, True
-                    End If
-                    If OverideDec Then wwPlain bstack, prive, "Locale Overide " + CStr(cLid), bstack.Owner.width, 1000, True
-                    If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
-                    If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
-                    If Not mNoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
-                    If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(bypass)"
-                    If mTextCompare Then ss$ = ss$ + " +TXT" Else ss$ = ss$ + " -TXT"
-                    If ForLikeBasic Then ss$ = ss$ + " +FOR" Else ss$ = ss$ + " -FOR"
-                    If DimLikeBasic Then ss$ = ss$ + " +DIM" Else ss$ = ss$ + " -DIM"
-                    If SecureNames Then ss$ = ss$ + " +SEC" Else ss$ = ss$ + " -SEC"
-                    wwPlain bstack, prive, "Switches " + ss$, bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "About Switches: use command Help Switches", 1000, True
-                    wwPlain bstack, prive, "Screens:" + Str$(DisplayMonitorCount()) + "  Primary is:" + Str$(FindPrimary + 1), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "This form is in screen:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.width, 1000, True
-                    wwPlain bstack, prive, "Console is in screen:" + Str$(Console + 1), bstack.Owner.width, 1000, True
-
+                    
+                    monitor bstack, prive, lang
                     players(GetCode(di)) = prive
                     Else
                     BadCommand
@@ -36165,7 +36134,7 @@ Function StockValues(bstack As basetask, b$, lang As Long) As Boolean
 ' Stock A[$|%| ]()  keep  N,  B[$|%| ]()
 ' Stock A[$|%| ]()  sweep  N [,  value ]   fill a copy of value to n items or empty slots
 Dim w$, pppp As mArray, v As Long, VN As Long, i As Long, what$, pppp1 As mArray, V1 As Long
-Dim bs As New basetask, p As Double, p1 As Double, soros As mStiva
+Dim bs As New basetask, p As Double, p1 As Double, soros As mStiva, ww$, ss$
 If Abs(IsLabel(bstack, b$, what$)) > 4 Then
         If neoGetArray(bstack, what$, pppp) Then
 If Not pppp.Arr Then MyEr "Need an Array", "Χρειάζομαι ένα πίνακα": Exit Function
@@ -36188,7 +36157,13 @@ againhere:
                                                                               If Not .StackItemTypeIsObject(i) Then
                                                                                        pppp.item(v) = .StackItem(i)
                                                                               Else
+                                                                            If TypeOf .StackItem(i) Is mArray Then
+                                                                                Set pppp1 = New mArray
+                                                                                .StackItem(i).CopyArray pppp1
+                                                                                Set pppp.item(v) = pppp1
+                                                                            Else
                                                                                        Set pppp.item(v) = .StackItem(i)
+                                                                                       End If
                                                                                        
                                                                               End If
                                                                               i = i + 1
@@ -36208,13 +36183,50 @@ againhere:
                                                                        
                                                                                         Select Case Abs(IsLabel(bstack, b$, w$))
                                                                                         Case 1, 4
-                                                                                        If GetVar(bstack, w$, i) Then
-                                                                                        If Typename$(var(i)) = "Group" Then UnFloatGroupReWriteVars bstack, what$, i, pppp.item(v)
+                                                                                        If GetVar(bstack, w$, i, , , , ww$) Then
+                                                                                        If Typename$(var(i)) = "Group" Then
+                                                                                            ss$ = bstack.GroupName
+                                                                                            If ww$ <> "" Then w$ = ww$
+                                                                                            If Len(var(i).GroupName) > Len(w$) Then
+                                                                                                If var(i).IamRef Then
+                                                                                                    ww$ = here$
+                                                                                                    here$ = vbNullString
+                                                                                                    UnFloatGroupReWriteVars bstack, w$, i, pppp.item(v)
+                                                                                                    here = ww$
+                                                                                                Else
+                                                                                                    UnFloatGroupReWriteVars bstack, w$, i, pppp.item(v)
+                                                                                                End If
+                                                                                            Else
+                                                                                                bstack.GroupName = Left$(w$, Len(w$) - Len(var(i).GroupName) + 1)
+                                                                                                w$ = Left$(var(i).GroupName, Len(var(i).GroupName) - 1)
+                                                                                                If Len(var(i).GroupName) > 0 Then
+                                                                                                    ww$ = here$
+                                                                                                    here$ = vbNullString
+                                                                                                    UnFloatGroupReWriteVars bstack, w$, i, pppp.item(v)
+                                                                                                    here = ww$
+                                                                                                Else
+                                                                                                    bstack.GroupName = ss$
+                                                                                                    GroupWrongUse
+                                                                                                    StockValues = False
+                                                                                                    Exit Function
+                                                                                                End If
+                                                                                            End If
+                                                                                            bstack.GroupName = ss$
+                                                                                          Else
+                                                                                                bs.soros.PushObj pppp.item(v)
+                                                                                                bs.soros.Copy2TopItem 1
+                                                                                                Set var(i) = bs.soros.PopObj
+                                                                                                bs.soros.drop 1
+                                                                                           
+                                                                                           
+                                                                                        End If
                                                                                         Else
-                                                                                        Set var(i) = pppp.item(v)
+                                                                                                bs.soros.PushObj pppp.item(v)
+                                                                                                bs.soros.Copy2TopItem 1
+                                                                                                Set var(i) = bs.soros.PopObj
+                                                                                                bs.soros.drop 1
                                                                                         End If
                                                                                         Case 3
-                                                                        
                                                                                         If GetVar(bstack, w$, i) Then Set var(i) = pppp.item(v)
                                                                                         Case 5, 6, 7
                                                                                          If neoGetArray(bstack, w$, pppp1) Then
@@ -36241,8 +36253,17 @@ againhere:
                                                                                         Else
                                                                                         i = GlobalVar(w$, 0)
                                                                                         End If
-                                                                                        var(i) = pppp.item(v)
+                                                                                        If MyIsObject(var(i)) Then
                                                                                         
+                                                                                        If TypeOf var(i) Is Document Then
+                                                                                            var(i).EmptyDoc
+                                                                                            var(i).textDoc = pppp.item(v)
+                                                                                        Else
+                                                                                        
+                                                                                        End If
+                                                                                        Else
+                                                                                        var(i) = pppp.item(v)
+                                                                                        End If
                                                                                         Case 5, 6, 7
                                                                                          If neoGetArray(bstack, w$, pppp1) Then
                                                                                          If Not pppp1.Arr Then MyEr "Need an Array", "Χρειάζομαι ένα πίνακα": Exit Function
@@ -36288,7 +36309,11 @@ againhere:
                                                                                                For i = p - 1 To 0 Step -1
                                                                                                                 With pppp
                                                                                                                 If MyIsObject(.item(i + v)) Then
-                                                                                                                     Set pppp1.item(i + V1) = .item(i + v)
+                                                                                                                    bs.soros.PushObj .item(i + v)
+                                                                                                                    bs.soros.Copy2TopItem 1
+                                                                                                                    Set pppp1.item(i + V1) = bs.soros.PopObj
+                                                                                                                    bs.soros.drop 1
+                                                                                            
                                                                                                                 Else
                                                                                                                      pppp1.item(i + V1) = .item(i + v)
                                                                                                                 End If
@@ -36298,7 +36323,10 @@ againhere:
                                                                                             For i = 0 To p - 1
                                                                                                                 With pppp
                                                                                                                 If MyIsObject(.item(i + v)) Then
-                                                                                                                     Set pppp1.item(i + V1) = .item(i + v)
+                                                                                                                    bs.soros.PushObj .item(i + v)
+                                                                                                                    bs.soros.Copy2TopItem 1
+                                                                                                                    Set pppp1.item(i + V1) = bs.soros.PopObj
+                                                                                                                    bs.soros.drop 1
                                                                                                                 Else
                                                                                                                     pppp1.item(i + V1) = .item(i + v)
                                                                                                                 End If
@@ -36310,7 +36338,11 @@ againhere:
                                                                                                For i = 0 To p - 1
                                                                                                                 With pppp
                                                                                                                 If MyIsObject(.item(i + v)) Then
-                                                                                                                     Set pppp1.item(i + V1) = .item(i + v)
+                                                                                                                    bs.soros.PushObj .item(i + v)
+                                                                                                                    bs.soros.Copy2TopItem 1
+                                                                                                                    Set pppp1.item(i + V1) = bs.soros.PopObj
+                                                                                                                    bs.soros.drop 1
+                                                                                                                    
                                                                                                                 Else
                                                                                                                       pppp1.item(i + V1) = .item(i + v)
                                                                                                                 End If
@@ -39108,6 +39140,13 @@ ElseIf i > 3 Then
  it = GetSub(ss$, x1)
  Else
  it = GetSub(ss$, x1)
+ If it = 0 Then
+ If Left$(what$, 5) = "THIS." Or Left$(what$, 5) = "ΑΥΤΟ." Then
+  ss$ = Left$(what$, 5) + ChrW(&HFFBF) + Mid$(what$, 6) + ")"
+  MakeThisSub basestack, ss$
+ it = GetSub(ss$, x1)
+ End If
+ End If
  End If
  End If
 
@@ -44654,7 +44693,19 @@ Exit Function
 Else
 ' STACK A$
 ' stack a$, "NN"
+If MaybeIsSymbol(rest$, ".") Then
+If IsStrExp(bstack, rest$, ss$) Then
+    GoTo isAstring
+ElseIf IsExp(bstack, rest$, x) Then
+    GoTo isAnobject
+Else
+    SyntaxError
+    ProcStack = False
+End If
+Exit Function
+Else
 x1 = Abs(IsLabel(bstack, rest$, what$))
+End If
 If x1 = 3 Then
     If Not MaybeIsSymbol(rest$, "+") Then
         If GetVar(bstack, what$, it) Then
@@ -44773,6 +44824,7 @@ Else
 conthere:
     rest$ = what$ & rest$
     If IsStrExp(bstack, rest$, ss$) Then
+isAstring:
         pa$ = vbNullString
         If VALIDATE(ss$, pa$, frm$) Then
                 Set ps = New mStiva
@@ -44801,6 +44853,7 @@ conthere:
         End If
                     Exit Function
     ElseIf IsExp(bstack, rest$, x) Then
+isAnobject:
         Set myobject = bstack.lastobj
         Set bstack.lastobj = Nothing
         If Err Then MyEr "Not a stack", "Δεν είναι σωρός": Exit Function
@@ -51518,4 +51571,76 @@ MyDoEvents0 bstack.Owner
 MyEr "", ""
 End If
 End If
+End Sub
+Sub monitor(bstack As basetask, prive As basket, lang As Long)
+    Dim ss$, di As Object
+    Set di = bstack.Owner
+    If lang = 0 Then
+        wwPlain bstack, prive, "Εξ ορισμού κωδικοσελίδα: " & GetACP, bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Φάκελος εφαρμογής", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, PathFromApp("m2000"), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Καταχώρηση gsb", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, myRegister("gsb"), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Φάκελος προσωρινών αρχείων", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, LONGNAME(strTemp), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Τρέχον φάκελος", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, mcd, bstack.Owner.width, 1000, True
+        If m_bInIDE Then
+        wwPlain bstack, prive, "Όριο Αναδρομής για Συναρτήσεις " + CStr(stacksize \ 2948 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Όριο Αναδρομής Συναρτήσεων/Τμημάτων με την Κάλεσε " + CStr(stacksize \ 1772 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Όριο κλήσεων για Τμήματα " + CStr(stacksize \ 1254 - 1), bstack.Owner.width, 1000, True
+        Else
+        wwPlain bstack, prive, "Όριο Αναδρομής για Συναρτήσεις " + CStr(stacksize \ 9832 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Όριο Αναδρομής Συναρτήσεων/Τμημάτων με την Κάλεσε " + CStr(stacksize \ 5864), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Όριο κλήσεων για Τμήματα  " + CStr(stacksize \ 5004), bstack.Owner.width, 1000, True
+        End If
+        If OverideDec Then wwPlain bstack, prive, "Αλλαγή Τοπικού " + CStr(cLid), bstack.Owner.width, 1000, True
+        If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
+        If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
+        If Not mNoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
+        If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(παράκαμψη)"
+        If mTextCompare Then ss$ = ss$ + " +TXT" Else ss$ = ss$ + " -TXT"
+        If ForLikeBasic Then ss$ = ss$ + " +FOR" Else ss$ = ss$ + " -FOR"
+        If DimLikeBasic Then ss$ = ss$ + " +DIM" Else ss$ = ss$ + " -DIM"
+        If SecureNames Then ss$ = ss$ + " +SEC" Else ss$ = ss$ + " -SEC"
+        wwPlain bstack, prive, "Διακόπτες " + ss$, bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Περί διακοπτών: χρησιμοποίησε την εντολή Βοήθεια Διακόπτες", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Οθόνες:" + Str$(DisplayMonitorCount()) + "  η βασική :" + Str$(FindPrimary + 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Αυτή η φόρμα είναι στην οθόνη:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Η κονσόλα είναι στην οθόνη:" + Str$(Console + 1), bstack.Owner.width, 1000, True
+
+    Else
+        wwPlain bstack, prive, "Default Code Page:" & GetACP, bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "App Path", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, PathFromApp("m2000"), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Register gsb", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, myRegister("gsb"), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Temporary", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, LONGNAME(strTemp), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Current directory", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, mcd, bstack.Owner.width, 1000, True
+        If m_bInIDE Then
+        wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 2948 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 1772 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 1254 - 1), bstack.Owner.width, 1000, True
+        Else
+        wwPlain bstack, prive, "Max Limit for Function Recursion " + CStr(stacksize \ 9832 - 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Max Limit for Function/Module Recursion using Call " + CStr(stacksize \ 5864), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Max Limit for calling modules in depth " + CStr(stacksize \ 5004), bstack.Owner.width, 1000, True
+        End If
+        If OverideDec Then wwPlain bstack, prive, "Locale Overide " + CStr(cLid), bstack.Owner.width, 1000, True
+        If UseIntDiv Then ss$ = "+DIV" Else ss$ = "-DIV"
+        If priorityOr Then ss$ = ss$ + " +PRI" Else ss$ = ss$ + " -PRI"
+        If Not mNoUseDec Then ss$ = ss$ + " -DEC" Else ss$ = ss$ + " +DEC"
+        If mNoUseDec <> NoUseDec Then ss$ = ss$ + "(bypass)"
+        If mTextCompare Then ss$ = ss$ + " +TXT" Else ss$ = ss$ + " -TXT"
+        If ForLikeBasic Then ss$ = ss$ + " +FOR" Else ss$ = ss$ + " -FOR"
+        If DimLikeBasic Then ss$ = ss$ + " +DIM" Else ss$ = ss$ + " -DIM"
+        If SecureNames Then ss$ = ss$ + " +SEC" Else ss$ = ss$ + " -SEC"
+        wwPlain bstack, prive, "Switches " + ss$, bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "About Switches: use command Help Switches", bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Screens:" + Str$(DisplayMonitorCount()) + "  Primary is:" + Str$(FindPrimary + 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "This form is in screen:" + Str$(FindFormSScreen(di) + 1), bstack.Owner.width, 1000, True
+        wwPlain bstack, prive, "Console is in screen:" + Str$(Console + 1), bstack.Owner.width, 1000, True
+    End If
 End Sub
