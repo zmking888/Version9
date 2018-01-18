@@ -92,7 +92,7 @@ Private mNoWrap As Boolean
 Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, BlockTopline As Long
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
-Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
@@ -118,18 +118,18 @@ Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "user32" _
+Private Declare Function GetClipboardData Lib "User32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "user32" _
+    Private Declare Function SetClipboardData Lib "User32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "user32" _
-    (ByVal hWnd As Long) As Long
-Private Declare Function CloseClipboard Lib "user32" _
+    Private Declare Function OpenClipboard Lib "User32" _
+    (ByVal hWND As Long) As Long
+Private Declare Function CloseClipboard Lib "User32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
     (ByVal wFormat As Long) As Long
     Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
     ' for Gui purposes
@@ -587,9 +587,9 @@ End Sub
 Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -820,7 +820,7 @@ FillBack thisHDC, b, glistN.CapColor
   For i = 1 To mDoc1.DocLines
   
     PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-    a.top = a.top + onelineheight
+    a.Top = a.Top + onelineheight
   Next i
  ' RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
   skip = True
@@ -829,7 +829,7 @@ FillBack thisHDC, b, glistN.CapColor
 Else
 showparagraphWork = showparagraph
    a.Left = a.Left + 1
-    a.top = a.top + glistN.addpixels \ 2
+    a.Top = a.Top + glistN.addpixels \ 2
     pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
@@ -1037,9 +1037,9 @@ End If
 If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 Exit Sub
 End If
@@ -2879,7 +2879,7 @@ DeleteObject my_brush
 End Sub
  Private Sub PrintItem1(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_NOPREFIX Or DT_NOCLIP)
  Dim cc As String
-r.top = r.top + TextPixelOffset
+r.Top = r.Top + TextPixelOffset
  If showparagraphonce Then
          cc = c & "¶"
   DrawText mHdc, StrPtr(cc), -1, r, way
@@ -2887,12 +2887,12 @@ r.top = r.top + TextPixelOffset
   DrawText mHdc, StrPtr(c), -1, r, way
    
     End If
-    r.top = r.top - TextPixelOffset
+    r.Top = r.Top - TextPixelOffset
     End Sub
  Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP)
-  r.top = r.top + TextPixelOffset
+  r.Top = r.Top + TextPixelOffset
   DrawText mHdc, StrPtr(c), -1, r, way
-r.top = r.top - TextPixelOffset
+r.Top = r.Top - TextPixelOffset
     End Sub
      Private Sub PrintItem2(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP)
  Dim that As Long
@@ -3194,12 +3194,12 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get top() As Long
-top = Callback.Controls(CtrlName).top
+Public Property Get Top() As Long
+Top = Callback.Controls(CtrlName).Top
 End Property
 
-Public Property Let top(ByVal RHS As Long)
-Callback.Controls(CtrlName).top = RHS
+Public Property Let Top(ByVal RHS As Long)
+Callback.Controls(CtrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(CtrlName).Left
@@ -3639,12 +3639,12 @@ On Error Resume Next
         ' for Kenring
         addthis = glistN.UserControlTextWidthPixels(CM + c) - offset - glistN.UserControlTextWidthPixels(c)
         r.Left = offset + rleft + addthis
-        r.top = r.top + TextPixelOffset
+        r.Top = r.Top + TextPixelOffset
         
         If Not mNoColor1 Then SetTextColor mHdc, M2000(col(i * 2))
     
         DrawText mHdc, StrPtr(c), -1, r, mway
-        r.top = r.top - TextPixelOffset
+        r.Top = r.Top - TextPixelOffset
         If r.Left < 0 Then Exit For
     Next i
     r.Left = rleft
@@ -4652,6 +4652,9 @@ MyPopUp.ZOrder 0
 
         Do While MyPopUp.Visible
    ProcTask2 basestack1
+   If Not Screen.ActiveForm Is Nothing Then
+If GetForegroundWindow <> Screen.ActiveForm.hWND Then MyPopUp.Visible = False
+End If
                 '     mywait basestack1, 1
                 If ExTarget Then Exit Do
                 Loop

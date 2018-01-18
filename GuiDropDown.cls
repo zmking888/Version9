@@ -41,15 +41,17 @@ Private Sub glistN_CtrlPlusF1()
       End If
 End Sub
  Public Sub Construct(there As Form, name$)
+ Dim PadGui As GuiM2000
  mIndex = -1
  Set Callback = there
- Set Pad = New GuiM2000
-
+ Set PadGui = New GuiM2000
+ Set Pad = PadGui
  On Error Resume Next
  Set glistN = Pad.Controls(1)
  If Err.Number > 0 Then
  Set glistN = Pad.Controls(1)
  End If
+ PadGui.PopUpMenuVal = True
  With Pad
 .gList2.HeadLine = vbNullString
 .gList2.HeadLine = vbNullString
@@ -67,13 +69,16 @@ End Sub
  Public Sub ConstructArray(there As Form, name$, i As Long)
  mIndex = i
  Set Callback = there
- Set Pad = New GuiM2000
+ Dim PadGui As GuiM2000
+ Set PadGui = New GuiM2000
+ Set Pad = PadGui
 
  On Error Resume Next
  Set glistN = Pad.Controls(1)
  If Err.Number > 0 Then
  Set glistN = Pad.Controls(1)
  End If
+ PadGui.PopUpMenuVal = True
  With Pad
  .Controls(0).Visible = 0
  .gList2.HeadLine = vbNullString
@@ -90,14 +95,14 @@ End With
  mesCtrlName = name$
 End Sub
 
-Public Sub Move(X, Y, Optional w, Optional h)
+Public Sub Move(x, y, Optional w, Optional h)
 With Textbox
 If IsMissing(w) Then
-.glistN.MoveTwips CLng(X), CLng(Y), 0, 0
+.glistN.MoveTwips CLng(x), CLng(y), 0, 0
 ElseIf IsMissing(h) Then
-.glistN.MoveTwips CLng(X), CLng(Y), CLng(w), 0
+.glistN.MoveTwips CLng(x), CLng(y), CLng(w), 0
 Else
-.glistN.MoveTwips CLng(X), CLng(Y), CLng(w), CLng(h)
+.glistN.MoveTwips CLng(x), CLng(y), CLng(w), CLng(h)
 End If
 Pad.Move Pad.Left, Pad.Top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
@@ -282,7 +287,7 @@ Private Sub glistN_ScrollMove(item As Long)
       End If
 End Sub
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".Scroll(" + Str(mIndex) + "," + Str(item) + ")"
    Else
@@ -334,46 +339,46 @@ End Sub
 
 Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
 Dim b$
-Dim gl As Long, X As Long, x1 As gList, XX As Boolean
+Dim gl As Long, x As Long, x1 As gList, XX As Boolean
 Iam = True
 If KeyCode = vbKeyRight And Len(MenuGroup) <> 0 Then
 Set x1 = Textbox.glistN
 Dim obj As gList
 With Callback
-For X = 1 To .Controls.Count - 1
+For x = 1 To .Controls.Count - 1
 
-    If TypeOf .Controls(X) Is gList Then
+    If TypeOf .Controls(x) Is gList Then
     If XX Then
-        If .Controls(X).enabled Then
-            If .Controls(X).MenuGroup = x1.MenuGroup Then .Controls(X).ShowMenu: Exit For
+        If .Controls(x).enabled Then
+            If .Controls(x).MenuGroup = x1.MenuGroup Then .Controls(x).ShowMenu: Exit For
         End If
     Else
-    Set obj = .Controls(X)
+    Set obj = .Controls(x)
         If obj Is x1 Then XX = True
         Set obj = Nothing
     End If
     End If
     
-Next X
+Next x
 
 End With
 Set x1 = Nothing
 ElseIf KeyCode = vbKeyLeft And Len(MenuGroup) <> 0 Then
 Set x1 = Textbox.glistN
 With Callback
-For X = .Controls.Count - 1 To 1 Step -1
-    If TypeOf .Controls(X) Is gList Then
+For x = .Controls.Count - 1 To 1 Step -1
+    If TypeOf .Controls(x) Is gList Then
     If XX Then
-        If .Controls(X).enabled Then
-            If .Controls(X).MenuGroup = x1.MenuGroup Then .Controls(X).ShowMenu: Exit For
+        If .Controls(x).enabled Then
+            If .Controls(x).MenuGroup = x1.MenuGroup Then .Controls(x).ShowMenu: Exit For
         End If
     Else
-     Set obj = .Controls(X)
+     Set obj = .Controls(x)
         If obj Is x1 Then XX = True
         Set obj = Nothing
     End If
     End If
-Next X
+Next x
 End With
 Set x1 = Nothing
 ElseIf KeyCode = vbKeyDown Or (KeyCode = vbKeyReturn And UseOnlyTheList) Then
@@ -533,7 +538,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, shift As Integer, X As Single, Y As Single)
+Private Sub textbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Dim gl As Long
 
 If Textbox.glistN.DblClick Then
@@ -1001,8 +1006,8 @@ Public Sub ShowMenu()
 If mMenuStyle Then textbox_KeyDown vbKeyDown, 0
 End Sub
 Sub Transparent()
-Dim X  As Long, Y As Long
+Dim x  As Long, y As Long
 Textbox.glistN.BackStyle = 1
-Textbox.glistN.GetLeftTop X, Y
-Textbox.glistN.RepaintFromOut Callback.image, X, Y
+Textbox.glistN.GetLeftTop x, y
+Textbox.glistN.RepaintFromOut Callback.image, x, y
 End Sub

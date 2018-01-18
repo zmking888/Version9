@@ -226,24 +226,24 @@ NOEXECUTION = False
 Wend
 BLOCKkey = False
 AskTitle$ = vbNullString
-Dim z As Form
- Set z = Nothing
+Dim Z As Form
+ Set Z = Nothing
 
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
             If Not x.Enablecontrol Then x.TestModal mycode
-          If x.Enablecontrol Then Set z = x
+          If x.Enablecontrol Then Set Z = x
             End If
             Next x
              Set x = Nothing
-          If Not zz Is Nothing Then Set z = zz
+          If Not zz Is Nothing Then Set Z = zz
           
-          If Typename(z) = "GuiM2000" Then
-            z.ShowmeALL
-            z.SetFocus
-            Set z = Nothing
-            ElseIf Not z Is Nothing Then
-            If z.Visible Then z.SetFocus
+          If Typename(Z) = "GuiM2000" Then
+            Z.ShowmeALL
+            Z.SetFocus
+            Set Z = Nothing
+            ElseIf Not Z Is Nothing Then
+            If Z.Visible Then Z.SetFocus
           End If
           ModalId = oldcodeid
           
@@ -268,7 +268,7 @@ If bstack.Owner.name = "DIS" Then
 If Form1.Visible Then Form1.SetFocus
 End If
 Else
-bstack.Owner.SetFocus
+If Not bstack.Owner Is Nothing Then If bstack.Owner.Visible Then bstack.Owner.SetFocus
 End If
 End If
   escok = oldesc
@@ -460,7 +460,7 @@ End Sub
 
 Private Sub Timer1_Timer()
 ' On Error Resume Next
-Dim x As Form, z As Long
+Dim x As Form, Z As Long
 If DIALOGSHOW Or ASKINUSE Or ModalId <> 0 Then
 Timer1.enabled = False
 Exit Sub
@@ -475,7 +475,7 @@ Form5.Visible = True
 End If
 If Not ttl Then
 ttl = True
-z = Form1.Top
+Z = Form1.Top
 Form1.Top = ScrInfo(Console).Top
 If Not IsSelectorInUse Then Form1.Show , Form5
 Else

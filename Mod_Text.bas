@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 38
+Global Const Revision = 39
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2000,6 +2000,7 @@ W3 = -1
 takeone:
     '' for arrays only
     If countDir >= 0 Then
+    
     If counter = myobject.Count Or (counter > Counterend And Counterend > -1) Or countDir = 0 Then
         Set myobject = Nothing
               rest$ = bck$
@@ -2062,6 +2063,15 @@ Else
                         Counterend = -1
                         counter = 0
                         countDir = 1
+                        If Not CheckIsmArray(myobject, var()) Then
+                            Set myobject = Nothing
+                            
+                        Else
+                                bck$ = rest$
+                                rest$ = vbNullString
+                                GoTo takeone
+                        End If
+                        
                     End If
                     End With
                 If Not CheckLastHandler(myobject, var()) Then InternalError: rest$ = bck$: RevisionPrint = False: Exit Function
@@ -7406,8 +7416,7 @@ IsNumber = False
     End If
     If CFname(s$, p, CVar(PP)) <> vbNullString Then
     If p = 0 Then
-    
-    MyErMacro a$, "Can't Read File TimeStamp", "Δεν μπορώ να διαβάσω την Χρονοσήμανση του αρχείου"
+    CantReadFileTimeStap a$
     Else
      r = SG * p
      End If
@@ -7775,6 +7784,7 @@ jumphere:
         LastErNum = 0
         LastErNum1 = 0
         End If
+        Set bstack.lastobj = Nothing
     Exit Function
     
 fun36: 'Case "EVAL(", "ΕΚΦΡ(", "ΕΚΦΡΑΣΗ("
@@ -36164,9 +36174,13 @@ againhere:
                                                                                        pppp.item(v) = .StackItem(i)
                                                                               Else
                                                                             If TypeOf .StackItem(i) Is mArray Then
+                                                                            If .StackItem(i).Arr Then
                                                                                 Set pppp1 = New mArray
                                                                                 .StackItem(i).CopyArray pppp1
                                                                                 Set pppp.item(v) = pppp1
+                                                                                Else
+                                                                                       Set pppp.item(v) = .StackItem(i)
+                                                                                End If
                                                                             Else
                                                                                        Set pppp.item(v) = .StackItem(i)
                                                                                        End If
@@ -36227,9 +36241,22 @@ againhere:
                                                                                            
                                                                                         End If
                                                                                         Else
+                                                                                            i = GlobalVar(w$, 0)
+                                                                                            
                                                                                                 bs.soros.PushObj pppp.item(v)
                                                                                                 bs.soros.Copy2TopItem 1
+                                                                                                If TypeOf pppp.item(v) Is mArray Then
+                                                                                                If pppp.item(v).Arr Then
+                                                                                                
+                                                                                                            Set var(i) = New mHandler
+                                                                                                         var(i).t1 = 3
+                                                                                                        Set var(i).objref = bs.soros.PopObj
+                                                                                                        Else
+                                                                                                         Set var(i) = bs.soros.PopObj
+                                                                                                        End If
+                                                                                                Else
                                                                                                 Set var(i) = bs.soros.PopObj
+                                                                                                End If
                                                                                                 bs.soros.drop 1
                                                                                         End If
                                                                                         Case 3
@@ -36273,10 +36300,20 @@ againhere:
                                                                                         Case 5, 6, 7
                                                                                          If neoGetArray(bstack, w$, pppp1) Then
                                                                                          If Not pppp1.Arr Then MyEr "Need an Array", "Χρειάζομαι ένα πίνακα": Exit Function
+                                                                                         If MaybeIsSymbol(b$, ")") Then
+                                                                                         If NeoGetArrayItem(pppp1, bstack, w$ + ")", V1, "") Then
+                                                                                         
+                                                                                         Else
+                                                                                         i = -1
+                                                                                         GlobalArr bstack, w$, vbNullString, 0, i
+                                                                                         Set var(i) = pppp.item(v)
+                                                                                         
+                                                                                         End If
+                                                                                         Else
                                                                                                 If NeoGetArrayItem(pppp1, bstack, w$, V1, b$) Then
                                                                                                      pppp1.item(V1) = pppp.item(v)
                                                                                                 End If
-                                                                                      
+                                                                                         End If
                                                                                          End If
                                                                                         End Select
                                                                         
@@ -36291,7 +36328,6 @@ againhere:
                                                                         Loop Until Not FastSymbol(b$, ",")
                                                   
                                                     ElseIf IsLabelSymbolNew(b$, "ΓΙΑ", "KEEP", lang) Then
-                                                    ' no copy of objects...only pointers...to objects
                                                     
                                                     If IsExp(bstack, b$, p) Then
                                                             If p <> MyRound(p) Or p < 0 Then
@@ -36310,21 +36346,44 @@ againhere:
                                                                                    If pppp1 Is pppp Then
                                                                                    If v = V1 Then
                                                                                    ' do nothing
-                                                                                   ElseIf Abs(v - V1) < p And V1 > v Then
+                                                                                   ElseIf Abs(v - V1) < p Then
                                                                                    'from top
+                                                                                   If V1 > v Then
                                                                                                For i = p - 1 To 0 Step -1
                                                                                                                 With pppp
                                                                                                                 If MyIsObject(.item(i + v)) Then
+                                                                                                                If i + v < V1 Then
                                                                                                                     bs.soros.PushObj .item(i + v)
                                                                                                                     bs.soros.Copy2TopItem 1
                                                                                                                     Set pppp1.item(i + V1) = bs.soros.PopObj
                                                                                                                     bs.soros.drop 1
-                                                                                            
+                                                                                                                Else
+                                                                                                                       Set pppp1.item(i + V1) = .item(i + v)
+                                                                                                                End If
                                                                                                                 Else
                                                                                                                      pppp1.item(i + V1) = .item(i + v)
                                                                                                                 End If
                                                                                                                 End With
                                                                                                Next i
+                                                                                    Else  ' v > V1
+                                                                                            For i = 0 To p - 1
+                                                                                                                With pppp
+                                                                                                                If MyIsObject(.item(i + v)) Then
+                                                                                                                If p + V1 <= v + i Then
+                                                                                                                    bs.soros.PushObj .item(i + v)
+                                                                                                                    bs.soros.Copy2TopItem 1
+                                                                                                                    Set pppp1.item(i + V1) = bs.soros.PopObj
+                                                                                                                    bs.soros.drop 1
+                                                                                                                    Else
+                                                                                                                    Set pppp1.item(i + V1) = .item(i + v)
+                                                                                                                    End If
+                                                                                                                Else
+                                                                                                                    pppp1.item(i + V1) = .item(i + v)
+                                                                                                                End If
+                                                                                                                End With
+                                                                                               Next i
+                                                                                    
+                                                                                    End If
                                                                                    Else
                                                                                             For i = 0 To p - 1
                                                                                                                 With pppp
@@ -50340,32 +50399,32 @@ End Function
 Sub PrepareLabel(bstack As basetask)
 
    If Not bstack.IamLambda Then
-  Dim MMM$
+  Dim mmm$
 
 
 If SecureNames Then
-MMM$ = sbf(bstack.OriginalCode).goodname
+mmm$ = sbf(bstack.OriginalCode).goodname
 Else
-MMM$ = here$
+mmm$ = here$
 End If
- MMM$ = CleanStr(MMM$, ChrW(-65))
-    If InStr(MMM$, "].") > 0 Then
-        MMM$ = Mid$(MMM$, InStr(MMM$, "].") + 2)
+ mmm$ = CleanStr(mmm$, ChrW(-65))
+    If InStr(mmm$, "].") > 0 Then
+        mmm$ = Mid$(mmm$, InStr(mmm$, "].") + 2)
     End If
    ' If AscW(MMM$) = 8191 Then MMM$ = Mid$(MMM$, 8)
-    If bstack.fHere <> "" And InStr(bstack.fHere, "(") > 0 Then MMM$ = bstack.fHere + "." + MMM$
+    If bstack.fHere <> "" And InStr(bstack.fHere, "(") > 0 Then mmm$ = bstack.fHere + "." + mmm$
     End If
-    If InStr(MMM$, ChrW(8191)) > 0 Then
-    DropLeft ChrW(8191), MMM$
-    If InStr(MMM$, ChrW(8191)) > 0 Then
-    DropLeft ChrW(8191), MMM$
+    If InStr(mmm$, ChrW(8191)) > 0 Then
+    DropLeft ChrW(8191), mmm$
+    If InStr(mmm$, ChrW(8191)) > 0 Then
+    DropLeft ChrW(8191), mmm$
     End If
-    If InStr(MMM$, ".") > 0 Then
-    DropLeft ".", MMM$
+    If InStr(mmm$, ".") > 0 Then
+    DropLeft ".", mmm$
     GoTo conthere
     Else
-    If Right$(MMM$, 2) = "()" Then
-        MMM$ = Left$(MMM$, Len(MMM$) - 2)
+    If Right$(mmm$, 2) = "()" Then
+        mmm$ = Left$(mmm$, Len(mmm$) - 2)
     End If
     
      If pagio$ = "GREEK" Then
@@ -50385,7 +50444,7 @@ conthere:
   
     Else
     If pagio$ = "GREEK" Then
-        If bstack.fHere <> "" Or Right$(MMM$, 2) = "()" Then
+        If bstack.fHere <> "" Or Right$(mmm$, 2) = "()" Then
         If bstack.IamLambda Then
         If Right$(here$, 3) = "$()" Then
             Form2.Label1(0) = "ΛΑΜΔΑ$()"
@@ -50400,7 +50459,7 @@ conthere:
             Form2.Label1prompt(0) = "Τμήμα: "
         End If
   Else
-        If bstack.fHere <> "" Or Right$(MMM$, 2) = "()" Then
+        If bstack.fHere <> "" Or Right$(mmm$, 2) = "()" Then
          If bstack.IamLambda Then
          If Right$(here$, 3) = "$()" Then
             Form2.Label1(0) = "LAMBDA$()"
@@ -50421,7 +50480,7 @@ conthere:
     
     End If
     
-    Form2.Label1(0) = MMM$
+    Form2.Label1(0) = mmm$
      
      
     
@@ -51402,7 +51461,7 @@ ElseIf mm.StackItemTypeIsObject(1) Then
                   Set pppp.item(v) = myobject
           End If
           Set myobject = Nothing
-          mm.drop 1
+        '  mm.drop 1
 Else
 If Typename$(pppp.item(v)) = doc Then
     If mm.PopType = "S" Then

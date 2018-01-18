@@ -68,12 +68,11 @@ Else
 x = x + Form1.Left
 y = y + Form1.Top
 End If
-
-If x + Width > VirtualScreenWidth() Then
+If x + width > VirtualScreenWidth() Then
 If y + Height > VirtualScreenHeight() Then
-Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
+Move VirtualScreenWidth() - width, VirtualScreenHeight() - Height
 Else
-Move VirtualScreenWidth() - Width, y
+Move VirtualScreenWidth() - width, y
 End If
 ElseIf y + Height > VirtualScreenHeight() Then
 Move x, VirtualScreenHeight() - Height
@@ -96,11 +95,11 @@ x = x + that.Left
 y = y + that.Top
 
 
-If x + Width > VirtualScreenWidth() Then
+If x + width > VirtualScreenWidth() Then
 If y + Height > VirtualScreenHeight() Then
-Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
+Move VirtualScreenWidth() - width, VirtualScreenHeight() - Height
 Else
-Move VirtualScreenWidth() - Width, y
+Move VirtualScreenWidth() - width, y
 End If
 ElseIf y + Height > VirtualScreenHeight() Then
 Move x, VirtualScreenHeight() - Height
@@ -273,6 +272,8 @@ gList1.SoftEnterFocus
 
 End Sub
 
+
+
 Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
@@ -280,7 +281,7 @@ If Button = 1 Then
     If Pouplastfactor = 0 Then Pouplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
+    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -288,7 +289,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
+    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -303,9 +304,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -314,11 +315,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
+     If x < (width - 150) Or x > width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
+        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
     End If
     
 
@@ -331,33 +332,33 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
-        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
+        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
+        If (addy + Height) / height1 > 0.4 And ((width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / height1)
         Pouplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((Width * Pouplastfactor / factor + addX) / Height * Pouplastfactor / factor) < (width1 / height1) Then
-        addX = -Width * Pouplastfactor / factor - 1
+        If ((width * Pouplastfactor / factor + addX) / Height * Pouplastfactor / factor) < (width1 / height1) Then
+        addX = -width * Pouplastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
         
-        If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, Width
+        If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, width
 
         Lx = x
         
         Else
         Lx = x * Pouplastfactor / factor
-             ScaleDialog Pouplastfactor, (Width + addX) * Pouplastfactor / factor
+             ScaleDialog Pouplastfactor, (width + addX) * Pouplastfactor / factor
          
    
          End If
 
         
-        PopUpLastWidth = Width
+        PopUpLastWidth = width
 
 
 ''gList1.PrepareToShow

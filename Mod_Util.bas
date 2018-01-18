@@ -6713,6 +6713,10 @@ End Sub
 Public Sub MisOperatror(ss$)
 MyEr "Group not support operator " + ss$, "Η ομάδα δεν υποστηρίζει το τελεστή " + ss$
 End Sub
+Public Sub CantReadFileTimeStap(a$)
+MyErMacro a$, "Can't Read File TimeStamp", "Δεν μπορώ να διαβάσω την Χρονοσήμανση του αρχείου"
+End Sub
+
 Public Sub ExpectedObjInline(nn$)
 MyErMacro nn$, "Expected Object", "Περίμενα αντικείμενο"
 End Sub

@@ -94,6 +94,7 @@ Public MY_BACK As New cDIBSection
 Dim CtrlFont As New StdFont
 Dim novisible As Boolean
 Private mModalId As Double, mModalIdPrev As Double
+Private mPopUpMenu As Boolean
 Public IamPopUp As Boolean
 Private mEnabled As Boolean
 Public WithEvents mDoc As Document
@@ -116,7 +117,12 @@ Property Let Modal(RHS As Double)
 mModalIdPrev = mModalId
 mModalId = RHS
 End Property
-
+Public Property Get PopUpMenuVal() As Boolean
+PopUpMenuVal = mPopUpMenu
+End Property
+Public Property Let PopUpMenuVal(RHS As Boolean)
+mPopUpMenu = RHS
+End Property
 Public Property Let Enablecontrol(RHS As Boolean)
 If RHS = False Then UnHook hWND '  And Not Me Is Screen.ActiveForm Then UnHook hWnd
 If Len(MyName$) = 0 Then Exit Property

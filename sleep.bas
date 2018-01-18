@@ -86,7 +86,7 @@ Private Declare Function WaitForSingleObject Lib "KERNEL32" ( _
     ByVal hHandle As Long, _
     ByVal dwMilliseconds As Long) As Long
     
-Private Declare Function MsgWaitForMultipleObjects Lib "user32" ( _
+Private Declare Function MsgWaitForMultipleObjects Lib "User32" ( _
     ByVal nCount As Long, _
     pHandles As Long, _
     ByVal fWaitAll As Long, _
@@ -455,7 +455,7 @@ End If
     
     ft.dwLowDateTime = CLng(dblDelayLow)
     lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
-    
+    Dim handlepopup As Boolean, lastpopup As Long
     Do
         ' QS_ALLINPUT means that MsgWaitForMultipleObjects will
         ' return every time the thread in which it is running gets
@@ -466,9 +466,37 @@ End If
             INFINITE, QS_ALLINPUT&)
            
                   DoEvents
+            If Not Screen.ActiveForm Is Nothing Then
+                    If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                        '    Debug.Print Screen.ActiveForm.PopUpMenuVal
+                        If Not handlepopup Then
+                            If Screen.ActiveForm.PopUpMenuVal Then
+                            lastpopup = Screen.ActiveForm.hdc
+                            handlepopup = True
+                            End If
+                       ElseIf GetForegroundWindow <> Screen.ActiveForm.hWND Then
+       If handlepopup Then
+                        handlepopup = False
+                        SetVisibleByHDC lastpopup, False
+                        End If
+                        End If
+Else
+                        If GetForegroundWindow <> Screen.ActiveForm.hWND Then Exit Do
+                        End If
+      
 
+
+End If
   Loop Until lBusy = WAIT_OBJECT_0
     ' Close the handles when you are done with them.
     CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd
+End Sub
+Sub SetVisibleByHDC(whatHDC As Long, setit As Long)
+Dim k As Form
+On Error Resume Next
+For Each k In Forms
+    If k.hdc = whatHDC Then k.Visible = setit
+Next k
+
 End Sub

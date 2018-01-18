@@ -208,7 +208,7 @@ jumphere:
             
                pobjTarget.Modal = mycodeid
                
-               Dim x As Form, z As Form, zz As Form
+               Dim x As Form, Z As Form, zz As Form
                Set zz = Screen.ActiveForm
                
                If Not pobjTarget.IamPopUp Then
@@ -237,11 +237,42 @@ jumphere:
             MoveFormToOtherMonitorOnly myform, center2mouse
 
            pobjTarget.Refresh
+           Dim handlepopup As Boolean
+            If Not Screen.ActiveForm Is Nothing Then
+                            If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                        '    Debug.Print Screen.ActiveForm.PopUpMenuVal
+                        If Not handlepopup Then
+                            If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
+                            handlepopup = True
+                            End If
+                            End If
+                            End If
+                            End If
                 Do While ModalId <> 0 And pobjTarget.Visible
                   '  ProcTask2 basestack1
                      mywait basestack1, 1, True
                      Sleep 1
                      'SleepWaitEdit2 1
+                     
+                        If Not Screen.ActiveForm Is Nothing Then
+                            If TypeOf Screen.ActiveForm Is GuiM2000 Then
+                        '    Debug.Print Screen.ActiveForm.PopUpMenuVal
+                        If Not handlepopup Then
+                            If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
+                            handlepopup = True
+                            End If
+                        ElseIf GetForegroundWindow <> Screen.ActiveForm.hWND Then
+                        handlepopup = False
+                        If Screen.ActiveForm.PopUpMenuVal Or Screen.ActiveForm.IamPopUp Then
+                        Screen.ActiveForm.Visible = False
+                        Else
+                        pobjTarget.SetFocus
+                        End If
+                        
+                        End If
+                        End If
+                     
+                        End If
                      If ExTarget Or LastErNum <> 0 Then Exit Do
                 Loop
                  ModalId = mycodeid
@@ -249,20 +280,20 @@ jumphere:
       Else
       ModalId = mycodeid
            End If
-        Set z = Nothing
+        Set Z = Nothing
            For Each x In Forms
             If x.Visible And x.name = "GuiM2000" Then
            x.TestModal mycodeid
-          If x.Enablecontrol Then Set z = x
+          If x.Enablecontrol Then Set Z = x
             End If
             Next x
-            If Not zz Is Nothing Then Set z = zz
-          If Typename(z) = "GuiM2000" Then
-            z.ShowmeALL
-            z.SetFocus
-            Set z = Nothing
-            ElseIf Not z Is Nothing Then
-            If z.Visible Then z.SetFocus
+            If Not zz Is Nothing Then Set Z = zz
+          If Typename(Z) = "GuiM2000" Then
+            Z.ShowmeALL
+            Z.SetFocus
+            Set Z = Nothing
+            ElseIf Not Z Is Nothing Then
+            If Z.Visible Then Z.SetFocus
           End If
           ModalId = oldmoldid
            End If
