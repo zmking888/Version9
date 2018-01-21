@@ -49,10 +49,18 @@ Private Declare Function GetSystemMetrics Lib "User32" ( _
    ByVal nIndex As Long) As Long
 
 Public Property Get VirtualScreenWidth() As Long
-   VirtualScreenWidth = (GetSystemMetrics(SM_CXVIRTUALSCREEN)) * dv15 + 130
+If IsWine Then
+   VirtualScreenWidth = (GetSystemMetrics(SM_CXVIRTUALSCREEN)) * dv15 - dv15
+Else
+   VirtualScreenWidth = (GetSystemMetrics(SM_CXVIRTUALSCREEN)) * dv15
+   End If
 End Property
 Public Property Get VirtualScreenHeight() As Long
-   VirtualScreenHeight = (GetSystemMetrics(SM_CYVIRTUALSCREEN)) * dv15 + 3
+If IsWine Then
+VirtualScreenHeight = (GetSystemMetrics(SM_CYVIRTUALSCREEN)) * dv15 - dv15
+Else
+   VirtualScreenHeight = (GetSystemMetrics(SM_CYVIRTUALSCREEN)) * dv15
+   End If
 End Property
 Public Property Get DisplayMonitorCount() As Long
    DisplayMonitorCount = GetSystemMetrics(SM_CMONITORS)

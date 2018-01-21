@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 39
+Global Const Revision = 40
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -36717,7 +36717,7 @@ Else
     If ttl Then
     ' we have title
         If Form3.WindowState = 1 Then
-        Form3.Visible = True: Form3.WindowState = 0: If Form3.WindowState = 0 Then Form3.Move VirtualScreenWidth() - 2000, -2000
+        Form3.Visible = True: Form3.WindowState = 0: If Form3.WindowState = 0 Then Form3.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
             Do While Not Form1.Visible Or NOEXECUTION
            mywait bstack, 5
                 Loop
@@ -47854,7 +47854,7 @@ If FastSymbol(rest$, ",") Then
     If IsExp(basestack, rest$, p) Then
         If p = 0 Then
                    If Not Form3.WindowState = 1 Then
-                        Form3.Visible = True: Form3.Move VirtualScreenWidth() - 2000, -2000
+                        Form3.Visible = True: Form3.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
                         Form3.WindowState = 1
                    End If
         Else
@@ -47862,7 +47862,7 @@ If FastSymbol(rest$, ",") Then
                 Form3.Visible = True
 
                 Form3.WindowState = 0
-             Form3.Move VirtualScreenWidth() - 2000, -2000
+             Form3.Move VirtualScreenWidth() + 2000, VirtualScreenHeight() + 2000
                 End If
             
         End If
