@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 40
+Global Const Revision = 41
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2063,7 +2063,7 @@ Else
                         Counterend = -1
                         counter = 0
                         countDir = 1
-                        If Not CheckIsmArray(myobject, var()) Then
+                        If Not CheckIsmArrayOrStackOrCollection(myobject, var()) Then
                             Set myobject = Nothing
                             
                         Else

@@ -6413,6 +6413,34 @@ If TypeOf obj Is mArray Then If obj.Arr Then CheckIsmArray = True: Set oldobj = 
 End If
 Set obj = oldobj
 End Function
+Public Function CheckIsmArrayOrStackOrCollection(obj As Object, vv() As Variant) As Boolean
+Dim oldobj As Object
+If obj Is Nothing Then Exit Function
+Set oldobj = obj
+
+Dim kk As Long
+again:
+If kk > 20 Then Set obj = oldobj: Exit Function
+If TypeOf obj Is mHandler Then
+    If obj.t1 <> 2 Then
+        If obj.indirect >= 0 And obj.indirect <= var2used Then
+                Set obj = vv(obj.indirect)
+                kk = kk + 1
+                GoTo again
+        Else
+                Set obj = obj.objref
+        End If
+   
+    End If
+    
+End If
+If Not obj Is Nothing Then
+If TypeOf obj Is mArray Then If obj.Arr Then CheckIsmArrayOrStackOrCollection = True: Set oldobj = Nothing: Exit Function
+If TypeOf obj Is mStiva Then CheckIsmArrayOrStackOrCollection = True: Set oldobj = Nothing: Exit Function
+If TypeOf obj Is FastCollection Then CheckIsmArrayOrStackOrCollection = True: Set oldobj = Nothing: Exit Function
+End If
+Set obj = oldobj
+End Function
 Public Function CheckDeepAny(obj As Object, vv() As Variant) As Boolean
 Dim oldobj As Object
 If obj Is Nothing Then Exit Function
