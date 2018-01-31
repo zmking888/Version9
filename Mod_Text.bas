@@ -76,7 +76,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 41
+Global Const Revision = 42
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16851,7 +16851,7 @@ assignvalue3:
                         If bstack.lastobj Is Nothing Then
                         If VarType(var(v)) = vbLong Then
                         On Error Resume Next
-                            var(v) = CLng(p)
+                            var(v) = CLng(Int(p))
                             If Err.Number > 0 Then OverflowLong: interpret = 0: GoTo there1
                             On Error GoTo 0
                         Else
@@ -17126,34 +17126,34 @@ somethingelse:
                 On Error GoTo forlong
                 Select Case ss$
                     Case "="
-                        v = GlobalVar(w$, CLng(p))
+                        v = GlobalVar(w$, CLng(Int(p)))
                         GoTo assignvalue2
                     Case "+="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(p + var(v))
+                            var(v) = CLng(Int(p) + var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "-="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(-p + var(v))
+                            var(v) = CLng(-Int(p) + var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "*="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(p * var(v))
+                            var(v) = CLng(Int(p) * var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "/="
                         If IsExp(bstack, b$, p) Then
-                            If p = 0 Then
+                            If Int(p) = 0 Then
                                 DevZero
                                 interpret = False
                                 GoTo there1
                             End If
-                            var(v) = CLng(var(v) / p)
+                            var(v) = CLng(var(v) / Int(p))
                         Else
                             GoTo noexpression
                         End If
@@ -17858,7 +17858,7 @@ If FastSymbol(b$, "=") Then '................................
                                    interpret = False
                                  GoTo there1
                                 End If
-                                 var(v) = var(v) \ MyRound(p)
+                                 var(v) = MyRound(var(v) / MyRound(p))
                                  Case "!"
                                  var(v) = -1 - (var(v) <> 0)
                             End Select
@@ -17919,16 +17919,16 @@ With pppp
         ElseIf IsOperator0(b$, "--", 2) Then
             .item(v) = .itemnumeric(v) - 1
             GoTo loopcontinue1
-        ElseIf IsOperator0(b$, "+=", 2) Then
+        ElseIf IsOperator(b$, "+=", 2) Then
             If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
             .item(v) = .itemnumeric(v) + p
-        ElseIf IsOperator0(b$, "-=", 2) Then
+        ElseIf IsOperator(b$, "-=", 2) Then
             If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
             .item(v) = .itemnumeric(v) - p
-        ElseIf IsOperator0(b$, "*=", 2) Then
+        ElseIf IsOperator(b$, "*=", 2) Then
             If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
             .item(v) = .itemnumeric(v) * p
-        ElseIf IsOperator0(b$, "/=", 2) Then
+        ElseIf IsOperator(b$, "/=", 2) Then
             If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
             If p = 0 Then
              DevZero
@@ -18242,21 +18242,21 @@ If IsOperator0(b$, "++", 2) Then
 pppp.item(v) = pppp.itemnumeric(v) + 1
 ElseIf IsOperator0(b$, "--", 2) Then
 pppp.item(v) = pppp.itemnumeric(v) - 1
-ElseIf IsOperator0(b$, "+=", 2) Then
+ElseIf IsOperator(b$, "+=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
 pppp.item(v) = pppp.itemnumeric(v) + MyRound(p)
-ElseIf IsOperator0(b$, "-=", 2) Then
+ElseIf IsOperator(b$, "-=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
 pppp.item(v) = pppp.itemnumeric(v) - MyRound(p)
-ElseIf IsOperator0(b$, "*=", 2) Then
+ElseIf IsOperator(b$, "*=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
-pppp.item(v) = pppp.itemnumeric(v) * MyRound(p)
-ElseIf IsOperator0(b$, "/=", 2) Then
+pppp.item(v) = MyRound(pppp.itemnumeric(v) * MyRound(p))
+ElseIf IsOperator(b$, "/=", 2) Then
 If Not IsExp(bstack, b$, p) Then interpret = False: here$ = ohere$: GoTo there1
 If MyRound(p) = 0 Then
  DevZero
  Else
- pppp.item(v) = Int(pppp.itemnumeric(v) / MyRound(p))
+ pppp.item(v) = MyRound(pppp.itemnumeric(v) / MyRound(p))
 End If
 ElseIf IsOperator0(b$, "-!", 2) Then
 pppp.item(v) = -pppp.itemnumeric(v)
@@ -19163,7 +19163,7 @@ ContEnd:
                 Execute = 2
                 Exit Function
                 ElseIf IsLabelSymbolNew(b$, "ΕΠΙΛΟΓΗΣ", "SELECT", lang) Then
-                MyEr "Expected in Select Case a Block or a Command", "Περίμενα στην Επίλεξε Με μια εντολή ή ένα μπλοκ εντολών)"
+               NoCommandOrBlock
                 Execute = 1
                 Exit Function
                 Else
@@ -19289,9 +19289,9 @@ cont10456:
              If IsExp(bstack, b$, p) Then
              On Error Resume Next
               If x2 < 0 Then
-                bstack.SetVar w$, CLng(p)
+                bstack.SetVar w$, CLng(Int(p))
             Else
-               var(x2) = CLng(p)
+               var(x2) = CLng(Int(p))
             End If
           
              If Err.Number = 6 Then
@@ -19322,8 +19322,11 @@ eos:
         If nd& = 4 Then
         sp = MyRound(sp, 0)
         p = MyRound(p, 0)
+        ElseIf x1 > 1 Then
+        sp = Int(sp)
+        p = Int(p)
         Else
-       sp = MyRound(sp, 13)
+        sp = MyRound(sp, 13)
         p = MyRound(p, 13)
         End If
             If x1 > 1 Then sp = Round(sp, 0)
@@ -19335,7 +19338,9 @@ eos:
                 
         If IsLabelSymbolNew(b$, "ΑΝΑ", "STEP", lang) Then
         If IsExp(bstack, b$, st) Then
-         If x1 > 1 Then st = Round(st)
+         If x1 > 1 Then
+         If x1 = 8 Then st = Fix(st) Else st = Round(st)
+         End If
          If Sgn(sp - p) = 0 Or st = 0 Then
         
          Else
@@ -20634,7 +20639,7 @@ ContOn:
         End If
             If y1 Then
             On Error Resume Next
-                p = CLng(p)
+                p = CLng(Int(p))
                         If Err.Number = 6 Then
                                 OverflowLong
                                 Execute = 0
@@ -21140,7 +21145,7 @@ assignvalue3:
                         If bstack.lastobj Is Nothing Then
                         If VarType(var(v)) = vbLong Then
                         On Error Resume Next
-                            var(v) = CLng(p)
+                            var(v) = CLng(Int(p))
                             If Err.Number > 0 Then OverflowLong: Execute = 0: Exit Function
                             On Error GoTo 0
                         Else
@@ -21453,34 +21458,34 @@ somethingelse:
                 If VarType(var(v)) = vbLong Then
                    Select Case ss$
                     Case "="
-                        v = GlobalVar(w$, CLng(p), , VarStat, temphere$)
+                        v = GlobalVar(w$, CLng(Int(p)), , VarStat, temphere$)
                         GoTo assignvalue2
                     Case "+="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(p + var(v))
+                            var(v) = CLng(Int(p) + var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "-="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(-p + var(v))
+                            var(v) = CLng(-Int(p) + var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "*="
                         If IsExp(bstack, b$, p) Then
-                            var(v) = CLng(p * var(v))
+                            var(v) = CLng(Int(p) * var(v))
                         Else
                             GoTo noexpression
                         End If
                     Case "/="
                         If IsExp(bstack, b$, p) Then
-                            If p = 0 Then
+                            If Int(p) = 0 Then
                                 DevZero
                                 Execute = 0
                                 Exit Function
                             End If
-                            var(v) = CLng(var(v) / p)
+                            var(v) = CLng(var(v) \ Int(p))
                         Else
                             GoTo noexpression
                         End If
@@ -23016,7 +23021,7 @@ If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
 .item(v) = .itemnumeric(v) - MyRound(p)
 ElseIf FastSymbol(b$, "*=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
-.item(v) = .itemnumeric(v) * MyRound(p)
+.item(v) = MyRound(.itemnumeric(v) * MyRound(p))
 ElseIf FastSymbol(b$, "/=", , 2) Then
 If Not IsExp(bstack, b$, p) Then Execute = 0: Exit Function
 If MyRound(p) = 0 Then

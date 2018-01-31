@@ -6795,6 +6795,10 @@ End Sub
 Public Sub NoReference()
    MyEr "No reference exist", "Δεν υπάρχει αναφορά"
 End Sub
+Public Sub NoCommandOrBlock()
+MyEr "Expected in Select Case a Block or a Command", "Περίμενα στην Επίλεξε Με μια εντολή ή ένα μπλοκ εντολών)"
+End Sub
+
 Public Sub NoSecReF()
 MyEr "No reference allowed - use new variable", "Δεν δέχεται αναφορά - χρησιμοποίησε νέα μεταβλητή"
 End Sub
