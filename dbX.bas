@@ -1604,7 +1604,8 @@ Else
     If ExtractPath(base) = vbNullString Then base = mylcasefILE(mcd + base)
     If ExtractType(base) = vbNullString Then base = base & ".mdb"
     If Not CanKillFile(base) Then FilePathNotForUser: DELfields = False: Exit Function
-    If CheckMine(base) Then KillFile base
+    If CheckMine(base) Then KillFile base: DELfields = True: Exit Function
+    
 End If
 
 End If

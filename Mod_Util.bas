@@ -5620,6 +5620,24 @@ End Function
 Sub myesc(b$)
 MyErMacro b$, "Escape", "Διακοπή εκτέλεσης"
 End Sub
+Sub wrongsizeOrposition(a$)
+    MyErMacro a$, "Wrong Size-Position for reading buffer", "Λάθος Μέγεθος-θέση, για διάβασμα Διάρθρωσης"
+End Sub
+Sub wrongweakref(a$)
+MyErMacro a$, "Wrong weak reference", "λάθος ισχνής αναφοράς"
+End Sub
+Sub negsqrt(a$)
+MyErMacro a$, "negative or zero number", "αρνητικός ή μηδέν σε ρίζα"
+End Sub
+Sub expecteddecimal(a$)
+MyErMacro a$, "Expected decimal separator char", "Περίμενα χαρακτήρα διαχωρισμού δεκαδικών"
+End Sub
+Sub wrongexprinstring(a$)
+MyErMacro a$, "Wrong expression in string", "λάθος μαθηματική έκφραση στο αλφαριθμητικό"
+End Sub
+Sub unknownoffset(a$, s$)
+MyErMacro a$, "Unknown Offset " & s$, "’γνωστη Μετάθεση " & s$
+End Sub
 Public Function MyDoEvents()
 On Error GoTo there
 If TaskMaster Is Nothing Then
