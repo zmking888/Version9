@@ -145,7 +145,7 @@ Public Sub Sort()
 If toplim = -1 Then Exit Sub
 If AllowSameKey Then
 If Stable Then
-InsertionSort1 PriveSpace(), LBound(PriveSpace()), toplim
+InsertionSort PriveSpace(), LBound(PriveSpace()), toplim
 Else
 QuickSortItemsNumbers PriveSpace(), LBound(PriveSpace()), toplim
 End If
@@ -163,7 +163,7 @@ Public Sub SortDes()
 If toplim = -1 Then Exit Sub
 If AllowSameKey Then
 If Stable Then
-InsertionSort2 PriveSpace(), LBound(PriveSpace()), toplim
+InsertionSort PriveSpace(), LBound(PriveSpace()), toplim, 1
 Else
 QuickSortItemsRevNumbers PriveSpace(), LBound(PriveSpace()), toplim
 End If
@@ -1113,9 +1113,9 @@ Stable = True
 End Function
 
 Function compareStr4(ByVal a$, ByVal b$) As Long
-Dim i As Long, j As Long, a1$, b1$, p1 As Double, p2 As Double, N$, k As Long, k1 As Long
+Dim i As Long, j As Long, a1$, b1$, p1 As Double, p2 As Double, n$, k As Long, k1 As Long
 If CompareString(useclid, &H1000, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$)) = 2 Then Exit Function
-N$ = "[-0-9.]"
+n$ = "[-0-9.]"
 k = Sgn(Len(a$) - Len(b$))
 k1 = k
 again:
@@ -1123,7 +1123,7 @@ j = IIf(Len(a$) >= Len(b$), Len(b$), Len(a$))
 
 For i = 1 To j
 
-    If Mid$(a$, i, 1) Like N$ Then
+    If Mid$(a$, i, 1) Like n$ Then
     a1$ = Mid$(a$, i)
     b1$ = Mid$(b$, i)
         IsNumberD2 a1$, p1
@@ -1132,7 +1132,7 @@ For i = 1 To j
             compareStr4 = Sgn(MyRound(p1, 8) - MyRound(p2, 8))
             If compareStr4 = 0 Then
                 If Len(a1$) * Len(b1$) <> 0 Then
-                    If Len(N$) > 6 Then N$ = "[-0-9]"
+                    If Len(n$) > 6 Then n$ = "[-0-9]"
                     k = Sgn(Len(a1$) - Len(b1$))
                      
                     a$ = a1$
@@ -1170,7 +1170,7 @@ For i = 1 To j
         End If
         End If
         Exit Function
-    ElseIf Mid$(b$, i, 1) Like N$ Then
+    ElseIf Mid$(b$, i, 1) Like n$ Then
     a$ = Mid$(a$, i)
     b$ = Mid$(b$, i)
     IsNumberD2 b$, p1
@@ -1225,32 +1225,23 @@ End Function
 Public Property Get IsQueue() As Variant
 IsQueue = AllowSameKey
 End Property
-Private Sub InsertionSort1(Arr() As item, ByVal iMin As Long, iMax As Long)
+Private Sub InsertionSort(Arr() As item, ByVal iMin As Long, ByVal iMax As Long, Optional what As Long = -1)
     Dim i As Long
     Dim j As Long
     Dim varSwap As item
-    iMin = iMin + 1
-    For i = iMin + 1 To iMax
-        varSwap = Arr(i)
-        For j = i To iMin + 1 Step -1
-            If compareStr4(varSwap.Key, Arr(j - 1).Key) = -1 Then Arr(j) = Arr(j - 1) Else Exit For
-        Next j
-        Arr(j) = varSwap
-    Next i
-End Sub
-
-Private Sub InsertionSort2(Arr() As item, ByVal iMin As Long, iMax As Long)
-    Dim i As Long
-    Dim j As Long
-    Dim varSwap As item
-    iMax = iMax - 1
-    For i = iMax - 1 To iMin Step -1
-        varSwap = Arr(i)
-        For j = i To iMax + 1
-        
-            If compareStr4(varSwap.Key, Arr(j + 1).Key) = -1 Then Arr(j) = Arr(j + 1) Else Exit For
-        Next j
-        Arr(j) = varSwap
-    Next i
+    i = iMin + 1
+    iMax = iMax + 1
+    While i < iMax
+        j = i
+        Do While j > iMin
+        If compareStr4(Arr(j).Key, Arr(j - 1).Key) = what Then
+            varSwap = Arr(j): Arr(j) = Arr(j - 1): Arr(j - 1) = varSwap
+            j = j - 1
+        Else
+            Exit Do
+        End If
+        Loop
+        i = i + 1
+    Wend
 End Sub
 
