@@ -2410,7 +2410,7 @@ Case Is >= "A"
             If one Then Exit Do
             If r$ <> "" Then
             one = True
-            rr& = 4 ' is long variable
+            rr& = 1 ' is long variable but here we want to be as numeric variable
             r$ = r$ & Myleft$(a$, 1)
         
             a$ = Mid$(a$, 2)
@@ -2671,6 +2671,7 @@ marvel2:
  feedback = feedthis
   a$ = Mid$(a$, pos1)
   If FastSymbol(a$, ",") Then
+       addone col(), pos2, 14
     pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)

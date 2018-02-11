@@ -77,7 +77,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 44
+Global Const Revision = 45
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -7698,7 +7698,7 @@ If FastSymbol(a$, "@") Then
     If GetVar(bstack, s$, VR) Then
     r = SG * True
 
- w1 = Abs(asc(v$) < 128)
+ w1 = Abs(Asc(v$) < 128)
 If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1, , , , False) Then
 If IsLabel(bstack, a$, s$) Then
 If Right$(s$, 1) = "(" Then FastSymbol a$, ")"
@@ -7820,7 +7820,7 @@ there12:
                     If FastSymbol(a$, ",") Then
                         If IsExp(bstack, a$, p) Then
                         
-                            w1 = Abs(asc(v$) < 128)
+                            w1 = Abs(Asc(v$) < 128)
                             If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1, , , , False) Then
                                 If IsLabelSymbolNew(a$, "ΨΗΦΙΟ", "BYTE", w1, , , , False) Then
                                     PP = 1
@@ -9858,7 +9858,7 @@ fun91: 'Case "ASC(", "ΚΩΔ("
     If s$ = vbNullString Then
     r = -1
     Else
-    r = SG * asc(s$)
+    r = SG * Asc(s$)
     End If
 
     
@@ -12769,7 +12769,103 @@ LB = 1
   
  End If
 End Function
+Function IsLabelF(a$, rrr$) As Long
+Dim buf$
+If Len(a$) < 129 Then IsLabelF = IsLabelF1(a$, rrr$): Exit Function
 
+   
+    buf$ = Left$(a$, 128)
+    IsLabelF = IsLabelF1(buf$, rrr$)
+    If buf$ = vbNullString Then
+        IsLabelF = IsLabelF1(a$, rrr$)
+    Else
+        a$ = Mid$(a$, 129 - Len(buf$))
+    End If
+End Function
+
+Function IsLabelF1(a$, r$) As Long
+' for left side...no &
+
+Dim rr&, one As Boolean, c$, gr As Boolean
+r$ = vbNullString
+If a$ = vbNullString Then IsLabelF1 = 0: Exit Function
+a$ = NLtrim$(a$)
+    Do While Len(a$) > 0
+    c$ = Left$(a$, 1)
+    If AscW(c$) < 256 Then
+        Select Case c$
+        Case "."
+            If one Then
+            Exit Do
+            ElseIf r$ <> "" And Len(a$) > 1 Then
+            If Mid$(a$, 2, 2) = ". " Or Mid$(a$, 2, 1) = " " Then Exit Do
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            rr& = 1
+            Else
+            IsLabelF1 = 0
+            Exit Function
+            End If
+      Case "\", "{" To "~", "^"
+        Exit Do
+        Case "0" To "9", "_"
+           If one Then
+            Exit Do
+            ElseIf r$ <> "" Then
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            rr& = 1 'is an identifier or floating point variable
+            Else
+            Exit Do
+            End If
+        Case Is >= "A"
+            If one Then
+            Exit Do
+            Else
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            rr& = 1 'is an identifier or floating point variable
+            End If
+        Case "$"
+            If one Then Exit Do
+            If r$ <> "" Then
+            one = True
+            rr& = 3 ' is string variable
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            Else
+            Exit Do
+            End If
+        Case "%"
+            If one Then Exit Do
+            If r$ <> "" Then
+                one = True
+                rr& = 4 ' is long variable
+                r$ = r$ & Left$(a$, 1)
+                a$ = Mid$(a$, 2)
+            Else
+            Exit Do
+            End If
+        Case Else
+        Exit Do
+        End Select
+        Else
+            If one Then
+            Exit Do
+            Else
+            gr = True
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            rr& = 1 'is an identifier or floating point variable
+            End If
+        End If
+
+    Loop
+    r$ = myUcase(r$, gr)
+    IsLabelF1 = rr&
+
+
+End Function
 Function IsLabelA(where$, a$, r$) As Long
 ' for left side...no &
 
@@ -25018,22 +25114,18 @@ conthereplease:
             Else
                 here$ = ohere$ + "." & what$
             End If
-            If here$ <> ohere$ Then
-            basestack.callohere = ohere$
-            basestack.callx1 = x1
-            'If Not ProcModuleEntry(basestack, ohere$, x1, rest$, lang) Then GoTo NERR
-                '    funcno = funcno - 1
+            With basestack
+                 If .OriginalCode <> x1 And x1 <> 0 Then
+                    .callohere = ohere$
+                    .callx1 = x1
+                    Identifier = True
+                Else
+                MyErMacro rest$, "Use Call command to call recuirsive in module", "Χρησιμοποίησε την Κάλεσε για αναδρομική κλήση τμήματος"
+                If here$ <> ohere$ Then here$ = ohere$
                 Identifier = True
-          Exit Function
-            Else
-               ''    funcno = funcno - 1
-          If what$ = here$ Then
-          MyErMacro rest$, "Use Call command to call recuirsive in module", "Χρησιμοποίησε την Κάλεσε για αναδρομική κλήση τμήματος"
-          
-          here$ = ohere$
-          Identifier = True
-          Exit Function
-          End If
+                End If
+            End With
+            Exit Function
 NERR:
 
                         If MOUT And rest$ = vbNullString Then
@@ -25041,7 +25133,7 @@ NERR:
                                 MyErMacro rest$, "unknown identifier " & what$, "’γνωστο αναγνωριστικό " & what$
                         End If
                         Identifier = True
-            End If
+            
 End Select
 
 
@@ -29433,7 +29525,7 @@ Exit Function
 End If
 final = IsLabelSymbolNew(rest$, "ΤΕΛΙΚΗ", "FINAL", lang)
 classcontclass:
-x1 = Abs(IsLabel(bstack, rest$, f$))
+x1 = Abs(IsLabelF(rest$, f$))
     If prv Then f$ = ChrW(&HFFBF) + f$
 ''f$ = myUcase$(f$)
 funcoperator:
@@ -29631,7 +29723,7 @@ ExecuteVarOnly = False
 Exit Function
 End If
 final = IsLabelSymbolNew(rest$, "ΤΕΛΙΚΟ", "FINAL", lang)
-x1 = Abs(IsLabel(bstack, rest$, f$))
+x1 = Abs(IsLabelF(rest$, f$))
     If prv Then f$ = ChrW(&HFFBF) + f$
 If x1 <> 0 Then
   If var(vvv).FuncList <> "" Then  ' maybe we have it
@@ -31993,7 +32085,7 @@ cont1010:
                         Else
                             strX1 = Str$(x1)
                         End If
-                        If asc(s$) <> 32 Then
+                        If Asc(s$) <> 32 Then
                         If InStr(s$, " ") = 2 Then
                         ss$ = ss$ + Left$(s$, 1)
                         s$ = Mid$(s$, 2)
@@ -32208,7 +32300,7 @@ If myobject Is Nothing Then GoTo exithere1
                              
                             Else  ' is not array so...
                             '' drop *
-                            If asc(s$) = 42 Then s$ = Mid$(s$, 2)
+                            If Asc(s$) = 42 Then s$ = Mid$(s$, 2)
                                   If GetVar(bstack, bstack.GroupName & s$, v) Then ' And here$ = VbNullString
                                   ' this needed for "a<=b"  a copy to a global group
                                 
@@ -32296,7 +32388,7 @@ cont1010:
                         x1 = IsLabelA("", s$, ss$)
                         Dim strX1 As String
                         If MyFunction(-2 * (ChrW(&H1FFF) = ss$), bstack, sss$, 1) Then '' >6 len for function
-                        If asc(s$) <> 32 Then
+                        If Asc(s$) <> 32 Then
                         If InStr(s$, " ") = 2 Then
                         ss$ = ss$ + Left$(s$, 1)
                         s$ = Mid$(s$, 2)
@@ -32880,7 +32972,7 @@ m = 1
  what$ = aheadstatus(rest$, , m)
 
  If m > 1 Then
- If asc(LTrim(Left$(rest$, m))) < 32 Then Exit Do
+ If Asc(LTrim(Left$(rest$, m))) < 32 Then Exit Do
  STq = True
  If s$ <> "" Then
  s$ = s$ + ", " + LTrim(Left$(rest$, m - 1))
@@ -40790,7 +40882,6 @@ backfromstr:
                 End If
             End If
         Else
-            
             it = GlobalVar(what$, it)
             MakeitObject2 var(it)
             
@@ -40849,11 +40940,26 @@ Case 3, 4
             If Not f Then
                 If Not flag Then
                     If ohere$ <> "" Then
-       
-                GlobalVar what$, i, True
-               MyRead = True
-       
+                            'GoTo contpush12
+               If MyIsObject(var(i)) Then
+                    If Typename(var(i)) = "lambda" Then
+                        If ohere$ = vbNullString Then
+                            GlobalSub what$ + "()", "CALL EXTERN " & Str(i)
+                        Else
+                            GlobalSub ohere$ & "." & bstack.GroupName & what$ + "()", "CALL EXTERN " & Str(i)
+                        End If
+                        GlobalVar what$, i, True
+                    ElseIf Typename(var(i)) = "Group" Then
+                        what$ = Left$(what$, Len(what$) - 1)
+                        GoTo backfromstr
                     Else
+                        GlobalVar what$, i, True
+                    End If
+                Else
+                     GlobalVar what$, i, True
+                 End If
+               MyRead = True
+               Else
                         NoSecReF
                         Exit Do
                     End If
@@ -40867,11 +40973,29 @@ Case 3, 4
                     If Not ReboundVar(bstack, what$, i) Then GlobalVar what$, i, True
                 Else
                    
-                    GlobalVar what$, i, True
-                     If Typename$(var(i)) = "Group" And Right$(what$, 1) = "$" Then
-                     what$ = Left$(what$, Len(what$) - 1)
-                        GoTo backfromstr
-                    End If
+'                    GlobalVar what$, i, True
+            If MyIsObject(var(i)) Then
+                    If Typename(var(i)) = "lambda" Then
+                         If ohere$ = vbNullString Then
+                             GlobalSub what$ + "()", "CALL EXTERN " & Str(i)
+                         Else
+                             GlobalSub ohere$ & "." & bstack.GroupName & what$ + "()", "CALL EXTERN " & Str(i)
+                         End If
+                         GlobalVar what$, i, True
+                    ElseIf Typename(var(i)) = "Group" Then
+                         what$ = Left$(what$, Len(what$) - 1)
+                         GoTo backfromstr
+                    Else
+                         GlobalVar what$, i, True
+                     End If
+                Else
+                GlobalVar what$, i, True
+                End If
+
+                '     If Typename$(var(i)) = "Group" And Right$(what$, 1) = "$" Then
+                 '    what$ = Left$(what$, Len(what$) - 1)
+                  '      GoTo backfromstr
+                   ' End If
                 End If
                 MyRead = True
             End If
@@ -41198,7 +41322,7 @@ Case 3
     ElseIf bs.IsObjectRef(myobject) Then
         If Typename$(myobject) = "lambda" Then
             If flag2 Then
-                GlobalVar what$, s$
+               i = GlobalVar(what$, s$)
             ElseIf GetVar(bstack, what$, i, , , flag) Then
                 CheckVar var(i), s$
             Else
@@ -43355,8 +43479,8 @@ MyFunction = True
                         End If
                 End If
         End If
-        x1 = Abs(IsLabel(bstack, rest$, what$))
-        If x1 = 1 Or x1 = 3 Or x1 = 4 Then   ' C() C%() C$()
+        x1 = Abs(IsLabelF(rest$, what$))
+If x1 = 1 Or x1 = 3 Or x1 = 4 Then   ' C() C%() C$()
 operators:
               If bstack.UseGroupname <> "" Then
                 If x1 = 1 Then
@@ -43374,15 +43498,15 @@ operators:
                 
                 If y1 Then  ' We have a global function
                         If Not GetGlobalSubAfterHere(bstack, what$, x1) Then
-                          If FastSymbol(rest$, "(") Then
-                                frm$ = BlockParam(rest$)
-                            If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
-                            If Not FastSymbol(rest$, ")") Then
-                       
-                            End If
-                            
-                        frm$ = Trim$(frm$)
-                        End If
+                                    If FastSymbol(rest$, "(") Then
+                                        frm$ = BlockParam(rest$)
+                                    If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+                                    If Not FastSymbol(rest$, ")") Then
+                                    
+                                    End If
+                                    
+                                    frm$ = Trim$(frm$)
+                                    End If
                                 If FastSymbol(rest$, "{") Then
                                         ss$ = block(rest$)
                                         i = Len(rest$)
@@ -43418,15 +43542,13 @@ operators:
                                        MyEr what$ & " missing definition", what$ & " λείπει ο ορισμός"
                                 End If
                          Else
-            If FastSymbol(rest$, "(") Then
-                                frm$ = BlockParam(rest$)
-                            If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
-                            If Not FastSymbol(rest$, ")") Then
-                       
-                            End If
-                            
-                        frm$ = Trim$(frm$)
-                        End If
+                                If FastSymbol(rest$, "(") Then
+                                    frm$ = BlockParam(rest$)
+                                If frm$ <> "" Then Mid$(rest$, 1, Len(frm$)) = Space$(Len(frm$))
+                                If Not FastSymbol(rest$, ")") Then
+                                End If
+                                frm$ = Trim$(frm$)
+                                End If
                                 If FastSymbol(rest$, "{") Then
                                         what$ = block(rest$)
                                             If Len(frm$) <> 0 Then
@@ -43472,6 +43594,7 @@ jump1:
                                     frm$ = vbNullString
                                     
                                 End If
+
                                 If FastSymbol(rest$, "{") Then
                                 
                                             what$ = block(rest$) + " "
@@ -47574,23 +47697,20 @@ If x1 <> 0 Then
                 GoTo BYPASS1
         End If
 End If
-X3 = Abs(IsLabel(basestack, rest$, what$))
-If X3 = 1 Or X3 > 4 Then
-If X3 <> 1 Then
-If Not FastSymbol(rest$, ")") Then
-If Not MaybeIsSymbol(rest$, "{") Then
-    rest$ = what$ + rest$
-    MyEr "Please insert a space after name and before parameters", "Παρακαλώ βάλει ένα διάστημα μετά το όνομα και πριν τη λίστα παραμέτρων"
-    MyModule = False
-    Exit Function
-    ' this is a solution, but I want an error
-    'what$ = Left$(what$, Len(what$) - 1)
-    'rest$ = "(" + rest$
-    'x1 = 1
-    'GoTo BYPASS1
-End If
-End If
-what$ = what$ + ")"
+'X3 = Abs(IsLabel(basestack, rest$, what$))
+X3 = IsLabelF(rest$, what$)
+If X3 = 1 Then
+'If X3 <> 1 Then
+'If Not FastSymbol(rest$, ")") Then
+'If Not MaybeIsSymbol(rest$, "{") Then
+ '   rest$ = what$ + rest$
+  '  MyEr "Please insert a space after name and before parameters", "Παρακαλώ βάλει ένα διάστημα μετά το όνομα και πριν τη λίστα παραμέτρων"
+   ' MyModule = False
+    'Exit Function
+'End If
+'End If
+If Right$(what$, 1) = "(" Then
+If FastSymbol(rest$, ")") Then what$ = what$ + ")"
 End If
 
         If x1 Then

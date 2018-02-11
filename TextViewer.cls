@@ -664,7 +664,7 @@ FillBack thisHDC, b, glistN.CapColor
   
  '   PrintItem2 thisHDC, mDoc1.TextLine(i), A
     PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-    a.top = a.top + onelineheight
+    a.Top = a.Top + onelineheight
   Next i
   RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
   skip = True
@@ -672,7 +672,7 @@ FillBack thisHDC, b, glistN.CapColor
    
 Else
    a.Left = a.Left + 1
-    a.top = a.top + glistN.addpixels \ 2
+    a.Top = a.Top + glistN.addpixels \ 2
     pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
@@ -1732,7 +1732,7 @@ End Sub
 Private Sub ColorizeExpressions(ByVal a$, col(), k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
-Dim N$
+Dim n$
 again:
 If a$ = vbNullString Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1746,13 +1746,13 @@ If kind = 0 Then
         pos2 = k - Len(a$) + 1
     
     End If
-    N$ = a$
-    kind = IsLabelOnly(N$, drop$)
-    If kind = 0 And N$ <> a$ Then
+    n$ = a$
+    kind = IsLabelOnly(n$, drop$)
+    If kind = 0 And n$ <> a$ Then
     feedthis = 10
-    a$ = N$: Exit Sub
+    a$ = n$: Exit Sub
     End If
-    a$ = N$
+    a$ = n$
     
 End If
 
@@ -2085,6 +2085,7 @@ marvel2:
  ''If feedthis Then Exit Sub
   a$ = Mid$(a$, pos1)
   If FastSymbol(a$, ",") Then
+  addone col(), pos2, 14
     pos2 = k - Len(a$) + 1
   pos1 = 1
   drop$ = aheadstatus(a$, False, pos1)
@@ -2561,7 +2562,7 @@ Case Is >= "A"
             If one Then Exit Do
             If r$ <> "" Then
             one = True
-            rr& = 4 ' is long variable
+            rr& = 1 ' only for colorize ' is long variable
             r$ = r$ & Left$(a$, 1)
         
             a$ = Mid$(a$, 2)
@@ -2989,11 +2990,11 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get top() As Long
-top = glistN.TopTwips
+Public Property Get Top() As Long
+Top = glistN.TopTwips
 End Property
 
-Public Property Let top(ByVal RHS As Long)
+Public Property Let Top(ByVal RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Get Height() As Long
