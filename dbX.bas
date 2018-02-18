@@ -12,7 +12,7 @@ Public JetPrefix As String
 Public JetPostfix As String
 'old Microsoft.Jet.OLEDB.4.0
 ' Microsoft.ACE.OLEDB.12.0
-Public Const JetPrefixHelp = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source="
+Public Const JetPrefixHelp = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source="
 Public Const JetPostfixHelp = ";Jet OLEDB:Database Password=100101;"
 Public DBUser As String ' '= VbNullString ' "admin"  ' or ""
 Public DBUserPassword   As String ''= VbNullString
@@ -33,37 +33,37 @@ Public Function MoveFile(pOldPath As String, pNewPath As String)
     MoveFileW StrPtr(pOldPath), StrPtr(pNewPath)
     
 End Function
-Public Function isdir(F$) As Boolean
+Public Function isdir(f$) As Boolean
 On Error Resume Next
 Dim mm As New recDir
 Dim lookfirst As Boolean
 Dim Pad$
-If F$ = vbNullString Then Exit Function
-If F$ = "." Then F$ = mcd
-If InStr(F$, "\..") > 0 Or F$ = ".." Or Left$(F$, 3) = "..\" Then
-If Right$(F$, 1) <> "\" Then
-Pad$ = ExtractPath(F$ & "\", True, True)
+If f$ = vbNullString Then Exit Function
+If f$ = "." Then f$ = mcd
+If InStr(f$, "\..") > 0 Or f$ = ".." Or Left$(f$, 3) = "..\" Then
+If Right$(f$, 1) <> "\" Then
+Pad$ = ExtractPath(f$ & "\", True, True)
 Else
-Pad$ = ExtractPath(F$, True, True)
+Pad$ = ExtractPath(f$, True, True)
 End If
 If Pad$ = vbNullString Then
-If Right$(F$, 1) <> "\" Then
-Pad$ = ExtractPath(mcd + F$ & "\", True)
+If Right$(f$, 1) <> "\" Then
+Pad$ = ExtractPath(mcd + f$ & "\", True)
 Else
-Pad$ = ExtractPath(mcd + F$, True)
+Pad$ = ExtractPath(mcd + f$, True)
 End If
 End If
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then F$ = Pad$
+If lookfirst Then f$ = Pad$
 Else
-F$ = mylcasefILE(F$)
-lookfirst = mm.isdir(F$)
+f$ = mylcasefILE(f$)
+lookfirst = mm.isdir(f$)
 If Not lookfirst Then
 
-Pad$ = mcd + F$
+Pad$ = mcd + f$
 
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then F$ = Pad$
+If lookfirst Then f$ = Pad$
 
 End If
 End If
@@ -1303,7 +1303,7 @@ End If
 End Sub
 Public Sub NewTable(bstackstr As basetask, r$)
 'BASE As String, tablename As String, ParamArray flds()
-Dim base As String, tablename As String, fs As String, i&, N As Double, l As Double, ok As Boolean
+Dim base As String, tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
 ok = False
 If IsStrExp(bstackstr, r$, base) Then
 If FastSymbol(r$, ",") Then
@@ -1397,18 +1397,18 @@ End If
                         If IsStrExp(bstackstr, r$, fs) Then
                         one_ok = True
                                 If FastSymbol(r$, ",") Then
-                                        If IsExp(bstackstr, r$, N) Then
+                                        If IsExp(bstackstr, r$, n) Then
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
-                                                If N = 8 Then N = 7: l = 0
-                                                If N = 10 Then N = 202
-                                                If N = 12 Then N = 203: l = 0
+                                                If n = 8 Then n = 7: l = 0
+                                                If n = 10 Then n = 202
+                                                If n = 12 Then n = 203: l = 0
                                                     If l <> 0 Then
                                                 
-                                                     .Append fs, N, l
+                                                     .Append fs, n, l
                                                     Else
-                                                     .Append fs, N
+                                                     .Append fs, n
                                            
                                                     End If
                                         
