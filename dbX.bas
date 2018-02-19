@@ -12,6 +12,8 @@ Public JetPrefix As String
 Public JetPostfix As String
 'old Microsoft.Jet.OLEDB.4.0
 ' Microsoft.ACE.OLEDB.12.0
+Public Const JetPrefixOld = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source="
+Public Const JetPostfixOld = ";Jet OLEDB:Database Password=100101;"
 Public Const JetPrefixHelp = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source="
 Public Const JetPostfixHelp = ";Jet OLEDB:Database Password=100101;"
 Public DBUser As String ' '= VbNullString ' "admin"  ' or ""
@@ -442,7 +444,18 @@ End If
                             Exit Sub
                         End If
                     Else
+                        Err.Clear
                         myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        If Err.Number = -2147467259 Then
+                           Err.Clear
+                           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           If Err.Number = 0 Then
+                               JetPrefix = JetPrefixOld
+                               JetPostfix = JetPostfixOld
+                           Else
+                               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                           End If
+                        End If
                     End If
                 End If
         End If
@@ -637,8 +650,19 @@ End If
                         Exit Sub
                     End If
                 Else
-                    myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
-                End If
+                        Err.Clear
+                        myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        If Err.Number = -2147467259 Then
+                           Err.Clear
+                           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           If Err.Number = 0 Then
+                               JetPrefix = JetPrefixOld
+                               JetPostfix = JetPostfixOld
+                           Else
+                               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                           End If
+                        End If
+                    End If
                 End If
                 PushOne base, myBase
             End If
@@ -840,7 +864,18 @@ Id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
  Exit Sub
  End If
  Else
- myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        Err.Clear
+        myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        If Err.Number = -2147467259 Then
+           Err.Clear
+           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+           If Err.Number = 0 Then
+               JetPrefix = JetPrefixOld
+               JetPostfix = JetPostfixOld
+           Else
+               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+           End If
+        End If
  End If
  End If
 
@@ -1033,7 +1068,18 @@ End If
  Exit Sub
  End If
  Else
-  myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        Err.Clear
+        myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+        If Err.Number = -2147467259 Then
+           Err.Clear
+           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+           If Err.Number = 0 Then
+               JetPrefix = JetPrefixOld
+               JetPostfix = JetPostfixOld
+           Else
+               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+           End If
+        End If
 End If
 End If
 On Error GoTo g101
@@ -1142,7 +1188,18 @@ Dim myBase
                         Exit Sub
                         End If
                     Else
+                        Err.Clear
                         myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        If Err.Number = -2147467259 Then
+                           Err.Clear
+                           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           If Err.Number = 0 Then
+                               JetPrefix = JetPrefixOld
+                               JetPostfix = JetPostfixOld
+                           Else
+                               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                           End If
+                        End If
                     End If
                 End If
                 PushOne base, myBase
@@ -1203,7 +1260,18 @@ End If
                         Exit Sub
                         End If
                     Else
+                        Err.Clear
                         myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        If Err.Number = -2147467259 Then
+                           Err.Clear
+                           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           If Err.Number = 0 Then
+                               JetPrefix = JetPrefixOld
+                               JetPostfix = JetPostfixOld
+                           Else
+                               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                           End If
+                        End If
                     End If
                  
                 End If
@@ -1342,7 +1410,18 @@ End If
                     Exit Sub
                     End If
                 Else
+                    Err.Clear
                     myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                    If Err.Number = -2147467259 Then
+                       Err.Clear
+                       myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                       If Err.Number = 0 Then
+                           JetPrefix = JetPrefixOld
+                           JetPostfix = JetPostfixOld
+                       Else
+                           MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                       End If
+                    End If
                 End If
                 End If
                 PushOne base, myBase
@@ -1632,16 +1711,26 @@ Dim myBase
                     MyEr "Can't update base to a CD-ROM", "Δεν μπορώ να γράψω στη βάση δεδομένων σε CD-ROM"
                     Exit Function
                 Else
-                 If Left$(base, 1) = "(" Or JetPostfix = ";" Then
-                    myBase.Open JetPrefix & JetPostfix
-                    If Err.Number Then
-                    MyEr Err.Description, Err.Description
-                    DELfields = False: Exit Function
+                    If Left$(base, 1) = "(" Or JetPostfix = ";" Then
+                        myBase.Open JetPrefix & JetPostfix
+                        If Err.Number Then
+                        MyEr Err.Description, Err.Description
+                        DELfields = False: Exit Function
+                        End If
+                    Else
+                        Err.Clear
+                        myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                        If Err.Number = -2147467259 Then
+                           Err.Clear
+                           myBase.Open JetPrefixOld & GetDosPath(base) & JetPostfixOld & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
+                           If Err.Number = 0 Then
+                               JetPrefix = JetPrefixOld
+                               JetPostfix = JetPostfixOld
+                           Else
+                               MyEr "Maybe Need Jet 4.0 library", "Μαλλον χρειάζεται η Jet 4.0 βιβλιοθήκη ρουτινών"
+                           End If
+                        End If
                     End If
-                 Else
-                    myBase.Open JetPrefix & GetDosPath(base) & JetPostfix & "User Id=" & DBUser & ";Password=" & DBUserPassword & ";" & DBSecurityOFF     'open the Connection
-                    End If
-                 
                 End If
                 PushOne base, myBase
             End If

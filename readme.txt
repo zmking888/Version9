@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 46 active-X
-Changed Help2000.mdb from Access97 to Access2000
+Version 9.0 revision 47 active-X
+automatic change to jet 4 if mdb is jet 4.0 based
 
 http://georgekarras.blogspot.gr/
 
