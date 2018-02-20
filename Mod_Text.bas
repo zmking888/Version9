@@ -1,17 +1,12 @@
 Attribute VB_Name = "Module1"
-'Copyright George Karras, Preveza, Greece
+' Author: George Karras, Preveza, Greece
 ' Some code are work of others, and included using info when possible.
-'Licensed under the Apache License, Version 2.0 (the "License");
-'you may not use this file except in compliance with the License.
-'You may obtain a copy of the License at
-'
-'    http://www.apache.org/licenses/LICENSE-2.0
-'
-'Unless required by applicable law or agreed to in writing, software
-'distributed under the License is distributed on an "AS IS" BASIS,
-'WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-'See the License for the specific language governing permissions and
-'limitations under the License.
+' Licensed under the GNU GENERAL PUBLIC LICENSE,  Version 3, 29 June 2007
+' Before loading the code in VB6 IDE, change editor's text to a Greek font.
+' Local References: File idispatch.tlb
+' You have to run it, and then you have to execute M2000.exe to call it, using in a second IDE the mexe.vbp, or just run M2000.exe
+
+
 
 Option Explicit
 Global startaddress As Long, stacksize As Long, findstack As Long
@@ -77,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 47
+Global Const Revision = 48
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -101,8 +96,8 @@ Public Const novalidstr = "+-/*!?_()[]&$#@;" & """"
 
 Public tempList2delete As String
 Public nnn$, basickey$, homepage$
-Private Const LOCALE_SENGLANGUAGE& = 4097
-Private Const LOCALE_SLANGUAGE& = &H2 '  localized name of language
+Private Const LOCALE_SENGLANGUAGE& = 4097&
+Private Const LOCALE_SLANGUAGE& = &H2& '  localized name of language
 Public shortlang As Boolean
 Public LEVCOLMENU As Long
  Declare Function ExpandEnvironmentStrings _
@@ -114,7 +109,7 @@ Private Declare Function GetTempFileNameW Lib "KERNEL32" _
      ByVal wUnique As Long, ByVal lpTempFileName As Long) _
      As Long
      
-Private Const UNIQUE_NAME = &H0
+Private Const UNIQUE_NAME = &H0&
 Public taskid As Long, kill2$, para$
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Public sRec As Object
@@ -215,33 +210,33 @@ Declare Function GetTempPath Lib "KERNEL32" Alias "GetTempPathW" (ByVal nBufferL
 Public Declare Function GetWindowsDirectory Lib "KERNEL32" Alias "GetWindowsDirectoryA" (ByVal lpBuffer As String, ByVal nsize As Long) As Long
 
 
-Private Const LOCALE_USER_DEFAULT = 0
+Private Const LOCALE_USER_DEFAULT = 0&
 
-Private Const LOCALE_SDECIMAL = &HE
-Private Const LOCALE_SGROUPING = &H10
-Private Const LOCALE_STHOUSAND = &HF
-Private Const LOCALE_SMONDECIMALSEP = &H16
-Private Const LOCALE_SMONTHOUSANDSEP = &H17
-Private Const LOCALE_SMONGROUPING = &H18
+Private Const LOCALE_SDECIMAL = &HE&
+Private Const LOCALE_SGROUPING = &H10&
+Private Const LOCALE_STHOUSAND = &HF&
+Private Const LOCALE_SMONDECIMALSEP = &H16&
+Private Const LOCALE_SMONTHOUSANDSEP = &H17&
+Private Const LOCALE_SMONGROUPING = &H18&
 Public trace As Boolean, tracecounter As Long
-Const CSIDL_DESKTOP = &H0
-Const CSIDL_PROGRAMS = &H2
-Const CSIDL_CONTROLS = &H3
-Const CSIDL_PRINTERS = &H4
-Const CSIDL_PERSONAL = &H5
-Const CSIDL_FAVORITES = &H6
-Const CSIDL_STARTUP = &H7
-Const CSIDL_RECENT = &H8
-Const CSIDL_SENDTO = &H9
-Const CSIDL_BITBUCKET = &HA
-Const CSIDL_STARTMENU = &HB
-Const CSIDL_DESKTOPDIRECTORY = &H10
-Const CSIDL_DRIVES = &H11
-Const CSIDL_NETWORK = &H12
-Const CSIDL_NETHOOD = &H13
-Public Const CSIDL_FONTS = &H14
+Const CSIDL_DESKTOP = &H0&
+Const CSIDL_PROGRAMS = &H2&
+Const CSIDL_CONTROLS = &H3&
+Const CSIDL_PRINTERS = &H4&
+Const CSIDL_PERSONAL = &H5&
+Const CSIDL_FAVORITES = &H6&
+Const CSIDL_STARTUP = &H7&
+Const CSIDL_RECENT = &H8&
+Const CSIDL_SENDTO = &H9&
+Const CSIDL_BITBUCKET = &HA&
+Const CSIDL_STARTMENU = &HB&
+Const CSIDL_DESKTOPDIRECTORY = &H10&
+Const CSIDL_DRIVES = &H11&
+Const CSIDL_NETWORK = &H12&
+Const CSIDL_NETHOOD = &H13&
+Public Const CSIDL_FONTS = &H14&
 
-Const CSIDL_TEMPLATES = &H15
+Const CSIDL_TEMPLATES = &H15&
 Const MAX_PATH = 260
 Private Type SHITEMID
     cb As Long
@@ -28062,11 +28057,11 @@ bb$ = bb$ & "   Σ ονομαΤμηματος ανοίγει τον διορθωτή για να γράψουμε πρόγραμμα" 
 bb$ = bb$ & "   Σ ονομαΣυνάρτησης( ανοίγει τον διορθωτή για να γράψουμε συνάρτηση" & vbCrLf
 bb$ = bb$ & "   Σ ονομαΣυνάρτησης$( ανοίγει τον διορθωτή για να γράψουμε συνάρτηση$" & vbCrLf
 bb$ = bb$ & "   Τμηματα  [μας δείχνει τα τμήματα στη μνήμη και το δίσκο]" & vbCrLf
-bb$ = bb$ & "   ΒΟΗΘΕΙΑ κατι  {μας δίνει βοήθεια σε ξεχωριστό παράθυρο)" & vbCrLf
+bb$ = bb$ & "   ΒΟΗΘΕΙΑ κατι (μας δίνει βοήθεια σε ξεχωριστό παράθυρο)" & vbCrLf
 bb$ = bb$ & "   ? ή ΤΥΠΩΣΕ τυπώνει" & vbCrLf
 bb$ = bb$ & "   δώσε την εντολή ΡΥΘΜΙΣΕΙΣ η ctrl+U για να αλλάξει την εξ ορισμού γραμματοσειρά και τα χρώματα" & vbCrLf
 bb$ = bb$ & "   δώσε την εντολή ΕΛΕΓΧΟΣ για να δεις στοιχεία του διερμηνευτή" & vbCrLf
-
+bb$ = bb$ & "   δώσε την εντολή ΤΕΛΟΣ για να τερματίσεις τον διερμηνευτή" & vbCrLf
 Else
 bb$ = "   GREEK or LATIN for choose the codepage for errors display" & vbCrLf
 bb$ = bb$ & "   with LATIN all error messages are in ENGLISH language  " & vbCrLf
@@ -28083,6 +28078,7 @@ bb$ = bb$ & "   use HELP writesomething [to find some help, open the help form]"
 bb$ = bb$ & "   ? or PRINT for printing" & vbCrLf
 bb$ = bb$ & "   type SETTINGS or ctrl+U to change the default font and colors" & vbCrLf
 bb$ = bb$ & "   type MONITOR for info about current state of Interpreter" & vbCrLf
+bb$ = bb$ & "   type END and press enter to close this program" & vbCrLf
 End If
 wwPlain bstack, players(GetCode(bstack.Owner)), bb$, di.width, 1000, True
 crNew bstack, players(GetCode(bstack.Owner))
@@ -44096,7 +44092,7 @@ comehere:
                     
                     Else
 
-                                             var(i).objref.Costruct PP, CLng(p), par, Runnable
+                        var(i).objref.Costruct PP, CLng(p), par, Runnable
                         End If
                         End If
                         Else
@@ -49974,12 +49970,15 @@ Dim p As Double, mm As MemBlock, w2 As Long
                 MyEr "Offset out of buffer", "Διεύθυνση εκτός διάρθρωσης"
                 Exit Function
             End If
+
+            SetUpForExecution w2, mm.SizeByte
             w2 = cUlng(uintnew(w2) + p)
             End If
             Set basestack.lastobj = Nothing
-            
-            CallWindowProc w2, 0&, 0&, 0&, 0&
-
+            Dim what As Long
+            what = CallWindowProc(w2, 0&, 0&, 0&, 0&)
+            If what <> 0 Then MyEr "Error " & what, "Λάθος " & what
+            ReleaseExecution w2, mm.SizeByte
             ExecCode = True
             Set mm = Nothing
             End If

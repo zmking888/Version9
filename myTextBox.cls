@@ -28,40 +28,40 @@ Event CtrlPlusF1()
 Private mprompt As String
 Private mkind As String
 Public SkipProcAtExitFocus As Boolean
-Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Const GMEM_DDESHARE = &H2000
-Private Const GMEM_DISCARDABLE = &H100
-Private Const GMEM_DISCARDED = &H4000
-Private Const GMEM_FIXED = &H0
-Private Const GMEM_INVALID_HANDLE = &H8000
-Private Const GMEM_LOCKCOUNT = &HFF
-Private Const GMEM_MODIFY = &H80
-Private Const GMEM_MOVEABLE = &H2
-Private Const GMEM_NOCOMPACT = &H10
-Private Const GMEM_NODISCARD = &H20
-Private Const GMEM_NOT_BANKED = &H1000
-Private Const GMEM_NOTIFY = &H4000
-Private Const GMEM_SHARE = &H2000
-Private Const GMEM_VALID_FLAGS = &H7F72
-Private Const GMEM_ZEROINIT = &H40
+Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Const GMEM_DDESHARE = &H2000&
+Private Const GMEM_DISCARDABLE = &H100&
+Private Const GMEM_DISCARDED = &H4000&
+Private Const GMEM_FIXED = &H0&
+Private Const GMEM_INVALID_HANDLE = &H8000&
+Private Const GMEM_LOCKCOUNT = &HFF&
+Private Const GMEM_MODIFY = &H80&
+Private Const GMEM_MOVEABLE = &H2&
+Private Const GMEM_NOCOMPACT = &H10&
+Private Const GMEM_NODISCARD = &H20&
+Private Const GMEM_NOT_BANKED = &H1000&
+Private Const GMEM_NOTIFY = &H4000&
+Private Const GMEM_SHARE = &H2000&
+Private Const GMEM_VALID_FLAGS = &H7F72&
+Private Const GMEM_ZEROINIT = &H40&
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "user32" _
+Private Declare Function GetClipboardData Lib "User32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "user32" _
+    Private Declare Function SetClipboardData Lib "User32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "user32" _
-    (ByVal hWnd As Long) As Long
-Private Declare Function CloseClipboard Lib "user32" _
+    Private Declare Function OpenClipboard Lib "User32" _
+    (ByVal hWND As Long) As Long
+Private Declare Function CloseClipboard Lib "User32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
     (ByVal wFormat As Long) As Long
     Private Pad$, mStayOpen As Boolean
 Public Property Get Text() As String
@@ -123,10 +123,10 @@ glistN.ShowMe
 locked = True
 End Property
 
-Public Property Get top() As Long
-top = glistN.TopTwips
+Public Property Get Top() As Long
+Top = glistN.TopTwips
 End Property
-Public Property Let top(RHS As Long)
+Public Property Let Top(RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Set Container(glistNN As gList)

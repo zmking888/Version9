@@ -29,7 +29,8 @@ ItemLen = ByteLen
 mItems = Times
 mNorun = Not executable
 mPtr = Blockmalloc(ByteLen * Times, clearme, mNorun)
-If mNorun Then If mPtr <> 0 Then mBytes = ByteLen * Times
+'If mNorun Then
+If mPtr <> 0 Then mBytes = ByteLen * Times
 End Sub
 Property Get ItemSize()
 ItemSize = ItemLen
@@ -41,17 +42,39 @@ Public Property Get Status()
     Status = ErrorMes
 End Property
 Public Sub ResizeItems(NewSize As Long, Optional clearme As Long = 0)
-If Not mNorun Then Exit Sub
+
 If mBytes = 0 Then Exit Sub
 Dim oPtr As Long
-oPtr = mPtr
+
+
 If NewSize > 0 Then
-    oPtr = BlockResizemalloc(mPtr, ItemLen * NewSize, clearme)
-    If oPtr <> 0 Then
-        mItems = NewSize
-        mPtr = oPtr
+    If mNorun Then
+        oPtr = BlockResizemalloc(mPtr, ItemLen * NewSize, clearme)
+        If oPtr <> 0 Then
+            mItems = NewSize
+            mPtr = oPtr
+        Else
+            ErrorMes = 3
+        End If
     Else
-        ErrorMes = 3
+    
+    If ItemLen * NewSize <= mBytes Then
+            mPtr = BlockResizeVirtual(mPtr, ItemLen * NewSize)
+            mItems = NewSize
+            mBytes = ItemLen * NewSize
+    Else
+       oPtr = Blockmalloc(ItemLen * NewSize, clearme, mNorun)
+       If oPtr <> 0 Then
+            VirtualBlockCopy oPtr, mPtr, ItemLen * NewSize, mBytes
+           
+            BlockFreeVirtual mPtr, mBytes
+            mItems = NewSize
+            mBytes = ItemLen * NewSize
+            mPtr = oPtr
+        Else
+            ErrorMes = 3
+        End If
+    End If
     End If
 Else
     ErrorMes = 2
@@ -100,21 +123,21 @@ If mNorun Then
 End If
 End Property
 Public Function ValidArea(ByVal ThisStart As Long, ByVal ThisWidth As Double) As Boolean
-Dim A As Double
+Dim a As Double
 ' ThisStart is a sign long which hold same bits with unsign address
 If ErrorMes = 0 And mItems > 0 Then
-A = uintnew(CDbl(mPtr))  ' make mptr an unsign as double
+a = uintnew(CDbl(mPtr))  ' make mptr an unsign as double
 If ThisStart = 0 Then
-    ThisStart = A
+    ThisStart = a
 Else
     ThisStart = uintnew(CDbl(ThisStart))
 End If
 ' we have to make both unsign and then check them
-If ThisStart - A >= 0 Then
+If ThisStart - a >= 0 Then
 If mNorun Then
-If ThisStart + ThisWidth <= A + BlockSize(mPtr) Then ValidArea = True
+If ThisStart + ThisWidth <= a + BlockSize(mPtr) Then ValidArea = True
 Else
-If ThisStart + ThisWidth <= A + mBytes Then ValidArea = True
+If ThisStart + ThisWidth <= a + mBytes Then ValidArea = True
 End If
 End If
 End If

@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 47 active-X
-automatic change to jet 4 if mdb is jet 4.0 based
+Version 9.0 revision 48 active-X
+Buffer Code and Execute Code final implementation
 
 http://georgekarras.blogspot.gr/
 
