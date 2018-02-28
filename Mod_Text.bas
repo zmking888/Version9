@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 48
+Global Const Revision = 49
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -18548,7 +18548,7 @@ Dim p As Double, ii As Long, ss$, what As Long
             Set var(ii) = cv
             ConstNew = True
     Case Else
-        MyErMacro b$, "No static for that type " + w$, "Όχι στατική για αυτό το τύπο " + w$
+        MyErMacro b$, "No constant for that type " + w$, "Όχι σταθερή για αυτό το τύπο " + w$
         Exit Function
     End Select
  Loop Until Not FastSymbol(b$, ",")

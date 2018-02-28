@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 48 active-X
-Buffer Code and Execute Code final implementation
+Version 9.0 revision 49 active-X
+change for an error message only
 
 http://georgekarras.blogspot.gr/
 
