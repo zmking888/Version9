@@ -72,7 +72,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 49
+Global Const Revision = 50
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14210,8 +14210,23 @@ backitem1:
     Set bstackstr.lastobj = Nothing
     CheckDeepAny anything, var()
     r$ = Typename$(anything)
-    
-    
+    If r$ = "mHandler" Then
+                Select Case anything.t1
+                Case 1
+                    r$ = "Inventory"
+                Case 2
+                    r$ = "Buffer"
+                Case 3
+                        W3 = anything.indirect
+                        If W3 > -1 And W3 <= var2used Then
+                        r$ = Typename(var(W3))
+                        Else
+                        r$ = Typename(anything.objref)
+                        End If
+                Case Else
+                    r$ = Typename(anything.objref)
+            End Select
+    End If
     IsStr1 = FastSymbol(a$, ")", True)
     ElseIf anything.StackItemType(W3) = "?" Then
     r$ = "(?)"
