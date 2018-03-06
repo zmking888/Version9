@@ -413,35 +413,10 @@ If osnum = 0 Then
   OperatingSystem = osnum
 End Function
 Public Function os() As String
-  
-  Static oo As Enum_OperatingSystem
-  If oo = 0 Then oo = OperatingSystem
-    Select Case oo
-        Case System_Windows_32: os = "Windows 32"
-        Case System_Windows_95: os = "Windows 95"
-        Case System_Windows_98: os = "Windows 98"
-        Case System_Windows_ME: os = "Windows ME"
-        Case System_Windows_NT: os = "Windows NT"
-        Case System_Windows_2K: os = "Windows 2000"
-        Case System_Windows_XP: os = "Windows XP"
-        Case System_Windows_Vista: os = "Windows Vista"
-        Case System_Windows_7: os = "Windows 7"
-        Case System_Windows_8: os = "Windows 8"
-        Case System_Windows_81: os = "Windows 8.1" 'Windows 8.1
-        Case System_Windows_10: os = "Windows 10"
-        Case System_Windows_New: os = "Windows New"
-        Case Else
-        os = platform$
-    End Select
+  os = OsInfo.OSName
 End Function
-Public Function platform() As String
-    Select Case OperatingPlatform
-        Case Enum_OperatingPlatform.Platform_Windows_32: platform = "Windows 32"
-        Case Enum_OperatingPlatform.Platform_Windows_95_98_ME: platform = "Windows 95/98/ME"
-        Case Enum_OperatingPlatform.Platform_Windows_NT_2K_XP: platform = "Windows NT/2000"
-        Case Else
-        platform = "Windows"
-    End Select
+Public Function Platform() As String
+    Platform = OsInfo.Platform
 End Function
 Function check_mem() As Long
 
@@ -1244,7 +1219,7 @@ Dim tSA2 As SAFEARRAY2D
     Dim screen_x As Long, screen_y As Long, mmx As Long, mmy As Long, mmy1 As Long
 
 
-    Dim dest As Long, pw As Long, ph As Long
+    Dim Dest As Long, pw As Long, ph As Long
     
     pw = cDIBbuffer1.width
     ph = cDIBbuffer1.Height
@@ -2925,7 +2900,7 @@ Case Else
 ismine = False
 End Select
 End Function
-Private Function IsNumberQuery(a$, fr As Long, r As Double, lR As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberQuery(a$, fr As Long, r As Double, lr As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 
 ' ti kanei to e$
@@ -3022,7 +2997,7 @@ Else
     End If
     If ig$ = vbNullString Then
     IsNumberQuery = False
-    lR = 1
+    lr = 1
     Else
     If SG < 0 Then ig$ = "-" & ig$
     Err.Clear
@@ -3043,10 +3018,10 @@ Else
     r = val(ig$ & DE$ & ex$)
     End If
     If Err > 0 Then
-    lR = 0
+    lr = 0
     Else
       'A$ = Mid$(A$, sng)
-    lR = sng - fr + 1
+    lr = sng - fr + 1
        IsNumberQuery = True
     End If
     End If
@@ -3098,7 +3073,7 @@ Function ValidNumberOnly(a$, r As Double, skipdec As Boolean) As Boolean
 r = 0
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
-Private Function IsNumberOnly(a$, fr As Long, r As Double, lR As Long, skipdecimals As Boolean) As Boolean
+Private Function IsNumberOnly(a$, fr As Long, r As Double, lr As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
@@ -3194,12 +3169,12 @@ Else
     End If
     If ig$ = vbNullString Then
     IsNumberOnly = False
-    lR = 1
+    lr = 1
     Else
     If SG < 0 Then ig$ = "-" & ig$
     r = val(ig$ & DE$ & ex$)
       'A$ = Mid$(A$, sng)
-    lR = sng - fr + 1
+    lr = sng - fr + 1
     IsNumberOnly = True
     End If
 End If
@@ -3310,7 +3285,7 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
 
 End Function
-Function IsLabelAnew(where$, a$, r$, lang As Long) As Long
+Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, gr As Boolean
@@ -3318,7 +3293,7 @@ r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
-l = Len(a$): If l = 0 Then IsLabelAnew = 0: lang = 1: Exit Function
+l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
@@ -3355,7 +3330,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    lang = 1
+    Lang = 1
     Exit Function
     Case 32, 160
     Case Else
@@ -3385,7 +3360,7 @@ p2 = StrPtr(a$): l = l - 1
         End If
         a$ = Mid$(a$, (i - p2) \ 2)
         IsLabelAnew = 1
-        lang = -1
+        Lang = -1
               
         Exit Function
 
@@ -3505,13 +3480,13 @@ i1233:
     Next i
   If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
        r$ = myUcase(r$, gr)
-       lang = 1 + CLng(gr)
+       Lang = 1 + CLng(gr)
 
     IsLabelAnew = rr&
 
 
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, r$, lang As Long, Optional p1 As Integer = 0) As Long
+Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional p1 As Integer = 0) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -3519,7 +3494,7 @@ rrr$ = vbNullString
 r$ = vbNullString
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p4 As Long  '', excludesp As Long
-  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: lang = 1: Exit Function
+  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3554,7 +3529,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    lang = 1
+    Lang = 1
     Exit Function
     Case 32, 160
     Case Else
@@ -3590,14 +3565,14 @@ p2 = StrPtr(a$): l = l - 1
         a$ = Mid$(a$, (i - p2) \ 2) ' mid$(a$, 2)
         IsLabelDotSub = 1
         
-        lang = -1
+        Lang = -1
       
         Exit Function
     
         ElseIf firstdot$ = vbNullString Then
         IsLabelDotSub = 1
-        lang = 1 + CLng(gr)
-        If lang = 1 Then
+        Lang = 1 + CLng(gr)
+        If Lang = 1 Then
         rrr$ = UCase(r$)
         Else
         rrr$ = myUcase(r$)
@@ -3724,7 +3699,7 @@ i123:
   If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
   End If
        rrr$ = firstdot$ + myUcase(r$, gr)
-       lang = 1 + CLng(gr)
+       Lang = 1 + CLng(gr)
     IsLabelDotSub = rr&
    'a$ = LTrim(a$)
 

@@ -1,6 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 50 active-X
+Version 9.0 revision 51 active-X
+Math library for vectors inside M2000.dll
+
+From revision 50:
 new ca.crt - install ca.crt as root certificate
 
 https://www.dropbox.com/s/30g5oduqt7tzfpm/ca.crt?dl=0

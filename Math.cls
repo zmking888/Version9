@@ -1,0 +1,1007 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "Math"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = True
+' Original code made by Elroy (User in VbForums)
+' Was a module and now is a Class, by George Karras
+' NOT FINISHED YET
+' We can't pass UDT from M2000 script but we can pass a pointer to memory
+' which we make using Buffer statement, and using Structure we can create offsets too.
+
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+  ByVal lpvDest As Long, ByVal lpvSource As Long, ByVal cbCopy As Long)
+Private Const Pi = 3.14159265358979
+Private Const pihalf = 1.5707963267949
+Private Const pidivby180 = 1.74532925199433E-02
+Private Const xyz As Double = 1               '       X+ to X-        Z- to Z+
+Private Const xzy As Double = -1              '       X+ to X-        Y+ to Y-
+Private Const yzx As Double = 2               '       Y+ to y-        X+ to X-
+Private Const yxz As Double = -2              '       Y+ to Y-        Z- to Z+
+Private Const zxy As Double = 3               '       Z+ to Z-        Y- to Y+
+Private Const zyx As Double = -3           '       Z+ to Z-        X+ to X-
+
+Private Type VecType
+    ' This is used for both 3D spatial vectors, and Euler angles as well.
+    x As Double
+    y As Double
+    z As Double
+End Type
+Private Type SegType
+    Origin As VecType
+    AxisF  As VecType   ' Forward, West,  AxisX
+    AxisL  As VecType   ' Left,    North, AxisY
+    AxisU  As VecType   ' Up,      Up,    AxisZ
+End Type
+'
+Private Type LineType
+    Point1 As VecType
+    Point2 As VecType
+End Type
+'
+Private Type QuatType                      ' To get axis and theta back out (JPL convention):
+    w As Double         ' cos(theta/2)              theta = ACos(q.w) * 2
+    x As Double         ' v.x * sin(theta/2)        v.x = q.x / sin(theta/2)    solve for theta first, and then plug in here.
+    y As Double         ' v.y * sin(theta/2)        v.y = q.y / sin(theta/2)
+    z As Double         ' v.z * sin(theta/2)        v.z = q.z / sin(theta/2)
+End Type
+Public Sub Vector(A As Long, x As Double, y As Double, z As Double)
+Dim v1 As VecType
+v1.x = x
+v1.y = y
+v1.z = z
+CopyMemory A, VarPtr(v1.x), 24
+End Sub
+Private Function GetVector(A As Long) As VecType
+    CopyMemory VarPtr(GetVector), A, 24
+End Function
+Private Sub PutVector(v As VecType, A As Long)
+    CopyMemory A, VarPtr(v), 24
+End Sub
+
+Private Function GetQuatType(A As Long) As QuatType
+    CopyMemory VarPtr(GetQuatType), A, 36
+End Function
+Private Sub PutQuatType(q As QuatType, A As Long)
+    CopyMemory A, VarPtr(q), 32
+End Sub
+Private Function GetLine(A As Long) As LineType
+    CopyMemory VarPtr(GetLine), A, 48
+End Function
+Private Sub PutLine(q As LineType, A As Long)
+    CopyMemory A, VarPtr(q), 48
+End Sub
+Public Function DotProduct(A As Long, B As Long) As Double
+    Dim v1 As VecType, v2 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    CopyMemory VarPtr(v2), B, 24
+    DotProduct = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+End Function
+Public Sub XProduct(A As Long, B As Long, C As Long)
+    Dim v1 As VecType, v2 As VecType, v3 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    CopyMemory VarPtr(v2), B, 24
+    v3.x = v1.y * v2.z - v1.z * v2.y
+    v3.y = v1.z * v2.x - v1.x * v2.z
+    v3.z = v1.x * v2.y - v1.y * v2.x
+    PutVector v3, C
+End Sub
+Public Sub RotVect(A As Long, B As Long, C As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+    Dim vec As VecType, axis As VecType, RotVect As VecType
+    CopyMemory VarPtr(vec), A, 24
+    CopyMemory VarPtr(axis), B, 24
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+    CopyMemory C, VarPtr(RotVect), 24
+End Sub
+Public Sub RotVectMult(N As Long, A As Long, B As Long, C As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+    Dim vec As VecType, axis As VecType, RotVect As VecType, m As Long
+    CopyMemory VarPtr(axis), B, 24
+    For m = 1 To N
+    CopyMemory VarPtr(vec), A, 24
+    RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+    CopyMemory C, VarPtr(RotVect), 24
+    A = A + 24
+    C = C + 24
+    Next m
+End Sub
+
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+'
+' Make Segment (ordered basis) functions.
+'
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+
+Private Function SegFrom3Pts(Origin As VecType, Point1 As VecType, Point2 As VecType, Optional order As Double = xyz) As SegType
+    ' BodyBuilderSegment = [Origin, Point1 - Origin, Point2 - Origin, Order]
+    SegFrom3Pts = SegFrom5Pts(Origin, Point1, Origin, Point2, Origin, order)
+End Function
+
+Private Function SegFrom5Pts(Origin As VecType, Point1Line1 As VecType, Point2Line1 As VecType, Point1Line2 As VecType, Point2Line2 As VecType, Optional order As Double = xyz) As SegType
+    ' BodyBuilderSegment = [Origin, Point2Line1 - Point1Line2, Point2Line2 - Point2Line2, Order]
+    '
+    SegFrom5Pts = SegFromLines(Origin, MakeLine(Point1Line1, Point2Line1), MakeLine(Point1Line2, Point2Line2), order)
+End Function
+
+Private Function SegFromLines(Origin As VecType, Line1 As LineType, Line2 As LineType, Optional order As Double = xyz) As SegType
+    ' This returns an ordered basis (following the right-hand-rule) with all vectors being a unit-in-length (orthonormal).
+    '
+    ' This function is designed to replicate the line in BodyBuilder that allows you to create a segment from an origin and two lines (but just for one frame):
+    '       Segment = [Origin, Line1.Point1 - Line1.Point2, Line2.Point1 - Line2.Point2, Order]
+    '
+    ' Note that the output axes are set at origin <0,0,0>.  Only the origin reflects an offset translation.
+    ' The return axes will always be orthonormal.
+    '
+    '                                                                        (Up)
+    '                                                                          Z
+    ' The figure at right attempts to illustrate one of these segments:        |    Y (Left, North)
+    ' This is the output of this function.                                     |   /
+    '                                                                          |  /
+    '                                                                          | /
+    '                                                                          |/
+    '                                                                 (Origin) *------- X (Forward, East)
+    '
+    ' The input is an origin and two lines.  The origin really stands alone and often isn't terribly important,
+    ' especially if we're just concerned with rotations.
+    '
+    ' The actual axes of the segment are constructed from the two lines, and things are constructed differently depending on the specified order.
+    ' The first line (Line1) defines the first letter of the order of the segment, with the positive direction defined by Line1.Point1
+    ' (and the line's origin defined by Line1.Point2).  The following may help:
+    '
+    '       For Xyz(1) & Xzy(-1)    AxisX is defined by Line1 with positive heading to Line1.Point1.
+    '       For Yzx(2) & Yxz(-2)    AxisY is defined by Line1 with positive heading to Line1.Point1.
+    '       For Zxy(3) & Zyx(-3)    AxisZ is defined by Line1 with positive heading to Line1.Point1.
+    '
+    ' The second line (Line2) approximates the last (third) letter of the order, with the alphabetic order specifying whether Line2.Point1 or Line2.Point2 is positive.
+    ' With respect to Line2, the following may provide as a cheat-sheet:
+    '
+    '       For xyZ(1)      AxisZ is approximated by Line2 with positive heading to Line2.Point1.
+    '       For xzY(-1)     AxisY is approximated by Line2 with positive heading to Line2.Point2.
+    '       For yzX(2)      AxisX is approximated by Line2 with positive heading to Line2.Point1.
+    '       For yxZ(-2)     AxisZ is approximated by Line2 with positive heading to Line2.Point2.
+    '       For zxY(3)      AxisY is approximated by Line2 with positive heading to Line2.Point1.
+    '       For zyX(-3)     AxisX is approximated by Line2 with positive heading to Line2.Point2.
+    '
+    ' Now, we've still got another axis of our segment to address.  For instance, for XYZ, we've yet to talk about Y.
+    ' This "middle" axis is defined by the cross product of the other two axes.
+    ' Also when discussing the last axis, I used the word "approximate".  I did this because, once the middle axis is determined,
+    ' this "last" axis is recalculated as the cross product of the first two.  This is the way an orthogonal segment is achieved.
+    ' The following are the actual calculations (with × denoting a cross product):
+    '
+    '       LineA = (Line1.Point1 - Line1.Point2)          ; Unitized.
+    '       LineB = (Line2.Point1 - Line2.Point2)          ; Unitized.
+    '
+    '       If constant is XYZ (1):         AxisX = LineA
+    '                                       AxisY = LineB × LineA
+    '                                       AxisZ = LineA × AxisY
+    '
+    '       If constant is XZY (-1):        AxisX = LineA
+    '                                       AxisZ = LineB × LineA
+    '                                       AxisY = AxisZ × LineA
+    '
+    '       If constant is YZX (2):         AxisY = LineA
+    '                                       AxisZ = LineB × LineA
+    '                                       AxisX = LineA × AxisZ
+    '
+    '       If constant is YXZ (-2):        AxisY = LineA
+    '                                       AxisX = LineB × LineA
+    '                                       AxisZ = AxisX × LineA
+    '
+    '       If constant is ZXY (3):         AxisZ = LineA
+    '                                       AxisX = LineB × LineA
+    '                                       AxisY = LineA × AxisX
+    '
+    '       If constant is ZYX (-3):        AxisZ = LineA
+    '                                       AxisY = LineB × LineA
+    '                                       AxisX = AxisY × LineA
+    '
+    ' And finally, here's another cheat-sheet that may help:
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), xyz]       (1)
+    '                  Origin     + AxisX -        + AxisZ -
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), xzy]       (-1)
+    '                  Origin     + AxisX -        - AxisY +
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), yzx]       (2)
+    '                  Origin     + AxisY -        + AxisX -
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), yxz]       (-2)
+    '                  Origin     + AxisY -        - AxisZ +
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), zxy]       (3)
+    '                  Origin     + AxisZ -        + AxisY -
+    '
+    '       Segment = [Point0, (L1.p1 - L1.p2), (L2.p1 - L2.p2), zyx]       (-3)
+    '                  Origin     + AxisZ -        - AxisX +
+    '
+    Dim v1 As VecType
+    Dim v2 As VecType
+    '
+    SegFromLines.Origin = Origin
+    '
+    v1 = VecDif(Line1.Point1, Line1.Point2)
+    v2 = VecDif(Line2.Point1, Line2.Point2)
+    v1 = UnitVec(v1)
+    v2 = UnitVec(v2)
+    '
+    Select Case order
+    Case xyz    ' 1
+        SegFromLines.AxisF = v1                                                         ' X
+        SegFromLines.AxisL = UnitVec(XProd(v2, SegFromLines.AxisF))                     ' Y
+        SegFromLines.AxisU = UnitVec(XProd(SegFromLines.AxisF, SegFromLines.AxisL))     ' Z
+    Case xzy    ' -1
+        SegFromLines.AxisF = v1                                                         ' X
+        SegFromLines.AxisU = UnitVec(XProd(v2, SegFromLines.AxisF))                     ' Z
+        SegFromLines.AxisL = UnitVec(XProd(SegFromLines.AxisU, SegFromLines.AxisF))     ' Y
+    Case yzx    ' 2
+        SegFromLines.AxisL = v1                                                         ' Y
+        SegFromLines.AxisU = UnitVec(XProd(v2, SegFromLines.AxisL))                     ' Z
+        SegFromLines.AxisF = UnitVec(XProd(SegFromLines.AxisL, SegFromLines.AxisU))     ' X
+    Case yxz    ' -2
+        SegFromLines.AxisL = v1                                                         ' Y
+        SegFromLines.AxisF = UnitVec(XProd(v2, SegFromLines.AxisL))                     ' X
+        SegFromLines.AxisU = UnitVec(XProd(SegFromLines.AxisF, SegFromLines.AxisL))     ' Z
+    Case zxy    ' 3
+        SegFromLines.AxisU = v1                                                         ' Z
+        SegFromLines.AxisF = UnitVec(XProd(v2, SegFromLines.AxisU))                     ' X
+        SegFromLines.AxisL = UnitVec(XProd(SegFromLines.AxisU, SegFromLines.AxisF))     ' Y
+    Case zyx    ' -3
+        SegFromLines.AxisU = v1                                                         ' Z
+        SegFromLines.AxisL = UnitVec(XProd(v2, SegFromLines.AxisU))                     ' Y
+        SegFromLines.AxisF = UnitVec(XProd(SegFromLines.AxisL, SegFromLines.AxisU))     ' X
+    End Select
+End Function
+
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+'
+' Conversion functions.
+'
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+Private Function Euler2Quat(euler As VecType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As QuatType
+    ' To get the same return from Quat2Euler, the following Euler angle constraints should be observed:
+    '       pi   >  euler.x  >  -pi            ' In theory, 180 (or -180) should be possible, but not here.
+    '       pi/2 >  euler.y  >   pi/2          ' Avoid pi/2 to avoid gimbal lock.
+    '       pi   >  euler.z  >  -pi            ' In theory, 180 (or -180) should be possible, but not here.
+    '
+    Dim sX As Double, sY As Double, SZ As Double
+    Dim cX As Double, cY As Double, cZ As Double
+    Dim EulerTemp As VecType
+    '
+    EulerTemp = euler
+    If bDegrees Then EulerTemp = VecDeg2Rad(EulerTemp)
+    '
+    ' Speed-up variables, so that Sin and Cos aren't repeatedly called.
+    sX = Sin(EulerTemp.x / 2#): sY = Sin(EulerTemp.y / 2#): SZ = Sin(EulerTemp.z / 2#)
+    cX = Cos(EulerTemp.x / 2#): cY = Cos(EulerTemp.y / 2#): cZ = Cos(EulerTemp.z / 2#)
+    '
+    Select Case order
+    Case xyz
+        Euler2Quat.w = cX * cY * cZ - sX * sY * SZ
+        Euler2Quat.x = sX * cY * cZ + cX * sY * SZ
+        Euler2Quat.y = cX * sY * cZ - sX * cY * SZ
+        Euler2Quat.z = cX * cY * SZ + sX * sY * cZ
+    Case xzy
+        Euler2Quat.w = cX * cY * cZ + sX * sY * SZ
+        Euler2Quat.x = sX * cY * cZ - cX * sY * SZ
+        Euler2Quat.y = cX * cY * SZ - sX * sY * cZ
+        Euler2Quat.z = cX * sY * cZ + sX * cY * SZ
+    Case yzx
+        Euler2Quat.w = cX * cY * cZ - sX * sY * SZ
+        Euler2Quat.x = cX * cY * SZ + sX * sY * cZ
+        Euler2Quat.y = sX * cY * cZ + cX * sY * SZ
+        Euler2Quat.z = cX * sY * cZ - sX * cY * SZ
+    Case yxz
+        Euler2Quat.w = cX * cY * cZ + sX * sY * SZ
+        Euler2Quat.x = cX * sY * cZ + sX * cY * SZ
+        Euler2Quat.y = sX * cY * cZ - cX * sY * SZ
+        Euler2Quat.z = cX * cY * SZ - sX * sY * cZ
+    Case zxy
+        Euler2Quat.w = cX * cY * cZ - sX * sY * SZ
+        Euler2Quat.x = cX * sY * cZ - sX * cY * SZ
+        Euler2Quat.y = cX * cY * SZ + sX * sY * cZ
+        Euler2Quat.z = sX * cY * cZ + cX * sY * SZ
+    Case zyx
+        Euler2Quat.w = cX * cY * cZ + sX * sY * SZ
+        Euler2Quat.x = cX * cY * SZ - sX * sY * cZ
+        Euler2Quat.y = cX * sY * cZ + sX * cY * SZ
+        Euler2Quat.z = sX * cY * cZ - cX * sY * SZ
+    End Select
+End Function
+
+Private Function Quat2Euler(q As QuatType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As VecType
+    ' The order (xyzEnum) may be reversed to some mathematicians.
+    ' However, it's done this way so that the same xyzEnum constant can be used for Euler2Quat and Quat2Euler, and return to the same Euler angles.
+    ' Also, this is the way BodyBuilder does it, and these procedures are meant to reproduce that functionality.
+    '
+    Select Case order
+    Case xyz: Quat2Euler = Quat2EulerHelper(-2# * (q.y * q.z - q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, 2# * (q.x * q.z + q.w * q.y), -2# * (q.x * q.y - q.w * q.z), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z)
+    Case xzy: Quat2Euler = Quat2EulerHelper(2# * (q.y * q.z + q.w * q.x), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, -2# * (q.x * q.y - q.w * q.z), 2# * (q.x * q.z + q.w * q.y), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z)
+    Case yzx: Quat2Euler = Quat2EulerHelper(-2# * (q.x * q.z - q.w * q.y), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, 2# * (q.x * q.y + q.w * q.z), -2# * (q.y * q.z - q.w * q.x), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z)
+    Case yxz: Quat2Euler = Quat2EulerHelper(2# * (q.x * q.z + q.w * q.y), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z, -2# * (q.y * q.z - q.w * q.x), 2# * (q.x * q.y + q.w * q.z), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z)
+    Case zxy: Quat2Euler = Quat2EulerHelper(-2# * (q.x * q.y - q.w * q.z), q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z, 2# * (q.y * q.z + q.w * q.x), -2# * (q.x * q.z - q.w * q.y), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z)
+    Case zyx: Quat2Euler = Quat2EulerHelper(2# * (q.x * q.y + q.w * q.z), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z, -2# * (q.x * q.z - q.w * q.y), 2# * (q.y * q.z + q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z)
+    End Select
+    '
+    If bDegrees Then Quat2Euler = VecRad2Deg(Quat2Euler)
+End Function
+
+Private Function Quat2EulerHelper(r11 As Double, r12 As Double, r21 As Double, r31 As Double, r32 As Double) As VecType
+    Quat2EulerHelper.x = ATan2(r11, r12)
+    Quat2EulerHelper.y = ASin(r21)
+    Quat2EulerHelper.z = ATan2(r31, r32)
+End Function
+
+Private Function Seg2Quat(seg As SegType) As QuatType
+    ' Ignores origin.
+    '
+    Seg2Quat = Axes2Quat(seg.AxisF, seg.AxisL, seg.AxisU)
+End Function
+
+Private Function Quat2Seg(q As QuatType) As SegType
+    ' Leaves the segment origin as zero.
+    '
+    Quat2Seg.AxisF = Quat2Fwd(q)
+    Quat2Seg.AxisL = Quat2Left(q)
+    Quat2Seg.AxisU = Quat2Up(q)
+End Function
+
+Private Function Euler2Seg(euler As VecType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As SegType
+    ' Leaves the segment origin as zero.
+    Euler2Seg = Quat2Seg(Euler2Quat(euler, order, bDegrees))
+End Function
+
+Private Function Seg2Euler(seg As SegType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As VecType
+    ' Ignores origin.
+    Seg2Euler = Quat2Euler(Seg2Quat(seg), order, bDegrees)
+End Function
+
+Private Function Axes2Quat(AxisF As VecType, AxisL As VecType, AxisU As VecType) As QuatType
+    ' Must be three orthogonal unit vectors.
+    ' Basically, the vectors that define a BodyBuilder segment.
+    '
+    Dim s As Double
+    Dim tr As Double
+    Dim max As Double
+    Dim x As Double, y As Double, z As Double
+    '
+    tr = (AxisF.x + AxisL.y + AxisU.z + 1#)
+    '
+    If (tr >= 1#) Then
+        s = (0.5 / Sqr(tr))
+        Axes2Quat.w = 0.25 / s
+        Axes2Quat.x = (AxisL.z - AxisU.y) * s
+        Axes2Quat.y = (AxisU.x - AxisF.z) * s
+        Axes2Quat.z = (AxisF.y - AxisL.x) * s
+    Else
+        If (AxisL.y > AxisU.z) Then max = AxisL.y Else max = AxisU.z
+        '
+        If (max < AxisF.x) Then
+            s = (Sqr(AxisF.x - (AxisL.y + AxisU.z) + 1#))
+            x = (s * 0.5)
+            s = (0.5 / s)
+            Axes2Quat.w = (AxisL.z - AxisU.y) * s
+            Axes2Quat.x = x
+            Axes2Quat.y = (AxisF.y + AxisL.x) * s
+            Axes2Quat.z = (AxisU.x + AxisF.z) * s
+        ElseIf (max = AxisL.y) Then
+            s = (Sqr(AxisL.y - (AxisU.z + AxisF.x) + 1#))
+            y = (s * 0.5)
+            s = (0.5 / s)
+            Axes2Quat.w = (AxisU.x - AxisF.z) * s
+            Axes2Quat.x = (AxisF.y + AxisL.x) * s
+            Axes2Quat.y = y
+            Axes2Quat.z = (AxisL.z + AxisU.y) * s
+        Else
+            s = (Sqr(AxisU.z - (AxisF.x + AxisL.y) + 1#))
+            z = (s * 0.5)
+            s = (0.5 / s)
+            Axes2Quat.w = (AxisF.y - AxisL.x) * s
+            Axes2Quat.x = (AxisU.x + AxisF.z) * s
+            Axes2Quat.y = (AxisL.z + AxisU.y) * s
+            Axes2Quat.z = z
+        End If
+    End If
+End Function
+
+Private Function Quat2Fwd(q As QuatType) As VecType
+    ' Make sure quat is normed.
+    Quat2Fwd = RotVecByQuat(MakeVec(1, 0, 0), q)
+End Function
+
+Private Function Quat2Left(q As QuatType) As VecType
+    ' Make sure quat is normed.
+    Quat2Left = RotVecByQuat(MakeVec(0, 1, 0), q)
+End Function
+
+Private Function Quat2Up(q As QuatType) As VecType
+    ' Make sure quat is normed.
+    Quat2Up = RotVecByQuat(MakeVec(0, 0, 1), q)
+End Function
+
+Private Function AxisAngle2Quat(axis As VecType, ByVal angle As Double, Optional bDegrees As Boolean = True) As QuatType
+    ' You should be sure the vector is a UNIT vector before calling this, else the quaternion will not be a unit quaternion.
+    ' Note that the Axis(vector) is the rotation vector, and has nothing to do with basis vectors.
+    '
+    Dim SinThetaDivTwo As Double
+    '
+    If bDegrees Then angle = Deg2Rad(angle)
+    SinThetaDivTwo = Sin(angle / 2)
+    '
+    AxisAngle2Quat.w = Cos(angle / 2)
+    AxisAngle2Quat.x = axis.x * SinThetaDivTwo
+    AxisAngle2Quat.y = axis.y * SinThetaDivTwo
+    AxisAngle2Quat.z = axis.z * SinThetaDivTwo
+End Function
+
+Private Function QuatAxis(quat As QuatType) As VecType
+    ' This is the rotation axis of the quaternion.
+    ' It has nothing to do with the quaternion's basis axes.
+    Dim SinThetaByTwo As Double
+    '
+    SinThetaByTwo = Sin(QuatAngle(quat, False) / 2)
+    '
+    On Error Resume Next
+        QuatAxis.x = quat.x / SinThetaByTwo
+        QuatAxis.y = quat.y / SinThetaByTwo
+        QuatAxis.z = quat.z / SinThetaByTwo
+    On Error GoTo 0
+End Function
+
+Private Function QuatAngle(quat As QuatType, Optional bDegrees As Boolean = True) As Double
+    ' Just the angle from the quaternion.
+    QuatAngle = ACos(quat.w) * 2
+    If bDegrees Then QuatAngle = Rad2Deg(QuatAngle)
+End Function
+
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+'
+' Rotation functions.
+'
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+
+Private Function RotSeg(seg As SegType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As SegType
+    ' This is exactly like a rotation: (Seg2 = Rot(Seg1, Axis, Angle)).
+    '
+    RotSeg = RotSegByQuat(seg, AxisAngle2Quat(axis, angle, bDegrees))
+End Function
+
+Private Function RotSegByQuat(seg As SegType, quat As QuatType) As SegType
+    RotSegByQuat.AxisF = RotVecByQuat(seg.AxisF, quat)
+    RotSegByQuat.AxisL = RotVecByQuat(seg.AxisL, quat)
+    RotSegByQuat.AxisU = RotVecByQuat(seg.AxisU, quat)
+    RotSegByQuat.Origin = seg.Origin
+End Function
+
+Private Function RotQuat(q1 As QuatType, q2 As QuatType) As QuatType
+    ' q1 is being rotated by q2 amount.
+    '
+    RotQuat.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
+    RotQuat.x = q1.w * q2.x + q1.x * q2.w - q1.y * q2.z + q1.z * q2.y
+    RotQuat.y = q1.w * q2.y + q1.x * q2.z + q1.y * q2.w - q1.z * q2.x
+    RotQuat.z = q1.w * q2.z - q1.x * q2.y + q1.y * q2.x + q1.z * q2.w
+End Function
+
+Private Function UnRotQuat(q1 As QuatType, q2 As QuatType) As QuatType
+    ' q1 is being UNrotated by q2 amount.
+    '
+    UnRotQuat = RotQuat(q1, NegQuat(q2))
+End Function
+
+Private Function RotVec(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+    RotVec = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
+End Function
+
+Private Function RotVecByQuat(vec As VecType, quat As QuatType) As VecType
+    ' This is essentially a vector rotation.
+    ' To emulate BodyBuilder: NewVec = RotVecByQuat(Vec, AxisAng2Quat(Axis, Deg2Rad(Angle)))
+    '
+    Dim num1 As Double, num2 As Double, num3 As Double
+    Dim num4 As Double, num5 As Double, num6 As Double
+    Dim num7 As Double, num8 As Double, num9 As Double
+    Dim numa As Double, numb As Double, numc As Double
+    '
+    num1 = quat.x * 2#:       num2 = quat.y * 2#:       num3 = quat.z * 2#
+    num4 = quat.x * num1:     num5 = quat.y * num2:     num6 = quat.z * num3
+    num7 = quat.x * num2:     num8 = quat.x * num3:     num9 = quat.y * num3
+    numa = quat.w * num1:     numb = quat.w * num2:     numc = quat.w * num3
+    '
+    ' RotVecByQuat.x = (1# - (num5 + num6)) * vec.x +       (num7 - numc)  * vec.y +       (num8 + numb)  * vec.z
+    ' RotVecByQuat.y =       (num7 + numc)  * vec.x + (1# - (num4 + num6)) * vec.y +       (num9 - numa)  * vec.z
+    ' RotVecByQuat.z =       (num8 - numb)  * vec.x +       (num9 + numa)  * vec.y + (1# - (num4 + num5)) * vec.z
+    '
+    RotVecByQuat.x = (1# - (num5 + num6)) * vec.x + (num7 - numc) * vec.y + (num8 + numb) * vec.z
+    RotVecByQuat.y = (num7 + numc) * vec.x + (1# - (num4 + num6)) * vec.y + (num9 - numa) * vec.z
+    RotVecByQuat.z = (num8 - numb) * vec.x + (num9 + numa) * vec.y + (1# - (num4 + num5)) * vec.z
+End Function
+
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+'
+' Angles Between functions.
+'
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+
+Private Function FixedBetweenSegs(seg1 As SegType, seg2 As SegType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As VecType
+    ' In BodyBuilder terms, this is:  FixedBetweenSegs = <seg1, seg2, order>
+    ' This takes the "Fixed" angle approach rather than the "Euler" angle approach.
+    ' Conceptually, seg1 & seg2 are reversed with respect to what's rotated against what for this "Fixed" approach,
+    ' but it's left this way to correspond to BodyBuilder code.
+    '
+    FixedBetweenSegs = NegVec(EulerBetweenSegs(seg1, seg2, order, bDegrees))
+End Function
+
+Private Function EulerBetweenSegs(seg1 As SegType, seg2 As SegType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As VecType
+    ' In BodyBuilder terms, this is:  EulerBetweenSegs = -<seg1, seg2, order>
+    ' We do NOT need to negate (as BodyBuilder does) when using this function.
+    '
+    EulerBetweenSegs = EulerBetweenQuats(Seg2Quat(seg1), Seg2Quat(seg2), order, bDegrees)
+End Function
+
+Private Function EulerBetweenQuats(q1 As QuatType, q2 As QuatType, Optional order As Double = xyz, Optional bDegrees As Boolean = True) As VecType
+    ' Put q2's rotation basis at <0,0,0>, and then convert to Euler angles.
+    ' In other words, what Euler angles will rotate q1 to q2.
+    '
+    EulerBetweenQuats = Quat2Euler(UnRotQuat(q2, q1), order, bDegrees)
+End Function
+
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+'
+' Simple Linear Algebra functions.
+'
+'****************************************************************************************************
+'****************************************************************************************************
+'****************************************************************************************************
+Private Function VecAvg(v1 As VecType, v2 As VecType) As VecType
+    VecAvg = VecDivNum(VecSum(v1, v2), 2)
+End Function
+Public Sub VecAver(A As Long, B As Long, C As Long)
+    Dim v1 As VecType
+    v1 = VecDivNum(VecSumm1(A, B), 2)
+    CopyMemory C, VarPtr(v1), 24
+End Sub
+Public Sub VecAverMult(N As Long, A As Long, B As Long, C As Long)
+    Dim v1 As VecType, m As Long
+    For m = 1 To N
+    v1 = VecDivNum(VecSumm1(A, B), 2)
+    CopyMemory C, VarPtr(v1), 24
+    A = A + 24
+    B = B + 24
+    C = C + 24
+    Next m
+End Sub
+Private Function VecSumm1(A As Long, B As Long) As VecType
+    Dim v1 As VecType, v2 As VecType, v3 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    CopyMemory VarPtr(v2), B, 24
+    VecSumm1.x = v1.x + v2.x
+    VecSumm1.y = v1.y + v2.y
+    VecSumm1.z = v1.z + v2.z
+    
+End Function
+
+Private Function VecSum(v1 As VecType, v2 As VecType) As VecType
+    VecSum.x = v1.x + v2.x
+    VecSum.y = v1.y + v2.y
+    VecSum.z = v1.z + v2.z
+End Function
+Public Sub VecSumm(A As Long, B As Long, C As Long)
+    Dim v1 As VecType, v2 As VecType, v3 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    CopyMemory VarPtr(v2), B, 24
+    v3.x = v1.x + v2.x
+    v3.y = v1.y + v2.y
+    v3.z = v1.z + v2.z
+    CopyMemory C, VarPtr(v3), 24
+End Sub
+Public Sub VecSummMult(N As Long, A As Long, B As Long, C As Long)
+    Dim v1 As VecType, v2 As VecType, v3 As VecType, m As Long
+    CopyMemory VarPtr(v2), B, 24
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v3.x = v1.x + v2.x
+    v3.y = v1.y + v2.y
+    v3.z = v1.z + v2.z
+    CopyMemory C, VarPtr(v3), 24
+    A = A + 24
+    C = C + 24
+    Next m
+End Sub
+Private Function VecDif(v1 As VecType, v2 As VecType) As VecType
+    VecDif.x = v1.x - v2.x
+    VecDif.y = v1.y - v2.y
+    VecDif.z = v1.z - v2.z
+End Function
+Public Sub VecDiff(A As Long, B As Long, C As Long)
+    Dim v1 As VecType, v2 As VecType, v3 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    CopyMemory VarPtr(v2), B, 24
+    v3.x = v1.x - v2.x
+    v3.y = v1.y - v2.y
+    v3.z = v1.z - v2.z
+    CopyMemory C, VarPtr(v3), 24
+End Sub
+Public Sub VecDiffMult(N As Long, A As Long, B As Long, C As Long)
+    Dim v1 As VecType, v2 As VecType, v3 As VecType, m As Long
+    CopyMemory VarPtr(v2), B, 24
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v3.x = v1.x - v2.x
+    v3.y = v1.y - v2.y
+    v3.z = v1.z - v2.z
+    CopyMemory C, VarPtr(v3), 24
+    A = A + 24
+    C = C + 24
+    Next m
+End Sub
+
+
+Sub VecDiffNum(A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x - d
+    v.y = v1.y - d
+    v.z = v1.z - d
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Sub VecDiffNumMult(N As Long, A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x - d
+    v.y = v1.y - d
+    v.z = v1.z - d
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+
+Private Function VecAddNum(v As VecType, d As Double) As VecType
+    VecAddNum.x = v.x + d
+    VecAddNum.y = v.y + d
+    VecAddNum.z = v.z + d
+End Function
+Sub VecAddiNum(A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x + d
+    v.y = v1.y + d
+    v.z = v1.z + d
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Sub VecAddiNumMult(N As Long, A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x + d
+    v.y = v1.y + d
+    v.z = v1.z + d
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+
+Sub VecDiviNum(A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x / d
+    v.y = v1.y / d
+    v.z = v1.z / d
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Sub VecDiviNumMult(N As Long, A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x / d
+    v.y = v1.y / d
+    v.z = v1.z / d
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+Private Function VecDivNum(v1 As VecType, d As Double) As VecType
+    VecDivNum.x = v1.x / d
+    VecDivNum.y = v1.y / d
+    VecDivNum.z = v1.z / d
+End Function
+Sub VecMulNum(A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x * d
+    v.y = v1.y * d
+    v.z = v1.z * d
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Sub VecMulNumMult(N As Long, A As Long, d As Double, B As Long)
+    Dim v As VecType, v1 As VecType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(v1), A, 24
+    v.x = v1.x * d
+    v.y = v1.y * d
+    v.z = v1.z * d
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+Private Function VecMultNum(v1 As VecType, d As Double) As VecType
+    VecMultNum.x = v1.x * d
+    VecMultNum.y = v1.y * d
+    VecMultNum.z = v1.z * d
+End Function
+
+Public Function VecMagnitude(A As Long) As Double
+    Dim v As VecType
+    CopyMemory VarPtr(v1), A, 24
+    VecMagnitude = Sqr(v.x * v.x + v.y * v.y + v.z * v.z)
+End Function
+Private Function VecMag(v As VecType) As Double
+    VecMag = Sqr(v.x * v.x + v.y * v.y + v.z * v.z)
+End Function
+
+Private Function NegVec(v As VecType) As VecType
+    NegVec.x = -v.x
+    NegVec.y = -v.y
+    NegVec.z = -v.z
+End Function
+Public Sub UnitVect(A As Long)
+    ' Returns ZERO vector if vector has no magnitude.
+    Dim v As VecType, d1 As VecType
+    Dim d As Double
+    CopyMemory VarPtr(v), A, 24
+    '
+    d = VecMag(v)
+    If d > 0 Then
+        d1.x = v.x / d
+        d1.y = v.y / d
+        d1.z = v.z / d
+    End If
+    CopyMemory A, VarPtr(d1), 24
+End Sub
+Public Sub UnitVectMult(N As Long, A As Long)
+    ' Returns ZERO vector if vector has no magnitude.
+    Dim v As VecType, d1 As VecType, Zero As VecType, m As Long
+    Dim d As Double
+    For m = 1 To N
+    CopyMemory VarPtr(v), A, 24
+    '
+    d = VecMag(v)
+    If d > 0 Then
+        d1.x = v.x / d
+        d1.y = v.y / d
+        d1.z = v.z / d
+    Else
+        d1 = Zero
+    End If
+    CopyMemory A, VarPtr(d1), 24
+    A = A + 24
+    Next m
+End Sub
+Private Function UnitVec(v As VecType) As VecType
+    ' Returns ZERO vector if vector has no magnitude.
+    Dim d As Double
+    '
+    d = VecMag(v)
+    If d > 0 Then
+        UnitVec.x = v.x / d
+        UnitVec.y = v.y / d
+        UnitVec.z = v.z / d
+    End If
+End Function
+' XProduct
+Private Function XProd(v1 As VecType, v2 As VecType) As VecType
+    XProd.x = v1.y * v2.z - v1.z * v2.y
+    XProd.y = v1.z * v2.x - v1.x * v2.z
+    XProd.z = v1.x * v2.y - v1.y * v2.x
+End Function
+' XDotProduct
+Private Function DotProd(v1 As VecType, v2 As VecType) As Double
+    DotProd = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
+End Function
+Sub NegateQuat(A As Long, B As Long)
+    Dim quat As QuatType
+    CopyMemory VarPtr(quat), A, 48
+'    quat.w = quat.w
+    quat.x = -quat.x
+    quat.y = -quat.y
+    quat.z = -quat.z
+    CopyMemory B, VarPtr(quat), 48
+End Sub
+Sub NegateQuatMult(N As Long, A As Long, B As Long)
+    Dim quat As QuatType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(quat), A, 48
+'    quat.w = quat.w
+    quat.x = -quat.x
+    quat.y = -quat.y
+    quat.z = -quat.z
+    CopyMemory B, VarPtr(quat), 48
+    A = A + 48
+    B = B + 48
+    Next m
+End Sub
+Private Function NegQuat(quat As QuatType) As QuatType
+    ' There are actually two ways to do this, negate the angle or negate the axis.
+    ' It turns out that negating the axis works a bit better with the RotQuat function
+    NegQuat.w = quat.w
+    NegQuat.x = -quat.x
+    NegQuat.y = -quat.y
+    NegQuat.z = -quat.z
+End Function
+Public Sub MakeLineFrom2Vec(A As Long, B As Long, C As Long) ' Pointers VecType, VecType, LineType
+    CopyMemory C, A, 24
+    CopyMemory C + 24, A, 24
+End Sub
+Private Function MakeLine(Point1 As VecType, Point2 As VecType) As LineType
+    MakeLine.Point1 = Point1
+    MakeLine.Point2 = Point2
+End Function
+
+Private Function MakeVec(x As Double, y As Double, z As Double) As VecType
+    MakeVec.x = x
+    MakeVec.y = y
+    MakeVec.z = z
+End Function
+Public Sub MakeQuaterion(A As Long, w As Double, x As Double, y As Double, z As Double)
+    CopyMemory A, VarPtr(w), 8
+    CopyMemory A + 8, VarPtr(x), 8
+    CopyMemory A + 16, VarPtr(y), 8
+    CopyMemory A + 24, VarPtr(z), 8
+End Sub
+Private Function MakeQuat(w As Double, x As Double, y As Double, z As Double) As QuatType
+    MakeQuat.w = w
+    MakeQuat.x = x
+    MakeQuat.y = y
+    MakeQuat.z = z
+End Function
+
+
+
+
+' debug
+Public Function VecString(A As Long) As String
+    Dim v As VecType
+    v = GetVector(A)
+    VecString = Format$(v.x, "#0.00000") & ", " & Format$(v.y, "#0.00000") & ", " & Format$(v.z, "#0.00000")
+End Function
+' trig functions
+Public Sub VectorRad2Deg(A As Long, B As Long)
+    Dim v As VecType
+    v = GetVector(A)
+    v.x = Rad2Deg(v.x)
+    v.y = Rad2Deg(v.y)
+    v.z = Rad2Deg(v.z)
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Public Sub VectorRad2DegMult(N As Long, A As Long, B As Long)
+    Dim v As VecType, m As Long
+    For m = 1 To N
+    v = GetVector(A)
+    v.x = Rad2Deg(v.x)
+    v.y = Rad2Deg(v.y)
+    v.z = Rad2Deg(v.z)
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+
+Public Sub VectorDeg2Rad(A As Long, B As Long)
+    Dim v As VecType
+    CopyMemory VarPtr(v), A, 24
+    v.x = Deg2Rad(v.x)
+    v.y = Deg2Rad(v.y)
+    v.z = Deg2Rad(v.z)
+    CopyMemory B, VarPtr(v), 24
+End Sub
+Public Sub VectorDeg2RadMult(N As Long, A As Long, B As Long)
+    Dim v As VecType, m As Long
+    For m = 1 To N
+    CopyMemory VarPtr(v), A, 24
+    v.x = Deg2Rad(v.x)
+    v.y = Deg2Rad(v.y)
+    v.z = Deg2Rad(v.z)
+    CopyMemory B, VarPtr(v), 24
+    A = A + 24
+    B = B + 24
+    Next m
+End Sub
+
+Private Function VecRad2Deg(v As VecType) As VecType
+    VecRad2Deg.x = Rad2Deg(v.x)
+    VecRad2Deg.y = Rad2Deg(v.y)
+    VecRad2Deg.z = Rad2Deg(v.z)
+End Function
+
+Private Function VecDeg2Rad(v As VecType) As VecType
+    VecDeg2Rad.x = Deg2Rad(v.x)
+    VecDeg2Rad.y = Deg2Rad(v.y)
+    VecDeg2Rad.z = Deg2Rad(v.z)
+End Function
+
+Public Function Rad2Deg(RadAngle As Double) As Double
+    Rad2Deg = RadAngle / pidivby180
+End Function
+
+Public Function Deg2Rad(DegAngle As Double) As Double
+    Deg2Rad = DegAngle * pidivby180
+End Function
+
+Public Function ACos(ByVal d As Double) As Double
+    ' Radians.
+    ' d is forced between 1 and -1.  This prevents IEEE rounding from causing any problems.
+    Dim dRoot As Double
+    Dim d2 As Double
+    '
+    Select Case True
+    Case d > 1:     d2 = 1
+    Case d < -1:    d2 = -1
+    Case Else:      d2 = d
+    End Select
+    '
+    dRoot = Sqr(1 - d2 * d2)
+    If Abs(dRoot) <> 0 Then
+        ACos = pihalf - Atn(d2 / dRoot)
+    Else
+        ACos = pihalf - pihalf * Sgn(d2)
+    End If
+End Function
+
+Public Function ASin(d As Double) As Double
+    ' Radians.
+    ' d is forced between 1 and -1.  This prevents IEEE rounding from causing any problems.
+    Dim dRoot As Double
+    Dim d2 As Double
+    '
+    Select Case True
+    Case d > 1:     d2 = 1
+    Case d < -1:    d2 = -1
+    Case Else:      d2 = d
+    End Select
+    '
+    dRoot = Sqr(1 - d2 * d2)
+    If Abs(dRoot) <> 0 Then
+        ASin = Atn(d2 / dRoot)
+    Else
+        ASin = pihalf * Sgn(d2)
+    End If
+End Function
+
+Public Function ATan2(y As Double, x As Double) As Double
+    Const epsilon As Double = 1.4E-45
+    ' Radians.
+    '
+    Select Case x
+    Case Is > epsilon:  ATan2 = Atn(y / x)
+    Case Is < -epsilon: ATan2 = Atn(y / x) + Pi * Sgn(y): If y = 0# Then ATan2 = ATan2 + Pi
+    Case Else:          ATan2 = pihalf * Sgn(y)
+    End Select
+End Function
