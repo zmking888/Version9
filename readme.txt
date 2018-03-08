@@ -1,8 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 52 active-X
+Version 9.0 revision 53 active-X
 We can make Decimals using @ for literals
 A=122323213213123321321@ is a Decimal
+use . as decimal point in code
+when display numbers M2000 has decimal point by locale.
 
 From revision 50:
 new ca.crt - install ca.crt as root certificate

@@ -16,7 +16,7 @@ Private Const myArray = "mArray"
 Const thislabel$ = "[!" + vbCr + "'\]"
 Dim ObjectCatalog As FastCollection, loadcatalog As New FastCollection
 Public rndbase As rndvars
-Public LastUse As Long
+Public LastUse As Long, cdecimaldot$
 Private funcno As Long, ua As Double, UB As Double
 Private simplestack1 As rndvars
 Private Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteW" (ByVal hWND As Long, ByVal lpszOp As Long, ByVal lpszFile As Long, ByVal lpszParams As Long, ByVal LpszDir As String, ByVal FsShowCmd As Long) As Long
@@ -73,7 +73,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 0
-Global Const Revision = 52
+Global Const Revision = 53
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3865,7 +3865,7 @@ NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
 NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
 End If
 CheckDec
-
+cdecimaldot$ = GetDeflocaleString(LOCALE_SDECIMAL)
 End Sub
 Public Sub CheckDec()
 OverideDec = False
@@ -8529,14 +8529,12 @@ Else
             If sng <= Len(a$) Then
             If Asc(Mid$(a$, sng, 1)) = 64 Then
             Mid$(a$, sng, 1) = " "
-           ' Set bstack.lastobj = New VarItem
-            'bstack.lastobj.ItemVariant = CDec(ig$ & DE$)
-            
-            'bstack.lastobj.Typename = "D"
-           ' Dim zz As Variant
-            'zz = CDec(ig$ & DE$)
-            'SwapVariant r, zz
-            r = CDec(ig$ & DE$)
+            If Len(DE$) > 0 Then
+                Mid$(DE$, 1, 1) = cdecimaldot$
+                r = CDec(ig$ & DE$)
+            Else
+            r = CDec(ig$)
+            End If
             If Err.Number = 6 Then
             Err.Clear
             r = val(ig$ & DE$)

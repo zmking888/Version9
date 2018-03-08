@@ -3168,14 +3168,18 @@ Else
         End If
     End If
     If ig$ = vbNullString Then
-    IsNumberOnly = False
-    lr = 1
+        IsNumberOnly = False
+        lr = 1
     Else
-    If Len(ig$ + DE$) > 13 And ex$ = "" Then
-    If SG < 0 Then ig$ = "-" & ig$
-    r = CDec(ig$ & DE$)
+        If SG < 0 Then ig$ = "-" & ig$
+        If Len(ig$ + DE$) > 13 And ex$ = "" Then
+            If Len(DE$) > 0 Then
+                Mid$(DE$, 1, 1) = cdecimaldot$
+                r = CDec(ig$ & DE$)
+            Else
+                r = CDec(ig$)
+            End If
     Else
-    
     If SG < 0 Then ig$ = "-" & ig$
     r = val(ig$ & DE$ & ex$)
     End If
