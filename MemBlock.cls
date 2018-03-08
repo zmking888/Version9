@@ -80,7 +80,7 @@ Else
     ErrorMes = 2
 End If
 End Sub
-Public Property Get GetBytePtr(offset As Double) As Long
+Public Property Get GetBytePtr(offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
 If offset < 0 Or offset >= mItems * ItemLen Then
     ErrorMes = 4
@@ -91,7 +91,7 @@ Else
     GetBytePtr = 0  ' null
 End If
 End Property
-Public Property Get GetPtr(offset As Double) As Long
+Public Property Get GetPtr(offset As Variant) As Long
 If ErrorMes = 0 And mItems > 0 Then
 If offset < 0 Or offset >= mItems Then
     ' zero

@@ -12,33 +12,42 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Private mTypeName As String
-Private mItemStr As String
-Private mItemDouble As Double
-Private mItemObject As Object
+Private mItem As Variant
+Private slot As Integer
 Private IamNull As Boolean
- Property Let Typename(ByRef rhs As String)
-mTypeName = rhs
+ Property Let Typename(ByRef RHS As String)
+mTypeName = RHS
 End Property
 
  Property Get Typename() As String
 Typename = mTypeName
 End Property
 
- Property Let ItemStr(ByRef rhs As String)
+ Property Let ItemStr(ByRef RHS As String)
  IamNull = False
-mItemStr = rhs
+ slot = 4
+mItem = CVar(RHS)
 End Property
 
  Property Get ItemStr() As String
-ItemStr = mItemStr
+If slot = 4 Then ItemStr = mItem
 End Property
- Property Let ItemDouble(ByVal rhs As Double)
+ Property Let ItemDouble(ByVal RHS As Variant)
  IamNull = False
-mItemDouble = rhs
+ slot = 2
+mItem = RHS
 End Property
 
-Property Get ItemDouble() As Double
-ItemDouble = mItemDouble
+Property Get ItemDouble() As Variant
+If slot = 2 Then ItemDouble = mItem
+End Property
+ Property Let ItemVariant(RHS As Variant)
+ slot = 2
+ IamNull = False
+mItem = RHS
+End Property
+ Property Get ItemVariant() As Variant
+ If slot = 2 Then ItemVariant = mItem
 End Property
 
 Private Sub Class_Initialize()
@@ -48,12 +57,13 @@ Property Get NoValue() As Boolean
 NoValue = IamNull
 End Property
 
-Public Property Set ObjectRef(rhs As Object)
-IamNull = rhs Is Nothing
-    Set mItemObject = rhs
+Public Property Set ObjectRef(RHS As Object)
+IamNull = RHS Is Nothing
+slot = 1
+    Set mItem = RHS
 End Property
 Public Property Get ObjectRef() As Object
-Set ObjectRef = mItemObject
+If slot = 1 Then Set ObjectRef = mItem
 End Property
 
 Private Sub Class_Terminate()

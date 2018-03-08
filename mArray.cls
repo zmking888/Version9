@@ -66,7 +66,7 @@ Private Type SAFEARRAY1D
     lLBound As Long
 End Type
 Public index As Long, final As Boolean
-Public Sub Compute0(p As Double, ss$)
+Public Sub Compute0(p As Variant, ss$)
 If final Then CantAssignValue: Exit Sub
 Dim v As Long
 On Error Resume Next
@@ -105,7 +105,7 @@ If MyIsNumeric(actualdata(v)) Then
                                  
                                   
                                  End Select
-                                 actualdata(v) = MyRound(actualdata(v), 13)
+                             If VarType(actualdata(v)) = vbDouble Then actualdata(v) = MyRound(actualdata(v), 13)
                             
 End If
                            v = v + 1
@@ -142,7 +142,7 @@ If MyIsNumeric(actualdata(v)) Then
                                 actualdata(v) = -actualdata(v)
                                   
                                  End Select
-                                 actualdata(v) = MyRound(actualdata(v), 13)
+                          If VarType(actualdata(v)) = vbDouble Then actualdata(v) = MyRound(actualdata(v), 13)
                             
 End If
                            v = v + 1
@@ -171,7 +171,7 @@ If MyIsNumeric(actualdata(v)) Then
                                  actualdata(v) = actualdata(v) / p
                                  
                                  End Select
-                                 actualdata(v) = MyRound(actualdata(v), 13)
+                                 If VarType(actualdata(v)) = vbDouble Then actualdata(v) = MyRound(actualdata(v), 13)
                             
 End If
                            v = v + 1
@@ -221,12 +221,12 @@ Public Sub PushProp(a As Variant)
 Set GroupRef = a
 Arr = False
 End Sub
-Public Sub CopySerialize(MMM() As Variant)
+Public Sub CopySerialize(mmm() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
 Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 
-GetMem4 VarPtrArray(MMM()), m_base
+GetMem4 VarPtrArray(mmm()), m_base
 GetMem4 VarPtrArray(actualdata()), m_base_0
 r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
@@ -242,14 +242,14 @@ r1 = SafeArrayUnaccessData(ByVal m_base)
 r2 = SafeArrayUnlock(m_base_0)
 r1 = SafeArrayUnlock(m_base)
 End Sub
-Public Sub CopyBackSerialize(MMM() As Variant)
+Public Sub CopyBackSerialize(mmm() As Variant)
 ' may we get an exception here
 Dim m_base As Long, first12 As Long
 Dim m_base_0 As Long, first12_0 As Long, r1 As Long, r2 As Long
 If Not RevOrder Then Err.Raise vbObjectError + 12345, "CopyBack", "Failed. is not vb6"
 Dim backup()
 backup() = actualdata()
-GetMem4 VarPtrArray(MMM()), m_base
+GetMem4 VarPtrArray(mmm()), m_base
 GetMem4 VarPtrArray(backup()), m_base_0
 r1 = SafeArrayLock(m_base)
 r2 = SafeArrayLock(m_base_0)
@@ -724,19 +724,19 @@ End If
 there1:
 
 End Property
-Public Property Get itemnumeric(curitem As Long) As Double
+Public Property Get itemnumeric(curitem As Long) As Variant
 On Error GoTo there1
 If Arr Then
 If maxitems1 >= curitem Then
 If IsObject(actualdata(curitem)) Then
 If Typename(actualdata(curitem)) = "PropReference" Then
-itemnumeric = CDbl(actualdata(curitem).Value)
+itemnumeric = actualdata(curitem).Value
 Else
 itemnumeric = 0
 End If
 Else
 
-itemnumeric = CDbl(actualdata(curitem))
+itemnumeric = actualdata(curitem)
 End If
 Exit Property
 Else

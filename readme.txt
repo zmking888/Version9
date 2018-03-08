@@ -1,7 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 51 active-X
-Math library for vectors inside M2000.dll
+Version 9.0 revision 52 active-X
+We can make Decimals using @ for literals
+A=122323213213123321321@ is a Decimal
 
 From revision 50:
 new ca.crt - install ca.crt as root certificate

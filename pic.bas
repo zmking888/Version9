@@ -3,7 +3,7 @@ Option Explicit
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hDC As Long, _
+Alias "GetTextMetricsA" (ByVal hdc As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -86,7 +86,7 @@ Public Type tagSize
     cX As Long
     cY As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "User32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -130,20 +130,20 @@ Type BITMAP
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "User32" (ByVal hWND As Long) As Long
 Private Declare Function GetDesktopWindow Lib "User32" () As Long
-Private Declare Function ReleaseDC Lib "User32" (ByVal hWND As Long, ByVal hDC As Long) As Long
+Private Declare Function ReleaseDC Lib "User32" (ByVal hWND As Long, ByVal hdc As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "User32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -553,11 +553,11 @@ Dim lhWNd As Long, lHDC As Long
     bitsPerPixel = GetDeviceCaps(lHDC, BITSPIXEL)
     ReleaseDC lhWNd, lHDC
 End Function
-Public Function RotateMaskDib(cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
+Public Function RotateMaskDib(cDIBbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 100, _
     Optional bckColor As Long = &HFFFFFF, Optional alpha As Long = 100)
     Dim ang As Long
-    ang = CLng(Angle!)
-Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
+    ang = CLng(angle!)
+angle! = -(CLng(angle!) Mod 360) / 180# * Pi
 If cDIBbuffer0.hDIb = 0 Then Exit Function
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
@@ -627,7 +627,7 @@ On Error Resume Next
     
  
        Dim pw1 As Long, ph1 As Long
-          Dim sx As Single, sy As Single
+          Dim sX As Single, sY As Single
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
@@ -639,13 +639,13 @@ On Error Resume Next
     k = -myw / (2# * Sin(r))
     
 
-       x_step2 = CLng(Fix(Cos(Angle! + Pi / 2) * pw))
-    y_step2 = CLng(Fix(Sin(Angle! + Pi / 2) * ph))
+       x_step2 = CLng(Fix(Cos(angle! + Pi / 2) * pw))
+    y_step2 = CLng(Fix(Sin(angle! + Pi / 2) * ph))
 
-    x_step = CLng(Fix(Cos(Angle!) * pw))
-    y_step = CLng(Fix(Sin(Angle!) * ph))
-  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(Angle! - r)))) * pw
-   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(Angle! - r)))) * ph
+    x_step = CLng(Fix(Cos(angle!) * pw))
+    y_step = CLng(Fix(Sin(angle!) * ph))
+  image_x = CLng(Fix(pw / 2 - Fix(k * Sin(angle! - r)))) * pw
+   image_y = CLng(Fix(ph / 2 + Fix(k * Cos(angle! - r)))) * ph
 Dim pw1out As Long, ph1out As Long, pwOut As Long, phOut As Long, much As Single
 ''Dim cw1 As Long, ch1 As Long, outf As Single, fadex As Long, fadey As Long, outf1 As Single, outf2 As Single
 pw1 = pw1 - 1
@@ -660,16 +660,16 @@ nomalo = Not (ang Mod 90 = 0)
         temp_image_y = image_y
         For screen_x = 0 To (myw - 1) * 3 Step 3
   
-                  sx = temp_image_x / pws
-                sy = temp_image_y / phs
-                mmx = Int(sx)
-                mmy = Int(sy)
+                  sX = temp_image_x / pws
+                sY = temp_image_y / phs
+                mmx = Int(sX)
+                mmy = Int(sY)
 
            
                     If mmx >= 1 And mmx <= pw1out And mmy >= 1 And mmy <= ph1out Then
-          xf = (sx - CSng(mmx))
+          xf = (sX - CSng(mmx))
              xf1 = (1! - xf)
-                      yf = (sy - CSng(mmy))
+                      yf = (sY - CSng(mmy))
                       yf1 = 1! - yf
                   
                    
@@ -789,7 +789,7 @@ Dim tSA2 As SAFEARRAY2D
         CopyMemory ByVal VarPtrArray(bDib2), 0&, 4
  End Function
 
-Public Sub CanvasSize(cDIBbuffer0 As cDIBSection, ByVal wcm As Double, ByVal hcm As Double, Optional ByVal rep As Boolean = False, Optional Max As Integer = 0, Optional yshift As Long = 0, Optional bcolor As Long = &HFFFFFF, Optional usepixel As Boolean = False, Optional ByVal Percent As Single = 85, Optional ByVal linewidth As Long = 4)
+Public Sub CanvasSize(cDIBbuffer0 As cDIBSection, ByVal wcm As Double, ByVal hcm As Double, Optional ByVal rep As Boolean = False, Optional max As Integer = 0, Optional yshift As Long = 0, Optional bcolor As Long = &HFFFFFF, Optional usepixel As Boolean = False, Optional ByVal Percent As Single = 85, Optional ByVal linewidth As Long = 4)
 ' top left align only
 Dim piw As Long, pih As Long, stx As Long, sty As Long, stOffx As Long, stOffy As Long, stBorderX As Long, stBorderY As Long, strx As Long, stry As Long, i As Long, j As Long
 
@@ -814,19 +814,19 @@ If cDIBbuffer1.Create(piw, pih) Then
      stry = cDIBbuffer1.Height \ cDIBbuffer0.Height
      stBorderX = stOffx \ (strx + 1)
      stBorderY = stOffy \ (stry + 1)
-                If Max = 0 Then Max = strx * stry
+                If max = 0 Then max = strx * stry
        sty = stBorderY
                 For j = 1 To stry
                 stx = stBorderX
                              For i = 1 To strx
                            
-                            If Max = 0 Then Exit For
+                            If max = 0 Then Exit For
                             cDIBbuffer0.PaintPicture cDIBbuffer1.HDC1, stx, sty + yshift
-                            Max = Max - 1
+                            max = max - 1
                                stx = stx + cDIBbuffer0.width + stBorderX
                            
                             Next i
-                 If Max = 0 Then Exit For
+                 If max = 0 Then Exit For
                    sty = sty + cDIBbuffer0.Height + stBorderY
                 Next j
                 cDIBbuffer1.FreeHDC
@@ -845,9 +845,9 @@ If cDIBbuffer1.Create(piw, pih) Then
     End If
 End Sub
 
-Public Sub RotateDibNew(cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 1, _
+Public Sub RotateDibNew(cDIBbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 1, _
     Optional bckColor As Long = &HFFFFFF)
-Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
+angle! = -(CLng(angle!) Mod 360) / 180# * Pi
 On Error Resume Next
 If cDIBbuffer0.hDIb = 0 Then Exit Sub
 If zoomfactor <= 0.01 Then zoomfactor = 0.01
@@ -921,7 +921,7 @@ On Error Resume Next
 
         
     Dim pw As Long, ph As Long
-   Dim sx As Single, sy As Single
+   Dim sX As Single, sY As Single
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
@@ -936,14 +936,14 @@ On Error Resume Next
     r = Atn(myw / myh)
     k = -myw / (2# * Sin(r))
  
-   x_step2 = (Cos(Angle! + Pi / 2!) * pw)
-    y_step2 = (Sin(Angle! + Pi / 2!) * ph)
+   x_step2 = (Cos(angle! + Pi / 2!) * pw)
+    y_step2 = (Sin(angle! + Pi / 2!) * ph)
 
-    x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    x_step = Cos(angle!) * pw
+    y_step = Sin(angle!) * ph
     
-  image_x = (pw / 2! - (k * Sin(Angle! - r))) * pw
-    image_y = (ph / 2! + (k * Cos(Angle! - r))) * ph
+  image_x = (pw / 2! - (k * Sin(angle! - r))) * pw
+    image_y = (ph / 2! + (k * Cos(angle! - r))) * ph
  '' image_x = image_x + x_step2 * pws / phs * Sin(r!)
  
     ''image_y = image_y + y_step2 * pws / phs * Cos(r!)
@@ -953,17 +953,17 @@ On Error Resume Next
         temp_image_x = image_x
         temp_image_y = image_y
          For screen_x = 0 To (myw - 1) * 3 Step 3
-                sx = temp_image_x / pws
-                sy = temp_image_y / phs
-                mmx = Fix(sx)
-                mmy = Fix(sy)
+                sX = temp_image_x / pws
+                sY = temp_image_y / phs
+                mmx = Fix(sX)
+                mmy = Fix(sY)
 
                     If mmx >= 0 And mmx <= pw And mmy >= 0 And mmy <= ph Then
-                 If sx > pw1 Then mmx = pw1
-               If sy > ph1 Then mmy = ph1
-             xf = Abs((sx - CSng(mmx)))
+                 If sX > pw1 Then mmx = pw1
+               If sY > ph1 Then mmy = ph1
+             xf = Abs((sX - CSng(mmx)))
              xf1 = 1! - xf
-                      yf = Abs((sy - CSng(mmy)))
+                      yf = Abs((sY - CSng(mmy)))
                       yf1 = 1! - yf
                       
                         If mmx = pw1 Or mmy = ph1 Then
@@ -999,8 +999,8 @@ On Error Resume Next
 Set cDIBbuffer1 = Nothing
 End Sub
 
-Public Sub RotateDibOLD(cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional bckColor As Long = &HFFFFFF)
-Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
+Public Sub RotateDibOLD(cDIBbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional bckColor As Long = &HFFFFFF)
+angle! = -(CLng(angle!) Mod 360) / 180# * Pi
 On Error Resume Next
 If cDIBbuffer0.hDIb = 0 Then Exit Sub
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
@@ -1072,7 +1072,7 @@ On Error Resume Next
 
 
     Dim pw As Long, ph As Long
-   Dim sx As Single, sy As Single
+   Dim sX As Single, sY As Single
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
@@ -1085,14 +1085,14 @@ On Error Resume Next
     ph1 = ph - 1
     r = Atn(myw / myh)
     k = -myw / (2# * Sin(r))
-   image_x = (pw / 2# - (k * Sin(Angle! - r))) * pw
-   image_y = (ph / 2# + (k * Cos(Angle! - r))) * ph
+   image_x = (pw / 2# - (k * Sin(angle! - r))) * pw
+   image_y = (ph / 2# + (k * Cos(angle! - r))) * ph
 
-   x_step2 = (Cos(Angle! + Pi / 2!) * pw)
-    y_step2 = (Sin(Angle! + Pi / 2!) * ph)
+   x_step2 = (Cos(angle! + Pi / 2!) * pw)
+    y_step2 = (Sin(angle! + Pi / 2!) * ph)
 
-    x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    x_step = Cos(angle!) * pw
+    y_step = Sin(angle!) * ph
 
     For screen_y = 0 To Fix(myh) - 1
         temp_image_x = image_x
@@ -1132,9 +1132,9 @@ On Error Resume Next
 Set cDIBbuffer1 = Nothing
 End Sub
 '
-Public Function RotateDib(bstack As basetask, cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
+Public Function RotateDib(bstack As basetask, cDIBbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 100, _
     Optional bckColor As Long = -1, Optional pic As Boolean = False, Optional alpha As Long = 100, Optional BACKx As Long, Optional BACKy As Long, Optional amask$ = vbNullString)
-Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
+angle! = -(CLng(angle!) Mod 360) / 180# * Pi
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Long, myh As Long, piw As Long, pih As Long, pix As Long, piy As Long
@@ -1154,8 +1154,8 @@ Call cDIBbuffer1.Create(piw * zoomfactor, pih * zoomfactor)
 cDIBbuffer0.needHDC
 cDIBbuffer1.LoadPictureStretchBlt cDIBbuffer0.HDC1, , , , , pix, piy, piw, pih
 cDIBbuffer0.FreeHDC
-myw = Int((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor)
-myh = Int((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor)
+myw = Int((Abs(piw * Cos(angle!)) + Abs(pih * Sin(angle!))) * zoomfactor)
+myh = Int((Abs(piw * Sin(angle!)) + Abs(pih * Cos(angle!))) * zoomfactor)
 Dim sprt As Boolean
 cDIBbuffer0.ClearUp
 Dim prive As basket
@@ -1167,18 +1167,18 @@ On Error GoTo there
         With bstack.Owner
         If pic Then
          If bstack.toprinter Then
-         cDIBbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDIBbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-            cDIBbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+            cDIBbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDIBbuffer0)
      
             sprt = True
             Else
                     If bstack.toprinter Then
-        cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-            cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 1, 3)), Int(.ScaleX(BACKy, 1, 3))
+            cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 1, 3)), Int(.ScaleX(BACKy, 1, 3))
             End If
         End If
         End With
@@ -1219,21 +1219,21 @@ Dim tSA2 As SAFEARRAY2D
     Dim screen_x As Long, screen_y As Long, mmx As Long, mmy As Long, mmy1 As Long
 
 
-    Dim Dest As Long, pw As Long, ph As Long
+    Dim dest As Long, pw As Long, ph As Long
     
     pw = cDIBbuffer1.width
     ph = cDIBbuffer1.Height
     r = Atn(myw / myh)
     k = -myw / (2# * Sin(r))
     
-    x_step = CLng(Cos(Angle!) * pw)
-    y_step = CLng(Sin(Angle!) * ph)
+    x_step = CLng(Cos(angle!) * pw)
+    y_step = CLng(Sin(angle!) * ph)
 
-    x_step2 = CLng(Cos(Angle! + Pi / 2) * pw)
-    y_step2 = CLng(Sin(Angle! + Pi / 2) * ph)
+    x_step2 = CLng(Cos(angle! + Pi / 2) * pw)
+    y_step2 = CLng(Sin(angle! + Pi / 2) * ph)
 
-    image_x = CLng(pw / 2 - k * Sin(Angle! - r)) * pw
-    image_y = CLng(ph / 2 + k * Cos(Angle! - r)) * ph
+    image_x = CLng(pw / 2 - k * Sin(angle! - r)) * pw
+    image_y = CLng(ph / 2 + k * Cos(angle! - r)) * ph
 
 If amask$ <> "" And sprt Then
         If Left$(amask$, 4) = "cDIB" Then
@@ -1364,15 +1364,15 @@ End Function
 
 
 
-Public Function RotateDib1(bstack As basetask, cDIBbuffer0 As cDIBSection, Optional ByVal Angle! = 0, Optional ByVal zoomfactor As Single = 100, _
+Public Function RotateDib1(bstack As basetask, cDIBbuffer0 As cDIBSection, Optional ByVal angle! = 0, Optional ByVal zoomfactor As Single = 100, _
    Optional bckColor As Long = -1, Optional BACKx As Long, Optional BACKy As Long)
-Angle! = -(CLng(Angle!) Mod 360) / 180# * Pi
+angle! = -(CLng(angle!) Mod 360) / 180# * Pi
 If zoomfactor <= 1 Then zoomfactor = 1
 zoomfactor = zoomfactor / 100#
 Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As Long
 Dim k As Single, r As Single
 
-If zoomfactor = 1 And Angle! = 0 Then Exit Function
+If zoomfactor = 1 And angle! = 0 Then Exit Function
     piw = cDIBbuffer0.width
     pih = cDIBbuffer0.Height
  Dim cDIBbuffer1 As Object, cDIBbuffer2 As Object
@@ -1386,8 +1386,8 @@ cDIBbuffer0.FreeHDC
   
  
 
-myw = Round((Abs(piw * Cos(Angle!)) + Abs(pih * Sin(Angle!))) * zoomfactor, 0)
-myh = Round((Abs(piw * Sin(Angle!)) + Abs(pih * Cos(Angle!))) * zoomfactor, 0)
+myw = Round((Abs(piw * Cos(angle!)) + Abs(pih * Sin(angle!))) * zoomfactor, 0)
+myh = Round((Abs(piw * Sin(angle!)) + Abs(pih * Cos(angle!))) * zoomfactor, 0)
 
 cDIBbuffer0.ClearUp
 If cDIBbuffer0.Create(myw, myh) Then
@@ -1397,9 +1397,9 @@ cDIBbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDIBbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDIBbuffer0.LoadPictureBlt .hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1435,7 +1435,7 @@ Dim tSA2 As SAFEARRAY2D
     Dim image_x As Single, image_y As Single, temp_image_x As Single, temp_image_y As Single
     Dim x_step As Single, y_step As Single, x_step2 As Single, y_step2 As Single
     Dim screen_x As Long, screen_y As Long, mmx As Long, mmy As Long, mmy1 As Long
-   Dim sx As Single, sy As Single
+   Dim sX As Single, sY As Single
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
@@ -1453,30 +1453,30 @@ Dim tSA2 As SAFEARRAY2D
 
       pws = (pw) * zoomfactor
     phs = (ph) * zoomfactor
-      image_x = (pws / 2# - (k * Sin(Angle! - r))) * pw
-   image_y = (phs / 2# + (k * Cos(Angle! - r))) * ph
-   x_step2 = (Cos(Angle! + Pi / 2!) * pw)
-    y_step2 = (Sin(Angle! + Pi / 2!) * ph)
+      image_x = (pws / 2# - (k * Sin(angle! - r))) * pw
+   image_y = (phs / 2# + (k * Cos(angle! - r))) * ph
+   x_step2 = (Cos(angle! + Pi / 2!) * pw)
+    y_step2 = (Sin(angle! + Pi / 2!) * ph)
 
-    x_step = Cos(Angle!) * pw
-    y_step = Sin(Angle!) * ph
+    x_step = Cos(angle!) * pw
+    y_step = Sin(angle!) * ph
 ''image_x = image_x + x_step1
 ''image_y = image_y + y_step1
     For screen_y = 0 To Fix(myh) - 1
         temp_image_x = image_x
         temp_image_y = image_y
         For screen_x = 0 To (Fix(myw) - 1) * 3 Step 3
-       sx = temp_image_x / pws
-                sy = temp_image_y / phs
-                mmx = Fix(sx)
-                mmy = Fix(sy)
+       sX = temp_image_x / pws
+                sY = temp_image_y / phs
+                mmx = Fix(sX)
+                mmy = Fix(sY)
 
                  
            If mmx >= 0 And mmx <= pw1 And mmy >= 0 And mmy <= ph1 Then
         
-             xf = Abs((sx - CSng(mmx)))
+             xf = Abs((sX - CSng(mmx)))
              xf1 = 1! - xf
-                      yf = Abs((sy - CSng(mmy)))
+                      yf = Abs((sY - CSng(mmy)))
                       yf1 = 1! - yf
                               If mmx = pw1 Or mmy = ph1 Then
                           mmx = mmx * 3
@@ -1520,7 +1520,7 @@ Sub Conv24(cDIBbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
 Call cDIBbuffer1.Create(cDIBbuffer0.width, cDIBbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDIBbuffer0.hDC
+cDIBbuffer1.LoadPictureBlt cDIBbuffer0.hdc
 Set cDIBbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -1545,11 +1545,11 @@ With ob
 Call SetWindowRgn(.hWND, (0), False)
 End With
 End Sub
-Public Function RotateRegion(hRgn As Long, Angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
+Public Function RotateRegion(hRgn As Long, angle As Single, ByVal piw As Long, ByVal pih As Long, ByVal Size As Single) As Long
 Dim k As Single, r As Single, aa As Single
-aa = (CLng(Angle! * 100) Mod 36000) / 100
+aa = (CLng(angle! * 100) Mod 36000) / 100
 
-Angle! = -aa / 180# * Pi
+angle! = -aa / 180# * Pi
    r = Atn(piw / CSng(pih)) + Pi / 2!
     k = piw / Cos(r)
  
@@ -1558,14 +1558,14 @@ hRgn = ScaleRegion(hRgn, Size)
 
     Dim uXF As XFORM
     Dim d2R As Single, rData() As Byte, rSize As Long
-    uXF.eM11 = Cos(Angle!)
-    uXF.eM12 = Sin(Angle!)
-    uXF.eM21 = -Sin(Angle!)
-    uXF.eM22 = Cos(Angle!)
+    uXF.eM11 = Cos(angle!)
+    uXF.eM12 = Sin(angle!)
+    uXF.eM21 = -Sin(angle!)
+    uXF.eM22 = Cos(angle!)
 k = Abs(k)
 
-uXF.eDx = Round(k * Cos(Angle! - r) / 2! + k / 2!, 0)
-uXF.eDy = Round(k * Sin(Angle! - r) / 2! + k / 2!, 0)
+uXF.eDx = Round(k * Cos(angle! - r) / 2! + k / 2!, 0)
+uXF.eDy = Round(k * Sin(angle! - r) / 2! + k / 2!, 0)
 
     rSize = GetRegionData(hRgn, rSize, ByVal 0&)
     
@@ -2901,7 +2901,7 @@ ismine = False
 End Select
 End Function
 Private Function IsNumberQuery(a$, fr As Long, r As Double, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
+Dim SG As Long, sng As Long, N$, ig$, DE$, sg1 As Long, ex$   ', e$
 
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
@@ -2917,7 +2917,7 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-n$ = Mid$(a$, sng)
+N$ = Mid$(a$, sng)
 
 If val("0" & Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
 IsNumberQuery = False
@@ -3003,15 +3003,15 @@ Else
     Err.Clear
     On Error Resume Next
     If Len(ex$) = 1 Then
-    n$ = ig$ & DE$ & ex$ + "1"
-     If IsExp(basestack1, n$, r) Then
-    sng = Len(ig$ & DE$ & ex$) - Len(n$)
+    N$ = ig$ & DE$ & ex$ + "1"
+     If IsExp(basestack1, N$, r) Then
+    sng = Len(ig$ & DE$ & ex$) - Len(N$)
         fr = 0
     End If
        Else
-    n$ = ig$ & DE$ & ex$
-    If IsExp(basestack1, n$, r) Then
-    sng = Len(ig$ & DE$ & ex$) - Len(n$)
+    N$ = ig$ & DE$ & ex$
+    If IsExp(basestack1, N$, r) Then
+    sng = Len(ig$ & DE$ & ex$) - Len(N$)
         fr = 0
     Else
     End If
@@ -3069,12 +3069,12 @@ Else
                             End If
 ValidNum = r1
 End Function
-Function ValidNumberOnly(a$, r As Double, skipdec As Boolean) As Boolean
+Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
 r = 0
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
-Private Function IsNumberOnly(a$, fr As Long, r As Double, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
+Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
+Dim SG As Long, sng As Long, N$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
 SG = 1
@@ -3089,7 +3089,7 @@ sng = fr - 1
     Exit Do
     End Select
     Loop
-n$ = Mid$(a$, sng)
+N$ = Mid$(a$, sng)
 
 If val("0" & Mid$(a$, sng, 1)) = 0 And Left(Mid$(a$, sng, 1), sng) <> "0" And Left(Mid$(a$, sng, 1), sng) <> "." Then
 IsNumberOnly = False
@@ -3171,8 +3171,14 @@ Else
     IsNumberOnly = False
     lr = 1
     Else
+    If Len(ig$ + DE$) > 13 And ex$ = "" Then
+    If SG < 0 Then ig$ = "-" & ig$
+    r = CDec(ig$ & DE$)
+    Else
+    
     If SG < 0 Then ig$ = "-" & ig$
     r = val(ig$ & DE$ & ex$)
+    End If
       'A$ = Mid$(A$, sng)
     lr = sng - fr + 1
     IsNumberOnly = True
@@ -4080,7 +4086,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hDC, tm
+    GetTextMetrics fonttest.hdc, tm
   With tm
 InternalLeadingSpace = (tm.tmInternalLeading = 0) Or Not (tm.tmInternalLeading > 0)
 End With

@@ -35,37 +35,37 @@ Public Function MoveFile(pOldPath As String, pNewPath As String)
     MoveFileW StrPtr(pOldPath), StrPtr(pNewPath)
     
 End Function
-Public Function isdir(f$) As Boolean
+Public Function isdir(F$) As Boolean
 On Error Resume Next
 Dim mm As New recDir
 Dim lookfirst As Boolean
 Dim Pad$
-If f$ = vbNullString Then Exit Function
-If f$ = "." Then f$ = mcd
-If InStr(f$, "\..") > 0 Or f$ = ".." Or Left$(f$, 3) = "..\" Then
-If Right$(f$, 1) <> "\" Then
-Pad$ = ExtractPath(f$ & "\", True, True)
+If F$ = vbNullString Then Exit Function
+If F$ = "." Then F$ = mcd
+If InStr(F$, "\..") > 0 Or F$ = ".." Or Left$(F$, 3) = "..\" Then
+If Right$(F$, 1) <> "\" Then
+Pad$ = ExtractPath(F$ & "\", True, True)
 Else
-Pad$ = ExtractPath(f$, True, True)
+Pad$ = ExtractPath(F$, True, True)
 End If
 If Pad$ = vbNullString Then
-If Right$(f$, 1) <> "\" Then
-Pad$ = ExtractPath(mcd + f$ & "\", True)
+If Right$(F$, 1) <> "\" Then
+Pad$ = ExtractPath(mcd + F$ & "\", True)
 Else
-Pad$ = ExtractPath(mcd + f$, True)
+Pad$ = ExtractPath(mcd + F$, True)
 End If
 End If
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then f$ = Pad$
+If lookfirst Then F$ = Pad$
 Else
-f$ = mylcasefILE(f$)
-lookfirst = mm.isdir(f$)
+F$ = mylcasefILE(F$)
+lookfirst = mm.isdir(F$)
 If Not lookfirst Then
 
-Pad$ = mcd + f$
+Pad$ = mcd + F$
 
 lookfirst = mm.isdir(Pad$)
-If lookfirst Then f$ = Pad$
+If lookfirst Then F$ = Pad$
 
 End If
 End If
@@ -216,9 +216,9 @@ DBUser = extDBUser
 DBUserPassword = extDBUserPassword
 Err.Clear
 End Sub
-Public Function inames(i As Long, lang As Long) As String
+Public Function inames(i As Long, Lang As Long) As String
 If (i And &H3) <> 1 Then
-Select Case lang
+Select Case Lang
 Case 1
 
 inames = "DESCENDING"
@@ -226,7 +226,7 @@ Case Else
 inames = "ΦΘΙΝΟΥΣΑ"
 End Select
 Else
-Select Case lang
+Select Case Lang
 Case 1
 inames = "ASCENDING"
 Case Else
@@ -236,10 +236,10 @@ End Select
 End If
 
 End Function
-Public Function fnames(i As Long, lang As Long) As String
+Public Function fnames(i As Long, Lang As Long) As String
 Select Case i
 Case 1
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "BOOLEAN"
     Case Else
@@ -247,7 +247,7 @@ Case 1
     End Select
     Exit Function
 Case 2
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "BYTE"
     Case Else
@@ -256,7 +256,7 @@ Case 2
    Exit Function
 
 Case 3
-        Select Case lang
+        Select Case Lang
     Case 1
     fnames = "INTEGER"
     Case Else
@@ -264,7 +264,7 @@ Case 3
     End Select
    Exit Function
 Case 4
-        Select Case lang
+        Select Case Lang
     Case 1
     fnames = "LONG"
     Case Else
@@ -273,7 +273,7 @@ Case 4
    Exit Function
  
 Case 5
-        Select Case lang
+        Select Case Lang
     Case 1
     fnames = "CURRENCY"
     Case Else
@@ -282,7 +282,7 @@ Case 5
    Exit Function
 
 Case 6
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "SINGLE"
     Case Else
@@ -291,7 +291,7 @@ Case 6
    Exit Function
 
 Case 7
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "DOUBLE"
     Case Else
@@ -299,7 +299,7 @@ Case 7
     End Select
    Exit Function
 Case 8
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "DATEFIELD"
     Case Else
@@ -307,7 +307,7 @@ Case 8
     End Select
    Exit Function
 Case 9 '.....................ole 205
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "BINARY"
     Case Else
@@ -315,7 +315,7 @@ Case 9 '.....................ole 205
     End Select
    Exit Function
 Case 10 '..........................................202
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "TEXT"
     Case Else
@@ -326,7 +326,7 @@ Case 11 '...........205
     fnames = "OLE"
     Exit Function
 Case 12 '...........................202
-    Select Case lang
+    Select Case Lang
     Case 1
     fnames = "MEMO"
     Case Else
@@ -374,7 +374,7 @@ End If
 
 End Sub
 
-Public Sub TABLENAMES(base As String, bstackstr As basetask, r$, lang As Long)
+Public Sub TABLENAMES(base As String, bstackstr As basetask, r$, Lang As Long)
 Dim tablename As String, scope As Long, cnt As Long, srl As Long, stac1 As New mStiva
 Dim myBase  ' variant
 scope = 1
@@ -404,7 +404,7 @@ End If
             If DriveType(Left$(base, 3)) = "Cd-Rom" Then
                 srl = DriveSerial(Left$(base, 3))
                 If srl = 0 And Not GetDosPath(base) = vbNullString Then
-                    If lang = 0 Then
+                    If Lang = 0 Then
                         If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base)) = vbCancel Then Exit Sub
                     Else
                         If Not ask("Put CD/Disk with file " & ExtractName(base)) = vbCancel Then Exit Sub
@@ -423,7 +423,7 @@ End If
                 End If
                 If Err.Number > 0 Then
                     Do While srl <> DriveSerial(Left$(base, 3))
-                        If lang = 0 Then
+                        If Lang = 0 Then
                             If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
                         Else
                             If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
@@ -533,7 +533,7 @@ End If
                              stac1.DataStr .name
                              If .Type = 203 And .DEFINEDSIZE >= 536870910# Then
                              
-                                         If lang = 1 Then
+                                         If Lang = 1 Then
                                         stac1.DataStr "MEMO"
                                         Else
                                         stac1.DataStr "ΥΠΟΜΝΗΜΑ"
@@ -548,7 +548,7 @@ End If
                                        
                                             stac1.DataVal CDbl(0)
                                      ElseIf .Type = 202 And .DEFINEDSIZE <> 536870910# Then
-                                            If lang = 1 Then
+                                            If Lang = 1 Then
                                             stac1.DataStr "TEXT"
                                             Else
                                             stac1.DataStr "ΚΕΙΜΕΝΟ"
@@ -556,7 +556,7 @@ End If
                                             stac1.DataVal CDbl(.DEFINEDSIZE)
                                     
                              Else
-                                        stac1.DataStr ftype(.Type, lang)
+                                        stac1.DataStr ftype(.Type, Lang)
                                         stac1.DataVal CDbl(.DEFINEDSIZE)
                              
                              End If
@@ -571,7 +571,7 @@ End If
                           stac1.DataVal CDbl(.Columns.Count)
                           For k = 0 To .Columns.Count - 1
                             stac1.DataStr .Columns(k).name
-                             stac1.DataStr inames(.Columns(k).sortorder, lang)
+                             stac1.DataStr inames(.Columns(k).sortorder, Lang)
                           Next k
                              Exit For
                              
@@ -603,7 +603,7 @@ End If
 g102:
 End Sub
 
-Public Sub append_table(bstackstr As basetask, base As String, r$, ED As Boolean, Optional lang As Long = -1)
+Public Sub append_table(bstackstr As basetask, base As String, r$, ED As Boolean, Optional Lang As Long = -1)
 Dim table$, i&, par$, ok As Boolean, t As Double, j&
 Dim gindex As Long
 ok = False
@@ -613,7 +613,7 @@ If IsStrExp(bstackstr, r$, table$) Then
 ok = True
 End If
 End If
-If lang <> -1 Then If IsLabelSymbolNew(r$, "ΣΤΟ", "TO", lang) Then If IsExp(bstackstr, r$, t) Then gindex = CLng(t) Else SyntaxError
+If Lang <> -1 Then If IsLabelSymbolNew(r$, "ΣΤΟ", "TO", Lang) Then If IsExp(bstackstr, r$, t) Then gindex = CLng(t) Else SyntaxError
 Dim Id$
   If InStr(UCase(Trim$(table$)) + " ", "SELECT") = 1 Then
 Id$ = table$
@@ -733,7 +733,7 @@ MyEr "Can't append " & Err.Description, "Αδυναμία προσθήκης:" & Err.Description
 End If
 
 End Sub
-Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional search$ = " = ", Optional lang As Long = 0, Optional IamHelpFile As Boolean = False)
+Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
 
 Dim base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p As Double, i&
 ok = False
@@ -827,7 +827,7 @@ Id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
     If DriveType(Left$(base, 3)) = "Cd-Rom" Then
         srl = DriveSerial(Left$(base, 3))
         If srl = 0 And Not GetDosPath(base) = vbNullString Then
-                If lang = 0 Then
+                If Lang = 0 Then
                     If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base)) = vbCancel Then Exit Sub
                 Else
                     If Not ask("Put CD/Disk with file " & ExtractName(base)) = vbCancel Then Exit Sub
@@ -841,7 +841,7 @@ Id$ = "SELECT * FROM [" & table$ & "] WHERE [" & first$ & "] " & Second$
             If Err.Number > 0 Then
             
             Do While srl <> DriveSerial(Left$(base, 3))
-                If lang = 0 Then
+                If Lang = 0 Then
                 If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
                 Else
                 If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
@@ -973,7 +973,7 @@ Case 11, 12 ' this is the binary field so we can save unicode there
 Exit Sub
 g10:
 If ERL Then
-If lang = 0 Then
+If Lang = 0 Then
 If ask("Το ερώτημα SQL δεν μπορεί να ολοκληρωθεί" & vbCrLf & table$, True) = vbRetry Then GoTo g05
 Else
 If ask("SQL can't complete" & vbCrLf & table$) = vbRetry Then GoTo g05
@@ -986,7 +986,7 @@ On Error Resume Next
 
 End Sub
 
-Public Sub GetNames(bstackstr As basetask, r$, bv As Object, lang)
+Public Sub GetNames(bstackstr As basetask, r$, bv As Object, Lang)
 Dim base As String, table$, from As Long, many As Long, ok As Boolean, fr As Double, stac1$, i&
 ok = False
 If IsStrExp(bstackstr, r$, base) Then
@@ -1035,7 +1035,7 @@ End If
        srl = DriveSerial(Left$(base, 3))
     If srl = 0 And Not GetDosPath(base) = vbNullString Then
     
-       If lang = 0 Then
+       If Lang = 0 Then
     If Not ask("Βάλε το CD/Δισκέτα με το αρχείο " & ExtractName(base)) = vbCancel Then Exit Sub
     Else
       If Not ask("Put CD/Disk with file " & ExtractName(base)) = vbCancel Then Exit Sub
@@ -1047,7 +1047,7 @@ End If
                If Err.Number > 0 Then
         
             Do While srl <> DriveSerial(Left$(base, 3))
-            If lang = 0 Then
+            If Lang = 0 Then
             If ask("Βάλε το CD/Δισκέτα με αριθμό σειράς " & CStr(srl) & " στον οδηγό " & Left$(base, 1)) = vbCancel Then Exit Do
             Else
             If ask("Put CD/Disk with serial number " & CStr(srl) & " in drive " & Left$(base, 1)) = vbCancel Then Exit Do
@@ -1371,7 +1371,7 @@ End If
 End Sub
 Public Sub NewTable(bstackstr As basetask, r$)
 'BASE As String, tablename As String, ParamArray flds()
-Dim base As String, tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
+Dim base As String, tablename As String, fs As String, i&, N As Double, l As Double, ok As Boolean
 ok = False
 If IsStrExp(bstackstr, r$, base) Then
 If FastSymbol(r$, ",") Then
@@ -1476,18 +1476,18 @@ End If
                         If IsStrExp(bstackstr, r$, fs) Then
                         one_ok = True
                                 If FastSymbol(r$, ",") Then
-                                        If IsExp(bstackstr, r$, n) Then
+                                        If IsExp(bstackstr, r$, N) Then
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
-                                                If n = 8 Then n = 7: l = 0
-                                                If n = 10 Then n = 202
-                                                If n = 12 Then n = 203: l = 0
+                                                If N = 8 Then N = 7: l = 0
+                                                If N = 10 Then N = 202
+                                                If N = 12 Then N = 203: l = 0
                                                     If l <> 0 Then
                                                 
-                                                     .Append fs, n, l
+                                                     .Append fs, N, l
                                                     Else
-                                                     .Append fs, n
+                                                     .Append fs, N
                                            
                                                     End If
                                         
@@ -1870,8 +1870,8 @@ If Init Then Exit Sub
 Set conCollection = New FastCollection
 Init = True
 End Sub
-Function ftype(ByVal a As Long, lang As Long) As String
-Select Case lang
+Function ftype(ByVal a As Long, Lang As Long) As String
+Select Case Lang
 Case 0
 Select Case a
     Case 0

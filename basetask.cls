@@ -100,7 +100,7 @@ Public Sub SetVarobJ(ByVal name$, var As Variant)
     Set StaticCollection.ValueObj = var
 End Sub
 
-Function AlterVar(ByVal name$, p As Double, ss$, inttype As Boolean) As Boolean
+Function AlterVar(ByVal name$, p As Variant, ss$, inttype As Boolean) As Boolean
 
 If Not StaticCollection.Find(name$) Then Exit Function
   With StaticCollection
@@ -145,17 +145,17 @@ If Not StaticCollection.Find(name$) Then Exit Function
             If inttype Then
             .Value = Int(.Value)
             Else
-            .Value = MyRound(.Value, 13)
+          If VarType(.Value) <> vbDecimal Then .Value = MyRound(.Value, 13)
             End If
             End If
             End With
    AlterVar = True
 End Function
-Function MyRound(ByVal x, Optional d As Double = 0) As Double
+Function MyRound(ByVal x, Optional d As Variant = 0#) As Variant
 Dim i, N
   i = Abs(Int(d)): If i > 13 Then i = 13
   N = Sgn(x) * 0.5
-
+On Error GoTo there
 Select Case i
 Case 0
 MyRound = Fix(x + N)
@@ -186,6 +186,10 @@ MyRound = Fix(x * 1000000000000# + N) / 1000000000000#
 Case 13
 MyRound = Fix(x * 10000000000000# + N) / 10000000000000#
 End Select
+Exit Function
+there:
+MyRound = x
+
 End Function
 Public Function ExistVar(ByVal name$) As Boolean
         ExistVar = StaticCollection.ExistKey(name$)
@@ -486,7 +490,7 @@ Else
 End If
 Set aa = Nothing
 End Function
-Public Function ThreadsStr(Optional ByVal lang As Long = 0)
+Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
 '' use threadsnames
 
 Dim aa As mThreadref, a$
@@ -498,7 +502,7 @@ While threadsnames.Done
 ' For Each aa In threadsnames
 Set aa = threadsnames.ValueObj
 If Left$(aa.VarName, 1) = "_" Then
-If lang = 0 Then
+If Lang = 0 Then
 a$ = a$ & "есытеяийо мгла "
 Else
 a$ = a$ & "INTERNAL THREAD "
@@ -513,7 +517,7 @@ Set aa = Nothing
 End If
 If Me.IamChild Then
 If Not Me.Parent Is Nothing Then
-ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(lang))
+ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(Lang))
 Else
 ThreadsStr = vbNullString
 End If
@@ -581,7 +585,7 @@ ElseIf parentSoros.PopType = ">" Then
     IsOptional = True
 End If
 End Function
-Public Function IsNumber(r As Double) As Boolean
+Public Function IsNumber(r As Variant) As Boolean
 If parentSoros.LookNull Then
 r = parentSoros.PopVal
 IsNumber = True
@@ -593,6 +597,16 @@ r = parentSoros.PopValLong
 IsNumber = True
 End If
 End Function
+Public Function IsVariant(r As Variant) As Boolean
+If parentSoros.LookNull Then
+r = parentSoros.PopVal
+IsVariant = True
+ElseIf parentSoros.PopType = "D" Then
+r = parentSoros.PopVariant
+IsVariant = True
+End If
+End Function
+
 Public Function IsObjectRef(r As Object) As Boolean
 If parentSoros.LookNull Then
 Set r = Nothing
@@ -620,7 +634,7 @@ Set r = parentSoros.PopObj
 IsInStackObject = True
 End If
 End Function
-Public Function IsInRetStackNumber(r As Double) As Boolean
+Public Function IsInRetStackNumber(r As Variant) As Boolean
 If RetSoros Is Nothing Then Exit Function
 If RetSoros.LookNull Then
 r = RetSoros.PopVal
@@ -643,11 +657,11 @@ End If
 End Function
 Public Function IsInStackLong(l As Long) As Boolean
 If soros.PopType = "L" Then
-    l = soros.PopValLong
+    l = CLng(soros.PopValLong)
     IsInStackLong = True
 End If
 End Function
-Public Function IsInStackNumber(r As Double) As Boolean
+Public Function IsInStackNumber(r As Variant) As Boolean
 If soros.LookNull Then
 r = soros.PopVal
 IsInStackNumber = True

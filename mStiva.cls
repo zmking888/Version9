@@ -232,7 +232,7 @@ On Error Resume Next
 
 Set aa = mstack.item(where)
 Select Case aa.Typename
-Case "N", "S"
+Case "N", "S", "?", "L"
 StackItemTypeObjectType = vbNullString
 Case "*"
 Set bb = aa.ObjectRef
@@ -262,7 +262,7 @@ On Error Resume Next
 
 Set aa = mstack.item(where)
 Select Case aa.Typename
-Case "N", "S", "L"
+Case "N", "S", "L", "?"
 Case Else
 StackItemTypeIsObject = True
 End Select
@@ -310,7 +310,7 @@ End If
 Inc
 End Sub
 
-Public Sub PushVal(a As Double)
+Public Sub PushVal(a As Variant)
 Dim aa As New VarItem
 aa.Typename = "N"
 aa.ItemDouble = a
@@ -321,10 +321,10 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
-Public Sub PushValLong(a As Double)
+Public Sub PushValLong(a As Variant)
 Dim aa As New VarItem
 aa.Typename = "L"
-aa.ItemDouble = a
+aa.ItemVariant = a
 If mstack.Count = 0 Then
 mstack.Add aa
 Else
@@ -344,7 +344,6 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
-
 Public Property Get PopObj() As Object
 On Error Resume Next
 dec
@@ -383,24 +382,31 @@ Else
 PopType = mstack.item(1).Typename
 End If
 End Function
-Public Property Get LookTopVal() As Double
+Public Property Get LookTopVal() As Variant
 On Error Resume Next
 If mMany > 0 Then
+
 LookTopVal = mstack.item(1).ItemDouble
 End If
 End Property
-Public Property Get LookNVal(N As Long) As Double
+Public Property Get LookNVal(N As Long) As Variant
 On Error Resume Next
-LookNVal = mstack.item(N).ItemDouble
+LookNVal = mstack.item(N).ItemVariant
 End Property
 
-Public Property Get PopVal() As Double
+Public Property Get PopVal() As Variant
 On Error Resume Next
 dec
 PopVal = mstack.item(1).ItemDouble
 mstack.Remove 1
 End Property
-Public Property Get PopValLong() As Long
+Public Property Get PopVariant() As Variant
+On Error Resume Next
+dec
+PopVariant = mstack.item(1).ItemVariant
+mstack.Remove 1
+End Property
+Public Property Get PopValLong() As Variant
 On Error Resume Next
 dec
 PopValLong = CLng(mstack.item(1).ItemDouble)
@@ -413,10 +419,10 @@ PopStr = mstack.item(1).ItemStr
 mstack.Remove 1
 
 End Property
-Public Sub DataValLong(a As Double)
+Public Sub DataValLong(a As Variant)
 Dim aa As New VarItem
 aa.Typename = "L"
-aa.ItemDouble = a
+aa.ItemVariant = a
 If mstack.Count = 0 Then
 mstack.Add aa
 Else
@@ -424,10 +430,10 @@ mstack.Add aa, , , mstack.Count
 End If
 Inc
 End Sub
-Public Sub DataVal(a As Double)
+Public Sub DataVal(a As Variant)
 Dim aa As New VarItem
 aa.Typename = "N"
-aa.ItemDouble = a
+aa.ItemVariant = a
 If mstack.Count = 0 Then
 mstack.Add aa
 Else
@@ -487,10 +493,20 @@ Inc
 End Sub
 
 Public Sub DataObj(RHS As Object)
-Dim aa As New VarItem
-aa.Typename = "*"  'something
-Set aa.ObjectRef = RHS
-Set RHS = Nothing
+Dim aa As VarItem
+If RHS Is Nothing Then
+    Set aa = New VarItem
+    aa.Typename = "*"  'something
+    Set aa.ObjectRef = RHS
+ElseIf TypeOf RHS Is VarItem Then
+    Set aa = RHS
+    Set RHS = Nothing
+Else
+    Set aa = New VarItem
+    aa.Typename = "*"  'something
+    Set aa.ObjectRef = RHS
+    Set RHS = Nothing
+End If
 If mstack.Count = 0 Then
 mstack.Add aa
 Else

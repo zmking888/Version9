@@ -159,23 +159,15 @@ End If
             If mybuf$ = vbNullString Then mybuf$ = mycode: NowProcess.IFCTRL = 0: NowProcess.jump = False
             ohere$ = here$
             here$ = myHere$
- ''Set NowProcess.Owner = myOwner ' μπορεί να έχει αλλάξει... για ασφάλεια???
-            ' always...start run from here owner setting.
             x = 1
             look = True
 
 
         Call executeblock(x, NowProcess, mybuf$, False, look, (Interrupted))
         If Not (NowProcess Is Nothing) Then Set myOwner = NowProcess.Owner
-        '' resync thread if we need more time new from 7 rev 19
         If Len(mybuf$) < 3 Then
         mybuf$ = vbNullString
-    '' If Not mNostretch And Not Interrupted Then
-            ''      If m_duration < uintnew(CDbl(timeGetTime)) Then
-   ''         mYspace = uintnew(CDbl(timeGetTime)) - m_duration - mYspace
-  ''          End If
-    
-   ''  End If
+
         Else
       
     If Interrupted Then m_duration = 0      ' do it in past;;
