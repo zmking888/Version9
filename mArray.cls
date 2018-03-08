@@ -150,7 +150,7 @@ End If
 Loop
 
 End Sub
-Public Sub Compute2(p As Double, ss$)
+Public Sub Compute2(p As Variant, ss$)
 If final Then CantAssignValue: Exit Sub
 Dim v As Long
 On Error Resume Next
@@ -161,7 +161,7 @@ If MyIsNumeric(actualdata(v)) Then
                                 Case "="
                                 actualdata(v) = p
                                 Case "+="
-                                actualdata(v) = p + actualdata(v)
+                                actualdata(v) = actualdata(v) + p
                                 Case "*="
                                  actualdata(v) = p * actualdata(v)
                                 Case "-="
@@ -927,7 +927,7 @@ Function MyIsNumeric(v As Variant) As Boolean
 Dim N As Integer
 GetMem2 VarPtr(v), N
 If N < 2 Then Exit Function
-MyIsNumeric = N < 8
+MyIsNumeric = N < 8 Or N = 14
 End Function
 Function MyIsObject(v As Variant) As Boolean
 Dim N As Integer

@@ -76,12 +76,12 @@ Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, B
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
 Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000&
 Private Const GMEM_DISCARDABLE = &H100&
 Private Const GMEM_DISCARDED = &H4000&
@@ -99,7 +99,7 @@ Private Const GMEM_VALID_FLAGS = &H7F72&
 Private Const GMEM_ZEROINIT = &H40&
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function GetClipboardData Lib "User32" _
     (ByVal wFormat As Long) As Long
@@ -111,7 +111,7 @@ Private Declare Function CloseClipboard Lib "User32" _
     () As Long
     Private Declare Function IsClipboardFormatAvailable Lib "User32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0&
 Const LOCALE_ILANGUAGE = 1&
@@ -301,8 +301,8 @@ Private Sub Class_Initialize()
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.LCID = cLid
-mDoc1.LCID = cLid
+mDoc.lcid = cLid
+mDoc1.lcid = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -1732,7 +1732,7 @@ End Sub
 Private Sub ColorizeExpressions(ByVal a$, col(), k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
-Dim n$
+Dim N$
 again:
 If a$ = vbNullString Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1746,14 +1746,25 @@ If kind = 0 Then
         pos2 = k - Len(a$) + 1
     
     End If
-    n$ = a$
-    kind = IsLabelOnly(n$, drop$)
-    If kind = 0 And n$ <> a$ Then
+    N$ = a$
+    kind = IsLabelOnly(N$, drop$)
+    If kind = 0 And N$ <> a$ Then
     feedthis = 10
-    a$ = n$: Exit Sub
+    a$ = N$: Exit Sub
     End If
-    a$ = n$
+    a$ = N$
+    If kind = 100 Then
+    If pos2 > 0 Then
+            addone col(), pos2 + 1, 14
+        Else
+            addone col(), 1, 14
+        End If
+         pos2 = k - Len(a$) + 1
+         
+    kind = 0
+    GoTo again
     
+    End If
 End If
 
 If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1788,6 +1799,7 @@ If kind > 0 Then
   feedthis = 0
    a$ = Mid$(a$, pos1)
    End If
+cont100:
    If FastSymbol(a$, ",") Then
      addone col(), pos2, 14
     pos2 = k - Len(a$) + 1
@@ -2525,6 +2537,10 @@ Exit Do
             a$ = Mid$(a$, 4)
                rr& = 1
             Extra& = 9
+            ElseIf Asc(Mid$(a$, 2, 1) + " ") = 38 Then
+            a$ = Mid$(a$, 3)
+            Extra& = 100
+            Exit Do
             Else
             If dot& > 0 Then a$ = "." + a$: dot& = 0
             
@@ -3699,6 +3715,9 @@ Do While pos <= Len(a$)
             End If
         Case "0" To "9", "."
             If part$ = "N" Then
+            If Mid$(a$ + " ", pos + 1, 1) Like "[&@#]" Then
+            pos = pos + 1
+            End If
             ElseIf part$ = "S" Then
             
             Else

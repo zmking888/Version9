@@ -437,9 +437,9 @@ GetDpi
 End If
 cmy = Me.Height / m_tBI.bmiHeader.biYPelsPerMeter * 100
 End Property
-Public Sub GetDpiDIB(other As cDIBSection)
-m_tBI.bmiHeader.biXPelsPerMeter = other.DPMX
-m_tBI.bmiHeader.biYPelsPerMeter = other.DPMY
+Public Sub GetDpiDIB(Other As cDIBSection)
+m_tBI.bmiHeader.biXPelsPerMeter = Other.DPMX
+m_tBI.bmiHeader.biYPelsPerMeter = Other.DPMY
 End Sub
 Public Sub GetDpi(Optional ByVal Xdpi As Long = -1, Optional ByVal Ydpi As Long = -1)
 If Xdpi <= 0 Then Xdpi = 1440 / Screen.TwipsPerPixelX
@@ -832,7 +832,7 @@ Public Sub RandomiseBits( _
         Optional ByVal bGray As Boolean = False _
     )
 Dim bDib() As Byte
-Dim x As Long, y As Long, Z As Long
+Dim x As Long, y As Long, z As Long
 Dim lc As Long
 Dim tSA As SAFEARRAY2D
 Dim xend As Long
@@ -859,9 +859,9 @@ If mStep > 3 Then cStep = 3 Else cStep = mStep
         For y = 0 To m_tBI.bmiHeader.biHeight - 1
             For x = 0 To xend Step mStep
                 lc = Rnd * 255
-                For Z = 0 To cStep
-                bDib(x + Z, y) = lc
-                Next Z
+                For z = 0 To cStep
+                bDib(x + z, y) = lc
+                Next z
             Next x
         Next y
     Else
@@ -869,9 +869,9 @@ If mStep > 3 Then cStep = 3 Else cStep = mStep
             For y = 0 To m_tBI.bmiHeader.biHeight - 1
             
                 bDib(x, y) = 0
-                For Z = 1 To cStep
+                For z = 1 To cStep
                 bDib(x + 1, y) = Rnd * 255
-                Next Z
+                Next z
             Next y
         Next x
     End If
@@ -1441,9 +1441,9 @@ CopyMemory ByVal VarPtrArray(bDib), 0&, 4
 End Sub
 Public Sub loadDIB(F As String)
 Dim fl As Long, fmem() As Byte, fh As Long, ff As BITMAPFILEHEADER
-If GetDosPath(F) = vbNullString Then Exit Sub
+If GetDosPath(F) = vbNullString Then MyEr "File not found", "Δεν βρέθηκε ο αρχείο": Exit Sub
+On Error GoTo er11
 fl = FileLen(GetDosPath(F))
-
 If fl > 0 Then
 ReDim fmem(fl) As Byte
 fh = FreeFile
@@ -1454,6 +1454,12 @@ Close fh
 
 CreateFromDIB VarPtr(fmem(Len(ff)))
 End If
+Exit Sub
+er11:
+Err.Clear
+On Error Resume Next
+If fh <> 0 Then Close fh
+MyEr "Can't read image", "Δεν βμπροώ να διαβάσω το αρχείο"
 End Sub
 
 Private Sub SentToClipBoard()
@@ -2029,7 +2035,7 @@ End If
 End If
 If Not vso Is Nothing Then
 If vso.Visible Then
-vso.Max = Height * aa - (where.ScaleHeight - VredY) \ DYP
+vso.max = Height * aa - (where.ScaleHeight - VredY) \ DYP
 vso.smallchange = 1
 If (where.ScaleHeight - VredY) \ DYP > 0 Then vso.largechange = (where.ScaleHeight - VredY) \ DYP
 vso.Refresh
@@ -2039,7 +2045,7 @@ End If
 End If
 If Not hso Is Nothing Then
 If hso.Visible Then
-hso.Max = width * aa - (where.ScaleWidth - VredX) \ DXP
+hso.max = width * aa - (where.ScaleWidth - VredX) \ DXP
 hso.smallchange = 1
 If (where.ScaleWidth - VredX) \ DXP > 0 Then hso.largechange = (where.ScaleWidth - VredX) \ DXP
 hso.Refresh
@@ -2077,7 +2083,7 @@ End If
 If Not vso Is Nothing Then
 If vso.Visible Then
 'vso.Enabled = False
-vso.Max = Height * aa - where.ScaleHeight \ DYP
+vso.max = Height * aa - where.ScaleHeight \ DYP
 vso.smallchange = 1
 vso.largechange = where.ScaleHeight \ DYP
 vso.Refresh
@@ -2127,7 +2133,7 @@ End If
 End If
 If Not vso Is Nothing Then
 If vso.Visible Then
-vso.Max = Height - (where.ScaleHeight - VredY) \ DYP
+vso.max = Height - (where.ScaleHeight - VredY) \ DYP
 vso.smallchange = 1
 If (where.ScaleHeight - VredY) \ DYP > 0 Then vso.largechange = (where.ScaleHeight - VredY) \ DYP
 vso.Refresh
@@ -2137,7 +2143,7 @@ End If
 End If
 If Not hso Is Nothing Then
 If hso.Visible Then
-hso.Max = width - (where.ScaleWidth - VredX) \ DXP
+hso.max = width - (where.ScaleWidth - VredX) \ DXP
 hso.smallchange = 1
 If (where.ScaleWidth - VredX) \ DXP > 0 Then hso.largechange = (where.ScaleWidth - VredX) \ DXP
 hso.Refresh

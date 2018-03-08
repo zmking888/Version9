@@ -3790,12 +3790,12 @@ UnHook Form1.hWND
 Form1.KeyPreview = True
 Targets = ot
 End Sub
-Private Sub mywait11(bstack As basetask, Pp As Double)
+Private Sub mywait11(bstack As basetask, PP As Double)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If Pp = 0 Then Exit Sub
+If PP = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -3807,7 +3807,7 @@ Exit Sub
 End If
 End If
 End If
-Pp = Pp + CDbl(timeGetTime)
+PP = PP + CDbl(timeGetTime)
 
 Do
 
@@ -3831,7 +3831,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until Pp <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -5341,6 +5341,9 @@ again22:
             End If
         Case "0" To "9", "."
             If part$ = "N" Then
+            If Mid$(a$ + " ", pos + 1, 1) Like "[&@#]" Then
+            pos = pos + 1
+            End If
             ElseIf part$ = "S" Then
             
             Else
@@ -5793,8 +5796,12 @@ Dim mLof As Long, nobom As Long
 nobom = 1
 ' code from Schmidt, member of vbforums
 If FileName = vbNullString Then Exit Function
-On Error GoTo ErrHandler
+On Error Resume Next
+If GetDosPath(FileName) = vbNullString Then MyEr "File not found", "Δεν βρέθηκε ο αρχείο": Exit Function
+ On Error GoTo ErrHandler
   BLen = FileLen(GetDosPath(FileName))
+'  If Err.Number = 53 Then MyEr "File not found", "Δεν βρέθηκε ο αρχείο": Exit Function
+ 
   If BLen = 0 Then Exit Function
   
   FNr = FreeFile

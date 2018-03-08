@@ -160,31 +160,31 @@ Select Case i
 Case 0
 MyRound = Fix(x + N)
 Case 1
-MyRound = Fix(x * 10# + N) / 10#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10 + N) / 10
 Case 2
-MyRound = Fix(x * 100# + N) / 100#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100 + N) / 100
 Case 3
-MyRound = Fix(x * 1000# + N) / 1000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000 + N) / 1000
 Case 4
-MyRound = Fix(x * 10000# + N) / 10000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000 + N) / 10000
 Case 5
-MyRound = Fix(x * 100000# + N) / 100000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000 + N) / 100000
 Case 6
-MyRound = Fix(x * 1000000# + N) / 1000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000 + N) / 1000000
 Case 7
-MyRound = Fix(x * 10000000# + N) / 10000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000 + N) / 10000000
 Case 8
-MyRound = Fix(x * 100000000# + N) / 100000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000 + N) / 100000000
 Case 9
-MyRound = Fix(x * 1000000000# + N) / 1000000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000 + N) / 1000000000
 Case 10
-MyRound = Fix(x * 10000000000# + N) / 10000000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000# + N) / 10000000000#
 Case 11
-MyRound = Fix(x * 100000000000# + N) / 100000000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000000# + N) / 100000000000#
 Case 12
-MyRound = Fix(x * 1000000000000# + N) / 1000000000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000000# + N) / 1000000000000#
 Case 13
-MyRound = Fix(x * 10000000000000# + N) / 10000000000000#
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000000# + N) / 10000000000000#
 End Select
 Exit Function
 there:
