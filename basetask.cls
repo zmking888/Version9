@@ -103,6 +103,7 @@ End Sub
 Function AlterVar(ByVal name$, p As Variant, ss$, inttype As Boolean) As Boolean
 
 If Not StaticCollection.Find(name$) Then Exit Function
+
   With StaticCollection
   If .IsObj Then
     If Typename(.ValueObj) = "mHandler" Then
@@ -116,6 +117,9 @@ If Not StaticCollection.Find(name$) Then Exit Function
         End If
     End If
   Else
+  Dim isLong As Boolean
+            isLong = VarType(.Value) = vbLong
+            
             Select Case ss$
             Case "!!", "~"
             .Value = -1 - (.Value <> 0)
@@ -142,8 +146,13 @@ If Not StaticCollection.Find(name$) Then Exit Function
             Case "!"
             .Value = -1 - (.Value <> 0)
             End Select
-            If inttype Then
-            .Value = Int(.Value)
+            If isLong Then
+                On Error Resume Next
+                .Value = CLng(MyRound(.Value, 0))
+                If Err.Number = 6 Then .Value = CDbl(MyRound(.Value, 0)): Err.Clear
+            
+            ElseIf inttype Then
+            .Value = MyRound(.Value, 0)
             Else
           If VarType(.Value) <> vbDecimal Then .Value = MyRound(.Value, 13)
             End If
@@ -152,41 +161,76 @@ If Not StaticCollection.Find(name$) Then Exit Function
    AlterVar = True
 End Function
 Function MyRound(ByVal x, Optional d As Variant = 0#) As Variant
-Dim i, N
+Dim i, n
   i = Abs(Int(d)): If i > 13 Then i = 13
-  N = Sgn(x) * 0.5
+  n = Sgn(x) * 0.5
 On Error GoTo there
+If VarType(x) = vbDouble Then
 Select Case i
 Case 0
-MyRound = Fix(x + N)
+MyRound = Fix(x + n)
 Case 1
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10 + N) / 10
+MyRound = Fix(x * 10# + n) / 10#
 Case 2
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100 + N) / 100
+MyRound = Fix(x * 100# + n) / 100#
 Case 3
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000 + N) / 1000
+MyRound = Fix(x * 1000# + n) / 1000#
 Case 4
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000 + N) / 10000
+MyRound = Fix(x * 10000# + n) / 10000#
 Case 5
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000 + N) / 100000
+MyRound = Fix(x * 100000# + n) / 100000#
 Case 6
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000 + N) / 1000000
+MyRound = Fix(x * 1000000# + n) / 1000000#
 Case 7
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000 + N) / 10000000
+MyRound = Fix(x * 10000000# + n) / 10000000#
 Case 8
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000 + N) / 100000000
+MyRound = Fix(x * 100000000# + n) / 100000000#
 Case 9
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000 + N) / 1000000000
+MyRound = Fix(x * 1000000000# + n) / 1000000000#
 Case 10
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000# + N) / 10000000000#
+MyRound = Fix(x * 10000000000# + n) / 10000000000#
 Case 11
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000000# + N) / 100000000000#
+MyRound = Fix(x * 100000000000# + n) / 100000000000#
 Case 12
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000000# + N) / 1000000000000#
+MyRound = Fix(x * 1000000000000# + n) / 1000000000000#
 Case 13
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000000# + N) / 10000000000000#
+MyRound = Fix(x * 10000000000000# + n) / 10000000000000#
 End Select
 Exit Function
+Else
+Select Case i
+Case 0
+MyRound = Fix(x + n)
+Case 1
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10 + n) / 10
+Case 2
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100 + n) / 100
+Case 3
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000 + n) / 1000
+Case 4
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000 + n) / 10000
+Case 5
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000 + n) / 100000
+Case 6
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000 + n) / 1000000
+Case 7
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000 + n) / 10000000
+Case 8
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000 + n) / 100000000
+Case 9
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000 + n) / 1000000000
+Case 10
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000# + n) / 10000000000#
+Case 11
+MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000000# + n) / 100000000000#
+Case 12
+MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000000# + n) / 1000000000000#
+Case 13
+MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000000# + n) / 10000000000000#
+End Select
+Exit Function
+End If
+
 there:
 MyRound = x
 
@@ -213,12 +257,12 @@ Public Sub ReadVar(ByVal name$, var As Variant)
         End If
     End With
 End Sub
-Public Sub DropNdot(N As Long)
-If N = 0 Then Exit Sub
-If curdotcol - N < 0 Then
+Public Sub DropNdot(n As Long)
+If n = 0 Then Exit Sub
+If curdotcol - n < 0 Then
     curdotcol = 0
 Else
-    curdotcol = curdotcol - N
+    curdotcol = curdotcol - n
 End If
 End Sub
 

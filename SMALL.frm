@@ -173,6 +173,7 @@ While Not NeoMsgBox.Visible And safety < uintnew(timeGetTime)
 Wend
 If NeoMsgBox.Visible = False Then
     MyEr "can't open msgbox", "δεν μπορώ να ανοίξω τον διάλογο"
+    GoTo conthere
     Exit Function
 End If
 NeoMsgBox.ZOrder 0
@@ -263,6 +264,7 @@ If AskInput Then
 bstack.soros.PushStr AskStrInput$
 End If
 End If
+conthere:
 AskCancel$ = vbNullString
 once = False
 ASKINUSE = False

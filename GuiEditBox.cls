@@ -128,7 +128,7 @@ Private Declare Function CloseClipboard Lib "User32" _
     () As Long
     Private Declare Function IsClipboardFormatAvailable Lib "User32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
@@ -396,8 +396,8 @@ Private Sub Class_Initialize()
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.LCID = cLid
-mDoc1.LCID = cLid
+mDoc.lcid = cLid
+mDoc1.lcid = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -2119,7 +2119,7 @@ If pos2 > 0 Then addone col(), pos2, 14
 End Sub
 Private Function blockString(s$) As String
 Dim i As Long, j As Long, c As Long
-Dim a1 As Boolean
+Dim A1 As Boolean
 
 If s$ = vbNullString Then Exit Function
 If mMultiLineComment2 <> "}" Then
@@ -2129,7 +2129,7 @@ Exit Function
 Else
 
 c = Len(s$)
-a1 = True
+A1 = True
 i = 1
 Do
 Select Case Asc(Mid$(s$, i, 1))
@@ -3979,9 +3979,6 @@ Do While pos <= Len(a$)
         Else
         
      b$ = b$ & part$
- ''  If Right$("WWWW" + b$, 4) = "lSlN" Then Exit Do
-   '  If Right$("WW" + b$, 2) = "lS" Then Exit Do
-  ''    If Right$("WW" + b$, 2) = "oS" Then Exit Do
      part$ = "N"
      word$ = word$ + w$
             End If
@@ -4293,9 +4290,9 @@ w = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos + 1
 
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
@@ -4312,16 +4309,16 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 w = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + 1
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
@@ -4338,7 +4335,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then
@@ -4372,9 +4369,9 @@ SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -4409,7 +4406,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -4433,9 +4430,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = vbNullString Then Exit Sub
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -4542,7 +4539,7 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.dropkey = False
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus

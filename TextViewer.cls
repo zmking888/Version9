@@ -1732,7 +1732,7 @@ End Sub
 Private Sub ColorizeExpressions(ByVal a$, col(), k As Long, pos2 As Long, feedthis As Long)
 Dim drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
-Dim N$
+Dim n$
 again:
 If a$ = vbNullString Then Exit Sub
 drop$ = "@(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
@@ -1746,16 +1746,16 @@ If kind = 0 Then
         pos2 = k - Len(a$) + 1
     
     End If
-    N$ = a$
-    kind = IsLabelOnly(N$, drop$)
-    If kind = 0 And N$ <> a$ Then
+    n$ = a$
+    kind = IsLabelOnly(n$, drop$)
+    If kind = 0 And n$ <> a$ Then
     feedthis = 10
-    a$ = N$: Exit Sub
+    a$ = n$: Exit Sub
     End If
-    a$ = N$
+    a$ = n$
     If kind = 100 Then
     If pos2 > 0 Then
-            addone col(), pos2 + 1, 14
+            addone col(), pos2, 14
         Else
             addone col(), 1, 14
         End If
@@ -1877,9 +1877,9 @@ End Sub
 Private Function blockString(s$) As String
 If s$ = vbNullString Then Exit Function
 Dim i As Long, j As Long, c As Long
-Dim a1 As Boolean
+Dim A1 As Boolean
 c = Len(s$)
-a1 = True
+A1 = True
 i = 1
 Do
 Select Case Asc(Mid$(s$, i, 1))
@@ -3787,9 +3787,6 @@ Do While pos <= Len(a$)
         Else
         
      b$ = b$ & part$
- ''  If Right$("WWWW" + b$, 4) = "lSlN" Then Exit Do
-   '  If Right$("WW" + b$, 2) = "lS" Then Exit Do
-  ''    If Right$("WW" + b$, 2) = "oS" Then Exit Do
      part$ = "N"
      word$ = word$ + w$
             End If
@@ -3826,10 +3823,7 @@ If srink Then
 End If
    
    
-   
-   
-
-
+ 
     aheadstatus = b$
 
 

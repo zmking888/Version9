@@ -1,10 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 54 active-X
-Currency added to Decimals
-use 1000& for long, 1000.23# for Currency, 1000@ for Decimals
-dot can be missing
-
+Version 9.0 revision 55 active-X
+We can export to files (unicode or ansi) double, decimal and currency type, mixed with strings (csv).
 
 
 From revision 50:

@@ -16,7 +16,7 @@ Attribute VB_Exposed = True
 ' NOT FINISHED YET
 ' We can't pass UDT from M2000 script but we can pass a pointer to memory
 ' which we make using Buffer statement, and using Structure we can create offsets too.
-
+Private mcheck As Boolean
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
   ByVal lpvDest As Long, ByVal lpvSource As Long, ByVal cbCopy As Long)
 Private Const Pi = 3.14159265358979
@@ -101,10 +101,10 @@ Public Sub RotVect(a As Long, b As Long, c As Long, angle As Double, Optional bD
     RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
 End Sub
-Public Sub RotVectMult(N As Long, a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
+Public Sub RotVectMult(n As Long, a As Long, b As Long, c As Long, angle As Double, Optional bDegrees As Boolean = True)  '(vec As VecType, axis As VecType, angle As Double, Optional bDegrees As Boolean = True) As VecType
     Dim vec As VecType, axis As VecType, RotVect As VecType, m As Long
     CopyMemory VarPtr(axis), b, 24
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(vec), a, 24
     RotVect = RotVecByQuat(vec, AxisAngle2Quat(axis, angle, bDegrees))
     CopyMemory c, VarPtr(RotVect), 24
@@ -584,9 +584,9 @@ Public Sub VecAver(a As Long, b As Long, c As Long)
     v1 = VecDivNum(VecSumm1(a, b), 2)
     CopyMemory c, VarPtr(v1), 24
 End Sub
-Public Sub VecAverMult(N As Long, a As Long, b As Long, c As Long)
+Public Sub VecAverMult(n As Long, a As Long, b As Long, c As Long)
     Dim v1 As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     v1 = VecDivNum(VecSumm1(a, b), 2)
     CopyMemory c, VarPtr(v1), 24
     a = a + 24
@@ -618,10 +618,10 @@ Public Sub VecSumm(a As Long, b As Long, c As Long)
     v3.z = v1.z + v2.z
     CopyMemory c, VarPtr(v3), 24
 End Sub
-Public Sub VecSummMult(N As Long, a As Long, b As Long, c As Long)
+Public Sub VecSummMult(n As Long, a As Long, b As Long, c As Long)
     Dim v1 As VecType, v2 As VecType, v3 As VecType, m As Long
     CopyMemory VarPtr(v2), b, 24
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v3.x = v1.x + v2.x
     v3.y = v1.y + v2.y
@@ -645,10 +645,10 @@ Public Sub VecDiff(a As Long, b As Long, c As Long)
     v3.z = v1.z - v2.z
     CopyMemory c, VarPtr(v3), 24
 End Sub
-Public Sub VecDiffMult(N As Long, a As Long, b As Long, c As Long)
+Public Sub VecDiffMult(n As Long, a As Long, b As Long, c As Long)
     Dim v1 As VecType, v2 As VecType, v3 As VecType, m As Long
     CopyMemory VarPtr(v2), b, 24
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v3.x = v1.x - v2.x
     v3.y = v1.y - v2.y
@@ -668,9 +668,9 @@ Sub VecDiffNum(a As Long, d As Double, b As Long)
     v.z = v1.z - d
     CopyMemory b, VarPtr(v), 24
 End Sub
-Sub VecDiffNumMult(N As Long, a As Long, d As Double, b As Long)
+Sub VecDiffNumMult(n As Long, a As Long, d As Double, b As Long)
     Dim v As VecType, v1 As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v.x = v1.x - d
     v.y = v1.y - d
@@ -694,9 +694,9 @@ Sub VecAddiNum(a As Long, d As Double, b As Long)
     v.z = v1.z + d
     CopyMemory b, VarPtr(v), 24
 End Sub
-Sub VecAddiNumMult(N As Long, a As Long, d As Double, b As Long)
+Sub VecAddiNumMult(n As Long, a As Long, d As Double, b As Long)
     Dim v As VecType, v1 As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v.x = v1.x + d
     v.y = v1.y + d
@@ -715,9 +715,9 @@ Sub VecDiviNum(a As Long, d As Double, b As Long)
     v.z = v1.z / d
     CopyMemory b, VarPtr(v), 24
 End Sub
-Sub VecDiviNumMult(N As Long, a As Long, d As Double, b As Long)
+Sub VecDiviNumMult(n As Long, a As Long, d As Double, b As Long)
     Dim v As VecType, v1 As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v.x = v1.x / d
     v.y = v1.y / d
@@ -740,9 +740,9 @@ Sub VecMulNum(a As Long, d As Double, b As Long)
     v.z = v1.z * d
     CopyMemory b, VarPtr(v), 24
 End Sub
-Sub VecMulNumMult(N As Long, a As Long, d As Double, b As Long)
+Sub VecMulNumMult(n As Long, a As Long, d As Double, b As Long)
     Dim v As VecType, v1 As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v1), a, 24
     v.x = v1.x * d
     v.y = v1.y * d
@@ -786,11 +786,11 @@ Public Sub UnitVect(a As Long)
     End If
     CopyMemory a, VarPtr(d1), 24
 End Sub
-Public Sub UnitVectMult(N As Long, a As Long)
+Public Sub UnitVectMult(n As Long, a As Long)
     ' Returns ZERO vector if vector has no magnitude.
     Dim v As VecType, d1 As VecType, Zero As VecType, m As Long
     Dim d As Double
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v), a, 24
     '
     d = VecMag(v)
@@ -835,9 +835,9 @@ Sub NegateQuat(a As Long, b As Long)
     quat.z = -quat.z
     CopyMemory b, VarPtr(quat), 48
 End Sub
-Sub NegateQuatMult(N As Long, a As Long, b As Long)
+Sub NegateQuatMult(n As Long, a As Long, b As Long)
     Dim quat As QuatType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(quat), a, 48
 '    quat.w = quat.w
     quat.x = -quat.x
@@ -901,9 +901,9 @@ Public Sub VectorRad2Deg(a As Long, b As Long)
     v.z = Rad2Deg(v.z)
     CopyMemory b, VarPtr(v), 24
 End Sub
-Public Sub VectorRad2DegMult(N As Long, a As Long, b As Long)
+Public Sub VectorRad2DegMult(n As Long, a As Long, b As Long)
     Dim v As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     v = GetVector(a)
     v.x = Rad2Deg(v.x)
     v.y = Rad2Deg(v.y)
@@ -922,9 +922,9 @@ Public Sub VectorDeg2Rad(a As Long, b As Long)
     v.z = Deg2Rad(v.z)
     CopyMemory b, VarPtr(v), 24
 End Sub
-Public Sub VectorDeg2RadMult(N As Long, a As Long, b As Long)
+Public Sub VectorDeg2RadMult(n As Long, a As Long, b As Long)
     Dim v As VecType, m As Long
-    For m = 1 To N
+    For m = 1 To n
     CopyMemory VarPtr(v), a, 24
     v.x = Deg2Rad(v.x)
     v.y = Deg2Rad(v.y)
@@ -1005,3 +1005,9 @@ Public Function ATan2(y As Double, x As Double) As Double
     Case Else:          ATan2 = pihalf * Sgn(y)
     End Select
 End Function
+Public Property Get CheckThis() As Boolean
+CheckThis = mcheck
+End Property
+Public Property Let CheckThis(RHS As Boolean)
+mcheck = RHS
+End Property

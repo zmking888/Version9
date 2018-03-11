@@ -2985,7 +2985,7 @@ d.CurrentX = 0
 d.CurrentY = 0
 End With
 End Sub
-Function iText(bb As basetask, ByVal v$, wi&, Hi&, aTitle$, N As Long, Optional NumberOnly As Boolean = False, Optional UseIntOnly As Boolean = False) As String
+Function iText(bb As basetask, ByVal v$, wi&, Hi&, aTitle$, n As Long, Optional NumberOnly As Boolean = False, Optional UseIntOnly As Boolean = False) As String
 Dim x&, y&, dd As Object, wh&, shiftlittle As Long, OLDV$
 Set dd = bb.Owner
 With players(GetCode(dd))
@@ -3012,18 +3012,18 @@ wi& = wi& + x&
 Hi& = Hi& + y&
 Form1.EditTextWord = True
 wh& = -1
-If N <= 0 Then Form1.TEXT1.Title = aTitle$ + " ": wh& = Abs(N - 1)
+If n <= 0 Then Form1.TEXT1.Title = aTitle$ + " ": wh& = Abs(n - 1)
 If NumberOnly Then
 Form1.TEXT1.NumberOnly = True
 Form1.TEXT1.NumberIntOnly = UseIntOnly
 OLDV$ = v$
-ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , N, shiftlittle
+ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
 If Result = 99 Then v$ = OLDV$
 Form1.TEXT1.NumberIntOnly = False
 Form1.TEXT1.NumberOnly = False
 Else
 OLDV$ = v$
-ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , N, shiftlittle
+ScreenEdit bb, v$, x&, y&, wi& - 1, Hi&, wh&, , n, shiftlittle
 If Result = 99 And Hi& = wi& Then v$ = OLDV$
 End If
 iText = v$
@@ -5347,12 +5347,16 @@ again22:
             ElseIf part$ = "S" Then
             
             Else
+            
             b$ = b$ & part$
             part$ = "N"
             End If
         Case "&"
         If part$ = vbNullString Then
         part$ = "S"
+        ElseIf part$ = "N" Then
+        b$ = b$ + part$
+        part$ = vbNullString
         Else
         b$ = part$
         part$ = "S"
@@ -5379,8 +5383,13 @@ again22:
                     End If
                 ElseIf w$ = ">" And pos > 1 Then
                     If Mid$(a$, pos - 1, 2) = "->" Then ' "->"
-                        part$ = "o"
-                        pos = pos + 2
+                   If Right$(b$, 1) = "S" Then
+                    b$ = b$ + part$
+                    part$ = "N"
+                    Else
+                      '  part$ = vbNullString
+                    End If
+                        
                     End If
                 End If
             End If
@@ -6087,12 +6096,12 @@ Do While Not (LOF(F) < Seek(F))
 Get #F, , a()
 s1 = a()
 
-If s1 = vbCr Or s1 = vbLf Or s1 = "," Then Exit Do
+If s1 = vbCr Or s1 = vbLf Or s1 = inpcsvsep$ Then Exit Do
 
 Loop
-If s1 = "," Then Exit Do
+If s1 = inpcsvsep$ Then Exit Do
 End If
-If s1 <> "," And (Not (LOF(F) < Seek(F))) And (Not inside) Then
+If s1 <> inpcsvsep$ And (Not (LOF(F) < Seek(F))) And (Not inside) Then
     ss = Seek(F)
     Get #F, , a()
     s1 = a()
@@ -6158,12 +6167,12 @@ Do While Not (LOF(F) < Seek(F))
 Get #F, , a
 s1 = Chr(a)
 
-If s1 = vbCr Or s1 = vbLf Or s1 = "," Then Exit Do
+If s1 = vbCr Or s1 = vbLf Or s1 = inpcsvsep$ Then Exit Do
 
 Loop
-If s1 = "," Then Exit Do
+If s1 = inpcsvsep$ Then Exit Do
 End If
-If s1 <> "," And (Not (LOF(F) < Seek(F))) And (Not inside) Then
+If s1 <> inpcsvsep$ And (Not (LOF(F) < Seek(F))) And (Not inside) Then
     ss = Seek(F)
     Get #F, , a
     s1 = Chr(a)
@@ -6179,21 +6188,21 @@ Loop
 
 a1111:
 End Sub
-Public Sub getUniRealComma(F As Long, r As Variant)
+Public Sub getUniRealComma(F As Long, s$)
 ' 2 bytes a time... stop to line end and advance to next line
 ' use numbers with . as decimal not ,
-Dim a() As Byte, s1 As String, ss As Long, s As String
-r = 0
+Dim a() As Byte, s1 As String, ss As Long
+s$ = ""
 a = " "
 On Error GoTo a111
 Do While Not LOF(F) < Seek(F)
 Get #F, , a()
 
 s1 = a()
-If s1 <> vbCr And s1 <> vbLf And s1 <> "," Then
+If s1 <> vbCr And s1 <> vbLf And s1 <> inpcsvsep$ Then
 s = s + s1
 Else
-If s1 <> "," And Not (LOF(F) < Seek(F)) Then
+If s1 <> inpcsvsep$ And Not (LOF(F) < Seek(F)) Then
     ss = Seek(F)
     Get #F, , a()
     s1 = a()
@@ -6204,26 +6213,28 @@ End If
 Exit Do
 End If
 Loop
-IsNumberD2 s$, r
+s$ = MyTrim$(s$)
+If s$ = "" Then s$ = "0"
 a111:
 
 
 End Sub
-Public Sub getAnsiRealComma(F As Long, r As Variant)
+Public Sub getAnsiRealComma(F As Long, s$)
 ' 2 bytes a time... stop to line end and advance to next line
 ' use numbers with . as decimal not ,
-Dim a As Byte, s1 As String, ss As Long, s As String
-r = 0
+Dim a As Byte, s1 As String, ss As Long
+s$ = ""
+
 
 On Error GoTo a112
 Do While Not LOF(F) < Seek(F)
 Get #F, , a
 
 s1 = Chr(a)
-If s1 <> vbCr And s1 <> vbLf And s1 <> "," Then
+If s1 <> vbCr And s1 <> vbLf And s1 <> inpcsvsep$ Then
 s = s + s1
 Else
-If s1 <> "," And Not (LOF(F) < Seek(F)) Then
+If s1 <> inpcsvsep$ And Not (LOF(F) < Seek(F)) Then
     ss = Seek(F)
     Get #F, , a
     s1 = Chr(a)
@@ -6234,7 +6245,8 @@ End If
 Exit Do
 End If
 Loop
-IsNumberD2 s$, r
+s$ = MyTrim$(s$)
+If s$ = "" Then s$ = "0"
 a112:
 
 
