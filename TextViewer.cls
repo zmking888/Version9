@@ -1877,9 +1877,9 @@ End Sub
 Private Function blockString(s$) As String
 If s$ = vbNullString Then Exit Function
 Dim i As Long, j As Long, c As Long
-Dim A1 As Boolean
+Dim a1 As Boolean
 c = Len(s$)
-A1 = True
+a1 = True
 i = 1
 Do
 Select Case Asc(Mid$(s$, i, 1))
@@ -3715,8 +3715,10 @@ Do While pos <= Len(a$)
             End If
         Case "0" To "9", "."
             If part$ = "N" Then
-            If Mid$(a$ + " ", pos + 1, 1) Like "[&@#]" Then
+            If Len(a$) < pos Then
+            If Mid$(a$, pos + 1, 1) Like "[&@#~]" Then
             pos = pos + 1
+            End If
             End If
             ElseIf part$ = "S" Then
             

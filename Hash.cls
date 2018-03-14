@@ -16,7 +16,8 @@ Option Explicit
  Private Type item
  Key As String
   ndx As Long
-  KeyType As Long  ' 0 as is , 1, reference/don't delete
+  KeyType As Integer  ' 0 as is , 1, reference/don't delete
+  originaltype As Integer
  firsthash As Long
  lastpos As Long
  Pleft As Long  ' a list
@@ -93,6 +94,7 @@ Friend Sub ReduceHash(newTop As Long, v())
             v(.ndx) = Empty
             End If
         .KeyType = 0
+        .originaltype = 0
         .ndx = -1
             
         End With
@@ -130,6 +132,22 @@ End Function
 Property Get Count()
 Count = toplim + 1
 End Property
+Friend Function Find2(Key As String, num As Long, checktype As Boolean) As Boolean
+Dim k As Long
+num = 0
+
+If Len(Key) = 0 Then Exit Function
+k = Hash(HashFunc(Key)) - 1
+
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then
+    num = PriveSpace(k).ndx: Find2 = True: index = k: checktype = PriveSpace(k).originaltype: Exit Function
+    End If
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
+End If
+End Function
 Friend Function Find(Key As String, num As Long) As Boolean
 Dim k As Long
 num = 0
@@ -182,7 +200,7 @@ With PriveSpace(k)
 Loop Until k < 0
 End If
 End Function
-Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False)
+Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False, Optional deftype As Boolean = False)
 Dim a As Long
 a = Malloc()
 On Error GoTo exxx
@@ -193,6 +211,11 @@ With PriveSpace(a)
         .KeyType = 1
     Else
         .KeyType = 0
+    End If
+    If deftype Then
+    .originaltype = True
+    Else
+    .originaltype = False
     End If
     .firsthash = HashFunc0(Key)
 End With
@@ -250,14 +273,14 @@ End Function
 Private Function HashFunc(a$)
 HashFunc = MyMod(uintnew(HashFunc0(a$) Or &HAFFAFF7 + Len(a$) + hashlen + 1), hashlen)
 End Function
-Private Function MyMod(r1 As Double, po) As Double
+Private Function MyMod(r1, po) As Variant
 MyMod = r1 - Fix(r1 / po) * po
 End Function
-Private Function uintnew(ByVal a As Double) As Double
-If a > CDbl(2147483647) Then a = CDbl(2147483647)
-If a < CDbl(-2147483648#) Then a = CDbl(-2147483648#)
+Private Function uintnew(ByVal a As Currency) As Currency
+If a > 2147483647@ Then a = 2147483647@
+If a < -2147483648@ Then a = -2147483648@
 If a < 0 Then
-uintnew = 4294967296# + a
+uintnew = 4294967296@ + a
 Else
 uintnew = a
 End If

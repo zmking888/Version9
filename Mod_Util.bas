@@ -4525,7 +4525,7 @@ End With
 End Sub
 Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, ByVal yy1&, ByVal yy2&, ByVal hor As Boolean, ByVal all As Boolean)
     Dim Redval&, Greenval&, Blueval&
-    Dim r1&, g1&, b1&, sr&, SG&, sb&
+    Dim r1&, g1&, b1&, sr&, sg&, sb&
     F& = F& Mod &H1000000
     t& = t& Mod &H1000000
     Redval& = F& And &H10000FF
@@ -4535,7 +4535,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
     g1& = (t& And &H100FF00) / &H100
     b1& = (t& And &HFF0000) / &H10000
     sr& = (r1& - Redval&) * 1000 / 127
-    SG& = (g1& - Greenval&) * 1000 / 127
+    sg& = (g1& - Greenval&) * 1000 / 127
     sb& = (b1& - Blueval&) * 1000 / 127
     Redval& = Redval& * 1000
     
@@ -4581,7 +4581,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
         TheObject.Line (FillLeft, RMAX(FillTop, yy1&))-(FillRight, RMIN(FillBottom, yy2&)), rgb(Redval& / 1000, Greenval& / 1000, Blueval& / 1000), BF
         End If
         Redval& = Redval& + sr&
-        Greenval& = Greenval& + SG&
+        Greenval& = Greenval& + sg&
         Blueval& = Blueval& + sb&
         FillTop = FillBottom
         FillBottom = FillTop + Step
@@ -4590,7 +4590,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
         TheObject.Line (RMAX(FillLeft, xx1&), FillTop)-(RMIN(FillRight, xx2&), FillBottom), rgb(Redval& / 1000, Greenval& / 1000, Blueval& / 1000), BF
         End If
         Redval& = Redval& + sr&
-        Greenval& = Greenval& + SG&
+        Greenval& = Greenval& + sg&
         Blueval& = Blueval& + sb&
         FillLeft = FillRight
         FillRight = FillRight + Step
@@ -4972,6 +4972,8 @@ If s$ <> "" Then
             If fornow Then
                 casesensitive = False
             End If
+            ElseIf d$ = "SBL" Then
+            ShowBooleanAsString = False
             ElseIf d$ = "DIM" Then
             DimLikeBasic = False
             ElseIf d$ = "FOR" Then
@@ -5102,6 +5104,8 @@ If IsLabel(basestack1, s$, d$) > 0 Then
                 If fornow Then
                      casesensitive = True
                 End If
+           ElseIf d$ = "SBL" Then
+            ShowBooleanAsString = True
          ElseIf d$ = "DIM" Then
             DimLikeBasic = True
          ElseIf d$ = "FOR" Then
@@ -5341,9 +5345,10 @@ again22:
             End If
         Case "0" To "9", "."
             If part$ = "N" Then
-            If Mid$(a$ + " ", pos + 1, 1) Like "[&@#]" Then
-            pos = pos + 1
+            If Len(a$) < pos Then
+                If Mid$(a$, pos + 1, 1) Like "[&@#~]" Then pos = pos + 1
             End If
+            
             ElseIf part$ = "S" Then
             
             Else
@@ -6907,7 +6912,7 @@ Public Sub NoMoreDeep(deep As Variant)
 MyEr "No more" + Str(deep) + " levels gosub allowed", "Δεν επιτρέπονται πάνω από" + Str(deep) + " επίπεδα για εντολή ΔΙΑΜΕΣΟΥ"
 End Sub
 Public Sub CantFind(w$)
-MyEr "Can't find " + w$, "Δεν μπορώ να βρω τo " + w$
+MyEr "Can't find " + w$ + " or type name", "Δεν μπορώ να βρω τo " + w$ + " ή όνομα τύπου"
 End Sub
 Public Sub OverflowLong()
 MyEr "OverFlow Long", "Yπερχείλιση μακρύ"

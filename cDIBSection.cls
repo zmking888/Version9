@@ -348,14 +348,14 @@ ba$ = Right$("00000" & ba$, 6)
 getRGB = val("&h" & Mid$(ba$, 1, 2)) * 256 * 256 + val("&h" & Mid$(ba$, 3, 2)) * 256 + val("&h" & Mid$(ba$, 5, 2))
 End Function
 Private Function getRGBquad(rgb As RGBQUAD) As Long
-getRGBquad = cUlng(rgb.rgbRed + rgb.rgbGreen * 256 + rgb.rgbBlue * 256 * 256)
+getRGBquad = cUlng(rgb.rgbRed + rgb.rgbGreen * 256@ + rgb.rgbBlue * 256 * 256@)
 
 End Function
-Private Function cUlng(ByVal a As Double) As Long ' πέρνει έναν umsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Private Function cUlng(ByVal a As Currency) As Long ' πέρνει έναν umsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
 On Error GoTo cu1
 a = Abs(Int(a))
-If a > CDbl(2147483647#) Then
-cUlng = a - 4294967296#
+If a > 2147483647@ Then
+cUlng = a - 4294967296@
 Else
 cUlng = CLng(a)
 End If
@@ -1688,7 +1688,7 @@ If m_hDIb <> 0 And m_hDC <> 0 Then m_hBmpOld = SelectObject(m_hDC, m_hDIb)
     DeleteDC lhDCDesktop
     sumhDC = sumhDC + 1
 End Sub
-Public Sub needPrinterHDC(dest As Object)
+Public Sub needPrinterHDC(Dest As Object)
 ' return hdc
 If UBound(MyDM) > 1 And p_hdc <> 0 Then
   m_hDC = CreateCompatibleDC(p_hdc)
@@ -1927,18 +1927,18 @@ canmake:
  Text "big....size " & CStr(3 * Int(picthis.width / autosize) * Int(picthis.Height / autosize) \ 1024 \ 1024) & " Mbyte", 0, 0
 
 End Function
-Public Sub MakePrinterhDC(dest As Object, PAGENAME$)
+Public Sub MakePrinterhDC(Dest As Object, PAGENAME$)
 Dim di As DOCINFO
         
           Dim ret As Long
           Dim LastError As Long
           Dim dummy3 As Object
 If UBound(MyDM) = 1 Then
-ShowProperties dummy3, dest.DeviceName, MyDM
+ShowProperties dummy3, Dest.DeviceName, MyDM
 End If
 
 'ImOrient MyDM
-          p_hdc = CreateDC(dest.DriverName, dest.DeviceName, 0, MyDM(1))
+          p_hdc = CreateDC(Dest.DriverName, Dest.DeviceName, 0, MyDM(1))
           di.cbSize = Len(di)   ' 20
           di.lpszDocName = PAGENAME$
 

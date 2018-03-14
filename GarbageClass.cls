@@ -486,14 +486,14 @@ Private Function UINT(ByVal a As Integer) As Long
  
  End Function
 
-Private Function MyMod(r1 As Double, po) As Double
+Private Function MyMod(r1, po) As Variant
 MyMod = r1 - Fix(r1 / po) * po
 End Function
-Private Function uintnew(ByVal a As Double) As Double
-If a > CDbl(2147483647) Then a = CDbl(2147483647)
-If a < CDbl(-2147483648#) Then a = CDbl(-2147483648#)
+Private Function uintnew(ByVal a As Currency) As Currency
+If a > 2147483647@ Then a = 2147483647@
+If a < -2147483648@ Then a = -2147483648@
 If a < 0 Then
-uintnew = 4294967296# + a
+uintnew = 4294967296@ + a
 Else
 uintnew = a
 End If

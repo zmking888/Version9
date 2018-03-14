@@ -2786,7 +2786,7 @@ Case "CHR$(", "CHRCODE$(", "CHRCODE(", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", 
 Case "CLOSE", "CLS", "CODE", "CODEPAGE", "COLLIDE(", "COLOR", "COLOR(", "COLORS"
 Case "COLOUR(", "COM", "COMMAND", "COMMAND$", "COMMIT", "COMMON", "COMPARE(", "COMPRESS", "COMPUTER", "COMPUTER$", "CONCURRENT", "CONST", "CONS("
 Case "CONTINUE", "CONTROL$", "COPY", "COS(", "CTIME(", "CURRENCY", "CURSOR", "CURVE"
-Case "DATA", "DATE$(", "DATE(", "DATEFIELD", "DB.PROVIDER", "DB.USER", "DECLARE", "DEF", "DELETE"
+Case "DATA", "DATE$(", "DATE(", "DATEFIELD", "DB.PROVIDER", "DB.USER", "DECIMAL", "DECLARE", "DEF", "DELETE"
 Case "DESCENDING", "DESKTOP", "DIM", "DIMENSION(", "DIR", "DIR$", "DIV", "DO"
 Case "DOC.LEN(", "DOC.PAR(", "DOC.UNIQUE.WORDS(", "DOC.WORDS(", "DOCUMENT", "DOS", "DOUBLE", "DOWN", "DRAW"
 Case "DRAWINGS", "DRIVE$(", "DRIVE.SERIAL(", "DROP", "DRW$(", "DURATION", "EACH("
@@ -2826,7 +2826,7 @@ Case "SEEK", "SEEK(", "SELECT", "SEQUENTIAL", "SET", "SETTINGS", "SGN(", "SHIFT"
 Case "SHOW", "SHOW$(", "SIN(", "SINGLE", "SINT(", "SIZE", "SIZE.X(", "SIZE.Y(", "SLOW"
 Case "SND$(", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPEECH$(", "SPLIT", "SPRITE"
 Case "SPRITE$", "SQRT(", "STACK", "STACK(", "STACK$(", "STACK.SIZE", "STACKITEM$(", "STACKITEM(", "STACKTYPE$(", "START", "STATIC"
-Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STREAM", "STRING$(", "STRUCTURE", "SUB", "SUBDIR", "SUPERCLASS"
+Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STREAM", "STRING$", "STRING$(", "STRUCTURE", "SUB", "SUBDIR", "SUPERCLASS"
 Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$("
@@ -2840,16 +2840,16 @@ Case "адеиасе", "ай(", "айеяаио.дуадийо(", "айеяаиос", "акгхес", "акгхгс", "акка
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "ам$(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апедысе"
-Case "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихлос", "аяихлос.паяацяажоу("
+Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
 Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "аукос"
 Case "аукос$(", "аукоу", "ауноуса", "ауто", "ажаияесг", "ажгсе", "баке", "баке.адеиа$(", "басг"
 Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "целисе", "целисла"
-Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла$", "цяаллатосеияа", "цяаллатосеияа$", "цяаллесамажояас", "цяаллг"
+Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла", "цяалла$", "цяаллатосеияа", "цяаллатосеияа$", "цяаллесамажояас", "цяаллг"
 Case "цяажг$(", "цяаье", "цягцояа", "цымиа", "дапед(", "деийтг.лояжг", "деийтгс", "деийтгс.йол", "деийтгс.у", "деийтгс.в"
 Case "деийтгса.у", "деийтгса.в", "деине", "дей(", "дейаен", "дейаен$(", "дем", "дени$(", "денилеяос$(", "дес", "дглосио"
 Case "диа", "диабасе", "диацяажг", "диадовийо", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастасг("
 Case "диастиво", "диажамеиа", "диажамеиа$", "диажамо", "диажуцг", "диейоье", "дийтуо$", "диояхысе"
-Case "дипка", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
+Case "дипка", "дипко", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
 Case "дуадийо.амти(", "дуадийо.амтистяожо(", "дуадийо.апо(", "дуадийо.г(", "дуадийо.йаи(", "дуадийо.окисхгсг(", "дуолиса(", "дысе"
 Case "еццяажес(", "еццяажо", "еццяажоу.кенеис(", "еццяажоу.лгйос(", "еццяажоу.ломадийес.кенеис(", "еццяажоу.пая(", "еццяаьило(", "ецйуяо(", "еий$("
 Case "еийома", "еийома.у(", "еийома.у.сглеиа(", "еийома.в(", "еийома.в.сглеиа(", "еийомес", "еийомидио", "еимая", "еимця"
@@ -2868,7 +2868,7 @@ Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.в", "йимгсг.вп", "йкасг", "йк
 Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяужо$(", "йяуье", "йуйкийа", "йуйкос"
 Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
-Case "коцийос", "коцистийо", "коцос", "коцос$(", "кс$", "кж(", "лайяус", "ле", "лецако("
+Case "коцийо", "коцийос", "коцистийо", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгйос", "лгйос(", "лгйос.елж("
 Case "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
@@ -2901,18 +2901,17 @@ ismine = False
 End Select
 End Function
 Private Function IsNumberQuery(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
-
+Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
-SG = 1
+sg = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
-    Case " ", "+"
+    Case " ", "+" ', ChrW(160)
     Case "-"
-    SG = -SG
+    sg = -sg
     Case Else
     Exit Do
     End Select
@@ -2951,7 +2950,7 @@ Else
         Do While sng <= Len(a$)
        
         Select Case Mid$(a$, sng, 1)
-        Case " "
+        Case " " ', ChrW(160)
         If Not (sg1 And Len(ex$) = 1) Then
         Exit Do
         End If
@@ -2962,7 +2961,6 @@ Else
         DE$ = DE$ & Mid$(a$, sng, 1)
         End If
         Case "E", "e" ' ************check it
-        If skipdecimals Then Exit Do
              If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
@@ -2971,7 +2969,6 @@ Else
         End If
    
                Case "е", "Е" ' ************check it
-               If skipdecimals Then Exit Do
                          If ex$ = vbNullString Then
                sg1 = True
         ex$ = "E"
@@ -2991,45 +2988,41 @@ Else
         End Select
          sng = sng + 1
         Loop
-        If ex$ = "E" Or ex$ = "E-" Or ex$ = "E+" Then
-        sng = sng - Len(ex$)
+        If sg1 Then
+            If Len(ex$) < 3 Then
+                If ex$ = "E" Then
+                    ex$ = " "
+                ElseIf ex$ = "E-" Or ex$ = "E+" Then
+                    ex$ = "  "
+                End If
+            End If
         End If
     End If
     If ig$ = vbNullString Then
     IsNumberQuery = False
     lr = 1
     Else
-    If SG < 0 Then ig$ = "-" & ig$
+    If sg < 0 Then ig$ = "-" & ig$
     Err.Clear
     On Error Resume Next
-    If Len(ex$) = 1 Then
-    n$ = ig$ & DE$ & ex$ + "1"
-    
-     If IsExp(basestack1, n$, r) Then
-    sng = Len(ig$ & DE$ & ex$) - Len(n$)
-        fr = 0
-    End If
-       Else
     n$ = ig$ & DE$ & ex$
-    If IsExp(basestack1, n$, r) Then
-    sng = Len(ig$ & DE$ & ex$) - Len(n$)
-        fr = 0
+    sng = Len(ig$ & DE$ & ex$)
+    rr = val(ig$ & DE$ & ex$)
+    If Err.Number > 0 Then
+         lr = 0
     Else
-    End If
-    
-    r = val(ig$ & DE$ & ex$)
-    End If
-    If Err > 0 Then
-    lr = 0
-    Else
-      'A$ = Mid$(A$, sng)
-    lr = sng - fr + 1
+        r = rr
+       lr = sng - fr + 2
        IsNumberQuery = True
     End If
+    
     End If
 End If
 End Function
-Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False) As Boolean
+
+
+
+Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -3044,8 +3037,31 @@ r1 = 1
 Dim v As Double, b$
 If final Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
- r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
- 
+
+r1 = (r1 And Len(a$) <= r) Or (a$ = vbNullString)
+If r1 Then
+Select Case checktype
+Case vbLong
+On Error Resume Next
+    v = CLng(v)
+    If Err.Number > 0 Then Err.Clear: r1 = False
+
+Case vbSingle
+On Error Resume Next
+     v = CSng(v)
+    If Err.Number > 0 Then Err.Clear: r1 = False
+Case vbDecimal
+On Error Resume Next
+    v = CDec(v)
+    If Err.Number > 0 Then Err.Clear: r1 = False
+Case vbCurrency
+On Error Resume Next
+    v = CCur(v)
+    If Err.Number > 0 Then Err.Clear: r1 = False
+End Select
+
+
+End If
 Else
 If (a$ = "-") Or a$ = vbNullString Then
 r1 = True
@@ -3072,21 +3088,21 @@ Else
 ValidNum = r1
 End Function
 Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
-r = 0
+r = r - r
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
 Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
+Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
-SG = 1
+sg = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
     Case " ", "+"
     Case "-"
-    SG = -SG
+    sg = -sg
     Case Else
     Exit Do
     End Select
@@ -3173,9 +3189,9 @@ Else
         IsNumberOnly = False
         lr = 1
     Else
-        If SG < 0 Then ig$ = "-" & ig$
+        If sg < 0 Then ig$ = "-" & ig$
         If Len(ig$ + DE$) > 13 And ex$ = "" Then
-        On Error Resume Next
+            On Error Resume Next
             If Len(DE$) > 0 Then
                 Mid$(DE$, 1, 1) = cdecimaldot$
                 r = CDec(ig$ & DE$)
@@ -3183,12 +3199,16 @@ Else
                 r = CDec(ig$)
             End If
             If Err.Number = 6 Then
-            r = CDbl(ig$ & DE$)
+                r = CDbl(ig$ & DE$)
             End If
-    Else
-    If SG < 0 Then ig$ = "-" & ig$
-    r = val(ig$ & DE$ & ex$)
-    End If
+         Else
+            r = val(ig$ & DE$ & ex$)
+             If Err.Number > 0 Then
+             Err.Clear
+             IsNumberOnly = False
+             End If
+
+            End If
       'A$ = Mid$(A$, sng)
     lr = sng - fr + 1
     IsNumberOnly = True
@@ -3830,6 +3850,8 @@ For i = 0 To UBound(mycommands())
 Select Case mycommands(i)
 Case "SORT", "танимолгсг"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSort)
+Case "DEF", "йаме"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDef)
 Case "NORMAL", "йамомийа"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoNormal)
 Case "DOUBLE", "дипка"

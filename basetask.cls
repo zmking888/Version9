@@ -14,6 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public callx1 As Long
 Public callohere As String
@@ -160,81 +161,89 @@ If Not StaticCollection.Find(name$) Then Exit Function
             End With
    AlterVar = True
 End Function
-Function MyRound(ByVal x, Optional d As Variant = 0#) As Variant
-Dim i, n
-  i = Abs(Int(d)): If i > 13 Then i = 13
-  n = Sgn(x) * 0.5
+Static Function MyRound(a As Variant, Optional ByVal i As Integer = 13)
+Dim c As Variant, j As VbVarType
+Dim n(1 To 28) As Single, d(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
+Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
+j = VarType(a)
+If j < vbSingle Then MyRound = a: Exit Function
 On Error GoTo there
-If VarType(x) = vbDouble Then
-Select Case i
-Case 0
-MyRound = Fix(x + n)
-Case 1
-MyRound = Fix(x * 10# + n) / 10#
-Case 2
-MyRound = Fix(x * 100# + n) / 100#
-Case 3
-MyRound = Fix(x * 1000# + n) / 1000#
-Case 4
-MyRound = Fix(x * 10000# + n) / 10000#
-Case 5
-MyRound = Fix(x * 100000# + n) / 100000#
-Case 6
-MyRound = Fix(x * 1000000# + n) / 1000000#
-Case 7
-MyRound = Fix(x * 10000000# + n) / 10000000#
-Case 8
-MyRound = Fix(x * 100000000# + n) / 100000000#
-Case 9
-MyRound = Fix(x * 1000000000# + n) / 1000000000#
-Case 10
-MyRound = Fix(x * 10000000000# + n) / 10000000000#
-Case 11
-MyRound = Fix(x * 100000000000# + n) / 100000000000#
-Case 12
-MyRound = Fix(x * 1000000000000# + n) / 1000000000000#
-Case 13
-MyRound = Fix(x * 10000000000000# + n) / 10000000000000#
-End Select
-Exit Function
-Else
-Select Case i
-Case 0
-MyRound = Fix(x + n)
-Case 1
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10 + n) / 10
-Case 2
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100 + n) / 100
-Case 3
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000 + n) / 1000
-Case 4
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000 + n) / 10000
-Case 5
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000 + n) / 100000
-Case 6
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000 + n) / 1000000
-Case 7
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000 + n) / 10000000
-Case 8
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000 + n) / 100000000
-Case 9
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000 + n) / 1000000000
-Case 10
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000# + n) / 10000000000#
-Case 11
-MyRound = Fix(x) + Fix((x - Fix(x)) * 100000000000# + n) / 100000000000#
-Case 12
-MyRound = Fix(x) + Fix((x - Fix(x)) * 1000000000000# + n) / 1000000000000#
-Case 13
-MyRound = Fix(x) + Fix((x - Fix(x)) * 10000000000000# + n) / 10000000000000#
-End Select
-Exit Function
+If n(1) = 0 Then
+    sg(-1) = CSng(-0.5)
+    sg(1) = CSng(0.5)
+    sg4(-1) = -0.5
+    sg4(1) = 0.5
+    sg8(-1) = CCur(-0.5)
+    sg8(1) = CCur(0.5)
+    For c = 1& To 6&
+        n(c) = CSng(10 ^ c)
+    Next c
+    For c = 7& To 28&
+        n(c) = CSng(-1)
+    Next c
+    For c = 1& To 13&
+        d(c) = CDbl(10 ^ c)
+    Next c
+    For c = 14& To 28&
+        d(c) = CDbl(-1)
+    Next c
+    For c = 1& To 3&
+        cur(c) = CCur(10 ^ c)
+    Next c
+    For c = 4& To 28&
+        cur(c) = CCur(-1)
+    Next c
+    For c = 1& To 28&
+        dec(c) = CDec(10 ^ c)
+    Next c
 End If
-
+    If i = 0 Then
+        MyRound = Sgn(a) * Int(Abs(a) + 0.5)
+        Exit Function
+    Else
+        c = Fix(a)
+        Select Case j
+        Case vbSingle
+            If n(i) > 0 Then
+                c = sg(Sgn(a))
+                MyRound = Fix(a * n(i) + c) / n(i)
+            Else
+                MyRound = a
+            End If
+            Exit Function
+        Case vbDouble
+            c = sg4(Sgn(a))
+            If d(i) > 0 Then
+                MyRound = Fix(a * d(i) + c) / d(i)
+            Else
+                MyRound = a
+            End If
+            Exit Function
+        Case vbCurrency
+            If cur(i) > 0 Then
+                c = sg8(Sgn(a))
+                MyRound = Fix(a) + Fix((a - Fix(a)) * cur(i) + c) / cur(i)
+            Else
+                MyRound = a
+            End If
+            Exit Function
+        Case vbDecimal
+            c = sg8(Sgn(a))
+            MyRound = Fix(a) + Fix((a - Fix(a)) * dec(i) + c) / dec(i)
+            Exit Function
+        Case Else
+            MyRound = a
+            Exit Function
+        End Select
+    End If
 there:
-MyRound = x
-
+Err.Clear
+MyRound = a
+If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγύλευσης εκτός περιοχής από 0 έως 28"
 End Function
+
+
+
 Public Function ExistVar(ByVal name$) As Boolean
         ExistVar = StaticCollection.ExistKey(name$)
 End Function

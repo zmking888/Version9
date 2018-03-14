@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.0 revision 55 active-X
-We can export to files (unicode or ansi) double, decimal and currency type, mixed with strings (csv).
+Version 9.1 active-X
+
 
 
 From revision 50:

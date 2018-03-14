@@ -8,15 +8,15 @@ Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As L
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal hDC As Long, lpdi As DOCINFO) As Long
+          (ByVal hdc As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal hdc As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal hdc As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal hdc As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -29,10 +29,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal hDC As Long, lpInitData As Any) As Long
+          (ByVal hdc As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -43,7 +43,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -129,7 +129,7 @@ End Type
      pDefault As Any) As Long
 
       Private Declare Function DocumentProperties Lib "winspool.drv" _
-      Alias "DocumentPropertiesA" (ByVal hWnd As Long, _
+      Alias "DocumentPropertiesA" (ByVal hWND As Long, _
       ByVal hPrinter As Long, ByVal pDeviceName As String, _
        pDevModeOutput As Any, pDevModeInput As Any, ByVal fMode As Long) As Long
 
@@ -171,7 +171,7 @@ End Sub
         ByteToString = StripNulls(TempStr)
       End Function
 
-      Function ShowProperties(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
+      Function ShowProperties(F As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
       Dim nsize As Long
      '' Dim pDevMode As DEVMODE
@@ -202,8 +202,8 @@ End Sub
         
       '' Call CopyMemory(adevmode(1), pDevMode, Len(pDevMode))
    End If
-         If Not f Is Nothing Then
-          nsize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
+         If Not F Is Nothing Then
+          nsize = DocumentProperties(F.hWND, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_IN_BUFFER Or DM_OUT_BUFFER)  '
          Else
          nsize = DocumentProperties(0, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_IN_BUFFER Or DM_OUT_BUFFER)
         End If
@@ -259,7 +259,7 @@ PrinterCap = GetDeviceCaps(p_hdc, Cap)
 ret = DeleteDC(p_hdc)
 End Function
 
-Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As Byte) As Boolean
+Function ChangeOrientation(F As Object, szPrinterName As String, adevmode() As Byte) As Boolean
       Dim hPrinter As Long, i As Long
       Dim nsize As Long
       Dim pDevMode As DEVMODE
@@ -284,8 +284,8 @@ Function ChangeOrientation(f As Object, szPrinterName As String, adevmode() As B
           End If
    
    End If
-         If Not f Is Nothing Then
-          nsize = DocumentProperties(f.hWnd, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
+         If Not F Is Nothing Then
+          nsize = DocumentProperties(F.hWND, hPrinter, szPrinterName, adevmode(1), adevmode(1), DM_PROMPT Or DM_OUT_BUFFER Or DM_IN_BUFFER)
          Else
 
       
@@ -371,24 +371,25 @@ b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" 
 b.regdelete "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\" & EXT & "\OpenWithList\"
 
 End Sub
-Function signlong(ByVal a As Double) As Double
+Function signlong(ByVal a As Currency) As Currency
 If a < 0 Then a = 0
-If a > 4294967295# Then a = 4294967295#
-If a > CDbl(2147483647) Then
-signlong = ((CDbl(&H80000000) + a) + CDbl(&H80000000)) ' And &HFFFFFFFF
+If a > 4294967295@ Then a = 4294967295@
+If a > 2147483647@ Then
+signlong = ((-2147483648@ + a) + -2147483648@)  ' And &HFFFFFFFF
 Else
 signlong = a
 End If
 End Function
-Function uintnew(ByVal a As Double) As Double
-If a > CDbl(2147483647) Then a = CDbl(2147483647)
-If a < CDbl(-2147483648#) Then a = CDbl(-2147483648#)
+Function uintnew(ByVal a As Currency) As Currency
+If a > 2147483647@ Then a = 2147483647@
+If a < -2147483648@ Then a = -2147483648@
 If a < 0 Then
-uintnew = 4294967296# + a
+uintnew = 4294967296@ + a
 Else
 uintnew = a
 End If
 End Function
+
 Function UINT(ByVal a As Long) As Long 'δίνει έναν integer σαν unsign integer σε long
  Dim b As Long
  b = a And &HFFFF
@@ -435,30 +436,12 @@ b = a
 Const bb = 65536
 HighWord = Int(b / bb)
 End Function
-Function cUlngFromVariant(ByVal c As Variant) As Long
-Dim a As Double
-On Error GoTo cu1
-a = Abs(Int(c))
-If a > CDbl(2147483647#) Then
-If a > CDbl(4294967296#) Then
-cUlngFromVariant = 0
-Else
-cUlngFromVariant = a - 4294967296#
-End If
-Else
-cUlngFromVariant = CLng(a)
-End If
-Exit Function
-cu1:
-cUlngFromVariant = 0
 
-
-End Function
-Function cUlng(ByVal a As Double) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Function cUlng(ByVal a As Currency) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
 On Error GoTo cu1
 a = Abs(Int(a))
-If a > CDbl(2147483647#) Then
-cUlng = a - 4294967296#
+If a > 2147483647@ Then
+cUlng = a - 4294967296@
 Else
 cUlng = CLng(a)
 End If
@@ -474,19 +457,19 @@ End Function
 Function PACKLNG$(ByVal a As Double)
 PACKLNG$ = Right$("00000000" & Hex$(cUlng(a)), 8)
 End Function
-Function PACKLNG2$(ByVal a As Double)  ' with error return..
+Function PACKLNG2$(ByVal a As Currency)  ' with error return..
 ' this if only for print
 On Error GoTo cu22
 Dim internal As Long
 a = Int(a)
-If a > 4294967296# Then
+If a > 4294967296@ Then
 PACKLNG2$ = "???+"
 ElseIf a < 0 Then
 ' error
 PACKLNG2$ = "???-"
 Else
-    If a > CDbl(2147483647#) Then
-    internal = a - 4294967296#
+    If a > 2147483647@ Then
+    internal = a - 4294967296@
     Else
     internal = CLng(a)
     End If

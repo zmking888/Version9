@@ -123,15 +123,15 @@ Public Function GetLongName(strTest As String) As String
    Dim sLongPath As String
    Dim buff As String
    Dim cbbuff As Long
-   Dim result As Long
+   Dim Result As Long
  
    buff = Space$(MAX_PATH_UNICODE)
    cbbuff = Len(buff)
  
-   result = GetLongPathName(StrPtr(strTest), StrPtr(buff), cbbuff)
+   Result = GetLongPathName(StrPtr(strTest), StrPtr(buff), cbbuff)
  
-   If result > 0 Then
-      sLongPath = Left$(buff, result)
+   If Result > 0 Then
+      sLongPath = Left$(buff, Result)
    End If
  
    GetLongName = sLongPath
@@ -140,7 +140,7 @@ End Function
   Function TotalDiskSpace(DriveLetter As String) As Double
 ' Returns the total storage capacity for a drive
 On Error GoTo 100
-Dim Dletter As String, X As Long
+Dim Dletter As String, x As Long
 
     Dim SectorsPerCluster As Long
     Dim BytesPerSector As Long
@@ -148,10 +148,10 @@ Dim Dletter As String, X As Long
     Dim TotalClusters As Long
 
     Dletter = Left(DriveLetter, 1) & ":\"
-    X = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
+    x = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
       BytesPerSector, NumberofFreeClusters, TotalClusters)
     
-    If X = 0 Then 'Error occurred
+    If x = 0 Then 'Error occurred
         TotalDiskSpace = -99 'Assign an arbitrary error value
         Exit Function
     End If
@@ -211,17 +211,17 @@ End Function
 Function FreeDiskSpace(DriveLetter As String) As Double
 ' Returns the number of free bytes for a drive
 On Error GoTo 400
-Dim Dletter As String, X As Double
+Dim Dletter As String, x As Double
     Dim SectorsPerCluster As Long
     Dim BytesPerSector As Long
     Dim NumberofFreeClusters As Long
     Dim TotalClusters As Long
 
     Dletter = Left(DriveLetter, 1) & ":\"
-    X = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
+    x = GetDiskFreeSpace(Dletter, SectorsPerCluster, _
       BytesPerSector, NumberofFreeClusters, TotalClusters)
     
-    If X = 0 Then 'Error occurred
+    If x = 0 Then 'Error occurred
         FreeDiskSpace = -99 'Assign an arbitrary error value
         Exit Function
     End If
@@ -643,30 +643,30 @@ look = 0
 End Function
 
 
-Public Sub QuickSortExtended(Arr() As String, ByVal lb As Long, ByVal UB As Long)
+Public Sub QuickSortExtended(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
-     If UB - lb = 1 Then
-     M1 = lb
+     If UB - LB = 1 Then
+     M1 = LB
       If Arr(M1) > Arr(UB) Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
       Exit Sub
      Else
-       M1 = (lb + UB) \ 2
-             If Arr(M1) = Arr(lb) Then
+       M1 = (LB + UB) \ 2
+             If Arr(M1) = Arr(LB) Then
                 M2 = UB - 1
-                M1 = lb
+                M1 = LB
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If Arr(UB) < Arr(lb) Then Tmp = Arr(lb): Arr(lb) = Arr(UB): Arr(UB) = Tmp
+                        If Arr(UB) < Arr(LB) Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
                         Exit Sub
                     End If
-                Loop Until Arr(M1) <> Arr(lb)
+                Loop Until Arr(M1) <> Arr(LB)
                 Piv = Arr(M1)
-                If M1 > lb Then If Arr(lb) > Piv Then Arr(M1) = Arr(lb): Arr(lb) = Piv: Piv = Arr(M1)
+                If M1 > LB Then If Arr(LB) > Piv Then Arr(M1) = Arr(LB): Arr(LB) = Piv: Piv = Arr(M1)
             Else
                 Piv = Arr(M1)
-                M1 = lb
+                M1 = LB
                 Do While (Arr(M1) < Piv): M1 = M1 + 1: Loop
             End If
     End If
@@ -681,36 +681,36 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
       If M1 > M2 Then Exit Do
       Do While (Arr(M1) < Piv): M1 = M1 + 1: Loop
     Loop
-    If lb < M2 Then QuickSortExtended Arr, lb, M2
+    If LB < M2 Then QuickSortExtended Arr, LB, M2
     If M1 < UB Then QuickSortExtended Arr, M1, UB
 End Sub
-Private Sub QuickSortItemsFileNames(Arr() As String, ByVal lb As Long, ByVal UB As Long)
+Private Sub QuickSortItemsFileNames(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
 Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
-     If UB - lb = 1 Then
-     M1 = lb
+     If UB - LB = 1 Then
+     M1 = LB
        If compareStr4(Arr(M1), Arr(UB)) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
       Exit Sub
      Else
-       M1 = (lb + UB) \ 2 '+ 1
+       M1 = (LB + UB) \ 2 '+ 1
        Piv = Arr(M1)
              If compareStr4(Arr(M1), Piv) = 0 Then
                 M2 = UB - 1
-                M1 = lb
-                Piv = Arr(lb)
+                M1 = LB
+                Piv = Arr(LB)
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(lb): Arr(lb) = Arr(UB): Arr(UB) = Tmp
+                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
                         Exit Sub
                     End If
                 Loop Until compareStr4(Arr(M1), Piv)
                 Piv = Arr(M1)
-                If M1 > lb Then If compareStr4(Arr(lb), Piv) = 1 Then Tmp = Arr(lb): Arr(lb) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
+                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then Tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
             Else
                 Piv = Arr(M1)
-                M1 = lb
+                M1 = LB
                 Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
             End If
     End If
@@ -725,7 +725,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
       If M1 > M2 Then Exit Do
       Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
     Loop
-    If lb < M2 Then QuickSortItemsFileNames Arr, lb, M2
+    If LB < M2 Then QuickSortItemsFileNames Arr, LB, M2
     If M1 < UB Then QuickSortItemsFileNames Arr, M1, UB
     Exit Sub
 abc1:
@@ -1178,34 +1178,34 @@ If compareStr444 = 0 Then compareStr444 = k1
 
 End Function
 
-Sub QuickSortItemsNumbers(Arr() As String, ByVal lb As Long, ByVal UB As Long)
+Sub QuickSortItemsNumbers(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
 Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
-     If UB - lb = 1 Then
-     M1 = lb
+     If UB - LB = 1 Then
+     M1 = LB
        If compareStr4(Arr(M1), Arr(UB)) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
       Exit Sub
      Else
-       M1 = (lb + UB) \ 2 '+ 1
+       M1 = (LB + UB) \ 2 '+ 1
        Piv = Arr(M1)
              If compareStr4(Arr(M1), Piv) = 0 Then
                 M2 = UB - 1
-                M1 = lb
-                Piv = Arr(lb)
+                M1 = LB
+                Piv = Arr(LB)
                 
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(lb): Arr(lb) = Arr(UB): Arr(UB) = Tmp
+                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
                         Exit Sub
                     End If
                 Loop Until compareStr4(Arr(M1), Piv) <> 0
                 Piv = Arr(M1)
-                If M1 > lb Then If compareStr4(Arr(lb), Piv) = 1 Then Tmp = Arr(lb): Arr(lb) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
+                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then Tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
             Else
                 Piv = Arr(M1)
-                M1 = lb
+                M1 = LB
                 Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
             End If
     End If
@@ -1220,7 +1220,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
       If M1 > M2 Then Exit Do
       Do While compareStr4(Arr(M1), Piv) = -1: M1 = M1 + 1: Loop
     Loop
-    If lb < M2 Then QuickSortItemsNumbers Arr, lb, M2
+    If LB < M2 Then QuickSortItemsNumbers Arr, LB, M2
     If M1 < UB Then QuickSortItemsNumbers Arr, M1, UB
     Exit Sub
 abc1:
@@ -1229,20 +1229,20 @@ abc1:
 End Sub
 
 Function IsNumberInFilename1(a$, p As Double) As Boolean
-Dim a1 As Long, LI As Long, a2 As Long
+Dim a1 As Long, LI As Long, A2 As Long
 LI = Len(a$)
 If LI > 0 Then
 a1 = 1
-a2 = 1
+A2 = 1
 If a1 > LI Then a$ = vbNullString: Exit Function
-If LI > 100 + a2 Then LI = 99 + a2
+If LI > 100 + A2 Then LI = 99 + A2
 If Mid$(a$, a1, 1) Like "[0-9]" Then
 Do While a1 <= LI
 a1 = a1 + 1
 If Not Mid$(a$, a1, 1) Like "[0-9]" Then Exit Do
 
 Loop
-p = val(Mid$(a$, a2, a1 - a2)): a$ = Mid$(a$, a1)
+p = val(Mid$(a$, A2, a1 - A2)): a$ = Mid$(a$, a1)
 IsNumberInFilename1 = True
 End If
 
@@ -1264,7 +1264,7 @@ Else
 IsNumberInFilename = False
 End If
 End Function
-Private Function IsNumberOnly(a$, fr As Long, r As Double, lR As Long) As Boolean
+Private Function IsNumberOnly(a$, fr As Long, r As Double, lr As Long) As Boolean
 Dim SG As Long, i As Long, ig$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
 i = fr
@@ -1288,10 +1288,10 @@ Else
     
     If ig$ = vbNullString Then
     IsNumberOnly = False
-    lR = 1
+    lr = 1
     Else
     r = val(ig$)
-    lR = i - fr + 1
+    lr = i - fr + 1
     IsNumberOnly = True
 End If
 
