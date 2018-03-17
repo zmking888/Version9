@@ -17,7 +17,8 @@ Option Explicit
  Key As String
   ndx As Long
   KeyType As Integer  ' 0 as is , 1, reference/don't delete
-  originaltype As Integer
+  originaltype As Byte
+  globalvar As Byte
  firsthash As Long
  lastpos As Long
  Pleft As Long  ' a list
@@ -94,7 +95,8 @@ Friend Sub ReduceHash(newTop As Long, v())
             v(.ndx) = Empty
             End If
         .KeyType = 0
-        .originaltype = 0
+        .globalvar = CByte(0)
+        .originaltype = CByte(0)
         .ndx = -1
             
         End With
@@ -132,7 +134,7 @@ End Function
 Property Get Count()
 Count = toplim + 1
 End Property
-Friend Function Find2(Key As String, num As Long, checktype As Boolean) As Boolean
+Friend Function Find2(Key As String, num As Long, Optional checktype As Boolean, Optional isglobal As Boolean) As Boolean
 Dim k As Long
 num = 0
 
@@ -142,7 +144,23 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).ndx: Find2 = True: index = k: checktype = PriveSpace(k).originaltype: Exit Function
+    num = PriveSpace(k).ndx: Find2 = True: index = k:  checktype = PriveSpace(k).originaltype: isglobal = PriveSpace(k).globalvar: Exit Function
+    End If
+     k = PriveSpace(k).Pleft - 1
+Loop Until k < 0
+End If
+End Function
+Friend Function Find3(Key As String, num As Long, isglobal As Boolean) As Boolean
+Dim k As Long
+num = 0
+
+If Len(Key) = 0 Then Exit Function
+k = Hash(HashFunc(Key)) - 1
+
+If k >= 0 Then
+Do
+    If PriveSpace(k).Key = Key Then
+    num = PriveSpace(k).ndx: Find3 = True: index = k: isglobal = PriveSpace(k).globalvar: Exit Function
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
@@ -200,24 +218,18 @@ With PriveSpace(k)
 Loop Until k < 0
 End If
 End Function
-Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False, Optional deftype As Boolean = False)
+Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
 Dim a As Long
 a = Malloc()
 On Error GoTo exxx
 With PriveSpace(a)
     .Key = Key
     .ndx = num
-    If isref Then
-        .KeyType = 1
-    Else
-        .KeyType = 0
-    End If
-    If deftype Then
-    .originaltype = True
-    Else
-    .originaltype = False
-    End If
+    .KeyType = CByte(Abs(isref))
+    .originaltype = CByte(deftype)
+    .globalvar = CByte(isglobal)
     .firsthash = HashFunc0(Key)
+    
 End With
 place HashFunc(Key), a
 exxx:

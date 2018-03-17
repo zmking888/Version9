@@ -1,11 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 9.1 active-X
+Version 9.2 active-X
 
 
 
-From revision 50:
-new ca.crt - install ca.crt as root certificate
+From version 9.0 revision 50:
+there is a new ca.crt - install ca.crt as root certificate
 
 https://www.dropbox.com/s/30g5oduqt7tzfpm/ca.crt?dl=0
 

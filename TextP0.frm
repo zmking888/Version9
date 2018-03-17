@@ -235,7 +235,7 @@ Attribute HTML.VB_VarHelpID = -1
 Private DisStack As basetask
 Private MeStack As basetask
 Dim lookfirst As Boolean, look1 As Boolean
-Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
@@ -655,9 +655,9 @@ TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -691,7 +691,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -715,9 +715,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = vbNullString Then Exit Sub
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -823,7 +823,7 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 TEXT1.glistN.dropkey = False
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 TEXT1.Render
 
@@ -842,9 +842,9 @@ w = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
 TEXT1.SelStartSilent = TEXT1.SelStart
 l = TEXT1.Charpos + 1
 
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not TEXT1.mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
@@ -861,7 +861,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 End Sub
 
 Public Sub supsub()
@@ -876,9 +876,9 @@ Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 w = TEXT1.mDoc.MarkParagraphID
 TEXT1.SelStartSilent = TEXT1.SelStart - (TEXT1.SelLength > 1)
 l = TEXT1.Charpos + 1
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not TEXT1.mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
@@ -895,7 +895,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 End Sub
 Public Function InIDECheck() As Boolean
     m_bInIDE = True
@@ -2007,7 +2007,7 @@ KeyCode = 0
  Exit Sub
  End If
  End If
- If TEXT1.UsedAsTextBox Then result = 99
+ If TEXT1.UsedAsTextBox Then Result = 99
 NOEDIT = True: noentrance = False: Exit Sub
 End If
 If KeyCode = vbKeyPause Then
@@ -2057,9 +2057,9 @@ End If
 If TEXT1.UsedAsTextBox Then
 Select Case KeyCode
 Case Is = vbKeyTab And (shift Mod 2 = 1), vbKeyUp
-result = -1
+Result = -1
 Case vbKeyReturn, vbKeyTab, vbKeyDown
-result = 1
+Result = 1
 Case Else
 noentrance = False
 Exit Sub
@@ -2309,25 +2309,6 @@ End If
 End If
 End Sub
 
-
-
-Private Sub textinform_Click()
-Dim s$, k As Long
-''If EditTextWord Then
-
-If pagio$ = "GREEK" Then
-s$ = InputBoxN("Πήγαινε στη γραμμή (από 1):", "Συγγραφή Κειμένου", s$)
-Else
-s$ = InputBoxN("Goto line (from 1):", "Text Editor", s$)
-End If
-If IsNumberA(s$, k) Then
-TEXT1.SetRowColumn k, 1
-End If
-''Else
-
-''End If
-
-End Sub
 
 Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, URL As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
@@ -2666,6 +2647,7 @@ MYFONT = defFontname
                 DialogSetupLang 0
                 pagio$ = "GREEK"
             End If
+            
                     SzOne = 14
              PenOne = 15
              PaperOne = 1

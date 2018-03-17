@@ -75,13 +75,13 @@ Private mNoWrap As Boolean
 Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, BlockTopline As Long
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000&
 Private Const GMEM_DISCARDABLE = &H100&
 Private Const GMEM_DISCARDED = &H4000&
@@ -99,20 +99,20 @@ Private Const GMEM_VALID_FLAGS = &H7F72&
 Private Const GMEM_ZEROINIT = &H40&
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "User32" _
+Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "User32" _
+    Private Declare Function SetClipboardData Lib "user32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "User32" _
+    Private Declare Function OpenClipboard Lib "user32" _
     (ByVal hWND As Long) As Long
-Private Declare Function CloseClipboard Lib "User32" _
+Private Declare Function CloseClipboard Lib "user32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+    Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0&
 Const LOCALE_ILANGUAGE = 1&
 
@@ -301,8 +301,8 @@ Private Sub Class_Initialize()
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.lcid = cLid
-mDoc1.lcid = cLid
+mDoc.LCID = cLid
+mDoc1.LCID = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -2532,7 +2532,7 @@ Exit Do
             r$ = r$ & Left$(a$, 1)
             a$ = Mid$(a$, 2)
                rr& = 1 'is an identifier or floating point variable
-            ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0123456789ABCDEFabcdef]" Then
+            ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0-9A-Fa-f]" Then
              r$ = r$ & Left$(a$, 3)
             a$ = Mid$(a$, 4)
                rr& = 1
@@ -2553,7 +2553,7 @@ Case Is >= "A"
             Else
   If Extra& > 0 Then
   If Len(r$) = 10 Then Exit Do
-  If Not c$ Like "[0123456789ABCDEFabcdef]" Then Exit Do
+  If Not c$ Like "[0-9a-fA-F]" Then Exit Do
   
   End If
               r$ = r$ & Left$(a$, 1)
@@ -2625,7 +2625,7 @@ Case Is >= "A"
     If rr& > 0 Then
         If Left$(r$, 1) = "#" Then
           If Len(r$) > 1 Then
-            If Mid$(r$, 2) Like "[0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef]" Then
+            If Mid$(r$, 2) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
                 rr& = 10
             Else
                 a$ = r$ + a$
@@ -3568,7 +3568,7 @@ Do While pos <= Len(a$)
             'hexadecimal literal number....
                 pos = pos + 2
                 Do While pos <= Len(a$)
-                If Not Mid$(a$, pos, 1) Like "[0123456789abcdefABCDEF]" Then Exit Do
+                If Not Mid$(a$, pos, 1) Like "[0-9a-fA-F]" Then Exit Do
                 pos = pos + 1
                 Loop
                 b$ = b$ & "N"

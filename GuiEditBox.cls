@@ -92,13 +92,13 @@ Private mNoWrap As Boolean
 Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, BlockTopline As Long
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000
 Private Const GMEM_DISCARDABLE = &H100
 Private Const GMEM_DISCARDED = &H4000
@@ -116,20 +116,20 @@ Private Const GMEM_VALID_FLAGS = &H7F72
 Private Const GMEM_ZEROINIT = &H40
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "User32" _
+Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "User32" _
+    Private Declare Function SetClipboardData Lib "user32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "User32" _
+    Private Declare Function OpenClipboard Lib "user32" _
     (ByVal hWND As Long) As Long
-Private Declare Function CloseClipboard Lib "User32" _
+Private Declare Function CloseClipboard Lib "user32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+    Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
     ' for Gui purposes
@@ -396,8 +396,8 @@ Private Sub Class_Initialize()
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.lcid = cLid
-mDoc1.lcid = cLid
+mDoc.LCID = cLid
+mDoc1.LCID = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -2119,7 +2119,7 @@ If pos2 > 0 Then addone col(), pos2, 14
 End Sub
 Private Function blockString(s$) As String
 Dim i As Long, j As Long, c As Long
-Dim A1 As Boolean
+Dim a1 As Boolean
 
 If s$ = vbNullString Then Exit Function
 If mMultiLineComment2 <> "}" Then
@@ -2129,7 +2129,7 @@ Exit Function
 Else
 
 c = Len(s$)
-A1 = True
+a1 = True
 i = 1
 Do
 Select Case Asc(Mid$(s$, i, 1))
@@ -2368,7 +2368,7 @@ Exit Do
             r$ = r$ & Myleft$(a$, 1)
             a$ = Mid$(a$, 2)
                rr& = 1 'is an identifier or floating point variable
-            ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0123456789ABCDEFabcdef]" Then
+            ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0-9A-Fa-f]" Then
              r$ = r$ & Myleft$(a$, 3)
             a$ = Mid$(a$, 4)
                rr& = 1
@@ -2385,7 +2385,7 @@ Case Is >= "A"
             Else
   If Extra& > 0 Then
   If Len(r$) = 10 Then Exit Do
-  If Not c$ Like "[0123456789ABCDEFabcdef]" Then Exit Do
+  If Not c$ Like "[0-9a-fA-F]" Then Exit Do
   
   End If
               r$ = r$ & Myleft$(a$, 1)
@@ -2457,7 +2457,7 @@ Case Is >= "A"
     If rr& > 0 Then
         If Myleft$(r$, 1) = "#" Then
           If Len(r$) > 1 Then
-            If Mid$(r$, 2) Like "[0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef][0123456789ABCDEFabcdef]" Then
+            If Mid$(r$, 2) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
                 rr& = 10
             Else
                 a$ = r$ + a$
@@ -3762,7 +3762,7 @@ Do While pos <= Len(a$)
             'hexadecimal literal number....
                 pos = pos + 2
                 Do While pos <= Len(a$)
-                If Not Mid$(a$, pos, 1) Like "[0123456789abcdefABCDEF]" Then Exit Do
+                If Not Mid$(a$, pos, 1) Like "[0-9a-fA-F]" Then Exit Do
                 pos = pos + 1
                 Loop
                 b$ = b$ & "N"
@@ -4290,9 +4290,9 @@ w = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos + 1
 
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
@@ -4309,16 +4309,16 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 w = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + 1
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
@@ -4335,7 +4335,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then
@@ -4369,9 +4369,9 @@ SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -4406,7 +4406,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -4430,9 +4430,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = vbNullString Then Exit Sub
-OldLcid = mDoc.lcid
+OldLcid = mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.lcid = TempLcid
+If TempLcid <> 0 Then mDoc.LCID = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -4539,7 +4539,7 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.dropkey = False
 End If
-mDoc.lcid = OldLcid
+mDoc.LCID = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus

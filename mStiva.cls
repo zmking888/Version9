@@ -321,6 +321,17 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
+Public Sub PushOptional()
+Dim aa As New VarItem
+aa.Typename = ">"
+aa.ItemDouble = 0
+If mstack.Count = 0 Then
+mstack.Add aa
+Else
+mstack.Add aa, , 1
+End If
+Inc
+End Sub
 Public Sub PushValLong(a As Variant)
 Dim aa As New VarItem
 aa.Typename = "L"
@@ -389,9 +400,9 @@ If mMany > 0 Then
 LookTopVal = mstack.item(1).ItemDouble
 End If
 End Property
-Public Property Get LookNVal(N As Long) As Variant
+Public Property Get LookNVal(n As Long) As Variant
 On Error Resume Next
-LookNVal = mstack.item(N).ItemVariant
+LookNVal = mstack.item(n).ItemVariant
 End Property
 
 Public Property Get PopVal() As Variant

@@ -20,7 +20,7 @@ Dim t() As Long
 Dim paramnum As Long
 Public FreeHere As Boolean
 
-Public Sub CallThis(ByVal vNewValue As String, paramList As String, lang As Long)
+Public Sub CallThis(ByVal vNewValue As String, paramList As String, Lang As Long)
 Dim l As Long, check$, m As Long
 l = InStr(vNewValue, ".")
 If l <> 0 Then
@@ -34,14 +34,14 @@ mConctruct = paramList
 If InStr(vNewValue, ".dll") > 0 Then
 mLib = mLib + ".dll"
 End If
-If mFunction Like "dll.*" Then
+If LCase(mFunction) Like "dll.*" Then
 mFunction = Mid$(mFunction, 5)
-ElseIf mFunction Like "dll*" Then
+ElseIf LCase(mFunction) Like "dll*" Then
 mFunction = Mid$(mFunction, 4)
 End If
 Do While paramList <> ""
 
- If IsLabelSymbolNew(paramList, "ÌÁÊÑÕÓ", "LONG", lang) Then
+ If IsLabelSymbolNew(paramList, "ÌÁÊÑÕÓ", "LONG", Lang) Then
  If FastSymbol(paramList, "&") Then l = 16 Else l = 0
  If IsPureLabel(paramList, check$) = 1 Then
  'OK
@@ -90,7 +90,7 @@ End Function
 Public Function IsArrayItem(there As Long) As Boolean
 IsArrayItem = (t(there) And &HF) > 4
 End Function
-Public Function CheckType(there As Long, ByVal thistype As Long) As Boolean
+Public Function checktype(there As Long, ByVal thistype As Long) As Boolean
 Select Case thistype
 Case 1, 4, 5, 7
 thistype = 1
@@ -99,9 +99,9 @@ thistype = 2
 End Select
 Select Case (t(there) And &HF)
 Case 1, 4, 5, 7
-CheckType = thistype = 1
+checktype = thistype = 1
 Case Else
-CheckType = thistype = 2
+checktype = thistype = 2
 End Select
 End Function
 Public Function IsByRef(there As Long) As Boolean

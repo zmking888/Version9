@@ -123,7 +123,17 @@ If Not StaticCollection.Find(name$) Then Exit Function
             
             Select Case ss$
             Case "!!", "~"
-            .Value = -1 - (.Value <> 0)
+     
+             Select Case VarType(.Value)
+                        Case vbBoolean
+                            .Value = Not CBool(.Value)
+                        Case vbCurrency
+                            .Value = CCur(Not CBool(.Value))
+                        Case vbDecimal
+                            .Value = CDec(Not CBool(.Value))
+                        Case Else
+                            .Value = CDbl(Not CBool(.Value))
+                        End Select
             Case "++"
             .Value = .Value + 1
             Case "--"
@@ -161,7 +171,7 @@ If Not StaticCollection.Find(name$) Then Exit Function
             End With
    AlterVar = True
 End Function
-Static Function MyRound(a As Variant, Optional ByVal i As Integer = 13)
+Static Function MyRound(a As Variant, Optional ByVal i As Integer = 0)
 Dim c As Variant, j As VbVarType
 Dim n(1 To 28) As Single, d(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
 Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
@@ -178,15 +188,19 @@ If n(1) = 0 Then
     For c = 1& To 6&
         n(c) = CSng(10 ^ c)
     Next c
-    For c = 7& To 28&
+    For c = 7& To 27&
         n(c) = CSng(-1)
     Next c
+        n(c) = CSng(10 ^ 5)
+        n(10) = CSng(10 ^ 5)
     For c = 1& To 13&
         d(c) = CDbl(10 ^ c)
     Next c
-    For c = 14& To 28&
+    For c = 14& To 27&
         d(c) = CDbl(-1)
     Next c
+    d(c) = CDbl(10 ^ 13)
+    
     For c = 1& To 3&
         cur(c) = CCur(10 ^ c)
     Next c
@@ -213,6 +227,7 @@ End If
             Exit Function
         Case vbDouble
             c = sg4(Sgn(a))
+ 
             If d(i) > 0 Then
                 MyRound = Fix(a * d(i) + c) / d(i)
             Else
@@ -241,8 +256,6 @@ Err.Clear
 MyRound = a
 If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγύλευσης εκτός περιοχής από 0 έως 28"
 End Function
-
-
 
 Public Function ExistVar(ByVal name$) As Boolean
         ExistVar = StaticCollection.ExistKey(name$)

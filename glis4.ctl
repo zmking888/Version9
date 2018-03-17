@@ -62,7 +62,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'m2000 ver 8.7
+'m2000 ver 9.2
 Option Explicit
 Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
@@ -317,7 +317,7 @@ Public WordCharRight As String
 Public WordCharRightButIncluded As String
 Public DropEnabled As Boolean
 Public DragEnabled As Boolean
-Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
@@ -536,7 +536,7 @@ End Sub
 Private Sub CalcAndShowBar1()
 Dim oldvalue As Long, oldmax As Long
 oldvalue = Value
-oldmax = Max
+oldmax = max
 On Error GoTo calcend
 state = True
 
@@ -544,14 +544,14 @@ state = True
             Err.Clear
     If Not Spinner Then
             If listcount - 1 - lines < 1 Then
-            Max = 1
+            max = 1
             Else
-            Max = listcount - 1 - lines
+            max = listcount - 1 - lines
             largechange = lines
             End If
             If Err.Number > 0 Then
                 Value = listcount - 1
-                Max = listcount - 1
+                max = listcount - 1
             End If
                       Value = topitem
         End If
@@ -2123,7 +2123,7 @@ With PropBag
 m_sync = .ReadProperty("sync", m_def_sync)
 NoFire = True
 Value = .ReadProperty("Value", 0)
-Max = .ReadProperty("Max", 100)
+max = .ReadProperty("Max", 100)
 Min = .ReadProperty("Min", 0)
 largechange = .ReadProperty("LargeChange", 1)
 smallchange = .ReadProperty("SmallChange", 1)
@@ -2194,7 +2194,7 @@ Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
 With PropBag
      .WriteProperty "sync", m_sync, m_def_sync
     .WriteProperty "Value", Value, 0
-    .WriteProperty "Max", Max, 100
+    .WriteProperty "Max", max, 100
     .WriteProperty "Min", Min, 0
     .WriteProperty "LargeChange", largechange, 1
     .WriteProperty "SmallChange", smallchange, 1
@@ -2534,7 +2534,7 @@ If MultiLineEditBox Then FindRealCursor item
         
             If SELECTEDITEM = listcount Then
             state = True
-            Value = Max
+            Value = max
             state = False
             End If
             
@@ -2797,13 +2797,13 @@ topitem = 0
             Err.Clear
     If Not Spinner Then
             If listcount - 1 - lines < 1 Then
-            Max = 1
+            max = 1
             Else
-            Max = listcount - 1 - lines
+            max = listcount - 1 - lines
             End If
             If Err.Number > 0 Then
                 Value = listcount - 1
-                Max = listcount - 1
+                max = listcount - 1
             End If
                       Value = j
 
@@ -2817,10 +2817,10 @@ Else
         On Error Resume Next
         Err.Clear
         If Not Spinner Then
-        Max = listcount - 1
+        max = listcount - 1
         If Err.Number > 0 Then
             Value = listcount - 1
-            Max = listcount - 1
+            max = listcount - 1
         End If
         End If
     state = False
@@ -3567,14 +3567,14 @@ End If
 If newheight <= 0 Then
 
 Else
-        minimumWidth = (1 - (Max - Min) / (largechange + Max - Min)) * newheight * (1 - Percent * 2) + 1
+        minimumWidth = (1 - (max - Min) / (largechange + max - Min)) * newheight * (1 - Percent * 2) + 1
         If minimumWidth < 60 Then
         
-        mLargeChange = Round(-(Max - Min) / ((60 - 1) / newheight / (1 - Percent * 2) - 1) - Max + Min) + 1
+        mLargeChange = Round(-(max - Min) / ((60 - 1) / newheight / (1 - Percent * 2) - 1) - max + Min) + 1
         
-        minimumWidth = (1 - (Max - Min) / (largechange + Max - Min)) * newheight * (1 - Percent * 2) + 1
+        minimumWidth = (1 - (max - Min) / (largechange + max - Min)) * newheight * (1 - Percent * 2) + 1
         End If
-        valuepoint = (Value - Min) / (largechange + Max - Min) * (newheight * (1 - 2 * Percent)) + newheight * Percent
+        valuepoint = (Value - Min) / (largechange + max - Min) * (newheight * (1 - 2 * Percent)) + newheight * Percent
 
        Shape Shape1, width - barwidth, newTop + valuepoint, barwidth, minimumWidth
        Shape Shape2, width - barwidth, newTop + newheight * (1 - Percent), barwidth, newheight * Percent ' newtop + newheight * Percent - scrTwips
@@ -3614,11 +3614,11 @@ mSmallChange = RHS
 showshapes
 PropertyChanged "SmallChange"
 End Property
-Private Property Get Max() As Long
-Max = mmax
+Private Property Get max() As Long
+max = mmax
 End Property
 
-Private Property Let Max(ByVal RHS As Long)
+Private Property Let max(ByVal RHS As Long)
 If Min > RHS Then RHS = Min
 If mValue > RHS Then mValue = RHS  ' change but not send event
 If RHS = 0 Then RHS = 1
@@ -3635,14 +3635,14 @@ If Spinner Then
 mpercent = 0.33
 mmax = high
 mmin = low
-mLargeChange = (Max - Min) * 0.2
+mLargeChange = (max - Min) * 0.2
 mSmallChange = stepbig
 mjumptothemousemode = True
 End If
 End Sub
 
 Private Property Let Min(ByVal RHS As Long)
-If Max <= RHS Then RHS = Max
+If max <= RHS Then RHS = max
 If mValue < RHS Then mValue = RHS  ' change but not send event
 
 mmin = RHS
@@ -3859,7 +3859,7 @@ End Sub
 Public Property Let Value(ByVal RHS As Long)
 ' Dim oldvalue As Long
 If RHS < Min Then RHS = Min
-If RHS > Max Then RHS = Max
+If RHS > max Then RHS = max
 If state And Spinner Then
 'don't fix the value
 Else
@@ -3884,13 +3884,13 @@ Public Property Let ValueSilent(ByVal RHS As Long)
 If Spinner Then
 ' no events
 If RHS < Min Then RHS = Min
-If RHS > Max Then RHS = Max
-mValue = Max - RHS + Min
+If RHS > max Then RHS = max
+mValue = max - RHS + Min
 showshapes
 End If
 End Property
 Public Property Get ValueSilent() As Long
-ValueSilent = Max - mValue + Min
+ValueSilent = max - mValue + Min
 End Property
 Private Property Get BarVisible() As Boolean
 BarVisible = Shape1.Visible
@@ -4007,7 +4007,7 @@ If Spinner Then
         End If
     End If
 Else
-If Value + largechange + 1 <= Max Then
+If Value + largechange + 1 <= max Then
 Value = Value + mSmallChange
 End If
 End If
@@ -4084,7 +4084,7 @@ processXY = True
             If y > Round(newheight * (1 - Percent)) - minimumWidth + newheight * Percent Then
             y = newheight * (1 - Percent) - minimumWidth
             End If
-            checknewvalue = Round((y - newheight * Percent) * (Max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
+            checknewvalue = Round((y - newheight * Percent) * (max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
             If checknewvalue = Value And mjumptothemousemode Then
                  ' do nothing
                 
@@ -4144,7 +4144,7 @@ processXY = True
             If x > Round(.width * (1 - Percent)) - minimumWidth + .width * Percent Then
             x = .width * (1 - Percent) - minimumWidth
             End If
-            checknewvalue = Round((x - .width * Percent) * (Max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
+            checknewvalue = Round((x - .width * Percent) * (max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
             If checknewvalue = Value And mjumptothemousemode Then
             ' do nothing
             Else
@@ -4205,10 +4205,10 @@ End If
         Value = Min
         ElseIf ForValidValue > ((newheight * (1 - Percent) - minimumWidth)) Then
         ForValidValue = ((newheight * (1 - Percent) - minimumWidth))
-        Value = Max
+        Value = max
         Else
 
-         Value = Round((ForValidValue - newheight * Percent) * (Max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
+         Value = Round((ForValidValue - newheight * Percent) * (max - Min) / ((newheight * (1 - Percent) - minimumWidth) - newheight * Percent)) + Min
          
         End If
     
@@ -4221,9 +4221,9 @@ Else
         Value = Min
         ElseIf ForValidValue > ((.width * (1 - Percent) - minimumWidth)) Then
         ForValidValue = ((.width * (1 - Percent) - minimumWidth))
-        Value = Max
+        Value = max
         Else
-        Value = Round((ForValidValue - .width * Percent) * (Max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
+        Value = Round((ForValidValue - .width * Percent) * (max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
         
         End If
       
@@ -4349,24 +4349,24 @@ Public Sub REALCUR(ByVal s$, ByVal probeX As Single, realpos As Long, usedCharLe
 ' for a probeX (maybe a cursor position or a wrapping point) we want to know for a S$, what is the real posistion in realpos,
 ' and how match is the length of S$ in the left side of that position
 
-Dim N As Long, st As Long, st1 As Long, st0 As Long
+Dim n As Long, st As Long, st1 As Long, st0 As Long
 'probeX = probeX - scrollme
 'If Not notextonly Then probeX = probeX - UserControlTextWidth("W") ' Else' probeX = probeX + 2 * scrTwips
 
-N = UserControlTextWidth(s$)
+n = UserControlTextWidth(s$)
 
 If CenterText Then
-probeX = scrollme / 2 + probeX - LeftMarginPixels * scrTwips - (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - N) / 2 + 2 * scrTwips
+probeX = scrollme / 2 + probeX - LeftMarginPixels * scrTwips - (UserControl.ScaleWidth - LeftMarginPixels * scrTwips - n) / 2 + 2 * scrTwips
 Else
 probeX = probeX - LeftMarginPixels * scrTwips + 2 * scrTwips
 End If
 
-If probeX > N Then
+If probeX > n Then
 If s$ = vbNullString Then
 realpos = 0
 usedCharLength = 1
 Else
-realpos = N
+realpos = n
 usedCharLength = Len(s$)
 End If
 Else
@@ -4455,19 +4455,19 @@ BreakLine = data <> ""
 End Function
 Public Sub REALCURb(ByVal s$, ByVal probeX As Single, realpos As Long, usedCharLength As Long, Optional notextonly As Boolean = False)
 ' this is for breakline only
-Dim N As Long, st As Long, st1 As Long, st0 As Long
+Dim n As Long, st As Long, st1 As Long, st0 As Long
 
 If Not notextonly Then probeX = probeX - UserControlTextWidth("W") ' Else' probeX = probeX + 2 * scrTwips
-N = UserControlTextWidth(s$)
+n = UserControlTextWidth(s$)
 
 probeX = probeX - 2 * LeftMarginPixels * scrTwips - 2 * scrTwips
 
-If probeX > N Then
+If probeX > n Then
 If s$ = vbNullString Then
 realpos = 0
 usedCharLength = 1
 Else
-realpos = N
+realpos = n
 usedCharLength = Len(s$) + 1
 End If
 Else

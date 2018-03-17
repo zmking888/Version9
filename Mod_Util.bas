@@ -46,11 +46,11 @@ Private Const C3_DIACRITIC As Long = &H2
 Private Const CT_CTYPE3 As Byte = &H4
 Private Declare Function GetStringTypeExW Lib "kernel32.dll" (ByVal Locale As Long, ByVal dwInfoType As Long, ByVal lpSrcStr As Long, ByVal cchSrc As Long, ByRef lpCharType As Byte) As Long
 Private Declare Function SetTextCharacterExtra Lib "gdi32" (ByVal hdc As Long, ByVal nCharExtra As Long) As Long
-Private Declare Function WideCharToMultiByte Lib "KERNEL32" (ByVal codepage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
+Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal codepage As Long, ByVal dwFlags As Long, ByVal lpWideCharStr As Long, ByVal cchWideChar As Long, ByVal lpMultiByteStr As Long, ByVal cchMultiByte As Long, ByVal lpDefaultChar As Long, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Public iamactive As Boolean
-Declare Function MultiByteToWideChar& Lib "KERNEL32" (ByVal codepage&, ByVal dwFlags&, MultiBytes As Any, ByVal cBytes&, ByVal pWideChars&, ByVal cWideChars&)
-Private Declare Function FillRect Lib "User32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Declare Function MultiByteToWideChar& Lib "kernel32" (ByVal codepage&, ByVal dwFlags&, MultiBytes As Any, ByVal cBytes&, ByVal pWideChars&, ByVal cWideChars&)
+Private Declare Function FillRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
 
 Public Type RECT
@@ -83,16 +83,16 @@ Private Const DT_TOP As Long = &H0&
 Private Const DT_VCENTER As Long = &H4&
 Private Const DT_WORDBREAK As Long = &H10&
 Private Const DT_WORD_ELLIPSIS As Long = &H40000
-Public Declare Function DestroyCaret Lib "User32" () As Long
-Public Declare Function CreateCaret Lib "User32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Public Declare Function ShowCaret Lib "User32" (ByVal hWND As Long) As Long
-Public Declare Function GetFocus Lib "User32" () As Long
-Public Declare Function SetCaretPos Lib "User32" (ByVal x As Long, ByVal y As Long) As Long
-Public Declare Function HideCaret Lib "User32" (ByVal hWND As Long) As Long
+Public Declare Function DestroyCaret Lib "user32" () As Long
+Public Declare Function CreateCaret Lib "user32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Public Declare Function ShowCaret Lib "user32" (ByVal hWND As Long) As Long
+Public Declare Function GetFocus Lib "user32" () As Long
+Public Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
+Public Declare Function HideCaret Lib "user32" (ByVal hWND As Long) As Long
 Const dv = 0.877551020408163
 Public QUERYLIST As String
 Public LASTQUERYLIST As Long
-Private Declare Function GetSysColor Lib "User32" (ByVal nIndex As Long) As Long
+Private Declare Function GetSysColor Lib "user32" (ByVal nIndex As Long) As Long
 Public releasemouse As Boolean
 Public LASTPROG$
 Public NORUN1 As Boolean
@@ -110,8 +110,8 @@ Public Const SRCCOPY = &HCC0020
 Public Release As Boolean
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 Declare Function RoundRect Lib "gdi32" (ByVal hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal y3 As Long) As Long
-Declare Function UpdateWindow Lib "User32" (ByVal hWND As Long) As Long
-Declare Function ScrollDC Lib "User32" (ByVal hdc As Long, ByVal dX As Long, ByVal dy As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
+Declare Function UpdateWindow Lib "user32" (ByVal hWND As Long) As Long
+Declare Function ScrollDC Lib "user32" (ByVal hdc As Long, ByVal dX As Long, ByVal dy As Long, lprcScroll As RECT, lprcClip As RECT, ByVal hrgnUpdate As Long, lprcUpdate As RECT) As Long
 Public LastErName As String
 Public LastErNameGR As String
 Public LastErNum As Long
@@ -122,8 +122,8 @@ Type POINTAPI
         x As Long
         y As Long
 End Type
-Declare Function GetDC Lib "User32" (ByVal hWND As Long) As Long
-Declare Function PaintDesktop Lib "User32" (ByVal hdc As Long) As Long
+Declare Function GetDC Lib "user32" (ByVal hWND As Long) As Long
+Declare Function PaintDesktop Lib "user32" (ByVal hdc As Long) As Long
 Declare Function SelectClipPath Lib "gdi32" (ByVal hdc As Long, ByVal iMode As Long) As Long
   Public Const RGN_AND = 1
     Public Const RGN_COPY = 5
@@ -160,12 +160,13 @@ Global Const HWND_TOPMOST = -1
 Global Const HWND_NOTOPMOST = -2
 Global Const SWP_NOACTIVATE = &H10
 Global Const SWP_SHOWWINDOW = &H40
-Declare Sub SetWindowPos Lib "User32" (ByVal hWND As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
+Declare Sub SetWindowPos Lib "user32" (ByVal hWND As Long, ByVal hWndInsertAfter As Long, ByVal x As Long, ByVal y As Long, ByVal cX As Long, ByVal cY As Long, ByVal wFlags As Long)
 Declare Function ExtFloodFill Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long, ByVal wFillType As Long) As Long
 Public Const FLOODFILLSURFACE = 1
 Public Const FLOODFILLBORDER = 0
 
 Public avifile As String
+Public BigPi As Variant
 Public Const Pi = 3.14159265358979
 Public Const PI2 = 6.28318530717958
 Public Result As Long
@@ -234,7 +235,7 @@ End Type
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal y3 As Long) As Long
 
 Private Declare Function PathToRegion Lib "gdi32" (ByVal hdc As Long) As Long
-Private Declare Function SetWindowRgn Lib "User32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
+Private Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Boolean) As Long
 Private Declare Function CreateFontIndirect Lib "gdi32" Alias "CreateFontIndirectA" (lpLogFont As LOGFONT) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -257,19 +258,19 @@ Const DFC_POPUPMENU = 5            'Only Win98/2000 !!
 Const DFCS_BUTTON3STATE = &H10
 Const DC_GRADIENT = &H20          'Only Win98/2000 !!
 
-Private Declare Function DrawCaption Lib "User32" (ByVal hWND As Long, ByVal hdc As Long, pcRect As RECT, ByVal un As Long) As Long
-Private Declare Function DrawEdge Lib "User32" (ByVal hdc As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
-Private Declare Function DrawFocusRect Lib "User32" (ByVal hdc As Long, lpRect As RECT) As Long
-Private Declare Function DrawFrameControl Lib "User32" (ByVal hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
-Private Declare Function DrawText Lib "User32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function SetRect Lib "User32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
-Private Declare Function OffsetRect Lib "User32" (lpRect As RECT, ByVal x As Long, ByVal y As Long) As Long
+Private Declare Function DrawCaption Lib "user32" (ByVal hWND As Long, ByVal hdc As Long, pcRect As RECT, ByVal un As Long) As Long
+Private Declare Function DrawEdge Lib "user32" (ByVal hdc As Long, qrc As RECT, ByVal edge As Long, ByVal grfFlags As Long) As Long
+Private Declare Function DrawFocusRect Lib "user32" (ByVal hdc As Long, lpRect As RECT) As Long
+Private Declare Function DrawFrameControl Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal un1 As Long, ByVal un2 As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function SetRect Lib "user32" (lpRect As RECT, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function OffsetRect Lib "user32" (lpRect As RECT, ByVal x As Long, ByVal y As Long) As Long
 ''API declarations
 ' old api..
 'Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (ByVal lpFileName As String) As Long
 'Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
-Public Declare Function GetCursorPos Lib "User32" (lpPoint As POINTAPI) As Long
-Private Declare Function GetAsyncKeyState Lib "User32" _
+Public Declare Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As Long
+Private Declare Function GetAsyncKeyState Lib "user32" _
     (ByVal vKey As Long) As Long
 Public TextEditLineHeight As Long
 Public LablelEditLineHeight As Long
@@ -361,6 +362,10 @@ End Sub
 Public Sub Unsignlongfailed(a$)
 MyErMacro a$, "Unsign long to sign failed", "Η μετατροπή πληθικού σε ακέραιο με πρόσημο, απέτυχε"
 End Sub
+Public Sub NoProperObject()
+MyEr "This object not supported", "Αυτό το αντικείμενο δεν υποστηρίζεται"
+End Sub
+
 Public Sub MyEr(er$, ergr$)
 If Left$(LastErName, 1) = Chr(0) Then
     LastErName = vbNullString
@@ -4525,7 +4530,7 @@ End With
 End Sub
 Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, ByVal yy1&, ByVal yy2&, ByVal hor As Boolean, ByVal all As Boolean)
     Dim Redval&, Greenval&, Blueval&
-    Dim r1&, g1&, b1&, sr&, sg&, sb&
+    Dim r1&, g1&, b1&, sr&, SG&, sb&
     F& = F& Mod &H1000000
     t& = t& Mod &H1000000
     Redval& = F& And &H10000FF
@@ -4535,7 +4540,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
     g1& = (t& And &H100FF00) / &H100
     b1& = (t& And &HFF0000) / &H10000
     sr& = (r1& - Redval&) * 1000 / 127
-    sg& = (g1& - Greenval&) * 1000 / 127
+    SG& = (g1& - Greenval&) * 1000 / 127
     sb& = (b1& - Blueval&) * 1000 / 127
     Redval& = Redval& * 1000
     
@@ -4581,7 +4586,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
         TheObject.Line (FillLeft, RMAX(FillTop, yy1&))-(FillRight, RMIN(FillBottom, yy2&)), rgb(Redval& / 1000, Greenval& / 1000, Blueval& / 1000), BF
         End If
         Redval& = Redval& + sr&
-        Greenval& = Greenval& + sg&
+        Greenval& = Greenval& + SG&
         Blueval& = Blueval& + sb&
         FillTop = FillBottom
         FillBottom = FillTop + Step
@@ -4590,7 +4595,7 @@ Sub Gradient(TheObject As Object, ByVal F&, ByVal t&, ByVal xx1&, ByVal xx2&, By
         TheObject.Line (RMAX(FillLeft, xx1&), FillTop)-(RMIN(FillRight, xx2&), FillBottom), rgb(Redval& / 1000, Greenval& / 1000, Blueval& / 1000), BF
         End If
         Redval& = Redval& + sr&
-        Greenval& = Greenval& + sg&
+        Greenval& = Greenval& + SG&
         Blueval& = Blueval& + sb&
         FillLeft = FillRight
         FillRight = FillRight + Step
@@ -5225,7 +5230,7 @@ Do While pos <= Len(a$)
             'hexadecimal literal number....
                 pos = pos + 2
                 Do While pos <= Len(a$)
-                If Not Mid$(a$, pos, 1) Like "[0123456789abcdefABCDEF]" Then Exit Do
+                If Not Mid$(a$, pos, 1) Like "[0-9a-fA-F]" Then Exit Do
                 pos = pos + 1
                 Loop
                 b$ = b$ & "N"
@@ -6594,7 +6599,7 @@ Public Sub AssigntoNothing()
   MyEr "Bad object declaration - use Declare command", "Λάθος όρισμα αντικειμένου - χρησιμοποίησε την Όρισε"
 End Sub
 Public Sub Overflow()
- MyEr "Overflow long", "υπερχείλιση μακρύ"
+ MyEr "Overflow", "υπερχείλιση"
 End Sub
 Public Sub MissCdibStr()
   MyEr "Missing IMAGE in string", "Λείπει εικόνα στο αλφαριθμητικό"
@@ -6607,6 +6612,9 @@ Public Sub MissStackItem()
 End Sub
 Public Sub MissStackNumber()
  MyEr "Missing number value from stack", "Λείπει αριθμός από το σωρό"
+End Sub
+Public Sub missNumber()
+MyEr "Only number allowed", "Μόνο αριθμός επιτρέπεται"
 End Sub
 Public Sub MissNumExpr()
 MyEr "Missing number expression", "Λείπει αριθμητική παράσταση"
@@ -6629,6 +6637,10 @@ End Sub
 Public Sub MissDir()
 MyEr "Missing directory name", "Λείπει όνομα φακέλου"
 End Sub
+Public Sub MissType()
+MyEr "Wrong data type", "Άλλος τύπος μεταβλητής"
+End Sub
+
 Public Sub BadPath()
 MyEr "Bad Path name", "Λάθος στο όνομα φακέλου (τόπο)"
 End Sub
