@@ -2853,6 +2853,7 @@ End If
 Form1.DIS.Visible = True
 FrameText d, SzOne, (.width + .Left - 1 - Form1.Left), (.Height + .Top - 1 - Form1.Top), PaperOne
 End With
+Form1.DIS.BackColor = mycolor(PaperOne)
 If lckfrm = 0 Then
 SetText d
 bstack.Owner.Font.charset = bstack.myCharSet
@@ -2870,6 +2871,7 @@ StoreFont bstack.Owner.Font.name, SzOne, bstack.myCharSet
 .MAXXGRAPH = Form1.width
 .MAXYGRAPH = Form1.Height
 .Paper = bstack.Owner.BackColor
+.mypen = mycolor(PenOne)
 End With
 
 
@@ -6891,6 +6893,9 @@ Public Sub GroupCantSetValue()
 End Sub
 Public Sub PropCantChange()
 MyEr "Property can't change", "Η ιδιότητα δεν μπορεί να αλλάξει"
+End Sub
+Public Sub NeedAGroupFromExpression()
+MyEr "Need a group from expression", "Χρειάζομαι μια ομάδα από την έκφραση"
 End Sub
 Public Sub NeedAGroupInRightExpression()
 MyEr "Need a group from right expression", "Χρειάζομαι μια ομάδα από την δεξιά έκφραση"

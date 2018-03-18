@@ -223,7 +223,7 @@ Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 
 Public ShadowMarks As Boolean
 Private nochange As Boolean
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
-Private Declare Function EmptyClipboard Lib "User32" () As Long
+Private Declare Function EmptyClipboard Lib "user32" () As Long
 Public MY_BACK As New cDIBSection
 Private mynum$
 Dim OneOnly As Boolean
@@ -235,11 +235,11 @@ Attribute HTML.VB_VarHelpID = -1
 Private DisStack As basetask
 Private MeStack As basetask
 Dim lookfirst As Boolean, look1 As Boolean
-Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "User32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -256,7 +256,7 @@ End Type
 End Type
 Public Point2Me As Object
 
-Private Declare Function GetCommandLineW Lib "KERNEL32" () As Long
+Private Declare Function GetCommandLineW Lib "kernel32" () As Long
 
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Ptr As Long, ByVal Value As Long)
 Private Declare Function SysAllocStringLen Lib "oleaut32" (ByVal Ptr As Long, ByVal Length As Long) As Long
@@ -655,9 +655,9 @@ TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -691,7 +691,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -715,9 +715,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = vbNullString Then Exit Sub
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -823,7 +823,7 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 TEXT1.glistN.dropkey = False
 End If
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 TEXT1.Render
 
@@ -842,9 +842,9 @@ w = TEXT1.mDoc.MarkParagraphID   ' this is the not the order
 TEXT1.SelStartSilent = TEXT1.SelStart
 l = TEXT1.Charpos + 1
 
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not TEXT1.mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
@@ -861,7 +861,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 End Sub
 
 Public Sub supsub()
@@ -876,9 +876,9 @@ Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 w = TEXT1.mDoc.MarkParagraphID
 TEXT1.SelStartSilent = TEXT1.SelStart - (TEXT1.SelLength > 1)
 l = TEXT1.Charpos + 1
-OldLcid = TEXT1.mDoc.lcid
+OldLcid = TEXT1.mDoc.LCID
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not TEXT1.mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
@@ -895,7 +895,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
-TEXT1.mDoc.lcid = OldLcid
+TEXT1.mDoc.LCID = OldLcid
 End Sub
 Public Function InIDECheck() As Boolean
     m_bInIDE = True
@@ -1844,7 +1844,16 @@ Else
    cLine = vbNullString
 End If
 
-If Not MOUT Then NOEXECUTION = False: ResetBreak: MOUT = interpret(basestack1, "START"): qq$ = vbNullString: mybasket = players(DisForm)
+If Not MOUT Then
+NOEXECUTION = False
+ResetBreak
+MOUT = interpret(basestack1, "START")
+qq$ = vbNullString
+
+MOUT = interpret(basestack1, "cls")
+
+mybasket = players(DisForm)
+End If
 
 Loop Until qq$ <> ""
 
@@ -2846,7 +2855,7 @@ End If
     TEXT1.Font.bold = basestack.myBold
     List1.Font.charset = basestack.myCharSet
     List1.Font.bold = basestack.myBold
-
+  
         Select Case pagio$
         Case "GREEK"
          GREEK basestack1

@@ -31,7 +31,7 @@ Dim tm As TEXTMETRIC
 
 Public osnum As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
-Private Declare Function GetSystemMetrics Lib "User32" _
+Private Declare Function GetSystemMetrics Lib "user32" _
     (ByVal nIndex As Long) As Long
 Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
@@ -47,10 +47,10 @@ Public sumhDC As Long  ' check it
 Public Rixecode As String
 Public MYSCRnum2stop As Long
 Public octava As Integer, NOTA As Integer, ENTASI As Long
-Private Declare Sub Sleep Lib "KERNEL32" (ByVal dwMilliseconds As Long)
+Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 Const Face$ = "C C#D D#E F F#G G#A A#B  "
 Public CLICK_COUNT As Long
-Private Declare Function GetVersionExA Lib "KERNEL32" (lpVersionInformation As OSVERSIONINFO) As Long
+Private Declare Function GetVersionExA Lib "kernel32" (lpVersionInformation As OSVERSIONINFO) As Long
 Private Type OSVERSIONINFO
     dwOSVersionInfoSize As Long
     dwMajorVersion As Long
@@ -89,7 +89,7 @@ End Type
 Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
-Public Declare Function SetWindowRgn Lib "User32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
+Public Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
 Private Declare Function ExtCreateRegion Lib "gdi32.dll" (ByRef lpXform As Any, ByVal nCount As Long, lpRgnData As Any) As Long
 Private Declare Function GetRegionData Lib "gdi32.dll" (ByVal hRgn As Long, ByVal dwCount As Long, ByRef lpRgnData As Any) As Long
 Private Type XFORM  ' used for stretching/skewing a region
@@ -102,7 +102,7 @@ Private Type XFORM  ' used for stretching/skewing a region
 End Type
 Public Const RGN_OR = 2
 '**********************************
-Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
@@ -141,18 +141,18 @@ Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByV
 Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long) As Long
 Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
-Private Declare Function GetDC Lib "User32" (ByVal hWND As Long) As Long
-Private Declare Function GetDesktopWindow Lib "User32" () As Long
-Private Declare Function ReleaseDC Lib "User32" (ByVal hWND As Long, ByVal hdc As Long) As Long
+Private Declare Function GetDC Lib "user32" (ByVal hWND As Long) As Long
+Private Declare Function GetDesktopWindow Lib "user32" () As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWND As Long, ByVal hdc As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
-Private Declare Function RegisterClipboardFormat Lib "User32" Alias _
+Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
 Private m_cfHTMLClipFormat As Long
-Private Declare Function OpenClipboard Lib "User32" (ByVal hWND As Long) As Long
-Private Declare Function CloseClipboard Lib "User32" () As Long
-Private Declare Function SetClipboardData Lib "User32" (ByVal wFormat As Long, ByVal hMem As Long) As Long
-Private Declare Function EmptyClipboard Lib "User32" () As Long
-Private Declare Function GetClipboardData Lib "User32" _
+Private Declare Function OpenClipboard Lib "user32" (ByVal hWND As Long) As Long
+Private Declare Function CloseClipboard Lib "user32" () As Long
+Private Declare Function SetClipboardData Lib "user32" (ByVal wFormat As Long, ByVal hMem As Long) As Long
+Private Declare Function EmptyClipboard Lib "user32" () As Long
+Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
  Public Const CF_UNICODETEXT = 13
    Declare Function InitializeSecurityDescriptor Lib "advapi32.dll" ( _
@@ -164,13 +164,13 @@ Private Declare Function GetClipboardData Lib "User32" _
       ByVal bDaclPresent As Long, _
       ByVal pDacl As Long, _
       ByVal bDaclDefaulted As Long) As Long
- Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
-Private Declare Function IsClipboardFormatAvailable Lib "User32" _
+ Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
 
 Private Const GMEM_DDESHARE = &H2000
@@ -207,7 +207,7 @@ Private Type MEMORYSTATUS
     dwTotalVirtual As Long
     dwAvailVirtual As Long
 End Type
-Private Declare Sub GlobalMemoryStatus Lib "KERNEL32" (lpBuffer As MEMORYSTATUS)
+Private Declare Sub GlobalMemoryStatus Lib "kernel32" (lpBuffer As MEMORYSTATUS)
 Public Declare Function joyGetPosEx Lib "winmm.dll" (ByVal uJoyID As Long, pji As JOYINFOEX) As Long
 Public Declare Function joyGetDevCapsA Lib "winmm.dll" (ByVal uJoyID As Long, pjc As JOYCAPS, ByVal cjc As Long) As Long
 
@@ -2831,7 +2831,7 @@ Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$("
 Case "TO", "TODAY", "TONE", "TOP", "TRIM$(", "TRUE", "TRY", "TUNE", "TWIPSX"
-Case "TWIPSY", "TYPE", "TYPE$(", "UCASE$(", "UINT(", "UNDER", "UNION.DATA$(", "UNIQUE", "UNTIL"
+Case "TWIPSY", "TYPE", "TYPE$(", "UCASE$(", "UINT(", "UNARY", "UNDER", "UNION.DATA$(", "UNIQUE", "UNTIL"
 Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WIDE", "WIDTH", "WIN", "WINDOW"
@@ -2871,7 +2871,7 @@ Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$
 Case "коцийо", "коцийос", "коцистийо", "коцос", "коцос$(", "кс$", "кж(", "лайяу", "лайяус", "ле", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "леходос", "лекос$(", "лекоус.тупос$("
 Case "лекыдиа", "леяос", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "левяи", "лгйос", "лгйос(", "лгйос.елж("
-Case "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
+Case "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
 Case "лпяоста(", "маи", "меа", "мео", "меои", "меос", "мгла", "мглата", "мглата$"
 Case "нейима", "одгциа", "одгцос$(", "охомг", "ойм$(", "олада", "олада(", "олада$(", "олада.сумоко(", "омола", "омола.аявеиоу$("
 Case "омола.аявеиоу.ломо$(", "омола.вягстг$", "ояио.амадяолгс", "ояисе", "ояож(", "оуяа", "ови", "паифеижымг", "паийтгс", "паине", "памта"
@@ -2886,7 +2886,7 @@ Case "стг", "стгкг", "стгкг(", "стгм", "сто", "стой", "стовои", "стовос", "стяоц
 Case "суццяажг", "суцйяиме(", "суцйяоусг(", "суцвымеусе.еццяажо", "сулпиесг", "сулпкгяысг", "сум(", "сумаятгсг", "сумаятгсг$("
 Case "сумаятгсг(", "сумевисе", "сумхгла", "сус", "сусйеуг.пяобокгс$", "сустгла", "сувмотгта(", "свд$(", "сведиа"
 Case "сведио.мглатым", "сыяос", "сыяос(", "сыяос$(", "сыяоутупос$(", "сысе", "сысе.еццяажо", "таимиа", "таимиа.летягтгс", "таимиес"
-Case "танг", "танг(", "танимолгсг", "таутисг(", "таутовяомо", "текестгс", "текийг", "текийо", "текийос", "текос", "текос(", "тий", "титкос.аявеиоу$(", "тилг"
+Case "танг", "танг(", "танимолгсг", "таутисг(", "таутовяомо", "текестг", "текестгс", "текийг", "текийо", "текийос", "текос", "текос(", "тий", "титкос.аявеиоу$(", "тилг"
 Case "тилг(", "тилгсыяоу$(", "тилгсыяоу(", "типота", "титкос", "титкос$(", "тлгла", "тлгла(", "тлгла$", "тлглата", "томос"
 Case "тон.еж(", "топийа", "топийес", "топийг", "топийо", "топийо$(", "топийо(", "топос$(", "топос.аявеиоу$("
 Case "тоте", "тяап(", "тупос", "тупос$(", "тупос.аявеиоу$(", "тупысе", "туваиос", "туваиос(", "тыяа", "у.сглеиа"
@@ -2901,17 +2901,17 @@ ismine = False
 End Select
 End Function
 Private Function IsNumberQuery(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
+Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$, rr As Double
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberQuery = False: Exit Function
-sg = 1
+SG = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
     Case " ", "+" ', ChrW(160)
     Case "-"
-    sg = -sg
+    SG = -SG
     Case Else
     Exit Do
     End Select
@@ -3002,7 +3002,7 @@ Else
     IsNumberQuery = False
     lr = 1
     Else
-    If sg < 0 Then ig$ = "-" & ig$
+    If SG < 0 Then ig$ = "-" & ig$
     Err.Clear
     On Error Resume Next
     n$ = ig$ & DE$ & ex$
@@ -3092,17 +3092,17 @@ r = r - r
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
 Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
-Dim sg As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
+Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$
 If a$ = vbNullString Then IsNumberOnly = False: Exit Function
-sg = 1
+SG = 1
 sng = fr - 1
     Do While sng < Len(a$)
     sng = sng + 1
     Select Case Mid$(a$, sng, 1)
     Case " ", "+"
     Case "-"
-    sg = -sg
+    SG = -SG
     Case Else
     Exit Do
     End Select
@@ -3189,7 +3189,7 @@ Else
         IsNumberOnly = False
         lr = 1
     Else
-        If sg < 0 Then ig$ = "-" & ig$
+        If SG < 0 Then ig$ = "-" & ig$
         If Len(ig$ + DE$) > 13 And ex$ = "" Then
             On Error Resume Next
             If Len(DE$) > 0 Then
@@ -3799,7 +3799,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "PLAYSCORE", 64, "паифеижымг", 64, "MOVIE", 65, "MEDIA", 65, "MUSIC", 65, "таимиа", 65, "лоусийг", 65, "DURATION", 66, "диаяйеиа", 66 _
 , "VOLUME", 67, "емтасг", 67, "TAB", 68, "стгкг", 68, "HEIGHT", 69, "уьос", 69, "POS", 70, "хесг", 70, "ROW", 71, "цяаллг", 71, "TIMECOUNT", 72, "жоятос", 72 _
 , "TICK", 73, "тий", 73, "TODAY", 74, "сглеяа", 74, "NOW", 75, "тыяа", 75, "MENU.VISIBLE", 76, "епикоцес.жамеяес", 76, "MENUITEMS", 77, "епикоцес", 77 _
-, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "паяахуяо", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92)
+, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "паяахуяо", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93)
 For i = 0 To UBound(myid()) Step 2
     aHash.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
 Next i

@@ -174,13 +174,13 @@ End Function
 Static Function MyRound(a As Variant, Optional ByVal i As Integer = 0)
 Dim c As Variant, j As VbVarType
 Dim n(1 To 28) As Single, d(1 To 28) As Double, cur(1 To 28) As Currency, dec(1 To 28) As Variant
-Dim sg(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
+Dim SG(-1 To 1) As Single, sg4(-1 To 1) As Double, sg8(-1 To 1) As Currency
 j = VarType(a)
 If j < vbSingle Then MyRound = a: Exit Function
 On Error GoTo there
 If n(1) = 0 Then
-    sg(-1) = CSng(-0.5)
-    sg(1) = CSng(0.5)
+    SG(-1) = CSng(-0.5)
+    SG(1) = CSng(0.5)
     sg4(-1) = -0.5
     sg4(1) = 0.5
     sg8(-1) = CCur(-0.5)
@@ -219,7 +219,7 @@ End If
         Select Case j
         Case vbSingle
             If n(i) > 0 Then
-                c = sg(Sgn(a))
+                c = SG(Sgn(a))
                 MyRound = Fix(a * n(i) + c) / n(i)
             Else
                 MyRound = a
@@ -642,13 +642,24 @@ Set Owner = Nothing
 Set lastobj = Nothing
 Set FuncObj = Nothing
 End Sub
-
+Public Function IsOptionalForArray(Check As Boolean) As Boolean
+If parentSoros.LookNull Then
+    IsOptionalForArray = False
+ElseIf parentSoros.PopType = ">" Then
+    parentSoros.drop 1
+    IsOptionalForArray = Check
+ElseIf parentSoros.Count = 0 Then
+  IsOptionalForArray = Check
+End If
+End Function
 Public Function IsOptional() As Boolean
 If parentSoros.LookNull Then
     IsOptional = False
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptional = True
+ElseIf parentSoros.Count = 0 Then
+  IsOptional = True
 End If
 End Function
 Public Function IsNumber(r As Variant) As Boolean
@@ -672,6 +683,11 @@ r = parentSoros.PopVariant
 IsVariant = True
 End If
 End Function
+Public Sub RemoveOptionals()
+Do While Not Parent.soros.IsEmpty
+If parentSoros.PopType = ">" Then Parent.soros.drop 1 Else Exit Do
+Loop
+End Sub
 
 Public Function IsObjectRef(r As Object) As Boolean
 If parentSoros.LookNull Then

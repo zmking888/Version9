@@ -268,6 +268,7 @@ StackItemTypeIsObject = True
 End Select
 End Property
 Public Property Get Total() As Long
+If mMany < 0 Then Stop
 Total = mMany
 End Property
 Public Property Get Count() As Long
@@ -277,9 +278,9 @@ Private Sub Inc()
 mMany = mMany + 1
 End Sub
 Private Sub dec()
-''If mMany = 0 Then Stop
-mMany = mMany - 1
 
+mMany = mMany - 1
+'If mMany <> mstack.Count - 1 Then Stop
 End Sub
 Public Sub drop(ByVal items As Long)
 Dim num As Long
@@ -289,13 +290,15 @@ If mMany < 0 Then mMany = 0: Set mstack = New Collection: Exit Sub
 For num = 1 To items
     mstack.Remove 1
 Next num
+'If mMany <> mstack.Count Then Stop
 End Sub
 Public Sub Flush()
 
 Dim num As Long
 For num = 1 To mstack.Count
+dec
   mstack.Remove 1
- dec
+ 
 Next num
 mMany = 0
 End Sub
@@ -345,6 +348,7 @@ Inc
 End Sub
 Public Sub PushObj(RHS As Object)
 Dim aa As New VarItem
+If Typename(RHS) = "VarItem" Then Stop
 aa.Typename = "*"  'something
 Set aa.ObjectRef = RHS
 Set RHS = Nothing
@@ -352,6 +356,14 @@ If mstack.Count = 0 Then
 mstack.Add aa
 Else
 mstack.Add aa, , 1
+End If
+Inc
+End Sub
+Public Sub PushObjVarItem(RHS As Object)
+If mstack.Count = 0 Then
+mstack.Add RHS
+Else
+mstack.Add RHS, , 1
 End If
 Inc
 End Sub
@@ -525,6 +537,14 @@ mstack.Add aa, , , mstack.Count
 End If
 Inc
 End Sub
+Public Sub DataObjVaritem(RHS As Object)
+If mstack.Count = 0 Then
+mstack.Add RHS
+Else
+mstack.Add RHS, , , mstack.Count
+End If
+Inc
+End Sub
 Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
@@ -586,6 +606,9 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set myArray = Nothing
                         Set vvl = mySecondArray
                         Set mySecondArray = Nothing
+                    ElseIf Typename(vvl) = "VarItem" Then
+                            DataOptional
+                            GoTo here
                     End If
                     ' DO SOMETHING
                         Set aa = vvl
@@ -600,7 +623,7 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                             DataStr a.item(x1)
                         End If
                      End If
-    
+here:
                 Next x1
 
 

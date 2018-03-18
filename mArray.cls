@@ -44,9 +44,9 @@ Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As 
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
-  Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" _
+  Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
-        Private Declare Sub CopyPart Lib "KERNEL32" Alias "RtlMoveMemory" _
+        Private Declare Sub CopyPart Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal pSA As Long) As Long
 Private Declare Function SafeArrayLock Lib "OleAut32.dll" (ByVal pSA As Long) As Long
@@ -779,6 +779,8 @@ Else
 If Not MyIsObject(item) Then
     If TypeOf actualdata(curitem) Is PropReference Then
         actualdata(curitem).Value = item
+    ElseIf TypeOf actualdata(curitem) Is VarItem Then
+        actualdata(curitem) = item
     Else
         Set actualdata(curitem) = Nothing
         actualdata(curitem) = CLng(0)
@@ -924,13 +926,13 @@ Next j
 GetAnyName$ = ChrW(&H1FFF) + ss$
 End Function
 Function MyIsNumeric(v As Variant) As Boolean
-Dim N As Integer
-GetMem2 VarPtr(v), N
-If N < 2 Then Exit Function
-MyIsNumeric = N < 8 Or N = 14
+Dim n As Integer
+GetMem2 VarPtr(v), n
+If n < 2 Then Exit Function
+MyIsNumeric = n < 8 Or n = 14
 End Function
 Function MyIsObject(v As Variant) As Boolean
-Dim N As Integer
-GetMem2 VarPtr(v), N
-MyIsObject = N = 9
+Dim n As Integer
+GetMem2 VarPtr(v), n
+MyIsObject = n = 9
 End Function

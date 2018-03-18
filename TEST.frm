@@ -209,7 +209,7 @@ Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, 
 Dim height1 As Long, width1 As Long
 Dim doubleclick As Long
 
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim EXECUTED As Boolean
 Dim stolemodalid As Variant
 Public Property Set Process(mBtask As basetask)
@@ -455,7 +455,7 @@ End Sub
 
 
 Private Sub glist3_CheckGotFocus(index As Integer)
-Dim s$
+Dim s$, z$
 gList4.SetFocus
 If index < 2 Then
 abt = False
@@ -466,17 +466,20 @@ If index = 1 Then
    
         Dim i As Long
         If MyBaseTask.ExistVar2(s$) Then
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
+            
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Static Variable", s$, vH_x, vH_y
+                sHelp "Static Variable", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Στατική Μεταβλητή", s$, vH_x, vH_y
+                sHelp "Στατική Μεταβλητή", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
         
         ElseIf GetlocalVar(s$, i) Then
+            IsStr1 MyBaseTask, "Type$(" + s$ + ")", z$
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Local Identifier", s$, vH_x, vH_y
+                sHelp "Local Identifier", s$ & vbCrLf & "Type " + z$, vH_x, vH_y
             Else
-                sHelp "Τοπικό Αναγνωριστικό", s$, vH_x, vH_y
+                sHelp "Τοπικό Αναγνωριστικό", s$ & vbCrLf & "Τύπος " + z$, vH_x, vH_y
             End If
         ElseIf GetGlobalVar(s$, i) Then
         If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
@@ -487,13 +490,29 @@ If index = 1 Then
             
             End If
         ElseIf GetSub(s$, i) Then
+            '
+            z$ = Label(2)
+            If MaybeIsSymbol(z$, "=") Then
             If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
-                sHelp "Μοdule", s$, vH_x, vH_y
+                sHelp "New Identifier", s$, vH_x, vH_y
             Else
-                sHelp "Τμήμα", s$, vH_x, vH_y
+                sHelp "Νέο Αναγνωριστικό", s$, vH_x, vH_y
             End If
+            Else
+                GoTo jumphere
+            End If
+            
         ElseIf ismine(s$) Then
             fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128
+        Else
+        z$ = Label(2)
+        If MaybeIsSymbol(z$, "=") Then
+            If AscW(s$ + Mid$(" Σ", Abs(pagio$ = "GREEK") + 1)) < 128 Then
+                sHelp "New Identifier", s$, vH_x, vH_y
+            Else
+                sHelp "Νέο Αναγνωριστικό", s$, vH_x, vH_y
+            End If
+        End If
         End If
     
     vHelp
@@ -508,8 +527,10 @@ vHelp
 End If
 Else
 If index = 0 Then
+i = MyBaseTask.OriginalCode
+jumphere:
 Dim aa As Long, aaa As String
-aa = MyBaseTask.OriginalCode
+aa = i
 aaa = SBcode(aa)
 If Left$(aaa, 10) = "'11001EDIT" Then
 SetNextLine aaa
