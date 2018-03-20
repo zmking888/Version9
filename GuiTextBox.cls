@@ -17,7 +17,7 @@ Option Explicit
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mprompt As String
-Private mkind As String
+Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean
 Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
@@ -49,7 +49,7 @@ Private Declare Function GetClipboardData Lib "user32" _
     Private Declare Function SetClipboardData Lib "user32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
     Private Declare Function OpenClipboard Lib "user32" _
-    (ByVal hWnd As Long) As Long
+    (ByVal hWND As Long) As Long
 Private Declare Function CloseClipboard Lib "user32" _
     () As Long
     Private Declare Function IsClipboardFormatAvailable Lib "user32" _
@@ -152,11 +152,11 @@ End If
 
 End Property
 
-Public Property Get top() As Variant
-top = Callback.Controls(CtrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(CtrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(CtrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(CtrlName).Left
@@ -214,6 +214,8 @@ End Property
 Private Sub Class_Terminate()
 Set glistN = Nothing
 End Sub
+
+
 
 Private Sub glistN_RegisterGlist(this As gList)
 If Not glistN.Spinner Then this.NoWheel = True
@@ -290,6 +292,7 @@ If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 ' RaiseEvent GotFocus
 If enabled Then
+glistN.FadeLastLinePart = mPartColor
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
 glistN.BackColor = white
@@ -297,6 +300,7 @@ End If
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
+glistN.FadeLastLinePart = black
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
 glistN.BackColor = dimm1
@@ -309,6 +313,7 @@ End If
 End Sub
 Public Sub Retired()
 If mStayOpen Then
+glistN.FadeLastLinePart = mPartColor
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
 glistN.BackColor = white
@@ -316,6 +321,7 @@ End If
 glistN.NoCaretShow = False
 Else
 If glistN.BackStyle <> 1 Then
+glistN.FadeLastLinePart = 0
 glistN.ForeColor = white
 glistN.BackColor = dimm2
 End If
@@ -603,6 +609,7 @@ Callback.Controls(CtrlName).SetFocus
 End Sub
 Sub Transparent()
 Dim x  As Long, y As Long
+glistN.FadeLastLinePart = mPartColor
 glistN.ForeColor = black
 glistN.BackStyle = 1
 glistN.GetLeftTop x, y
@@ -632,3 +639,14 @@ End If
 
 'Retired
 End Sub
+
+Public Property Get FadePartColor() As Variant
+FadePartColor = mPartColor
+End Property
+
+Public Property Let FadePartColor(ByVal vNewValue As Variant)
+On Error Resume Next
+mPartColor = CLng(vNewValue)
+End Property
+
+

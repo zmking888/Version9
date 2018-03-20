@@ -488,10 +488,10 @@ Textbox.glistN.ShowMe
 glistN.BypassLeaveonChoose = False
 If Iam Then
 Pad.Visible = False
-'glistN.Visible = False
+
 Else
 If Not glistN.enabled Then
-'glistN.Visible = False:
+
 glistN.enabled = True
 End If
 End If
@@ -503,7 +503,7 @@ Private Sub textbox_GotFocus()
  
  Textbox.glistN.ShowMe
 If Pad.Visible Then
-'Iam = False
+
 glistN.enabled = False
 glistN.BypassLeaveonChoose = False
 End If
@@ -587,10 +587,7 @@ Pad.Height = Callback.Controls(CtrlName).Height * glistN.restrictLines
 End If
 glistN.MoveTwips 0, 0, Pad.width, Pad.Height
     Textbox.SkipProcAtExitFocus = True
-'    Textbox.glistN.NoCaretShow = True
-  '  Textbox.glistN.ShowPan
     glistN.LeaveonChoose = True
-   ' glistN.SetFocus
   If AutoComplete Then
         glistN.moveto Text
         If glistN.ListIndex < 0 Then
@@ -820,8 +817,10 @@ ff1.bold = .CtrlFontBold
 
 End With
 Set Textbox.glistN.Font = ff1
+Textbox.FadePartColor = &H777777
 Textbox.Retired
 With glistN
+
 .SingleLineSlide = True
 .NoPanLeft = True
 .NoPanRight = False
@@ -1011,3 +1010,11 @@ Textbox.glistN.BackStyle = 1
 Textbox.glistN.GetLeftTop x, y
 Textbox.glistN.RepaintFromOut Callback.image, x, y
 End Sub
+Public Property Get FadePartColor() As Variant
+FadePartColor = Textbox.FadePartColor
+End Property
+
+Public Property Let FadePartColor(ByVal vNewValue As Variant)
+On Error Resume Next
+Textbox.FadePartColor = CLng(vNewValue)
+End Property

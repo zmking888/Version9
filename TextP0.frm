@@ -69,7 +69,6 @@ Begin VB.Form Form1
       Height          =   675
       Index           =   0
       Left            =   6465
-      OLEDropMode     =   1  'Manual
       ScaleHeight     =   675
       ScaleWidth      =   780
       TabIndex        =   1
@@ -173,7 +172,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -195,7 +194,6 @@ Begin VB.Form Form1
       Left            =   780
       MouseIcon       =   "TextP0.frx":06CC
       MousePointer    =   1  'Arrow
-      OLEDropMode     =   1  'Manual
       ScaleHeight     =   5640
       ScaleWidth      =   5640
       TabIndex        =   5
@@ -307,7 +305,6 @@ If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
               TaskMaster.RestEnd1
    TaskMaster.TimerTick
-If Not TaskMaster Is Nothing Then TaskMaster.rest
 End If
         End If
 End Sub
@@ -330,7 +327,6 @@ If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
               TaskMaster.RestEnd1
    TaskMaster.TimerTick
-If Not TaskMaster Is Nothing Then TaskMaster.rest
 End If
         End If
 End Sub
@@ -397,7 +393,6 @@ If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
               TaskMaster.RestEnd1
    TaskMaster.TimerTick
-If Not TaskMaster Is Nothing Then TaskMaster.rest
 End If
         End If
 End Sub
@@ -471,7 +466,7 @@ End If
 End If
 End Sub
 
-Private Sub gList1_MarkOut()
+Private Sub glist1_MarkOut()
 Pack1
 End Sub
 Public Sub Pack1()

@@ -93,12 +93,12 @@ Private BlockStartPara As Long, BlockStartPos As Long, BlockStartLine As Long, B
 Private BlockStartCursor As Long, BlockEndCursor As Long
 Private BlockEndPara As Long, BlockEndPos As Long, BlockEndline As Long, BlockBottomline As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000
 Private Const GMEM_DISCARDABLE = &H100
 Private Const GMEM_DISCARDED = &H4000
@@ -116,7 +116,7 @@ Private Const GMEM_VALID_FLAGS = &H7F72
 Private Const GMEM_ZEROINIT = &H40
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
@@ -128,7 +128,7 @@ Private Declare Function CloseClipboard Lib "user32" _
     () As Long
     Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function GetLocaleInfo Lib "kernel32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+    Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
@@ -141,6 +141,7 @@ Dim Callback As GuiM2000
 Dim oldEditDoc As Boolean
 Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long
 Dim Quit
+Private OldPar As Long, dragCharpos As Long
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
@@ -189,6 +190,8 @@ ff.bold = .CtrlFontBold
 End With
 mStayOpen = True
 With glistN
+.NoEscapeKey = True
+.bypassfirstClick = True
 .Vertical = True
 .DropEnabled = True
 .DragEnabled = True
@@ -396,8 +399,8 @@ Private Sub Class_Initialize()
 Set mDoc = New Document
 Set mDoc1 = New Document
 ResetSelColors
-mDoc.LCID = cLid
-mDoc1.LCID = cLid
+mDoc.lcid = cLid
+mDoc1.lcid = cLid
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
 undopara = -1
@@ -499,14 +502,14 @@ Private Sub glistN_CheckGotFocus()
 If Not locked Then
 glistN.HideCaretOnexit = False
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
-'RaiseEvent GotFocus
+
 If enabled Then
 glistN.NoCaretShow = NoMark
 
 mNoColor = mNoColor1
 glistN.ForeColor = black
 glistN.BackColor = white
-'glistN.PanPos = 0
+
 Else
 mNoColor = True
 glistN.NoCaretShow = False Or NoMark
@@ -558,6 +561,22 @@ End If
 'RaiseEvent LostFocus
 End Sub
 
+Private Sub glistN_CorrectCursorAfterDrag()
+    If Not mDoc.InvalidPara(OldPar) Then
+        SelLengthSilent = 0
+        mDoc.MarkParagraphID = OldPar
+        glistN.enabled = False
+        ParaSelStart = dragCharpos
+        glistN.enabled = True
+        ManualInform
+        OldPar = 0
+    End If
+End Sub
+
+
+
+
+
 Private Sub glistN_HaveMark(Yes As Boolean)
 Yes = HaveMarkedText
 End Sub
@@ -565,7 +584,27 @@ End Sub
 Private Sub glistN_MarkCut(ThatData As String)
 ThatData = undotext
 End Sub
+Private Sub glistN_DragOverDone(a As Boolean)
 
+If Not mDoc.InvalidPara(OldPar) Then
+        a = True
+        SelLengthSilent = 0
+        mDoc.MarkParagraphID = OldPar
+        glistN.enabled = False
+        ParaSelStart = dragCharpos
+        glistN.enabled = True
+        ManualInform
+        OldPar = 0
+    End If
+End Sub
+Private Sub glistN_DragOverNow(a As Boolean)
+If OldPar = 0 Then
+a = True
+ SelLengthSilent = 0
+ OldPar = mDoc.MarkParagraphID
+ dragCharpos = Charpos
+End If
+End Sub
 Private Sub glistN_Maybelanguage()
 If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
@@ -725,9 +764,9 @@ End Sub
 Private Sub glistN_ChangeSelStart(thisselstart As Long)
 If glistN.ListIndex < 0 Then Exit Sub
 Dim what$, ThatPara As Long, pastchars As Long
-pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)  'showparagraph)
+pastchars = mDoc.TextParagraphLine2(glistN.ListIndex + 1, what$, ThatPara, False)
 Charpos = pastchars + glistN.SelStart
-'If Len(mDoc.TextParagraph(ThatPara)) < Charpos Then Charpos = Len(mDoc.TextParagraph(ThatPara)) + 1
+
 If Not glistN.enabled Then Exit Sub
 If glistN.SelStart = 0 Then
 inform glistN.ListIndex + 1, 1
@@ -752,19 +791,20 @@ End Sub
 Private Sub glistN_DragData(ThatData As String)
 FillBlock
 ThatData = UndoDoc.textDoc
-'glistN.NoCaretShow = False
+ OldPar = mDoc.MarkParagraphID
+ dragCharpos = Charpos
 End Sub
 
 Private Sub glistN_DragPasteData(ThatData As String)
 Dim a() As String, k As Long
 a() = Split(ThatData, ChrW(9))
+OldPar = 0
 PasteDoc Join(a(), "    ")
 RelocateMarkedText
 
 End Sub
 
 Private Sub glistN_DropFront(ok As Boolean)
-
 ok = False
 ' we need to know if we delete mark before paste data
 ' when we perform dragdrop to the same document
@@ -784,7 +824,6 @@ End If
 End Sub
 
 Private Sub glistN_DropOk(ok As Boolean)
-
 If HaveMarkedText Then
 If ClickInsideMarkedText Then
 Else
@@ -940,7 +979,7 @@ End If
                       If mNoWrap And (glistN.ListIndex = item) Then
               '        glistN.ExternalCursor glistN.SelStart, what$, black
                        ElseIf (Not skipcolor) And (glistN.ListIndex = item) Then
-                      '      glistN.ExternalCursor glistN.SelStart, what$, black
+                      If OldPar > 0 Then glistN.ExternalCursor glistN.SelStart, what$, black
                        End If
             ElseIf Not NoMark Then
             
@@ -4290,9 +4329,9 @@ w = mDoc.MarkParagraphID   ' this is the not the order
 SelStartSilent = SelStart
 l = Charpos + 1
 
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not mDoc.FindStrDown(s$, w, l) Then GoTo sdnOut
@@ -4309,16 +4348,16 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdnOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Sub Searchup(s$, Optional anystr As Boolean = False)
 Dim l As Long, w As Long, TempLcid As Long, OldLcid As Long
 w = mDoc.MarkParagraphID
 SelStartSilent = SelStart - (SelLength > 1)
 l = Charpos + 1
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If Not mDoc.FindStrUp(s$, w, l) Then GoTo sdupOut
@@ -4335,7 +4374,7 @@ ParaSelStart = l
 glistN.enabled = True
 SelLength = Len(s$)
 sdupOut:
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 End Sub
 Public Sub helpmeSub()
       If mIndex >= 0 Then
@@ -4369,9 +4408,9 @@ SelStartSilent = SelStart  'MOVE CHARPOS TO SELSTART
 
 el = Charpos  ' charpos maybe is in the start or the end of block
 s$ = SelText
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -4406,7 +4445,7 @@ End If
 Loop Until (w = eW And l = el) Or safety = 2
 
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 Render
 If glistN.Visible Then glistN.SetFocus
 End Sub
@@ -4430,9 +4469,9 @@ Else
 neo$ = InputBoxN("Replace Word (use Shift for Stop)", "Text Editor", s$)
 End If
 If neo$ = vbNullString Then Exit Sub
-OldLcid = mDoc.LCID
+OldLcid = mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then mDoc.LCID = TempLcid
+If TempLcid <> 0 Then mDoc.lcid = TempLcid
 If Len(neo$) >= Len(s$) Then
     Set mDoc10 = New Document
     mDoc10 = neo$
@@ -4539,7 +4578,7 @@ End If
 Loop Until safety = 2 Or KeyPressed(16)
 glistN.dropkey = False
 End If
-mDoc.LCID = OldLcid
+mDoc.lcid = OldLcid
 If w2 > 0 Then mDoc.WrapAgainBlock w2, w2:   mDoc.ColorThis w2
 Render
 If glistN.Visible Then glistN.SetFocus

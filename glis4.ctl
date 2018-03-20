@@ -83,6 +83,8 @@ Public OverrideShow As Boolean
 Public HideCaretOnexit As Boolean
 Public overrideTextHeight As Long
 Public AutoHide As Boolean, NoWheel As Boolean
+Private missMouseClick As Boolean
+Public bypassfirstClick As Boolean
 Private Shape1 As Myshape, Shape2 As Myshape, Shape3 As Myshape
 Private Type RECT
         Left As Long
@@ -101,18 +103,18 @@ End Type
 Private ehat$
 Private fast As Boolean
 Private Declare Function GdiFlush Lib "gdi32" () As Long
-Private Declare Function SetWindowRgn Lib "User32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
+Private Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
 Private Declare Function SetBkColor Lib "gdi32" (ByVal hdc As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function DestroyCaret Lib "User32" () As Long
-Private Declare Function CreateCaret Lib "User32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Private Declare Function ShowCaret Lib "User32" (ByVal hWND As Long) As Long
-Private Declare Function SetCaretPos Lib "User32" (ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function HideCaret Lib "User32" (ByVal hWND As Long) As Long
-Private Declare Function DrawText Lib "User32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function FillRect Lib "User32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
-Private Declare Function FrameRect Lib "User32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function DestroyCaret Lib "user32" () As Long
+Private Declare Function CreateCaret Lib "user32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Private Declare Function ShowCaret Lib "user32" (ByVal hWND As Long) As Long
+Private Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
+Private Declare Function HideCaret Lib "user32" (ByVal hWND As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FrameRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal y3 As Long) As Long
 
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
@@ -242,6 +244,9 @@ Event BlinkNow(Face As Boolean)
 Event CtrlPlusF1()
 Event EnterOnly()
 Event RefreshOnly()
+Event CorrectCursorAfterDrag()
+Event DragOverNow(a As Boolean)
+Event DragOverDone(a As Boolean)
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -253,6 +258,7 @@ Private cY As Long
 Private cX As Long
 Dim myt As Long, FaceBlink As Boolean
 Dim mytPixels As Long
+Public NoMoveDrag As Boolean
 Public BarColor As Long
 Public BarHatch As Long
 Public BarHatchColor As Long
@@ -265,6 +271,7 @@ Private LastVScroll As Long
 Public FreeMouse As Boolean
 Public NoCaretShow As Boolean
 Public NoBarClick As Boolean
+Public NoEscapeKey As Boolean
 Public InfoDropBarClick As Boolean
 Dim valuepoint As Long, minimumWidth As Long
 Dim mValue As Long, mmax As Long, mmin As Long, mLargeChange As Long  ' min 1
@@ -309,6 +316,7 @@ Public MarkNext As Long  ' 0 - markin, 1- Markout
 Public Noflashingcaret As Boolean
 Public NoFreeMoveUpDown As Boolean  ' if true then keyup and keydown scroll up down the list
 Public PromptLineIdent As Long ' to be a console we need prompt line to have some chars untouch perhaps this ">"
+Public FadeLastLinePart As Long ' if is zero then no use at all
 Public LastLinePart As String
 Public Spinner As Boolean ' if true and restrictline =1 - we have events for up down values
 Public maxchar As Long ' for non multiline
@@ -317,11 +325,11 @@ Public WordCharRight As String
 Public WordCharRightButIncluded As String
 Public DropEnabled As Boolean
 Public DragEnabled As Boolean
-Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
-Private Declare Function GetKeyboardLayout& Lib "User32" (ByVal dwLayout&) ' not NT?
+Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (ByVal Locale As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "User32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -848,10 +856,13 @@ Else
                 RaiseEvent Selected2(SELECTEDITEM - 1)
             End If
         ElseIf KeyAscii = 27 Then  ' can be used if not enabled...to quit
+        
             KeyAscii = 0
-            SELECTEDITEM = -1
-            secreset = False
-             RaiseEvent Selected2(-2)
+            If Not NoEscapeKey Then
+                SELECTEDITEM = -1
+                secreset = False
+                 RaiseEvent Selected2(-2)
+             End If
      Else
         If myEnabled Then
         If maxchar = 0 Or (maxchar > Len(list(SELECTEDITEM - 1)) Or MultiLineEditBox) Then
@@ -1004,8 +1015,10 @@ End Sub
 
 Public Sub SoftEnterFocus()
 
-
+If bypassfirstClick Then
+missMouseClick = True
 FreeMouse = True
+End If
 state = Not enabled
 Noflashingcaret = Not enabled
 If EditFlag Then
@@ -1378,7 +1391,11 @@ RaiseEvent Maybelanguage
 ElseIf KeyCode = vbKeyV Then
 Exit Sub
 Else
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
+Else
 RaiseEvent RefreshOnly
+End If
 End If
 i = -1
 If shift <> 4 And mynum$ <> "" Then
@@ -1412,6 +1429,7 @@ End Sub
 Private Sub UserControl_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 ' cut area
 If dropkey Then Exit Sub
+If missMouseClick Then Exit Sub
 nowX = x
 nowY = y
 
@@ -1481,7 +1499,7 @@ End Sub
 Private Sub UserControl_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 If dropkey Then Exit Sub
 Static PX As Long, PY As Long
-
+If missMouseClick Then Exit Sub
 If Abs(PX - x) <= 60 And Abs(PY - y) <= 60 Then Exit Sub
 PX = x
 PY = y
@@ -1727,6 +1745,7 @@ End Sub
 Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 'If Not myt = mytPixels * SCRTWIPS Then Stop
 If dropkey Then Exit Sub
+If missMouseClick Then missMouseClick = False: Exit Sub
 If Button = 1 Then mlx = CLng(x / scrTwips): mly = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
 If (Button And 2) = 2 Then
 x = nowX
@@ -1889,15 +1908,20 @@ End If
 ElseIf Effect = vbDropEffectMove Then
 If marvel Then
 RaiseEvent PushUndoIfMarked
-RaiseEvent MarkDelete(False)
+If Not NoMoveDrag Then RaiseEvent MarkDelete(False)
 End If
 End If
 Effect = 0
+RaiseEvent MarkDestroyAny
+HideCaretOnexit = False
+Timer2.enabled = False
+RaiseEvent CorrectCursorAfterDrag
 End Sub
 
 Private Sub UserControl_OLEDragDrop(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single)
 Dim something$, ok As Boolean
 If dropkey Then Exit Sub
+ 
 If (Effect And 3) > 0 Then
 If data.GetFormat(vbCFText) Or data.GetFormat((13)) Then
 
@@ -1975,15 +1999,17 @@ Private Sub UserControl_OLEDragOver(data As DataObject, Effect As Long, Button A
 On Error Resume Next
 If dropkey Then Exit Sub
 If Not DropEnabled Then Effect = 0: Exit Sub
-Dim tListcount As Long, YYT As Long
-If TaskMaster Is Nothing Then
-Else
-  If TaskMaster.QueueCount > 0 Then
-              TaskMaster.RestEnd1
-   TaskMaster.TimerTick
-If Not TaskMaster Is Nothing Then TaskMaster.rest
+Dim tListcount As Long, YYT As Long, oldpb As Boolean, oldbp As Boolean
+If Not TaskMaster Is Nothing Then
+        If TaskMaster.QueueCount > 0 And Not STbyST Then
+            oldbp = bypasstrace
+            bypasstrace = True
+            TaskMaster.RestEnd1
+            TaskMaster.TimerTick
+            TaskMaster.RestEnd1
+            bypasstrace = oldbp
         End If
-End If
+    End If
 tListcount = listcount
  If state = vbOver Then
  
@@ -2011,6 +2037,7 @@ ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
                         If (shift And 2) = 2 Then
                             Effect = vbDropEffectCopy
                         Else
+
                             Effect = vbDropEffectMove
                         End If
                 Else
@@ -2018,18 +2045,25 @@ ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
             End If
             End If
 ElseIf state = vbLeave Then
+Dim ok As Boolean
+missMouseClick = True
+If Not marvel And Effect = 0 Then RaiseEvent DragOverDone(ok)
+If Not ok Then
+        Timer2.enabled = False
+        
         Timer3.enabled = True
         Effect = vbDropEffectNone
         HideCaretOnexit = True
         MovePos x, y
-    
+    End If
 ElseIf state = vbEnter Then
-       
- 
+ok = False
+If Not marvel Then RaiseEvent DragOverNow(ok)
+ If Not ok Then
  If Not Timer1.enabled Then
  HideCaretOnexit = False
  MovePos x, y
- 
+ End If
 End If
 
                                
@@ -2039,6 +2073,7 @@ End If
                     If (shift And 2) = 2 Then
                        Effect = vbDropEffectCopy
                        Else
+
                            Effect = vbDropEffectMove
                            End If
             Else
@@ -2050,12 +2085,19 @@ End Sub
 
 
 Private Sub UserControl_OLEGiveFeedback(Effect As Long, DefaultCursors As Boolean)
+Dim oldbp As Boolean
 On Error Resume Next
-        If TaskMaster.QueueCount > 0 Then
-              TaskMaster.RestEnd1
-   TaskMaster.TimerTick
-TaskMaster.rest
+   If Not TaskMaster Is Nothing Then
+        If TaskMaster.QueueCount > 0 And Not STbyST Then
+            oldbp = bypasstrace
+            bypasstrace = True
+            TaskMaster.RestEnd1
+            TaskMaster.TimerTick
+            TaskMaster.RestEnd1
+            bypasstrace = oldbp
         End If
+    End If
+   
 End Sub
 
 Private Sub UserControl_OLEStartDrag(data As DataObject, AllowedEffects As Long)
@@ -2066,8 +2108,7 @@ RaiseEvent DragData(this$)
 aa = this$ & ChrW$(0)
  data.SetData aa(), 13
 data.SetData aa(), vbCFText
- AllowedEffects = vbDropEffectCopy + vbDropEffectMove
- 
+AllowedEffects = vbDropEffectCopy + vbDropEffectMove
 End Sub
 Public Sub MovePos(ByVal x As Single, ByVal y As Single)
 
@@ -3450,15 +3491,25 @@ End Function
 
 Private Sub PrintLineControlSingle(mHdc As Long, c As String, r As RECT)
 ' this is our basic print routine
-Dim that As Long, cc As String
+Dim that As Long, cc As String, fg As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
 DrawText mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or that
 Else
 If LastLinePart <> "" Then
-cc = c + LastLinePart
+    If FadeLastLinePart > 0 Then
+    cc = c + LastLinePart
+    fg = Me.ForeColor
+    Me.ForeColor = FadeLastLinePart
    DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
+   Me.ForeColor = fg
+   DrawText mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
+    
+    Else
+    cc = c + LastLinePart
+   DrawText mHdc, StrPtr(cc), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
+   End If
 Else
 
     DrawText mHdc, StrPtr(c), -1, r, DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
@@ -3926,6 +3977,10 @@ mpercent = RHS
 PropertyChanged "Percent"
 End Property
 Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
+If KeyCode = 27 And NoEscapeKey Then
+KeyCode = 0
+Exit Sub
+End If
 If KeyCode = vbKeyTab And Not mEditFlag Then
 If shift = 2 Then
         choosenext

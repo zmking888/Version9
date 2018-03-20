@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.2 Revision 1 active-X
+Version 9.2 Revision 2 active-X
 
 
 From version 9.0 revision 50:

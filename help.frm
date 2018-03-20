@@ -32,21 +32,13 @@ Begin VB.Form Form4
       TabIndex        =   0
       Top             =   300
       Width           =   6015
-      _ExtentX        =   10610
-      _ExtentY        =   6747
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   12
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   -2147483624
+      _extentx        =   10610
+      _extenty        =   6747
+      max             =   1
+      vertical        =   -1  'True
+      font            =   "help.frx":000C
+      showbar         =   0   'False
+      backcolor       =   -2147483624
    End
 End
 Attribute VB_Name = "Form4"
@@ -66,11 +58,11 @@ Private jump As Boolean
  Dim setupxy As Single
  Dim scrTwips As Long
 
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
-Dim UAddPixelsTop As Long
+Dim UAddPixelsTop As Long, flagmarkout As Boolean
 
 Private Sub Form_Deactivate()
 jump = False
@@ -107,6 +99,7 @@ gList1.LeftMarginPixels = 4
 Set Label1 = New TextViewer
 Set Label1.Container = gList1
 Label1.FileName = vbNullString
+Label1.glistN.NoMoveDrag = True
 Label1.glistN.DropEnabled = False
 Label1.glistN.DragEnabled = Not abt
 Label1.NoMark = True
@@ -307,12 +300,18 @@ End If
 End Sub
 
 Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+If shift <> 0 Then
+If Label1.SelectionColor = rgb(255, 64, 128) Then Label1.SelectionColor = 0
+Label1.NoMark = False
+Label1.EditDoc = True
+End If
 Select Case KeyCode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
 gList1.EditFlag = False
 If mHelp Or abt Then MKEY$ = MKEY$ & Chr$(KeyCode): KeyCode = 0
 End Select
 If mHelp Or abt Then shift = 0
+
 End Sub
 
 Private Sub gList1_KeyDownAfter(KeyCode As Integer, shift As Integer)
@@ -322,13 +321,22 @@ If mHelp Or abt Then
 End If
 End Sub
 
+Private Sub glist1_MarkOut()
+If flagmarkout Then
+If Label1.SelectionColor = rgb(255, 64, 128) Then Label1.SelectionColor = 0
+flagmarkout = False: Exit Sub
+End If
+End Sub
+
 Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+flagmarkout = True
 If mHelp Then
 shift = 0
 End If
 End Sub
 
 Private Sub gList1_selected2(item As Long)
+
 Label1.NoMark = False
 Label1.EditDoc = True
 End Sub
@@ -337,9 +345,30 @@ Private Sub glist1_WordMarked(ThisWord As String)
 If abt Then
 feedback$ = Trim$(Replace(ThisWord, ChrW(160), " "))
 feednow$ = FeedbackExec$
+Label1.SelLengthSilent = 0
 CallGlobal feednow$
 Else
-If Not mHelp Then ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
+If Not mHelp Then
+If Form2.Visible Then
+    If ThisWord = "Control" Or ThisWord = "Έλεγχος" Then
+    sHelp Form2.gList2.HeadLine, Form2.testpad.Text, vH_x, vH_y
+    vHelp
+    If TestShowCode Then
+    Label1.SelStartSilent = Form2.testpad.SelStart
+    Label1.SelLengthSilent = 0
+    Label1.SelectionColor = rgb(255, 64, 128)
+    If Form2.testpad.SelStart > 0 And Form2.testpad.SelLength > 0 Then Label1.SelLength = Form2.testpad.SelLength
+    End If
+    Else
+    ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
+    End If
+    Else
+    Label1.SelLengthSilent = 0
+    Label1.SelectionColor = 0
+ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
+End If
+
+End If
 
 End If
 ThisWord = vbNullString
@@ -418,7 +447,7 @@ End If
 allwidth = NewWidth  ''vH_x * factor
 allheight = vH_y * factor
 itemWidth = allwidth - 2 * borderleft
-MyForm Me, Left, Top, allwidth, allheight, True, factor
+myform Me, Left, Top, allwidth, allheight, True, factor
 
   
 gList1.addpixels = 4 * factor

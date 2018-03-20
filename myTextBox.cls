@@ -26,7 +26,7 @@ Event SpinnerValue(ThisValue As Long)
 Event DeployMenu()
 Event CtrlPlusF1()
 Private mprompt As String
-Private mkind As String
+Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean
 Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
 Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
@@ -53,15 +53,15 @@ Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
-Private Declare Function GetClipboardData Lib "User32" _
+Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
-    Private Declare Function SetClipboardData Lib "User32" _
+    Private Declare Function SetClipboardData Lib "user32" _
     (ByVal wFormat As Long, ByVal hMem As Long) As Long
-    Private Declare Function OpenClipboard Lib "User32" _
+    Private Declare Function OpenClipboard Lib "user32" _
     (ByVal hWND As Long) As Long
-Private Declare Function CloseClipboard Lib "User32" _
+Private Declare Function CloseClipboard Lib "user32" _
     () As Long
-    Private Declare Function IsClipboardFormatAvailable Lib "User32" _
+    Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
     Private Pad$, mStayOpen As Boolean
 Public Property Get Text() As String
@@ -217,11 +217,13 @@ If Not locked Then
 If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse = 0
 RaiseEvent GotFocus
 If enabled Then
+glistN.FadeLastLinePart = mPartColor
 glistN.ForeColor = rgb(0, 0, 0)
 glistN.BackColor = rgb(255, 255, 255)
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
+glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
 glistN.BackColor = rgb(100, 200, 160)
 glistN.NoCaretShow = True
@@ -231,6 +233,7 @@ End If
 
 End Sub
 Public Sub Retired()
+glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
 glistN.BackColor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
@@ -240,12 +243,13 @@ Private Sub glistN_CheckLostFocus()
 If Not locked Then
 If mStayOpen Then
 glistN.NoCaretShow = True
-
+glistN.FadeLastLinePart = 0
 If glistN.Visible Then glistN.PanPos = 0: glistN.PrepareToShow
 RaiseEvent LostFocus
 Exit Sub
 End If
 If Not SkipProcAtExitFocus Then
+glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
 glistN.BackColor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
@@ -430,6 +434,16 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = rgb(0, 0, 0)
+glistN.FadeLastLinePart = mPartColor
 glistN.BackColor = rgb(255, 255, 255)
 End If
+End Property
+
+Public Property Get FadePartColor() As Variant
+FadePartColor = mPartColor
+End Property
+
+Public Property Let FadePartColor(ByVal vNewValue As Variant)
+On Error Resume Next
+mPartColor = CLng(vNewValue)
 End Property
