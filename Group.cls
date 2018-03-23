@@ -30,6 +30,33 @@ Public HasValue As Boolean, HasSet As Boolean, HasStrValue As Boolean, HasParame
 Public HasParametersSet As Boolean
 Public SuperClassList As Object
 Public IamSuperClass As Boolean
+Private eventlist As FastCollection  ' we have to copy this
+Public highpriorityoper As String
+Public leftoper$  ' we have to copy this
+Public HasUnary As Boolean
+
+Public Property Get Events() As Object
+Set Events = eventlist
+End Property
+Public Property Set Events(RHS As Object)
+Set eventlist = RHS
+End Property
+Public Sub RegisterEvent(ByVal a$)
+a$ = myUcase(a$)
+If eventlist Is Nothing Then Set eventlist = New FastCollection
+If eventlist.ExistKey(a$) Then Exit Sub
+eventlist.AddKey a$, vbNullString
+End Sub
+Public Function EventFuncPos(a$, retName$, pos As Long) As Boolean
+If eventlist Is Nothing Then EventFuncPos = 0: Exit Function
+With eventlist
+If eventlist.ExistKey(a$) Then
+    retName$ = .Value
+    If retName$ <> vbNullString Then pos = .sValue: EventFuncPos = True
+End If
+End With
+End Function
+
 Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva
 Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
 For i = 1 To OwnSoros.Total
@@ -291,6 +318,7 @@ End Sub
 
 Private Sub Class_Terminate()
 Set SuperClassList = Nothing
+Set eventlist = Nothing
 If IamFloatGroup Then EndFloat
 Set LinkToGroup = Nothing
 End Sub

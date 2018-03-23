@@ -48,16 +48,16 @@ Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As 
 Private Declare Function GetProcAddress Lib "KERNEL32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 
 
-Private Declare Function GetWindowLongA Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long) As Long
+Private Declare Function GetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long) As Long
 
 
-Private Declare Function SetWindowLongA Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowLongW Lib "User32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongW Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowTextW Lib "User32" (ByVal hWND As Long, ByVal lpString As Long) As Long
+Private Declare Function SetWindowTextW Lib "user32" (ByVal hWND As Long, ByVal lpString As Long) As Long
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 
@@ -273,7 +273,13 @@ On Error Resume Next
 If Not bstack.Owner Is Nothing Then
 If bstack.Owner.Visible Then
 If bstack.Owner.name = "DIS" Then
-If Form1.Visible Then Form1.SetFocus
+If Form1.Visible Then
+Form1.SetFocus
+If IsWine Then
+If Form1.DIS.Visible Then Form1.DIS.SetFocus
+End If
+End If
+
 End If
 Else
 If Not bstack.Owner Is Nothing Then If bstack.Owner.Visible Then bstack.Owner.SetFocus

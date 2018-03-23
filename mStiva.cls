@@ -714,10 +714,12 @@ End Sub
 Private Sub Class_Terminate()
 Flush
 End Sub
-Sub CopyGroupObj(myobject As Object, myobject2 As Object)
+Sub CopyGroupObj(myobject1 As Object, myobject2 As Object)
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
+  Dim myobject As Group
+ Set myobject = myobject1
              With myobject
                 If .IamFloatGroup Then
          
@@ -750,8 +752,11 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                 myobject2.HasValue = .HasValue
                 myobject2.HasSet = .HasSet
                 myobject2.HasParameters = .HasParameters
-                      '' Set myobject2.LinkRef = Nothing ' .Link
+
              Set myobject2.SuperClassList = .SuperClassList
+                Set myobject2.Events = .Events
+                myobject2.highpriorityoper = .highpriorityoper
+                myobject2.HasUnary = .HasUnary
             End With
 End Sub
 Function Copy() As mStiva

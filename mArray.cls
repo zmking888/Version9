@@ -44,9 +44,9 @@ Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As 
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
-  Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
+  Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
-        Private Declare Sub CopyPart Lib "kernel32" Alias "RtlMoveMemory" _
+        Private Declare Sub CopyPart Lib "KERNEL32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal pSA As Long) As Long
 Private Declare Function SafeArrayLock Lib "OleAut32.dll" (ByVal pSA As Long) As Long
@@ -855,11 +855,13 @@ Dim aa As Object
 Set aa = New Group
 Set var = aa
 End Sub
-Sub CopyGroupObj(myobject As Object, myobject2 As Object)
+Sub CopyGroupObj(myobject1 As Object, myobject2 As Object)
 'Special Copy
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Set myobject2 = New Group
+ Dim myobject As Group
+ Set myobject = myobject1
  
              With myobject
                 If .IamFloatGroup Then
@@ -894,6 +896,9 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                 myobject2.HasParametersSet = myobject.HasParametersSet
                 Set myobject2.SuperClassList = myobject.SuperClassList
                 Set myobject2.LinkRef = myobject
+                Set myobject2.Events = myobject.Events
+                myobject2.highpriorityoper = myobject.highpriorityoper
+                myobject2.HasUnary = myobject.HasUnary
                 End If
             End With
          

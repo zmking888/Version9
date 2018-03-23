@@ -30,7 +30,7 @@ If Forms.Count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
-If Form1.Top >= ScrY() Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
+If Form1.Top >= VirtualScreenHeight Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
 If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
@@ -132,7 +132,6 @@ Public Sub CallModule(modulename$, ParamArray a())
 Static once As Boolean, where As Long, what
 If Status <> 0 Then Exit Sub
 If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
-'MyEr "Not Found", "Δεν Βρέθηκε"
     what = False
     
     If mObjRef Is Nothing Then
@@ -209,7 +208,7 @@ If IhaveSignature Then
 look = IsLabelOnly(sign$, dummy$)
 If look = 2 Then ' byref
 look = IsLabelOnly(sign$, dummy$)
-look = GlobalVar("b" + CStr(var2used) + "." + dummy$, True)
+look = globalvar("b" + CStr(var2used) + "." + dummy$, True)
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
 mS.DataObj ar

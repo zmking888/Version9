@@ -684,6 +684,7 @@ IsVariant = True
 End If
 End Function
 Public Sub RemoveOptionals()
+If Parent Is Nothing Then Exit Sub
 Do While Not Parent.soros.IsEmpty
 If parentSoros.PopType = ">" Then Parent.soros.drop 1 Else Exit Do
 Loop

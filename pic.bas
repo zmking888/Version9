@@ -3,7 +3,7 @@ Option Explicit
 Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
 Public fonttest As PictureBox
 Private Declare Function GetTextMetrics Lib "gdi32" _
-Alias "GetTextMetricsA" (ByVal hdc As Long, _
+Alias "GetTextMetricsA" (ByVal hDC As Long, _
 lpMetrics As TEXTMETRIC) As Long
 Private Type TEXTMETRIC
 tmHeight As Long
@@ -47,10 +47,10 @@ Public sumhDC As Long  ' check it
 Public Rixecode As String
 Public MYSCRnum2stop As Long
 Public octava As Integer, NOTA As Integer, ENTASI As Long
-Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+Private Declare Sub Sleep Lib "KERNEL32" (ByVal dwMilliseconds As Long)
 Const Face$ = "C C#D D#E F F#G G#A A#B  "
 Public CLICK_COUNT As Long
-Private Declare Function GetVersionExA Lib "kernel32" (lpVersionInformation As OSVERSIONINFO) As Long
+Private Declare Function GetVersionExA Lib "KERNEL32" (lpVersionInformation As OSVERSIONINFO) As Long
 Private Type OSVERSIONINFO
     dwOSVersionInfoSize As Long
     dwMajorVersion As Long
@@ -86,7 +86,7 @@ Public Type tagSize
     cX As Long
     cY As Long
 End Type
-Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hdc As Long, lpAspectRatio As tagSize) As Long
+Declare Function GetAspectRatioFilterEx Lib "gdi32" (ByVal hDC As Long, lpAspectRatio As tagSize) As Long
 Declare Function CreateRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Declare Function CombineRgn Lib "gdi32" (ByVal hDestRgn As Long, ByVal hSrcRgn1 As Long, ByVal hSrcRgn2 As Long, ByVal nCombineMode As Long) As Long
 Public Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
@@ -102,7 +102,7 @@ Private Type XFORM  ' used for stretching/skewing a region
 End Type
 Public Const RGN_OR = 2
 '**********************************
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
@@ -130,20 +130,20 @@ Type BITMAP
         bmBitsPixel As Integer
         bmBits As Long
 End Type
-Declare Function StretchBlt Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
-Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long
-Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
-Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long
+Declare Function StretchBlt Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal nSrcWidth As Long, ByVal nSrcHeight As Long, ByVal dwRop As Long) As Long
+Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hDC As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hDC As Long) As Long
+Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
+Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) As Long
 Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
 Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long
 'Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
-Declare Function GetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long) As Long
-Declare Function SetPixel Lib "gdi32" (ByVal hdc As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
+Declare Function GetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long) As Long
+Declare Function SetPixel Lib "gdi32" (ByVal hDC As Long, ByVal x As Long, ByVal y As Long, ByVal crColor As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare Function GetDC Lib "user32" (ByVal hWND As Long) As Long
 Private Declare Function GetDesktopWindow Lib "user32" () As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hWND As Long, ByVal hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWND As Long, ByVal hDC As Long) As Long
 Private Const BITSPIXEL = 12         '  Number of bits per pixel
 Private Declare Function RegisterClipboardFormat Lib "user32" Alias _
    "RegisterClipboardFormatA" (ByVal lpString As String) As Long
@@ -164,12 +164,12 @@ Private Declare Function GetClipboardData Lib "user32" _
       ByVal bDaclPresent As Long, _
       ByVal pDacl As Long, _
       ByVal bDaclDefaulted As Long) As Long
- Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+ Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" _
     (ByVal wFormat As Long) As Long
 
@@ -207,7 +207,7 @@ Private Type MEMORYSTATUS
     dwTotalVirtual As Long
     dwAvailVirtual As Long
 End Type
-Private Declare Sub GlobalMemoryStatus Lib "kernel32" (lpBuffer As MEMORYSTATUS)
+Private Declare Sub GlobalMemoryStatus Lib "KERNEL32" (lpBuffer As MEMORYSTATUS)
 Public Declare Function joyGetPosEx Lib "winmm.dll" (ByVal uJoyID As Long, pji As JOYINFOEX) As Long
 Public Declare Function joyGetDevCapsA Lib "winmm.dll" (ByVal uJoyID As Long, pjc As JOYCAPS, ByVal cjc As Long) As Long
 
@@ -526,7 +526,7 @@ End Function
 
 Public Function DIBtoSTR(mdib As cDIBSection) As String
 Dim a As String
-If mdib.width > 0 Then
+If mdib.Width > 0 Then
 If my_system < Platform_Windows_NT_2K_XP Then
 a = String$(mdib.BytesPerScanLine * mdib.Height, Chr(0))
 
@@ -534,7 +534,7 @@ Else
 a = String$(mdib.BytesPerScanLine * mdib.Height \ 2, Chr(0))
 End If
 CopyMemory ByVal StrPtr(a), ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
-a = "cDIB" & Right$("0000" & Hex$(mdib.width), 4) + Right$("0000" & Hex$(mdib.Height), 4) + a
+a = "cDIB" & Right$("0000" & Hex$(mdib.Width), 4) + Right$("0000" & Hex$(mdib.Height), 4) + a
 DIBtoSTR = a
 End If
 End Function
@@ -579,7 +579,7 @@ GetMem1 ppBa + 2, BR
 'BG = val("&h" & Mid$(ba$, 3, 2))
 'bbb = val("&h" & Mid$(ba$, 5, 2))
 Dim pw As Long, ph As Long
-    piw = cDIBbuffer0.width
+    piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
     r = Atn(piw / pih) + Pi / 2
      k = Fix(Abs((piw / Cos(r) / 2) * zoomfactor) + 0.5)
@@ -591,7 +591,7 @@ Dim cDIBbuffer1 As Object
  myw = 2 * k
 myh = 2 * k
 
-    pw = cDIBbuffer0.width
+    pw = cDIBbuffer0.Width
     ph = cDIBbuffer0.Height
  cDIBbuffer0.ClearUp
 Call cDIBbuffer0.Create(myw, myh)
@@ -724,7 +724,7 @@ Dim x As Long, y As Long
 
 Dim xmax As Long, yMax As Long
     yMax = backdib.Height - 1
-    xmax = backdib.width - 1
+    xmax = backdib.Width - 1
 Dim bDib() As Byte
 Dim tSA As SAFEARRAY2D
     With tSA
@@ -808,9 +808,9 @@ If cDIBbuffer1.Create(piw, pih) Then
      stx = 0: sty = 0
      If rep Then
       cDIBbuffer1.needHDC
-     stOffx = cDIBbuffer1.width Mod cDIBbuffer0.width
+     stOffx = cDIBbuffer1.Width Mod cDIBbuffer0.Width
      stOffy = cDIBbuffer1.Height Mod cDIBbuffer0.Height
-     strx = cDIBbuffer1.width \ cDIBbuffer0.width
+     strx = cDIBbuffer1.Width \ cDIBbuffer0.Width
      stry = cDIBbuffer1.Height \ cDIBbuffer0.Height
      stBorderX = stOffx \ (strx + 1)
      stBorderY = stOffy \ (stry + 1)
@@ -823,7 +823,7 @@ If cDIBbuffer1.Create(piw, pih) Then
                             If max = 0 Then Exit For
                             cDIBbuffer0.PaintPicture cDIBbuffer1.HDC1, stx, sty + yshift
                             max = max - 1
-                               stx = stx + cDIBbuffer0.width + stBorderX
+                               stx = stx + cDIBbuffer0.Width + stBorderX
                            
                             Next i
                  If max = 0 Then Exit For
@@ -865,7 +865,7 @@ GetMem1 ppBa + 2, BR
 'BG = val("&h" + Mid$(ba$, 3, 2))
 'bbb = val("&h" + Mid$(ba$, 5, 2))
 
-    piw = cDIBbuffer0.width
+    piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
     r = Atn(piw / pih) + Pi / 2!
     k = Abs((piw / Cos(r) / 2!) * zoomfactor)
@@ -925,7 +925,7 @@ On Error Resume Next
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
-    pw = cDIBbuffer1.width
+    pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
     pws = pw
     phs = ph
@@ -1018,7 +1018,7 @@ GetMem1 ppBa + 2, BR
 'BG = val("&h" + Mid$(ba$, 3, 2))
 'bbb = val("&h" + Mid$(ba$, 5, 2))
 
-    piw = cDIBbuffer0.width
+    piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
     r = Atn(piw / pih) + Pi / 2!
     k = Abs((piw / Cos(r) / 2!))
@@ -1076,7 +1076,7 @@ On Error Resume Next
     Dim xf As Single, yf As Single
     Dim xf1 As Single, yf1 As Single
     Dim pws As Single, phs As Single
-    pw = cDIBbuffer1.width
+    pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
     pws = pw
     phs = ph
@@ -1146,7 +1146,7 @@ GetMem1 ppBa, bbb
 GetMem1 ppBa + 1, BG
 GetMem1 ppBa + 2, BR
 
-    piw = cDIBbuffer0.width
+    piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
  Dim cDIBbuffer1 As Object, cDIBbuffer2 As Object, cDIBbuffer3 As Object
  Set cDIBbuffer1 = New cDIBSection
@@ -1167,18 +1167,18 @@ On Error GoTo there
         With bstack.Owner
         If pic Then
          If bstack.toprinter Then
-         cDIBbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
+         cDIBbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 0, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 0, 3) - myh \ 2)
          Else
-            cDIBbuffer0.LoadPictureBlt bstack.Owner.hdc, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
+            cDIBbuffer0.LoadPictureBlt bstack.Owner.hDC, Int(.ScaleX(prive.XGRAPH, 1, 3) - myw \ 2), Int(.ScaleX(prive.YGRAPH, 1, 3) - myh \ 2)
             End If
             BACKSPRITE = DIBtoSTR(cDIBbuffer0)
      
             sprt = True
             Else
                     If bstack.toprinter Then
-        cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-            cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 1, 3)), Int(.ScaleX(BACKy, 1, 3))
+            cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 1, 3)), Int(.ScaleX(BACKy, 1, 3))
             End If
         End If
         End With
@@ -1219,9 +1219,9 @@ Dim tSA2 As SAFEARRAY2D
     Dim screen_x As Long, screen_y As Long, mmx As Long, mmy As Long, mmy1 As Long
 
 
-    Dim dest As Long, pw As Long, ph As Long
+    Dim Dest As Long, pw As Long, ph As Long
     
-    pw = cDIBbuffer1.width
+    pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
     r = Atn(myw / myh)
     k = -myw / (2# * Sin(r))
@@ -1248,7 +1248,7 @@ If amask$ <> "" And sprt Then
         Call cDIBbuffer2.Create(piw * zoomfactor, pih * zoomfactor)
         With cDIBbuffer3
 .needHDC
-cDIBbuffer2.LoadPictureStretchBlt .HDC1, , , , , pix, piy, .width, .Height
+cDIBbuffer2.LoadPictureStretchBlt .HDC1, , , , , pix, piy, .Width, .Height
 .FreeHDC
 End With
   Set cDIBbuffer3 = Nothing
@@ -1373,7 +1373,7 @@ Dim myw As Single, myh As Single, piw As Long, pih As Long, pix As Long, piy As 
 Dim k As Single, r As Single
 
 If zoomfactor = 1 And angle! = 0 Then Exit Function
-    piw = cDIBbuffer0.width
+    piw = cDIBbuffer0.Width
     pih = cDIBbuffer0.Height
  Dim cDIBbuffer1 As Object, cDIBbuffer2 As Object
  Set cDIBbuffer1 = New cDIBSection
@@ -1397,9 +1397,9 @@ cDIBbuffer0.Cls bckColor
 Else
         With bstack.Owner
         If bstack.toprinter Then
-        cDIBbuffer0.LoadPictureBlt .hdc, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
+        cDIBbuffer0.LoadPictureBlt .hDC, Int(.ScaleX(BACKx, 0, 3)), Int(.ScaleX(BACKy, 0, 3))
         Else
-                      cDIBbuffer0.LoadPictureBlt .hdc, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
+                      cDIBbuffer0.LoadPictureBlt .hDC, .ScaleX(BACKx, 1, 3), .ScaleX(BACKy, 1, 3)
            End If
         End With
         End If
@@ -1442,7 +1442,7 @@ Dim tSA2 As SAFEARRAY2D
 
     Dim pw As Long, ph As Long
     
-    pw = cDIBbuffer1.width
+    pw = cDIBbuffer1.Width
     ph = cDIBbuffer1.Height
     r = Atn(myw / myh)
     k = -myw / (2! * Sin(r))
@@ -1519,8 +1519,8 @@ End Function
 Sub Conv24(cDIBbuffer0 As Object)
  Dim cDIBbuffer1 As Object
  Set cDIBbuffer1 = New cDIBSection
-Call cDIBbuffer1.Create(cDIBbuffer0.width, cDIBbuffer0.Height)
-cDIBbuffer1.LoadPictureBlt cDIBbuffer0.hdc
+Call cDIBbuffer1.Create(cDIBbuffer0.Width, cDIBbuffer0.Height)
+cDIBbuffer1.LoadPictureBlt cDIBbuffer0.hDC
 Set cDIBbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
@@ -1628,14 +1628,14 @@ myRgn = fRegionFromBitmap2(photo, tr, CInt(rr))
 End If
   If myRgn = 0 Then
 
- myRgn = CreateRectRgn(0, 0, photo.width, photo.Height)
+ myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
  End If
  Else
 
-myRgn = CreateRectRgn(0, 0, photo.width, photo.Height)
+myRgn = CreateRectRgn(0, 0, photo.Width, photo.Height)
  End If
  ''''''''''''''''If SZ <> 1 Then myRgn = ScaleRegion(myRgn, SZ)
- myRgn = RotateRegion(myRgn, (ROT), photo.width * SZ, photo.Height * SZ, SZ)
+ myRgn = RotateRegion(myRgn, (ROT), photo.Width * SZ, photo.Height * SZ, SZ)
 
 
 
@@ -1645,10 +1645,10 @@ addSprite
 Load Form1.dSprite(PobjNum)
 With Form1.dSprite(PobjNum)
 .Height = photo.Height * DYP * SZ
-.width = photo.width * DXP * SZ
+.Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
 
-players(PobjNum).x = .width / 2
+players(PobjNum).x = .Width / 2
 players(PobjNum).y = .Height / 2
 Call SetWindowRgn(.hWND, myRgn, 0)
 
@@ -1687,14 +1687,14 @@ Dim i As Long, k As Integer, suma As Long
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
-x1 = Form1.dSprite(k).Left + Form1.dSprite(k).width * (100 - Percent) / 200
+x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
 y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
-x2 = x1 + Form1.dSprite(k).width * (1 - 2 * (100 - Percent) / 200)
+x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 For i = Priority - 1 To 1 Step -1
 k = FindSpriteByTag(i)
 If k <> 0 Then
-If x2 < Form1.dSprite(k).Left Or x1 >= Form1.dSprite(k).Left + Form1.dSprite(k).width Or y2 <= Form1.dSprite(k).Top Or y1 > Form1.dSprite(k).Top + Form1.dSprite(k).Height Then
+If x2 < Form1.dSprite(k).Left Or x1 >= Form1.dSprite(k).Left + Form1.dSprite(k).Width Or y2 <= Form1.dSprite(k).Top Or y1 > Form1.dSprite(k).Top + Form1.dSprite(k).Height Then
 Else
 suma = suma + 2 ^ (k - 1)
 End If
@@ -1724,9 +1724,9 @@ End If
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, k As Long
 k = FindSpriteByTag(Priority)
 If k = 0 Then Exit Function
-x1 = Form1.dSprite(k).Left + Form1.dSprite(k).width * (100 - Percent) / 200
+x1 = Form1.dSprite(k).Left + Form1.dSprite(k).Width * (100 - Percent) / 200
 y1 = Form1.dSprite(k).Top + Form1.dSprite(k).Height * (100 - Percent) / 200
-x2 = x1 + Form1.dSprite(k).width * (1 - 2 * (100 - Percent) / 200)
+x2 = x1 + Form1.dSprite(k).Width * (1 - 2 * (100 - Percent) / 200)
 y2 = y1 + Form1.dSprite(k).Height * (1 - 2 * (100 - Percent) / 200)
 If x2 < nx1 Or x1 >= nx2 Or y2 <= ny1 Or y1 > ny2 Then
 CollideArea = False
@@ -1744,7 +1744,7 @@ addSprite
 Load Form1.dSprite(PobjNum)
 With Form1.dSprite(PobjNum)
 .Height = lHeight
-.width = lWidth
+.Width = lWidth
 .Picture = photo.Picture(1)
 .Picture = LoadPicture("")
 ' NO REGION
@@ -1844,12 +1844,12 @@ If s < 1 Or s > PobjNum Then Exit Sub
  myRgn = fRegionFromBitmap2(photo, tran, CInt(rrr))
  End If
   If myRgn = 0 Then
- myRgn = CreateRectRgn(2, 2, photo.width - 2, photo.Height - 2)
+ myRgn = CreateRectRgn(2, 2, photo.Width - 2, photo.Height - 2)
  End If
  
  Else
 
-myRgn = CreateRectRgn(2, 2, photo.width - 2, photo.Height - 2)
+myRgn = CreateRectRgn(2, 2, photo.Width - 2, photo.Height - 2)
 
 
  End If
@@ -1858,7 +1858,7 @@ myRgn = CreateRectRgn(2, 2, photo.width - 2, photo.Height - 2)
 
 ''If SZ <> 1 Then myRgn = ScaleRegion(myRgn, SZ)
 
-myRgn = RotateRegion(myRgn, (ROT), photo.width * SZ, photo.Height * SZ, SZ)
+myRgn = RotateRegion(myRgn, (ROT), photo.Width * SZ, photo.Height * SZ, SZ)
 
  RotateDibNew photo, (ROT), 1, tran
  
@@ -1869,10 +1869,10 @@ Dim oldtag As Long
 
 With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
-.width = photo.width * DXP * SZ
+.Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(s).x - .width / 2
-players(s).x = .width / 2
+.Left = .Left + players(s).x - .Width / 2
+players(s).x = .Width / 2
 .Top = .Top + players(s).y - .Height / 2
 players(s).y = .Height / 2
 Call SetWindowRgn(.hWND, myRgn, True)
@@ -1942,7 +1942,7 @@ Dim mmx As Long, mmy As Long, cc As Long
 
 Dim GLHEIGHT, GLWIDTH As Long
     GLHEIGHT = picSource.Height
-    GLWIDTH = picSource.width
+    GLWIDTH = picSource.Width
     ReDim myRgn(picSource.Height * 4) As RECT
     Dim rectCount As Long, oldrect
     rectCount = -1
@@ -1994,7 +1994,7 @@ Dim GLHEIGHT, GLWIDTH As Long
 
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
    
-    fRegionFromBitmap2 = c_CreatePartialRegion(myRgn(), 2&, rectCount + 1&, 0&, picSource.width)
+    fRegionFromBitmap2 = c_CreatePartialRegion(myRgn(), 2&, rectCount + 1&, 0&, picSource.Width)
 
 End Function
 
@@ -2036,7 +2036,7 @@ Dim mmx As Long, mmy As Long, cc As Long
 
 Dim GLHEIGHT, GLWIDTH As Long
     GLHEIGHT = picSource.Height
-    GLWIDTH = picSource.width
+    GLWIDTH = picSource.Width
 lSkinRgn = CreateRectRgn(0, 0, 0, 0)
   mmy = GLHEIGHT
 
@@ -2791,13 +2791,13 @@ Case "DESCENDING", "DESKTOP", "DIM", "DIMENSION(", "DIR", "DIR$", "DIV", "DO"
 Case "DOC.LEN(", "DOC.PAR(", "DOC.UNIQUE.WORDS(", "DOC.WORDS(", "DOCUMENT", "DOS", "DOUBLE", "DOWN", "DRAW"
 Case "DRAWINGS", "DRIVE$(", "DRIVE.SERIAL(", "DROP", "DRW$(", "DURATION", "EACH("
 Case "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENVELOPE$(", "EOF("
-Case "ERASE", "ERROR", "ERROR$", "ESCAPE", "EVAL(", "EVAL$(", "EVENT", "EVERY", "EXCLUSIVE", "EXECUTE", "EXIST(", "EXIST.DIR("
+Case "ERASE", "ERROR", "ERROR$", "ESCAPE", "EVAL(", "EVAL$(", "EVENT", "EVENTS", "EVERY", "EXCLUSIVE", "EXECUTE", "EXIST(", "EXIST.DIR("
 Case "EXIT", "EXPORT", "EXTERN", "FALSE", "FAST", "FIELD", "FIELD$(", "FILE$("
 Case "FILE.APP$(", "FILE.NAME$(", "FILE.NAME.ONLY$(", "FILE.PATH$(", "FILE.STAMP(", "FILE.TITLE$(", "FILE.TYPE$(", "FILELEN(", "FILES"
 Case "FILL", "FILTER$(", "FINAL", "FIND", "FKEY", "FLOODFILL", "FLOOR(", "FLUSH", "FONT", "FONTNAME$", "FOR"
 Case "FORM", "FORMAT$(", "FORMLABEL", "FORWARD(", "FRAC(", "FRAME", "FREQUENCY(", "FROM", "FUNCTION", "FUNCTION$(", "FUNCTION("
 Case "GARBAGE", "GET", "GLOBAL", "GOSUB", "GOTO", "GRABFRAME$", "GRADIENT", "GREEK", "GROUP", "GROUP(", "GROUP$("
-Case "GROUP.COUNT(", "HEIGHT", "HELP", "HEX", "HEX$(", "HIDE", "HIDE$(", "HIFI", "HIGHWORD("
+Case "GROUP.COUNT(", "HEIGHT", "HELP", "HEX", "HEX$(", "HIDE", "HIDE$(", "HIGH", "HIFI", "HIGHWORD("
 Case "HILOWWORD(", "HIWORD(", "HOLD", "HTML", "HWND", "ICON", "IF", "IF(", "IF$(", "IMAGE", "IMAGE.X("
 Case "IMAGE.X.PIXELS(", "IMAGE.Y(", "IMAGE.Y.PIXELS(", "IN", "INKEY$", "INKEY(", "INLINE", "INPUT", "INPUT$("
 Case "INSERT", "INSTR(", "INT(", "INTEGER", "INTERVAL", "INVENTORY", "ISLET", "ISNUM", "ISWINE", "ITALIC"
@@ -2820,7 +2820,7 @@ Case "PLAYER", "PLAYSCORE", "POINT", "POINT(", "POLYGON", "POS", "POS.X", "POS.Y
 Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
 Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REVISION"
-Case "RIGHT$(", "RIGHTPART$(", "RINSTR(", "RND", "ROUND(", "ROW", "SAVE", "SAVE.AS", "SAVE.DOC", "SCALE.X"
+Case "RIGHT", "RIGHT$(", "RIGHTPART$(", "RINSTR(", "RND", "ROUND(", "ROW", "SAVE", "SAVE.AS", "SAVE.DOC", "SCALE.X"
 Case "SCALE.Y", "SCAN", "SCORE", "SCREEN.PIXELS", "SCREEN.X", "SCREEN.Y", "SCRIPT", "SCROLL", "SEARCH"
 Case "SEEK", "SEEK(", "SELECT", "SEQUENTIAL", "SET", "SETTINGS", "SGN(", "SHIFT", "SHIFTBACK", "SHORTDIR$("
 Case "SHOW", "SHOW$(", "SIN(", "SINGLE", "SINT(", "SIZE", "SIZE.X(", "SIZE.Y(", "SLOW"
@@ -2843,10 +2843,10 @@ Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "ам
 Case "апко", "апкос", "апо", "апохгйеусг.ыс", "апой$(", "апойопг", "апойкеистийа", "апок(", "аяца", "аяихло", "аяихлос", "аяихлос.паяацяажоу("
 Case "аяис$(", "аяистеяолеяос$(", "аявеиа", "аявеио", "аявеио$(", "аявеиоу.лгйос(", "аявеиоу.сталпа(", "аявг", "аукос"
 Case "аукос$(", "аукоу", "ауноуса", "ауто", "ажаияесг", "ажгсе", "баке", "баке.адеиа$(", "басг"
-Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "целисе", "целисла"
+Case "басг(", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг", "бгла", "богхеиа", "цецомос", "цецомота", "целисе", "целисла"
 Case "цемийес", "цемийг", "цемийо", "циа", "цомийо", "цяалла", "цяалла$", "цяаллатосеияа", "цяаллатосеияа$", "цяаллесамажояас", "цяаллг"
 Case "цяажг$(", "цяаье", "цягцояа", "цымиа", "дапед(", "деийтг.лояжг", "деийтгс", "деийтгс.йол", "деийтгс.у", "деийтгс.в"
-Case "деийтгса.у", "деийтгса.в", "деине", "дей(", "дейаен", "дейаен$(", "дем", "дени$(", "денилеяос$(", "дес", "дглосио"
+Case "деийтгса.у", "деийтгса.в", "деине", "дей(", "дейаен", "дейаен$(", "дем", "дениос", "дени$(", "денилеяос$(", "дес", "дглосио"
 Case "диа", "диабасе", "диацяажг", "диадовийо", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастасг("
 Case "диастиво", "диажамеиа", "диажамеиа$", "диажамо", "диажуцг", "диейоье", "дийтуо$", "диояхысе"
 Case "дипка", "дипко", "дипкос", "дойилг", "дойилг(", "долг", "дяолеас", "дуадийг.пеяистяожг(", "дуадийо", "дуадийо(", "дуадийо.айеяаио("
@@ -2891,7 +2891,7 @@ Case "тилг(", "тилгсыяоу$(", "тилгсыяоу(", "типота", "титкос", "титкос$(", "тлгл
 Case "тон.еж(", "топийа", "топийес", "топийг", "топийо", "топийо$(", "топийо(", "топос$(", "топос.аявеиоу$("
 Case "тоте", "тяап(", "тупос", "тупос$(", "тупос.аявеиоу$(", "тупысе", "туваиос", "туваиос(", "тыяа", "у.сглеиа"
 Case "упаявеи(", "упаявеи.йатакоцос(", "упеяйкасг", "уплея(", "упо", "упойатакоцос", "упок", "упокоцистг", "упокоцистгс$", "упокоипо"
-Case "уполмгла", "упыяа(", "уьос", "уьос.сглеиоу", "жайекос$(", "жамеяо$(", "жаядиа", "жеяе"
+Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.сглеиоу", "жайекос$(", "жамеяо$(", "жаядиа", "жеяе"
 Case "жеяеписы", "жхимоуса", "жиктяо$(", "жомто", "жояла", "жояла$", "жоятос", "жоятысе", "жоятысе.еццяажо"
 Case "жяасг", "жымг", "жыто$(", "в.сглеиа", "вая$(", "ваяайтгяес", "ваяане", "ваяйыд$("
 Case "ваяйыд(", "вягсг", "вягстг", "вягстгс", "вягстым", "вяомос$(", "вяомос(", "вяыла", "вяыла(", "вяылата"
@@ -4119,7 +4119,7 @@ If Err.Number > 0 Then aSize = 12: fonttest.Font.Size = aSize
 End Sub
 Public Function InternalLeadingSpace() As Long
 On Error Resume Next
-    GetTextMetrics fonttest.hdc, tm
+    GetTextMetrics fonttest.hDC, tm
   With tm
 InternalLeadingSpace = (tm.tmInternalLeading = 0) Or Not (tm.tmInternalLeading > 0)
 End With
