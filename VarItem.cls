@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Private mTypeName As String
 Private mItem As Variant
 Private slot As Integer
@@ -67,7 +68,5 @@ If slot = 1 Then Set ObjectRef = mItem
 End Property
 
 Private Sub Class_Terminate()
-' Ensure that if this is a last reference to object...
-' then a class terminate happen
-Set mItemObject = Nothing
+If slot = 1 Then Set mItem = Nothing
 End Sub

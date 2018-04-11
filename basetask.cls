@@ -17,6 +17,7 @@ Option Explicit
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public callx1 As Long
+Public RRCOUNTER As Long
 Public callohere As String
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
@@ -25,6 +26,8 @@ Public IFCTRL As Boolean, jump As Boolean
 Public Vars As Long
 Public usestack As Boolean
 Public commnum As Long
+Public strnum As Long
+Public numnum As Long
 Public strfunnum As Long
 Public numfunnum As Long
 Public connectnow As Boolean
@@ -71,7 +74,7 @@ Public OriginalCode As Long
 Public StaticInUse$
 Private mIamlambda As Boolean
 Private mIamAnEvent As Boolean
-Public NoError As Boolean
+Public NoError As Boolean, lastpointer As Object
 Public Sub CopyStrip(bst As basetask)
 With bst
 .StaticInUse = StaticInUse
@@ -556,7 +559,7 @@ Else
 End If
 Set aa = Nothing
 End Function
-Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
+Public Function ThreadsStr(Optional ByVal lang As Long = 0)
 '' use threadsnames
 
 Dim aa As mThreadref, a$
@@ -568,7 +571,7 @@ While threadsnames.Done
 ' For Each aa In threadsnames
 Set aa = threadsnames.ValueObj
 If Left$(aa.VarName, 1) = "_" Then
-If Lang = 0 Then
+If lang = 0 Then
 a$ = a$ & "есытеяийо мгла "
 Else
 a$ = a$ & "INTERNAL THREAD "
@@ -583,7 +586,7 @@ Set aa = Nothing
 End If
 If Me.IamChild Then
 If Not Me.Parent Is Nothing Then
-ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(Lang))
+ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(lang))
 Else
 ThreadsStr = vbNullString
 End If
@@ -642,14 +645,14 @@ Set Owner = Nothing
 Set lastobj = Nothing
 Set FuncObj = Nothing
 End Sub
-Public Function IsOptionalForArray(Check As Boolean) As Boolean
+Public Function IsOptionalForArray(check As Boolean) As Boolean
 If parentSoros.LookNull Then
     IsOptionalForArray = False
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
-    IsOptionalForArray = Check
+    IsOptionalForArray = check
 ElseIf parentSoros.Count = 0 Then
-  IsOptionalForArray = Check
+  IsOptionalForArray = check
 End If
 End Function
 Public Function IsOptional() As Boolean

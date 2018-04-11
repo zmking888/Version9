@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 ' lambda functions in M2000
 ' in running state copy nonlocal variables to current list
 Public name$
@@ -34,7 +35,7 @@ For i = 0 To used - 1
     
     If IsObject(myVar(where).Value) Then
     dummy = 0
-    myVar(where).there = GlobalVar(nm$, dummy, , glb)
+    myVar(where).there = globalvar(nm$, dummy, , glb)
     
     If Typename(myVar(where).Value) = "lambda" Then
          
@@ -55,7 +56,7 @@ For i = 0 To used - 1
     End If
     
     Else
-    myVar(where).there = GlobalVar(nm$, myVar(where).Value, , glb)
+    myVar(where).there = globalvar(nm$, myVar(where).Value, , glb)
     End If
     Else
     
@@ -65,7 +66,7 @@ For i = 0 To used - 1
         
         
            If Typename(myVar(where).Value) = "lambda" Then
-             GlobalVar nm$, there, True, glb
+             globalvar nm$, there, True, glb
                         If glb Then
                         GlobalSub nm$ + "()", "CALL EXTERN " & Str(myVar(where).there)
                     Else
@@ -78,10 +79,10 @@ For i = 0 To used - 1
           'LinkGroup bstack, here$ & "." & bstack.GroupName & nm$, v(i)
           'End If
           Else
-          GlobalVar nm$, there, True, glb
+          globalvar nm$, there, True, glb
           End If
 Else
-          GlobalVar nm$, there, True, glb
+          globalvar nm$, there, True, glb
     End If
     End If
     
@@ -101,8 +102,8 @@ If refcount = 0 Then
 For i = 0 To used - 1
 ' check if is better with MyIsObject
     If IsObject(v(myVar(i).there)) Then
-        If Typename(myVar(where).Value) = "Group" Then
-            Set myVar(where).Value = CopyGroupObj(v(myVar(i).there))
+        If Typename(myVar(i).Value) = "Group" Then
+            Set myVar(i).Value = CopyGroupObj(v(myVar(i).there))
             ' why not  Set v(myVar(i).there) = Nothing
         Else
             Set myVar(i).Value = v(myVar(i).there)
@@ -182,7 +183,7 @@ Set subs = Nothing
 End Sub
 Public Sub CopyTo(a As lambda, v() As Variant)
 ' only for new
-Dim b As lambda, VR As Variant, where As Long
+Dim b As lambda, VR As Variant, where As Long, nm$
 Set a = New lambda
 a.code$ = Me.code$
 a.OriginalCode = Me.OriginalCode

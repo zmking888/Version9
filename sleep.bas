@@ -1,5 +1,6 @@
 Attribute VB_Name = "Module7"
 Option Explicit
+Private Declare Function GdiFlush Lib "gdi32" () As Long
 Private Const MEM_DECOMMIT = &H4000&
 Private Const MEM_RELEASE = &H8000&
 Private Const MEM_COMMIT = &H1000&
@@ -86,7 +87,7 @@ Private Declare Function WaitForSingleObject Lib "KERNEL32" ( _
     ByVal hHandle As Long, _
     ByVal dwMilliseconds As Long) As Long
     
-Private Declare Function MsgWaitForMultipleObjects Lib "User32" ( _
+Private Declare Function MsgWaitForMultipleObjects Lib "user32" ( _
     ByVal nCount As Long, _
     pHandles As Long, _
     ByVal fWaitAll As Long, _
@@ -179,15 +180,47 @@ Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
       Debug.Print GetLastError()
       End If
 End Sub
+Public Sub MyRefresh(bstack As basetask)
+With Prefresh(GetCode(bstack.Owner))
+            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+            
+                If .RRCOUNTER = 0 Then
+                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+                 If bstack.Owner.Visible Then bstack.Owner.Refresh
+                 End If
+                 
+                 End With
+End Sub
+Public Sub SkipRefresh(bstack As basetask)
+            With Prefresh(GetCode(bstack.Owner))
+                   .k1 = uintnew(timeGetTime + REFRESHRATE)
+                 End With
+End Sub
+Public Sub PrintRefresh(bstack As basetask, Scr As Object)
+    With Prefresh(GetCode(bstack.Owner))
+        If uintnew(timeGetTime) > .k1 Then
+            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            If Scr.Visible Then Scr.Refresh
+            If Not TaskMaster Is Nothing Then
+                TaskMaster.StopProcess
+                DoEvents
+                TaskMaster.StartProcess
+            Else
+                DoEvents
+            End If
+        End If
+    End With
+End Sub
+
 Public Sub MyDoEvents0new(some As Object)
    On Error GoTo procbliah3
 
 
-
-            If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+        With Prefresh(GetCode(some))
+            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
             
                 If RRCOUNTER = 0 Then
-                    k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
                     If some.Visible Then some.Refresh
                   
                    
@@ -200,20 +233,22 @@ Public Sub MyDoEvents0new(some As Object)
                         DoEvents
                     End If
            End If
+           End With
    Exit Sub
+   
 procbliah3:
 DoEvents
 End Sub
 
 Public Sub MyDoEvents0(some As Object)
    On Error GoTo procbliah3
+With Prefresh(GetCode(some))
 
 
-
-            If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+            If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
             
-                If RRCOUNTER = 0 Then
-                    k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+                If .RRCOUNTER = 0 Then
+                    .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
                     If some.Visible Then some.Refresh
                   
                    End If
@@ -225,15 +260,15 @@ Public Sub MyDoEvents0(some As Object)
                     Else
                         DoEvents
                     End If
-           
+End With
    Exit Sub
 procbliah3:
 DoEvents
 End Sub
 
-Public Sub MyDoEvents1(some As Object, Optional DOeVONLY As Boolean = False)
+Public Sub MyDoEvents1(some As Object, Optional DOeVONLY As Boolean = False, Optional ResetK1 As Boolean)
 Static once As Boolean
-On Error Resume Next
+If some Is Nothing Then
 If TaskMaster Is Nothing Then
 If DOeVONLY Then
             DoEvents
@@ -242,7 +277,68 @@ If DOeVONLY Then
             
             If RRCOUNTER = 0 Then
             k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-            If Not some Is Nothing Then If some.Visible Then some.Refresh
+            End If
+            End If
+Else
+    TaskMaster.rest
+    If DOeVONLY Then
+     If Not once Then
+        once = True
+        TaskMaster.TimerTickNow
+        TaskMaster.StopProcess
+         DoEvents
+         TaskMaster.StartProcess
+         once = False
+         Else
+        TaskMaster.TimerTickNow
+         TaskMaster.StopProcess
+         DoEvents
+        End If
+    Else
+    
+    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+    
+            
+            If RRCOUNTER = 0 Then
+            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+            TaskMaster.Dispose
+         If Not once Then
+        once = True
+        TaskMaster.TimerTickNow
+        TaskMaster.StopProcess
+         DoEvents
+         TaskMaster.StartProcess
+         once = False
+         Else
+        TaskMaster.TimerTickNow
+         TaskMaster.StopProcess
+         DoEvents
+        End If
+                  
+                  End If
+        End If
+
+TaskMaster.RestEnd
+End If
+
+
+
+Exit Sub
+End If
+
+On Error Resume Next
+If some Is Nothing Then Stop
+With Prefresh(GetCode(some))
+If TaskMaster Is Nothing Then
+If DOeVONLY Then
+            DoEvents
+            Else
+    
+    If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+            
+            If .RRCOUNTER = 0 Then
+            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
+            If some.Visible Then some.Refresh
             End If
             End If
 Else
@@ -263,15 +359,14 @@ Else
          DoEvents
         End If
     Else
-    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-            
-            If RRCOUNTER = 0 Then
-            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-            If some Is Nothing Then
-            TaskMaster.Dispose
-            Else
-         If some.Visible Then some.Refresh ': TaskMaster.RestEnd: Exit Sub
-         End If
+      If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+             If .RRCOUNTER = 0 Then
+            .k1 = uintnew(timeGetTime) + REFRESHRATE: .RRCOUNTER = 1
+               
+         If some.Visible Then some.Refresh
+        
+         
+         
          If Not once Then
         once = True
         TaskMaster.TimerTickNow
@@ -290,21 +385,75 @@ Else
 
 TaskMaster.RestEnd
 End If
+End With
 End Sub
-Public Sub MyRefresh(some As Object)
+Public Sub MyDoEvents2(Optional obj As Object)
+On Error GoTo endevents
+If k1 = 0 Then k1 = uintnew(timeGetTime): RRCOUNTER = 1
+   If TaskMaster.PlayMusic Then
+                    TaskMaster.OnlyMusic = True
+                        TaskMaster.TimerTick
+                        TaskMaster.OnlyMusic = False
+    End If
+    If TaskMaster.Processing Then
+    If Not extreme Then
+        If Not obj Is Nothing Then
+              With Prefresh(GetCode(obj))
+                If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
+                If RRCOUNTER = 0 Then
+                    If obj.Visible Then
+                        If Kform Then
+                            Kform = False
+                            .k1 = 0
+                            TaskMaster.rest
+                            UpdateWindow obj.hWND
+                            DoEvents
+                            TaskMaster.RestEnd
+                        Else
+                            MyDoEvents1 obj
+                        End If
+                       '.k1 = uintnew(timeGetTime + REFRESHRATE)
+                       .RRCOUNTER = 1
+                    End If
+                End If
+            End With
+        End If
+        
+    Else
+         If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+         If RRCOUNTER = 0 Then k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+               
 
 
-    If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
-            
-            If RRCOUNTER = 0 Then
-            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
-         If some.Visible Then some.Refresh
 
-                  End If
-                  
+    End If
+Else
 
-   
+
+
+ If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+ If RRCOUNTER = 0 Then
+        k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+        If QRY Then
+             DoEvents
+        Else
+            If Kform Then
+                Kform = False
+                TaskMaster.rest
+                DoEvents
+                TaskMaster.RestEnd
+            Else
+                DoEvents
+            End If
+        End If
+    End If
+End If
+Exit Sub
+endevents:
+ DoEvents
 End Sub
+
+
 Public Sub SleepWait3(lNumberOf10ThmiliSeconds As Long)
 
 
@@ -323,7 +472,6 @@ Exit Sub
 Dim l As Boolean, k
 l = NOEDIT
   b.MARKONE
-  ''If A > 10 Then Sleep 0
 While a > b.MARKTWO And l = NOEDIT
 MyDoEvents2 Form1
 If Not TaskMaster Is Nothing Then If TaskMaster.Processing Then TaskMaster.TimerTick Else Sleep 0
@@ -338,7 +486,7 @@ Do
  MyDoEvents
 Loop Until a > b.MARKTWO
 End Sub
-Public Sub SleepWaitEdit(lNumberOf10ThmiliSeconds As Long)
+Public Sub SleepWaitEdit(bstack As basetask, lNumberOf10ThmiliSeconds As Long)
 On Error Resume Next
 If Forms.Count < 3 Then
 Sleep 1
@@ -394,7 +542,7 @@ TaskMaster.rest
     
     ft.dwLowDateTime = CLng(dblDelayLow)
     lRet = SetWaitableTimer(hTimer, ft, 0, 0, 0, False)
-    
+   With Prefresh(GetCode(bstack.Owner))
     Do
         ' QS_ALLINPUT means that MsgWaitForMultipleObjects will
         ' return every time the thread in which it is running gets
@@ -404,10 +552,10 @@ TaskMaster.rest
         lBusy = MsgWaitForMultipleObjects(1, hTimer, False, _
             INFINITE, QS_ALLINPUT&)
  
-       If uintnew(timeGetTime) > k1 Then RRCOUNTER = 0
+       If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
             
-            If RRCOUNTER = 0 Then
-            k1 = uintnew(timeGetTime + REFRESHRATE): RRCOUNTER = 1
+            If .RRCOUNTER = 0 Then
+            .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
           If TaskMaster Is Nothing Then
             DoEvents
            Else
@@ -417,6 +565,7 @@ TaskMaster.rest
          End If
                   End If
   Loop Until lBusy = WAIT_OBJECT_0
+  End With
     ' Close the handles when you are done with them.
     CloseHandle hTimer
 If Not TaskMaster Is Nothing Then TaskMaster.RestEnd

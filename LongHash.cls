@@ -117,6 +117,7 @@ Public Sub AddKey(RHS As Long, Optional aValue As String = vbNullString, Optiona
     ItemCreator lastkey, aValue, aInfo
     
 End Sub
+
 Private Sub ItemCreator(Key As Long, storethis As String, andthis As String)
 Dim a As Long, first As Long
 Done = False
@@ -130,6 +131,18 @@ With PriveSpace(a)
 place HashFunc1(first), a
 End With
 End Sub
+Public Sub ItemCreator2(Key As Long, storethis As String)
+Dim first As Long
+first = HashFunc0(Key)
+index = Malloc()
+With PriveSpace(index)
+    .Key = Key
+    .Container = storethis
+    .firsthash = first
+place HashFunc1(first), index
+End With
+End Sub
+
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
     k = Hash(b)
@@ -170,6 +183,20 @@ Else
     Value = PriveSpace(index).Container
 End If
 End Property
+Property Let ValueStr(RHS As String)
+If index = -1 Then
+Else
+    PriveSpace(index).Container = RHS
+End If
+End Property
+
+Property Get StrPointer() As Long
+If index = -1 Then
+Else
+    StrPointer = StrPtr(PriveSpace(index).Container)
+End If
+End Property
+
 Property Get Info() As String
 If index = -1 Then
 Else

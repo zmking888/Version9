@@ -1,11 +1,11 @@
 Attribute VB_Name = "Module5"
 Option Explicit
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Const Pi = 3.14159265359
 Private Type SAFEARRAYBOUND
     cElements As Long
-    lLbound As Long
+    lLBound As Long
 End Type
 Private Type SAFEARRAY2D
     cDims As Integer
@@ -16,23 +16,58 @@ Private Type SAFEARRAY2D
     Bounds(0 To 1) As SAFEARRAYBOUND
 End Type
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
-Public Sub SaveBmp(sFile As String, ByVal scr As Object)
+Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
 ' as a .DIB with .bmp extension
        Dim photo As New cDIBSection
-            photo.CopyPicture scr
+            photo.CopyPicture Scr
             photo.SaveDib sFile
        
 End Sub
+Public Function File2newMemblock(FileName As String, r, p) As Object
+    Dim mem As New MemBlock, BLen As Long, i As Long
+    r = -1#
+    FileName = CFname(FileName)
+    If FileName <> "" Then
+     
+     
+    BLen = FileLen(GetDosPath(FileName))
+    If BLen Then
+    mem.Costruct 1, BLen, , CBool(p)
+    i = FreeFile
+    On Error Resume Next
 
+    Open GetDosPath(FileName) For Binary Access Read As i
+
+    If Err.Number > 0 Then MyEr Err.Description, Err.Description: Close i: Exit Function
+    If mem.getData(i, mem.GetPtr(0), BLen) Then
+    r = 0#
+    Set File2newMemblock = mem
+    End If
+    Close i
+    End If
+    End If
+End Function
+
+Public Function SaveStr2MemBlock(a, r) As Object
+Dim aa As New cDIBSection
+r = -1#
+If cDib(a, aa) Then
+    aa.GetDpi 96, 96
+    If Not aa.SaveDibToMeMBlock(SaveStr2MemBlock) Then
+    MyEr "Can't save to buffer", "Δεν μπορώ να σώσω στη διάρθρωση"
+    Else
+    r = 0#
+    End If
+End If
+End Function
 
 Public Function SaveJPG( _
       ByRef cDib As cDIBSection, _
-      ByVal sFile As String, _
-      Optional ByVal lQuality As Long = 90 _
-   ) As Boolean
+      ByVal sFile As String, Optional ByVal lQuality As Long = 90, _
+      Optional UserComment As String) As Boolean
    Dim j As New cJpeg
 j.Quality = lQuality
-j.Comment = "m2000 exctract "  'not exactly what I want...
+If UserComment = "" Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
 If lQuality <= 50 Then
 j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
 Else
@@ -46,11 +81,11 @@ j.SaveFile sFile
 End With
    End Function
 
-Public Sub CheckOrientation(a As cDIBSection, f As String)
+Public Sub CheckOrientation(a As cDIBSection, F As String)
 
-          If LCase(ExtractType(f, (0))) = "jpg" Then
+          If LCase(ExtractType(F, (0))) = "jpg" Then
            Dim qw As New ExifRead
-             qw.Load f
+             qw.Load F
  
             Select Case qw.Tag(Orientation)
                   Case 3
@@ -63,18 +98,17 @@ Public Sub CheckOrientation(a As cDIBSection, f As String)
                          
                          End If
 End Sub
-
-Public Function RotateDib90(cDIBbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
+Public Function RotateDib90(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
-If cDIBbuffer0.hDIb = 0 Then Exit Function
-   piw = cDIBbuffer0.Width
-   pih = cDIBbuffer0.Height
+If cDibbuffer0.hDIb = 0 Then Exit Function
+   piw = cDibbuffer0.Width
+   pih = cDibbuffer0.Height
       If piw = 0 Then Exit Function
 
  Dim cDIBbuffer1 As New cDIBSection
 If cDIBbuffer1.Create(pih, piw) Then
 
-cDIBbuffer1.GetDpiDIB cDIBbuffer0
+cDIBbuffer1.GetDpiDIB cDibbuffer0
 Dim bDib() As Byte, bDib1() As Byte
 Dim x As Long, y As Long
 Dim tSA As SAFEARRAY2D
@@ -83,19 +117,19 @@ On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
-        .Bounds(0).cElements = cDIBbuffer0.Height
-        .Bounds(1).lLbound = 0
-        .Bounds(1).cElements = cDIBbuffer0.BytesPerScanLine()
-        .pvData = cDIBbuffer0.DIBSectionBitsPtr
+        .Bounds(0).lLBound = 0
+        .Bounds(0).cElements = cDibbuffer0.Height
+        .Bounds(1).lLBound = 0
+        .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
+        .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -135,23 +169,23 @@ Else
 
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
- cDIBbuffer0.CreateFromPicture cDIBbuffer1.Picture
-cDIBbuffer0.GetDpiDIB cDIBbuffer1
+ cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
+cDibbuffer0.GetDpiDIB cDIBbuffer1
     End If
 
 
 
 End Function
-Public Function RotateDib270(cDIBbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
+Public Function RotateDib270(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
-   piw = cDIBbuffer0.Width
-   pih = cDIBbuffer0.Height
+   piw = cDibbuffer0.Width
+   pih = cDibbuffer0.Height
     If piw = 0 Then Exit Function
 ' Dim cDIBbuffer1 As Object
  Dim cDIBbuffer1 As New cDIBSection
 If cDIBbuffer1.Create(pih, piw) Then
 'cDIBbuffer1.WhiteBits
-cDIBbuffer1.GetDpiDIB cDIBbuffer0
+cDIBbuffer1.GetDpiDIB cDibbuffer0
 cDIBbuffer1.Cls
 Dim bDib() As Byte, bDib1() As Byte
 Dim x As Long, y As Long
@@ -161,19 +195,19 @@ On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
-        .Bounds(0).cElements = cDIBbuffer0.Height
-        .Bounds(1).lLbound = 0
-        .Bounds(1).cElements = cDIBbuffer0.BytesPerScanLine()
-        .pvData = cDIBbuffer0.DIBSectionBitsPtr
+        .Bounds(0).lLBound = 0
+        .Bounds(0).cElements = cDibbuffer0.Height
+        .Bounds(1).lLBound = 0
+        .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
+        .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -211,24 +245,24 @@ If MEDOEV Then
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
- cDIBbuffer0.CreateFromPicture cDIBbuffer1.Picture
-cDIBbuffer0.GetDpiDIB cDIBbuffer1
+ cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
+cDibbuffer0.GetDpiDIB cDIBbuffer1
     End If
 
 
 
 End Function
-Public Function RotateDib180(cDIBbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
+Public Function RotateDib180(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 ' MEDOEV if true then with doevents
 Dim piw As Long, pih As Long
 
-If cDIBbuffer0.hDIb = 0 Then Exit Function
-   piw = cDIBbuffer0.Width
-   pih = cDIBbuffer0.Height
+If cDibbuffer0.hDIb = 0 Then Exit Function
+   piw = cDibbuffer0.Width
+   pih = cDibbuffer0.Height
       If piw = 0 Then Exit Function
  Dim cDIBbuffer1 As New cDIBSection
  If cDIBbuffer1.Create(piw, pih) Then
- cDIBbuffer1.GetDpiDIB cDIBbuffer0
+ cDIBbuffer1.GetDpiDIB cDibbuffer0
 
 Dim bDib() As Byte, bDib1() As Byte
 Dim x As Long, y As Long
@@ -238,19 +272,19 @@ On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
-        .Bounds(0).cElements = cDIBbuffer0.Height
-        .Bounds(1).lLbound = 0
-        .Bounds(1).cElements = cDIBbuffer0.BytesPerScanLine()
-        .pvData = cDIBbuffer0.DIBSectionBitsPtr
+        .Bounds(0).lLBound = 0
+        .Bounds(0).cElements = cDibbuffer0.Height
+        .Bounds(1).lLBound = 0
+        .Bounds(1).cElements = cDibbuffer0.BytesPerScanLine()
+        .pvData = cDibbuffer0.DIBSectionBitsPtr
     End With
     CopyMemory ByVal VarPtrArray(bDib()), VarPtr(tSA), 4
     With tSA1
         .cbElements = 1
         .cDims = 2
-        .Bounds(0).lLbound = 0
+        .Bounds(0).lLBound = 0
         .Bounds(0).cElements = cDIBbuffer1.Height
-        .Bounds(1).lLbound = 0
+        .Bounds(1).lLBound = 0
         .Bounds(1).cElements = cDIBbuffer1.BytesPerScanLine()
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
@@ -295,8 +329,8 @@ Else
     End If
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
-cDIBbuffer0.CreateFromPicture cDIBbuffer1.Picture
-cDIBbuffer0.GetDpiDIB cDIBbuffer1
+cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
+cDibbuffer0.GetDpiDIB cDIBbuffer1
     End If
 End Function
 

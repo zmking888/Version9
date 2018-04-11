@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+Option Explicit
 'class for call back
 Private objref As basetask
 Private mineHere$
@@ -129,7 +130,7 @@ Set oldsoros = Nothing
 here$ = ohere$
 End Sub
 Public Sub CallModule(modulename$, ParamArray a())
-Static once As Boolean, where As Long, what
+Static once As Boolean, where As Long, what, full$
 If Status <> 0 Then Exit Sub
 If Not GetSubFullName2(myUcase(modulename$, True), full$, where) Then
     what = False
@@ -168,7 +169,7 @@ Dim manydim As Long, maxitems As Long, probe As Long, v() As Variant, probelow A
 Dim IhaveSignature As Boolean, sign$, sign2$, dummy$, look As Long
 If reghash.Find(myUcase(modulename$, True)) Then
 sign$ = reghash.Value
-sign2$ = sigh$
+sign2$ = sign$
 IhaveSignature = True
 End If
 ' no byrefernece yet
@@ -275,7 +276,7 @@ once = False
 End Sub
 
 Public Sub ExecuteStatement(ByVal code$)
-Dim what$, pos As Long, func As Boolean, param$
+Dim what$, pos As Long, func As Boolean, param$, drop$
 If Status <> 0 Then Exit Sub
 If IsLabelOnly(code$, what$) > 4 Then
     func = True
@@ -351,7 +352,7 @@ Run = True
         LastErNameGR = vbNullString
 
 If Execute(objref, code$, False) <> 1 Then
-Run = fasle
+Run = False
 
 If Not App.StartMode = vbSModeStandalone Then
                  MOUT = True
@@ -450,7 +451,7 @@ End Sub
 
 Private Sub Class_Terminate()
 Set mObjRef = Nothing
-mName$ = name$
+mName$ = vbNullString
 Set objref.Owner = Nothing
 Set objref.Sorosref = Nothing
 Set objref = Nothing

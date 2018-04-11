@@ -141,7 +141,7 @@ Public textbox1 As myTextBox
 Public WithEvents ListPad As Document
 Attribute ListPad.VB_VarHelpID = -1
 Private Type myImage
-    image As StdPicture
+    Image As StdPicture
     Height As Long
     Width As Long
     Top As Long
@@ -149,8 +149,8 @@ Private Type myImage
 End Type
 Dim Image1 As myImage
 'This is my new MsgBox
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Private Declare Function DestroyCaret Lib "User32" () As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function DestroyCaret Lib "user32" () As Long
 Dim iTop As Long, iLeft As Long, iwidth As Long, iheight As Long
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
@@ -163,7 +163,7 @@ Dim myOk As myButton
 Dim myCancel As myButton
 Dim all As Long
 Dim novisible As Boolean
-Private mModalId As Variant
+Private mModalid As Variant
 
 
 '
@@ -193,7 +193,7 @@ End If
 End Sub
 
 Private Sub Form_Load()
-Dim photo As Object
+Dim photo As cDIBSection, aPic As StdPicture
 
 novisible = True
 ''Set LastGlist = Nothing
@@ -240,7 +240,10 @@ Else
                Set photo = Nothing
        Else
                If CFname(AskDIB$) <> "" Then
-                   Set LoadPictureMine = LoadPicture(GetDosPath(CFname(AskDIB$)))
+                  Set aPic = LoadMyPicture(GetDosPath(CFname(AskDIB$)), True, gList2.backcolor)
+                    If aPic Is Nothing Then Exit Sub
+               
+                   Set LoadPictureMine = aPic
                Else
                    Set LoadPictureMine = Form3.Icon
                End If
@@ -497,7 +500,7 @@ iLeft = borderleft
 iTop = 5 * bordertop
 iwidth = itemwidth3
 iheight = bordertop * 12
- Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.BackColor, BF
+ Line (0, 0)-(ScaleWidth - dv15, ScaleHeight - dv15), Me.backcolor, BF
 If (curIwidth / iwidth) < (curIheight / iheight) Then
 sc = curIheight / iheight
 ImageMove Image1, iLeft + (iwidth - curIwidth / sc) / 2, iTop, curIwidth / sc, iheight
@@ -523,10 +526,10 @@ End Function
 Public Property Set LoadApicture(aImage As StdPicture)
 On Error Resume Next
 Dim sc As Double
-Set Image1.image = Nothing
+Set Image1.Image = Nothing
 Image1.Width = 0
 If aImage.handle <> 0 Then
-Set Image1.image = aImage
+Set Image1.Image = aImage
 If (aImage.Width / iwidth) < (aImage.Height / iheight) Then
 sc = aImage.Height / iheight
 ImageMove Image1, iLeft + (iwidth - aImage.Width / sc) / 2, iTop, aImage.Width / sc, iheight
@@ -544,10 +547,10 @@ End Property
 Public Property Set LoadPictureMine(aImage As StdPicture)
 On Error Resume Next
 Dim sc As Double
-Set Image1.image = Nothing
+Set Image1.Image = Nothing
 Image1.Width = 0
 If aImage.handle <> 0 Then
-Set Image1.image = aImage
+Set Image1.Image = aImage
 Image1.Height = aImage.Height
 Image1.Width = aImage.Width
 End If
@@ -583,16 +586,21 @@ CopyFromLParamToRect a, thatRect
 FillBack thathDC, a, thatbgcolor
 End Sub
 Private Sub ImageMove(a As myImage, neoTop As Long, NeoLeft As Long, NeoWidth As Long, NeoHeight As Long)
-If a.image Is Nothing Then Exit Sub
-If a.image.Width = 0 Then Exit Sub
-If a.image.Type = vbPicTypeIcon Then
-Dim aa As New cDIBSection
-aa.BackColor = BackColor
-aa.CreateFromPicture a.image
-aa.ResetBitmapTypeToBITMAP
-PaintPicture aa.Picture, neoTop, NeoLeft, NeoWidth, NeoHeight
+If a.Image Is Nothing Then Exit Sub
+If a.Image.Width = 0 Then Exit Sub
+If a.Image.Type = vbPicTypeIcon Then
+If IsWine Then
+    PaintPicture a.Image, neoTop, NeoLeft, NeoWidth, NeoHeight
+    PaintPicture a.Image, neoTop, NeoLeft, NeoWidth, NeoHeight
 Else
-PaintPicture a.image, neoTop, NeoLeft, NeoWidth, NeoHeight
+    Dim aa As New cDIBSection
+    aa.backcolor = backcolor
+    aa.CreateFromPicture a.Image
+    aa.ResetBitmapTypeToBITMAP
+    PaintPicture aa.Picture, neoTop, NeoLeft, NeoWidth, NeoHeight
+    End If
+Else
+PaintPicture a.Image, neoTop, NeoLeft, NeoWidth, NeoHeight
 End If
 
 End Sub

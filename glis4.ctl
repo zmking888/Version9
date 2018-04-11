@@ -26,6 +26,12 @@ Begin VB.UserControl gList
    PropertyPages   =   "glis4.ctx":0000
    ScaleHeight     =   7800
    ScaleWidth      =   7245
+   Begin VB.Timer BlinkTimer 
+      Enabled         =   0   'False
+      Interval        =   10000
+      Left            =   1590
+      Top             =   855
+   End
    Begin VB.Timer Timer2bar 
       Enabled         =   0   'False
       Interval        =   100
@@ -62,7 +68,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'m2000 ver 9.2
+'m2000 ver 9.3
 Option Explicit
 Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
@@ -72,7 +78,7 @@ Private Type Myshape
     hatchType As Long
     Top As Long
     Left As Long
-    width As Long
+    Width As Long
     Height As Long
 End Type
 Private mynum$, dragslow As Long
@@ -103,25 +109,25 @@ End Type
 Private ehat$
 Private fast As Boolean
 Private Declare Function GdiFlush Lib "gdi32" () As Long
-Private Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
-Private Declare Function SetBkColor Lib "gdi32" (ByVal hdc As Long, ByVal crColor As Long) As Long
+Private Declare Function SetWindowRgn Lib "user32" (ByVal hwnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
+Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
-Private Declare Function CreateCaret Lib "user32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Private Declare Function ShowCaret Lib "user32" (ByVal hWND As Long) As Long
+Private Declare Function CreateCaret Lib "user32" (ByVal hwnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Private Declare Function ShowCaret Lib "user32" (ByVal hwnd As Long) As Long
 Private Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function HideCaret Lib "user32" (ByVal hWND As Long) As Long
-Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hdc As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
-Private Declare Function FillRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
-Private Declare Function FrameRect Lib "user32" (ByVal hdc As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function HideCaret Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
+Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
+Private Declare Function FrameRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function CreateRoundRectRgn Lib "gdi32" (ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long, ByVal X3 As Long, ByVal y3 As Long) As Long
 
 Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
-Private Declare Function Ellipse Lib "gdi32" (ByVal hdc As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
+Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Long, ByVal y1 As Long, ByVal x2 As Long, ByVal y2 As Long) As Long
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
-Private Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long
+Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
 
 Private Const PS_NULL = 5
@@ -247,6 +253,7 @@ Event RefreshOnly()
 Event CorrectCursorAfterDrag()
 Event DragOverNow(a As Boolean)
 Event DragOverDone(a As Boolean)
+Event HeadLineChange(a$)
 Private state As Boolean
 Private secreset As Boolean
 Private scrollme As Long
@@ -329,7 +336,7 @@ Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (By
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hwnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -337,7 +344,7 @@ Const WM_KEYFIRST = &H100
     y As Long
 End Type
  Private Type Msg
-    hWND As Long
+    hwnd As Long
     Message As Long
     wParam As Long
     lParam As Long
@@ -345,7 +352,7 @@ End Type
     pt As POINTAPI
 End Type
 Dim doubleclick As Long
-Dim mlx As Long, mly As Long
+Dim mLx As Long, mLy As Long
 Public SkipForm As Boolean
 Public dropkey As Boolean
 Public MenuGroup As String
@@ -393,6 +400,7 @@ End Property
 Public Property Let HeadLine(ByVal RHS As String)
 If mHeadline = vbNullString Then
 ' reset headlineheight
+RaiseEvent HeadLineChange(RHS)
 mHeadline = RHS
 HeadlineHeight = UserControlTextHeight() / scrTwips
 
@@ -442,8 +450,8 @@ Public Property Let sync(ByVal New_sync As String)
     m_sync = New_sync
     PropertyChanged "sync"
 End Property
-Public Property Get hWND() As Long
-hWND = UserControl.hWND
+Public Property Get hwnd() As Long
+hwnd = UserControl.hwnd
 End Property
 Public Property Let Text(ByVal new_text As String)
 Clear True
@@ -621,15 +629,15 @@ Else
     End If
 End Property
 
-Public Property Let BackColor(ByVal RHS As OLE_COLOR)
+Public Property Let backcolor(ByVal RHS As OLE_COLOR)
 
     m_backcolor = RHS
-UserControl.BackColor = RHS
+UserControl.backcolor = RHS
   PropertyChanged "BackColor"
     
 End Property
-Public Property Get BackColor() As OLE_COLOR
-    BackColor = m_backcolor 'UserControl.Backcolor
+Public Property Get backcolor() As OLE_COLOR
+    backcolor = m_backcolor 'UserControl.Backcolor
 End Property
 Public Property Get ForeColor() As OLE_COLOR
     ForeColor = m_ForeColor
@@ -795,10 +803,10 @@ If SELECTEDITEM > 0 Then
 If SELECTEDITEM - topitem - 1 <= lines Then
 If BackStyle = 1 Then
 
-Line (scrollme + scrTwips, (SELECTEDITEM - topitem) * YYT)-(scrollme + UserControl.width, (SELECTEDITEM - topitem - 1) * YYT), 0, B
+Line (scrollme + scrTwips, (SELECTEDITEM - topitem) * YYT)-(scrollme + UserControl.Width, (SELECTEDITEM - topitem - 1) * YYT), 0, B
 
 Else
-Line (scrollme, (SELECTEDITEM - topitem) * YYT)-(scrollme + UserControl.width, (SELECTEDITEM - topitem - 1) * YYT), 0, B
+Line (scrollme, (SELECTEDITEM - topitem) * YYT)-(scrollme + UserControl.Width, (SELECTEDITEM - topitem - 1) * YYT), 0, B
 
 
 End If
@@ -815,6 +823,19 @@ If ListIndex < 0 Then
 Else
 PressKey KeyCode, shift
 End If
+End Sub
+
+Private Sub BlinkTimer_Timer()
+If mBlinkTime = 0 Then BlinkON = False
+If BlinkON Then
+    BlinkTimer.Interval = mBlinkTime
+    FaceBlink = Not FaceBlink
+    RaiseEvent BlinkNow(FaceBlink)
+    ShowPan
+Else
+    BlinkTimer.enabled = False
+End If
+
 End Sub
 
 Private Sub Timer1bar_Timer()
@@ -924,23 +945,26 @@ End Sub
 
 Private Sub Timer1_Timer()
 If BlinkON Then
-    Timer1.Interval = mBlinkTime
-    FaceBlink = Not FaceBlink
-    RaiseEvent BlinkNow(FaceBlink)
-    ShowPan
+    If Not BlinkTimer.enabled Then
+        BlinkTimer.Interval = mBlinkTime
+        BlinkTimer.enabled = True
+        FaceBlink = Not FaceBlink
+        RaiseEvent BlinkNow(FaceBlink)
+        ShowPan
+    End If
 Else
-Timer1.enabled = False
-Timer1.Interval = 30
-If Not enabled Then Exit Sub
+    Timer1.enabled = False
+    Timer1.Interval = 30
+    If Not enabled Then Exit Sub
 
-If listcount > 0 Then
-  ShowMe2
-Else
+    If listcount > 0 Then
+      ShowMe2
+    Else
+    
+      ShowMe
+    End If
 
-  ShowMe
-End If
-
-Refresh
+    Refresh
 End If
 End Sub
 
@@ -1065,12 +1089,12 @@ WordCharLeft = " ,."
 WordCharRight = " ,."
 BarColor = &H63DFFE  '&HC3C3C3
 Shape1.hatchType = 1
-mlx = -1000
-mly = -1000
+mLx = -1000
+mLy = -1000
 End Sub
 
 Private Sub UserControl_InitProperties()
- BackColor = m_def_BackColor
+ backcolor = m_def_BackColor
    ForeColor = m_def_ForeColor
     CapColor = m_def_CapColor
  dcolor = m_def_dcolor
@@ -1092,6 +1116,7 @@ Public Sub PressKey(KeyCode As Integer, shift As Integer, Optional NoEvents As B
 If shift <> 0 And KeyCode = 16 Then Exit Sub
 
 Timer1.enabled = False
+If BlinkON Then BlinkTimer.enabled = True
 'Timer1.Interval = 1000
 Dim lastlistindex As Long, bb As Boolean
 lastlistindex = ListIndex
@@ -1460,7 +1485,7 @@ If mHeadline <> "" And Timer2.enabled = False Then
         ' -1 is mHeadline
         ' headline listen clicks if  list is disabled...
         RaiseEvent ExposeItemMouseMove(Button, -1, CLng(x) / scrTwips, CLng(y) / scrTwips)
-        If (x < width - mPreserveNpixelsHeaderRight) Or (mPreserveNpixelsHeaderRight = 0) Then RaiseEvent HeaderSelected(Button)
+        If (x < Width - mPreserveNpixelsHeaderRight) Or (mPreserveNpixelsHeaderRight = 0) Then RaiseEvent HeaderSelected(Button)
         If oldbutton <> Button Then
         Button = 0
         Exit Sub
@@ -1477,7 +1502,7 @@ YYT = YYT + (mHeadline <> "")
 lastX = x
 LastY = y
 
-If (x > width - barwidth) And BarVisible And EnabledBar And Button = 1 Then
+If (x > Width - barwidth) And BarVisible And EnabledBar And Button = 1 Then
 If Vertical Then
 GetOpenValue = valuepoint - y + mHeadlineHeightTwips
 Else
@@ -1517,12 +1542,11 @@ If TIMESTAMP = 0 Or (TIMESTAMP - Timer) > 1 Then TIMESTAMP = Timer
 If (TIMESTAMP + 0.02) > Timer And shift = 0 Then Exit Sub
 TIMESTAMP = Timer
 
-
 If Not FreeMouse Then Exit Sub
 If Button = 0 Then If mousepointer < 2 Then mousepointer = 1
-If (x > width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
+If (x > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
 Hidebar = True: BarVisible = True
-ElseIf (x < width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
+ElseIf (x < Width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
 Hidebar = False
 BarVisible = False
 End If
@@ -1581,7 +1605,7 @@ ElseIf dr Then
      End If
 If (SELECTEDITEM <> (topitem + YYT + 1)) And SELECTEDITEM >= 0 And Button <> 0 Then secreset = False
 ' special for M2000  (StickBar And x > Width / 2)
-If shift = 0 And ((Not scrollme > 0) And (x > width / 2) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
+If shift = 0 And ((Not scrollme > 0) And (x > Width / 2) Or Not SingleLineSlide) And StickBar And MarkNext = 0 And tListcount > lines + 1 Then
 If Abs(LastY - y) < scrTwips * 2 Then LastY = y: Exit Sub
 Hidebar = True
 CalcAndShowBar1
@@ -1746,7 +1770,7 @@ Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single
 'If Not myt = mytPixels * SCRTWIPS Then Stop
 If dropkey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
-If Button = 1 Then mlx = CLng(x / scrTwips): mly = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
+If Button = 1 Then mLx = CLng(x / scrTwips): mLy = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
 If (Button And 2) = 2 Then
 x = nowX
 y = nowY
@@ -1763,7 +1787,7 @@ Timer2.enabled = False
 If Not (FreeMouse Or Not myEnabled) Then Exit Sub
 
 With UserControl
- If (x < 0 Or y < 0 Or x > .width Or y > .Height) And (LeaveonChoose And Not BypassLeaveonChoose) Then
+ If (x < 0 Or y < 0 Or x > .Width Or y > .Height) And (LeaveonChoose And Not BypassLeaveonChoose) Then
 If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
  SELECTEDITEM = -1
  RaiseEvent Selected2(-2)
@@ -1944,10 +1968,10 @@ End If
 If ok Then
         If data.GetFormat(13) Then
           
-          something$ = data.GetData(13)
+          something$ = data.getData(13)
           Else
         
-            something$ = data.GetData(vbCFText)
+            something$ = data.getData(vbCFText)
             End If
 something$ = Replace(something$, ChrW(0), "")
 
@@ -2183,7 +2207,7 @@ BorderStyle = .ReadProperty("BorderStyle", m_def_BorderStyle)
 
 m_showbar = .ReadProperty("ShowBar", m_def_Showbar)
 dcolor = .ReadProperty("dcolor", m_def_dcolor)
-BackColor = .ReadProperty("BackColor", m_def_BackColor)
+backcolor = .ReadProperty("BackColor", m_def_BackColor)
 ForeColor = .ReadProperty("ForeColor", m_def_ForeColor)
 CapColor = .ReadProperty("CapColor", m_def_CapColor)
 
@@ -2248,7 +2272,7 @@ With PropBag
    .WriteProperty "BorderStyle", m_BorderStyle, m_def_BorderStyle
     .WriteProperty "ShowBar", m_showbar, m_def_Showbar
     .WriteProperty "dcolor", dcolor, m_def_dcolor
-     .WriteProperty "Backcolor", BackColor, m_def_BackColor
+     .WriteProperty "Backcolor", backcolor, m_def_BackColor
        .WriteProperty "ForeColor", ForeColor, m_def_ForeColor
     .WriteProperty "CapColor", CapColor, m_def_CapColor
 
@@ -2293,7 +2317,7 @@ Else
 SELECTEDITEM = 0
 End If
 End Property
-Private Sub FloatListMe(state As Boolean, x As Single, y As Single)
+Public Sub FloatListMe(state As Boolean, x As Single, y As Single)
 Static preX As Single, preY As Single
 Dim mm$, mo As Control, nm$, cnt$, p As Long
 mm$ = UserControl.Ambient.DisplayName
@@ -2614,7 +2638,7 @@ Public Sub Clear(Optional ByVal interface As Boolean = False)
 SELECTEDITEM = -1
 LastSelected = -2
 itemcount = 0
-If hWND <> 0 Then HideCaret (hWND)
+If hwnd <> 0 Then HideCaret (hwnd)
 state = True
 mValue = 0  ' if here you have an error you forget to apply VALUE as default property
 showshapes
@@ -2762,15 +2786,15 @@ nr.Left = 0
 nr.Bottom = mytPixels + 1
 hnr.Bottom = mytPixels + 1
 
-nr.Right = width / scrTwips
-hnr.Right = width / scrTwips
+nr.Right = Width / scrTwips
+hnr.Right = Width / scrTwips
 
 If mHeadline <> "" Then
 nr.Bottom = HeadlineHeight
 
-RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hdc, skipme)
+RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hDC, skipme)
 nr.Bottom = HeadlineHeight
-CalcRectHeader UserControl.hdc, mHeadline, hnr, DT_CENTER
+CalcRectHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
 If Not skipme Then
 If hnr.Bottom < HeadLineHeightMinimum Then
 hnr.Bottom = HeadLineHeightMinimum
@@ -2781,13 +2805,13 @@ If mHeadlineHeight <> hnr.Bottom Then
 HeadlineHeight = hnr.Bottom
 nr.Bottom = mHeadlineHeight
 End If
-FillBack UserControl.hdc, nr, CapColor
+FillBack UserControl.hDC, nr, CapColor
 End If
 hnr.Top = (nr.Bottom - hnr.Bottom) \ 2
 hnr.Bottom = nr.Bottom - hnr.Top
 hnr.Left = 0
 hnr.Right = nr.Right
-PrintLineControlHeader UserControl.hdc, mHeadline, hnr, DT_CENTER
+PrintLineControlHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
 
      nr.Top = nr.Bottom
 nr.Bottom = nr.Top + mytPixels + 1
@@ -2800,10 +2824,10 @@ again123:
 
 REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
 REALX2 = scrollme + REALX
-If Not NoScroll Then If REALX2 > width * 0.8 * dragslow Then scrollme = scrollme - width * 0.2 * dragslow: GoTo again123
-If REALX2 - width * 0.2 * dragslow < 0 Then
+If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: GoTo again123
+If REALX2 - Width * 0.2 * dragslow < 0 Then
 If Not NoScroll Then
-scrollme = scrollme + width * 0.2 * dragslow
+scrollme = scrollme + Width * 0.2 * dragslow
 If scrollme > 0 Then scrollme = 0 Else GoTo again123
 End If
 End If
@@ -2890,7 +2914,7 @@ If j >= listcount Then j = listcount - 1
   End If
         For i = topitem To j
         
-        RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hdc, skipme)
+        RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hDC, skipme)
         If Not skipme Then
              If i = SELECTEDITEM - 1 And Not NoCaretShow And Not ListSep(i) Then
 
@@ -2901,7 +2925,7 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
              If mEditFlag Then
                 If nfg = fg Then Me.ForeColor = fg
              ElseIf nfg = fg Then
-                    If Me.BackColor = 0 Then
+                    If Me.backcolor = 0 Then
                     Me.ForeColor = &HFFFFFF
                     Else
                     Me.ForeColor = 0
@@ -2909,10 +2933,10 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
             End If
             
                     If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
-                                   MyMark UserControl.hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i, True
+                                   MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i, True
                         End If
 
-                 PrintLineControlSingle UserControl.hdc, list(i), nr
+                 PrintLineControlSingle UserControl.hDC, list(i), nr
                  Me.ForeColor = fg
              Else
                  If ListSep(i) And list(i) = vbNullString Then
@@ -2920,10 +2944,10 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
                    hnr.Right = nr.Right
                    hnr.Top = nr.Top + mytPixels \ 2
                    hnr.Bottom = hnr.Top + 1
-                   FillBack UserControl.hdc, hnr, ForeColor
+                   FillBack UserControl.hDC, hnr, ForeColor
                 Else
                    If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
-                                 MyMark UserControl.hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i
+                                 MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i
                     End If
                     If ListSep(i) Then
                         ForeColor = dcolor
@@ -2931,7 +2955,7 @@ nr.Left = scrollme / scrTwips + LeftMarginPixels
          
                '    ForeColor = fg
                     End If
-                    PrintLineControlSingle UserControl.hdc, list(i), nr
+                    PrintLineControlSingle UserControl.hDC, list(i), nr
                     
                 End If
       
@@ -2976,10 +3000,10 @@ nr.Bottom = nr.Top + mytPixels + 1
                                                        ShowMyCaretInTwips REALX2, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips
                                                End If
                                    End If
-                                   If Not NoScroll Then If REALX2 > width * 0.8 * dragslow Then scrollme = scrollme - width * 0.2 * dragslow: PrepareToShow 10
-                                   If REALX2 - width * 0.2 * dragslow < 0 Then
+                                   If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: PrepareToShow 10
+                                   If REALX2 - Width * 0.2 * dragslow < 0 Then
                                    If Not NoScroll Then
-                                     scrollme = scrollme + width * 0.2 * dragslow
+                                     scrollme = scrollme + Width * 0.2 * dragslow
                                    If scrollme > 0 Then scrollme = 0 Else PrepareToShow 10
                                    End If
                                    End If
@@ -2988,15 +3012,15 @@ nr.Bottom = nr.Top + mytPixels + 1
                                 
                                         If BackStyle = 1 Then
                             
-                                            Line (scrTwips, (SELECTEDITEM - topitem) * myt + mHeadlineHeightTwips)-(scrollme + UserControl.width - 2 * scrTwips, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips), 0, B
+                                            Line (scrTwips, (SELECTEDITEM - topitem) * myt + mHeadlineHeightTwips)-(scrollme + UserControl.Width - 2 * scrTwips, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips), 0, B
                                         Else
-                                            Line (0, (SELECTEDITEM - topitem) * myt + mHeadlineHeightTwips)-(scrollme + UserControl.width, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips), 0, B
+                                            Line (0, (SELECTEDITEM - topitem) * myt + mHeadlineHeightTwips)-(scrollme + UserControl.Width, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips), 0, B
                                      
                                         End If
                                 End If
                 End If
         Else
-        HideCaret (hWND)
+        HideCaret (hwnd)
         End If
     End If
     
@@ -3019,7 +3043,7 @@ Dim YYT As Long, nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long
 barwidth = UserControlTextWidth("W")
 If listcount = 0 And HeadLine = vbNullString Then
 Repaint
-HideCaret (hWND)
+HideCaret (hwnd)
 Exit Sub
 End If
 If MultiSelect And LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
@@ -3031,27 +3055,27 @@ nr.Left = 0 '
 hnr.Left = 0  ' no scrolling
 nr.Bottom = mytPixels + 1
 hnr.Bottom = mytPixels + 1
-nr.Right = width / scrTwips
-hnr.Right = width / scrTwips
+nr.Right = Width / scrTwips
+hnr.Right = Width / scrTwips
 
 If mHeadline <> "" Then
 nr.Bottom = HeadlineHeight
-RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hdc, skipme)
+RaiseEvent ExposeRect(-1, VarPtr(nr), UserControl.hDC, skipme)
 nr.Bottom = HeadlineHeight
-CalcRectHeader UserControl.hdc, mHeadline, hnr, DT_CENTER
+CalcRectHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
 If Not skipme Then
 
 If mHeadlineHeight <> hnr.Bottom Then
 HeadlineHeight = hnr.Bottom
 nr.Bottom = mHeadlineHeight
 End If
-FillBack UserControl.hdc, nr, CapColor
+FillBack UserControl.hDC, nr, CapColor
 End If
 hnr.Top = (nr.Bottom - hnr.Bottom) \ 2
 hnr.Bottom = nr.Bottom - hnr.Top
 hnr.Left = 0
 hnr.Right = nr.Right
-PrintLineControlHeader UserControl.hdc, mHeadline, hnr, DT_CENTER
+PrintLineControlHeader UserControl.hDC, mHeadline, hnr, DT_CENTER
 
 nr.Top = nr.Bottom
 nr.Bottom = nr.Top + mytPixels + 1
@@ -3064,10 +3088,10 @@ again123:
 
 REALX = UserControlTextWidth(Mid$(list(SELECTEDITEM - 1), 1, SelStart - 1)) + LeftMarginPixels * scrTwips
 REALX2 = scrollme + REALX
-If Not NoScroll Then If REALX2 > width * 0.8 * dragslow Then scrollme = scrollme - width * 0.2 * dragslow: GoTo again123
-If REALX2 - width * 0.2 * dragslow < 0 Then
+If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: GoTo again123
+If REALX2 - Width * 0.2 * dragslow < 0 Then
 If Not NoScroll Then
-scrollme = scrollme + width * 0.2 * dragslow
+scrollme = scrollme + Width * 0.2 * dragslow
 If scrollme > 0 Then scrollme = 0 Else GoTo again123
 End If
 
@@ -3105,7 +3129,7 @@ nfg1 = fg
 For i = topitem To j
 CurrentX = scrollme
 CurrentY = 0
-  RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hdc, skipme)
+  RaiseEvent ExposeRect(i, VarPtr(nr), UserControl.hDC, skipme)
   If Not skipme Then
   If i = SELECTEDITEM - 1 And Not NoCaretShow And Not ListSep(i) Then
     nfg = fg
@@ -3116,7 +3140,7 @@ CurrentY = 0
   If mEditFlag Then
    If nfg = fg Then Me.ForeColor = fg
   ElseIf nfg = fg Then
-  If Me.BackColor = 0 Then
+  If Me.backcolor = 0 Then
   Me.ForeColor = &HFFFFFF
   Else
   Me.ForeColor = 0
@@ -3124,10 +3148,10 @@ CurrentY = 0
   End If
 
    If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
- MyMark UserControl.hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i, True
+ MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i, True
  End If
 
-   PrintLineControlSingle UserControl.hdc, list(i), nr
+   PrintLineControlSingle UserControl.hDC, list(i), nr
  If nfg = fg Then Me.ForeColor = fg
  Else
     nfg = fg
@@ -3138,11 +3162,11 @@ CurrentY = 0
  hnr.Right = nr.Right
  hnr.Top = nr.Top + mytPixels \ 2
  hnr.Bottom = hnr.Top + 1
- FillBack UserControl.hdc, hnr, ForeColor
+ FillBack UserControl.hDC, hnr, ForeColor
  Else
 
  If (MultiSelect Or ListMenu(i)) And itemcount > 0 Then
- MyMark UserControl.hdc, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i
+ MyMark UserControl.hDC, mytPixels \ 3, nr.Left - LeftMarginPixels / 2, nr.Top + mytPixels / 2, i
  End If
   If ListSep(i) Then
  ForeColor = dcolor
@@ -3153,7 +3177,7 @@ CurrentY = 0
    End If
  End If
 
- PrintLineControlSingle UserControl.hdc, list(i), nr
+ PrintLineControlSingle UserControl.hDC, list(i), nr
  End If
 
    End If
@@ -3201,10 +3225,10 @@ If SELECTEDITEM > 0 Then
                                    ShowMyCaretInTwips REALX2, (SELECTEDITEM - topitem - 1) * myt + mHeadlineHeightTwips
                                    End If
                                
-                                   If Not NoScroll Then If REALX2 > width * 0.8 * dragslow Then scrollme = scrollme - width * 0.2 * dragslow: PrepareToShow 10
-                                   If REALX2 - width * 0.2 * dragslow < 0 Then
+                                   If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: PrepareToShow 10
+                                   If REALX2 - Width * 0.2 * dragslow < 0 Then
                                     If Not NoScroll Then
-                                     scrollme = scrollme + width * 0.2 * dragslow
+                                     scrollme = scrollme + Width * 0.2 * dragslow
                                    If scrollme > 0 Then scrollme = 0 Else PrepareToShow 10
 :
                                    
@@ -3215,11 +3239,11 @@ If SELECTEDITEM > 0 Then
                                    
                                    If BackStyle = 1 Then
                        
-                                           Line (scrTwips, (SELECTEDITEM - topitem) * YYT + mHeadlineHeightTwips)-(0 + UserControl.width, (SELECTEDITEM - topitem - 1) * YYT + mHeadlineHeightTwips - scrTwips / 2), 0, B
+                                           Line (scrTwips, (SELECTEDITEM - topitem) * YYT + mHeadlineHeightTwips)-(0 + UserControl.Width, (SELECTEDITEM - topitem - 1) * YYT + mHeadlineHeightTwips - scrTwips / 2), 0, B
                          
                                    Else
                        
-                                        Line (0, (SELECTEDITEM - topitem) * YYT + mHeadlineHeightTwips)-(0 + UserControl.width, (SELECTEDITEM - topitem - 1) * YYT + mHeadlineHeightTwips), 0, B
+                                        Line (0, (SELECTEDITEM - topitem) * YYT + mHeadlineHeightTwips)-(0 + UserControl.Width, (SELECTEDITEM - topitem - 1) * YYT + mHeadlineHeightTwips), 0, B
                            
                                    End If
                 End If
@@ -3228,7 +3252,7 @@ If SELECTEDITEM > 0 Then
         End If
         Else
 
-        HideCaret (hWND)
+        HideCaret (hwnd)
     End If
 Else
 
@@ -3318,8 +3342,8 @@ If UserControl.Parent.Picture.handle <> 0 And BackStyle = 1 Then
 If Me.BorderStyle = 1 Then
 CurrentY = 0
     CurrentX = 0
-Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
-UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, width - 2 * scrTwips, Height - 2 * scrTwips
+Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.backcolor, B
+UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
     CurrentY = 0
     CurrentX = 0
 Else
@@ -3336,7 +3360,7 @@ If mmo.Picture.handle <> 0 Then
     If Me.BorderStyle = 1 Then
     CurrentY = 0
         CurrentX = 0
-    Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
+    Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.backcolor, B
         CurrentY = 0
         CurrentX = 0
     End If
@@ -3380,8 +3404,8 @@ If BackStyle = 1 Then
             If Me.BorderStyle = 1 Then
                     CurrentY = 0
                     CurrentX = 0
-                    Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
-                    UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, width - 2 * scrTwips, Height - 2 * scrTwips
+                    Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.backcolor, B
+                    UserControl.PaintPicture UserControl.Parent.Picture, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
                     CurrentY = 0
                     CurrentX = 0
             Else
@@ -3391,24 +3415,24 @@ If BackStyle = 1 Then
             If Me.BorderStyle = 1 Then
                 CurrentY = 0
                 CurrentX = 0
-                Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
-                UserControl.PaintPicture UserControl.Parent.image, scrTwips, scrTwips, width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, width - 2 * scrTwips, Height - 2 * scrTwips
+                Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.backcolor, B
+                UserControl.PaintPicture UserControl.Parent.Image, scrTwips, scrTwips, Width - 2 * scrTwips, Height - 2 * scrTwips, mo.Left, mo.Top, Width - 2 * scrTwips, Height - 2 * scrTwips
                 CurrentY = 0
                 CurrentX = 0
             Else
-                UserControl.PaintPicture UserControl.Parent.image, 0, 0, , , mo.Left, mo.Top
+                UserControl.PaintPicture UserControl.Parent.Image, 0, 0, , , mo.Left, mo.Top
             End If
         End If
     Else
         Dim mmo As Object, isfrm As Boolean
         RaiseEvent GetBackPicture(mmo)
         If Not mmo Is Nothing Then
-            If mmo.image.handle <> 0 Then
-                UserControl.PaintPicture mmo.image, 0, 0, , , mo.Left - mmo.Left, mo.Top - mmo.Top
+            If mmo.Image.handle <> 0 Then
+                UserControl.PaintPicture mmo.Image, 0, 0, , , mo.Left - mmo.Left, mo.Top - mmo.Top
                 If Me.BorderStyle = 1 Then
                 CurrentY = 0
                     CurrentX = 0
-                Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.BackColor, B
+                Line (0, 0)-(ScaleWidth - scrTwips, ScaleHeight - scrTwips), Me.backcolor, B
                     CurrentY = 0
                     CurrentX = 0
                 End If
@@ -3469,19 +3493,19 @@ Public Function UserControlTextWidthPixels(a$) As Long
 Dim nr As RECT
 If Len(a$) > 0 Then
 
-CalcRect UserControl.hdc, a$, nr
+CalcRect UserControl.hDC, a$, nr
 UserControlTextWidthPixels = nr.Right
 End If
 End Function
 Public Function UserControlTextWidth(a$) As Long
 Dim nr As RECT
-CalcRect UserControl.hdc, a$, nr
+CalcRect UserControl.hDC, a$, nr
 UserControlTextWidth = nr.Right * scrTwips
 End Function
 Private Function UserControlTextHeight() As Long
 Dim nr As RECT
 If overrideTextHeight = 0 Then
-CalcRect1 UserControl.hdc, "fj", nr
+CalcRect1 UserControl.hDC, "fj", nr
 UserControlTextHeight = nr.Bottom * scrTwips
 Exit Function
 End If
@@ -3527,7 +3551,7 @@ DrawText mHdc, StrPtr(c), -1, r, DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING 
   Private Sub CalcRectHeader(mHdc As Long, c As String, r As RECT, Optional that As Long = 0)
 r.Top = 0
 r.Left = 0
-If r.Right = 0 Then r.Right = UserControl.width / scrTwips
+If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
 DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or that
 End Sub
 Private Sub PrintLineControl(mHdc As Long, c As String, r As RECT)
@@ -3539,7 +3563,7 @@ Private Sub PrintLinePixels(dd As Object, c As String)
 Dim r As RECT    ' print to a picturebox as label
 r.Right = dd.ScaleWidth
 r.Bottom = dd.ScaleHeight
-DrawText dd.hdc, StrPtr(c), -1, r, DT_NOPREFIX Or DT_WORDBREAK
+DrawText dd.hDC, StrPtr(c), -1, r, DT_NOPREFIX Or DT_WORDBREAK
 End Sub
 Private Sub CalcRect(mHdc As Long, c As String, r As RECT)
 r.Top = 0
@@ -3548,7 +3572,7 @@ Dim that As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
-If r.Right = 0 Then r.Right = UserControl.width / scrTwips
+If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
 DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or that
 Else
     DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
@@ -3560,7 +3584,7 @@ r.Top = 0
 r.Left = 0
 
 If WrapText Then
-If r.Right = 0 Then r.Right = UserControl.width / scrTwips - LeftMarginPixels
+If r.Right = 0 Then r.Right = UserControl.Width / scrTwips - LeftMarginPixels
 
 DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX
 Else
@@ -3597,7 +3621,6 @@ th1:
 End If
 End Sub
 Private Sub Redraw(ParamArray Status())
-
 If EnabledBar Then
 Dim fakeLargeChange As Long, newheight As Long, newTop As Long
 Dim b As Boolean, nstatus As Boolean
@@ -3627,9 +3650,9 @@ Else
         End If
         valuepoint = (Value - Min) / (largechange + max - Min) * (newheight * (1 - 2 * Percent)) + newheight * Percent
 
-       Shape Shape1, width - barwidth, newTop + valuepoint, barwidth, minimumWidth
-       Shape Shape2, width - barwidth, newTop + newheight * (1 - Percent), barwidth, newheight * Percent ' newtop + newheight * Percent - scrTwips
-        Shape Shape3, width - barwidth, newTop, barwidth, newheight * Percent   ' left or top
+       Shape Shape1, Width - barwidth, newTop + valuepoint, barwidth, minimumWidth
+       Shape Shape2, Width - barwidth, newTop + newheight * (1 - Percent), barwidth, newheight * Percent ' newtop + newheight * Percent - scrTwips
+        Shape Shape3, Width - barwidth, newTop, barwidth, newheight * Percent   ' left or top
 End If
 End With
 If UBound(Status) >= 0 Then
@@ -3845,7 +3868,7 @@ Set mo = UserControl.Parent.Controls(nm$).item(CInt(cnt$))
 Else
 Set mo = UserControl.Parent.Controls(nm$)
 End If
-mo.Move mo.Left, mo.Top, mo.width, RHS
+mo.Move mo.Left, mo.Top, mo.Width, RHS
 End Property
 Public Sub MoveTwips(ByVal mleft As Long, ByVal mtop As Long, mWidth As Long, mHeight As Long)
 Dim mm$, mo As Control, nm$, cnt$, p As Long
@@ -3863,7 +3886,7 @@ Else
 Set mo = UserControl.Parent.Controls(nm$)
 End If
 If mWidth < 100 Then
-mo.Move mleft, mtop, mo.width, mo.Height
+mo.Move mleft, mtop, mo.Width, mo.Height
 ElseIf mHeight < 100 Then
 mo.Move mleft, mtop, mWidth, mo.Height
 Else
@@ -3977,6 +4000,7 @@ mpercent = RHS
 PropertyChanged "Percent"
 End Property
 Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
+
 If KeyCode = 27 And NoEscapeKey Then
 KeyCode = 0
 Exit Sub
@@ -4179,7 +4203,7 @@ If x >= valuepoint - scrTwips And x <= minimumWidth + valuepoint - scrTwips Then
 ' is our scroll bar
 OurDraw = Not rep
 
-ElseIf x > .width * Percent And x < .width * (1 - Percent) Then
+ElseIf x > .Width * Percent And x < .Width * (1 - Percent) Then
 processXY = True
 '  we are inside so take a largechange
         If x < valuepoint Then
@@ -4195,11 +4219,11 @@ processXY = True
                 x = valuepoint + minimumWidth
                 End If
         End If
-            If x < .width * Percent Then x = .width * Percent
-            If x > Round(.width * (1 - Percent)) - minimumWidth + .width * Percent Then
-            x = .width * (1 - Percent) - minimumWidth
+            If x < .Width * Percent Then x = .Width * Percent
+            If x > Round(.Width * (1 - Percent)) - minimumWidth + .Width * Percent Then
+            x = .Width * (1 - Percent) - minimumWidth
             End If
-            checknewvalue = Round((x - .width * Percent) * (max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
+            checknewvalue = Round((x - .Width * Percent) * (max - Min) / ((.Width * (1 - Percent) - minimumWidth) - .Width * Percent)) + Min
             If checknewvalue = Value And mjumptothemousemode Then
             ' do nothing
             Else
@@ -4207,7 +4231,7 @@ processXY = True
             If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5  ' autorepeat
             Timer1bar.enabled = True
             End If
-ElseIf x >= .width * (1 - Percent) And x <= .width Then
+ElseIf x >= .Width * (1 - Percent) And x <= .Width Then
 processXY = True
 checknewvalue = Value + mSmallChange
 If checknewvalue = Value Then
@@ -4218,7 +4242,7 @@ If Timer1bar.Interval > 10 Then Timer1bar.Interval = Timer1bar.Interval - 5 ' au
 Timer1bar.enabled = True
 End If
 ' is right button
-ElseIf x < .width * Percent - scrTwips Then
+ElseIf x < .Width * Percent - scrTwips Then
 processXY = True
 checknewvalue = Value - mSmallChange
 If checknewvalue = Value Then
@@ -4271,14 +4295,14 @@ End If
 Else
 
          ForValidValue = x + GetOpenValue
-        If ForValidValue < .width * Percent Then
-        ForValidValue = .width * Percent
+        If ForValidValue < .Width * Percent Then
+        ForValidValue = .Width * Percent
         Value = Min
-        ElseIf ForValidValue > ((.width * (1 - Percent) - minimumWidth)) Then
-        ForValidValue = ((.width * (1 - Percent) - minimumWidth))
+        ElseIf ForValidValue > ((.Width * (1 - Percent) - minimumWidth)) Then
+        ForValidValue = ((.Width * (1 - Percent) - minimumWidth))
         Value = max
         Else
-        Value = Round((ForValidValue - .width * Percent) * (max - Min) / ((.width * (1 - Percent) - minimumWidth) - .width * Percent)) + Min
+        Value = Round((ForValidValue - .Width * Percent) * (max - Min) / ((.Width * (1 - Percent) - minimumWidth) - .Width * Percent)) + Min
         
         End If
       
@@ -4336,7 +4360,7 @@ my_brush = CreateSolidBrush(bgcolor)
 FillRect thathDC, there, my_brush
 DeleteObject my_brush
 End Sub
-Private Sub MyMark(thathDC As Long, radius As Long, x As Long, y As Long, item As Long, Optional reverse As Boolean = False) ' circle
+Private Sub MyMark(thathDC As Long, radius As Long, x As Long, y As Long, item As Long, Optional Reverse As Boolean = False) ' circle
 '
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long
 Dim th As RECT
@@ -4347,7 +4371,7 @@ th.Bottom = y + radius
 Dim old_brush As Long, old_pen As Long, my_brush As Long
 
     If Not ListChecked(item) Then
-                If reverse Then
+                If Reverse Then
                   my_brush = CreateSolidBrush(0)
                 Else
                    my_brush = CreateSolidBrush(m_ForeColor)
@@ -4369,13 +4393,13 @@ Dim old_brush As Long, old_pen As Long, my_brush As Long
         
 
         If ListSelected(item) Then
-            If reverse Then
+            If Reverse Then
                 my_brush = CreateSolidBrush(0)  '
             Else
                 my_brush = CreateSolidBrush(m_dcolor)  'm_CapColor
             End If
         Else
-        If reverse Then
+        If Reverse Then
             my_brush = CreateSolidBrush(&HFFFFFF)
         Else
             my_brush = CreateSolidBrush(m_backcolor)
@@ -4392,10 +4416,10 @@ End Sub
 
 Public Property Get widthtwips() As Long
 
-widthtwips = UserControl.width
+widthtwips = UserControl.Width
 End Property
 Public Property Get WidthPixels() As Long
-WidthPixels = UserControl.width / scrTwips
+WidthPixels = UserControl.Width / scrTwips
 End Property
 Public Property Get HeightPixels() As Long
 HeightPixels = UserControl.Height / scrTwips
@@ -4649,16 +4673,16 @@ End If
 End Property
 Private Sub ShowMyCaretInTwips(x1 As Long, y1 As Long)
 
-If hWND <> 0 Then
+If hwnd <> 0 Then
  With UserControl
  If Not caretCreated Then
 
- CreateCaret hWND, 0, .ScaleX(1, 1, 3) + 2, .ScaleY(myt, 1, 3) - 2: caretCreated = True
+ CreateCaret hwnd, 0, .ScaleX(1, 1, 3) + 2, .ScaleY(myt, 1, 3) - 2: caretCreated = True
  End If
 ' we can set caret pos if we don't have the focus
 
 SetCaretPos .ScaleX(x1, 1, 3), .ScaleY(y1, 1, 3) + 1
-ShowCaret (hWND)
+ShowCaret (hwnd)
 
 
 End With
@@ -4675,7 +4699,7 @@ End Property
 
 Public Property Let EditFlag(ByVal RHS As Boolean)
 mEditFlag = RHS
-If Not RHS Then If hWND <> 0 Then DestroyCaret: caretCreated = False
+If Not RHS Then If hwnd <> 0 Then DestroyCaret: caretCreated = False
 End Property
 Public Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long, Optional ByVal offsetx As Long = 0)
 Dim a As RECT
@@ -4687,13 +4711,13 @@ End Sub
 Public Sub WriteThere(thatRect As Long, aa$, ByVal offsetx As Long, ByVal offsety As Long, thiscolor As Long)
 Dim a As RECT, fg As Long
 CopyFromLParamToRect a, thatRect
-If a.Left > width Then Exit Sub
+If a.Left > Width Then Exit Sub
 a.Right = WidthPixels
 a.Left = a.Left + offsetx
 a.Top = a.Top + offsety
 fg = ForeColor
 ForeColor = thiscolor
-    DrawText UserControl.hdc, StrPtr(aa$), -1, a, DT_NOPREFIX Or DT_NOCLIP
+    DrawText UserControl.hDC, StrPtr(aa$), -1, a, DT_NOPREFIX Or DT_NOCLIP
     ForeColor = fg
 End Sub
 Public Property Get FontBold() As Boolean
@@ -4737,10 +4761,10 @@ If ExtSelStart <= 0 Then ExtSelStart = 1
                                  End If
                                  
 
-                                   If Not NoScroll Then If REALX2 > width * 0.8 * dragslow Then scrollme = scrollme - width * 0.2 * dragslow: PrepareToShow 10
-                                   If REALX2 - width * 0.2 * dragslow < 0 Then
+                                   If Not NoScroll Then If REALX2 > Width * 0.8 * dragslow Then scrollme = scrollme - Width * 0.2 * dragslow: PrepareToShow 10
+                                   If REALX2 - Width * 0.2 * dragslow < 0 Then
                               If Not NoScroll Then
-                              scrollme = scrollme + width * 0.2 * dragslow
+                              scrollme = scrollme + Width * 0.2 * dragslow
                               If scrollme > 0 Then scrollme = 0 Else PrepareToShow 10
                                    End If
                                    End If
@@ -4766,9 +4790,12 @@ End Sub
 
 Public Sub Shutdown()
 waitforparent = False
+BlinkON = False
+BlinkTimer.enabled = False
 Timer1.enabled = False
 Timer2.enabled = False
 Timer3.enabled = False
+BlinkTimer.Interval = 10000
 Timer1.Interval = 10000
 Timer2.Interval = 10000
 Timer3.Interval = 10000
@@ -4890,15 +4917,15 @@ End Function
 Public Function LineTopOffsetPixels()
 Dim nr As RECT, a$
 a$ = "fg"
-CalcRect1 UserControl.hdc, a$, nr
+CalcRect1 UserControl.hDC, a$, nr
 LineTopOffsetPixels = (mytPixels - nr.Bottom) / 2
 End Function
 
 
-Private Sub Shape(a As Myshape, Optional Left As Long = -1, Optional Top As Long = -1, Optional width As Long = -1, Optional Height As Long = -1)
+Private Sub Shape(a As Myshape, Optional Left As Long = -1, Optional Top As Long = -1, Optional Width As Long = -1, Optional Height As Long = -1)
 If Left <> -1 Then a.Left = Left
 If Top <> -1 Then a.Top = Top
-If width <> -1 Then a.width = width
+If Width <> -1 Then a.Width = Width
 If Height <> -1 Then a.Height = Height
 Dim th As RECT, my_brush As Long, br2 As Long
 If a.Visible Then
@@ -4906,23 +4933,23 @@ With th
 .Top = a.Top / scrTwips
 .Left = a.Left / scrTwips
 .Bottom = .Top + a.Height / scrTwips
-.Right = .Left + a.width / scrTwips
+.Right = .Left + a.Width / scrTwips
 End With
 
  br2 = CreateSolidBrush(BarHatchColor)
    
    If a.hatchType = 1 Then
 
-    SetBkColor UserControl.hdc, BarColor
+    SetBkColor UserControl.hDC, BarColor
  my_brush = CreateHatchBrush(BarHatch, BarHatchColor)
 
-  FillRect UserControl.hdc, th, my_brush
+  FillRect UserControl.hDC, th, my_brush
  Else
   my_brush = CreateSolidBrush(BarColor)
-  FillRect UserControl.hdc, th, my_brush
+  FillRect UserControl.hDC, th, my_brush
 End If
 
-FrameRect UserControl.hdc, th, br2
+FrameRect UserControl.hDC, th, br2
 
   DeleteObject my_brush
   DeleteObject br2
@@ -4934,15 +4961,15 @@ Function DoubleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long
 Static Lx As Long, ly As Long
 If item = itemline Then
    If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
-      FloatList = False
       mousepointer = 1
+      
+      FloatList = False
             If Button = 1 Then
+                  
+            
                 doubleclick = doubleclick + 1
-                ''If mlx <> lx Or mly <> ly Then
-                          Lx = mlx
-                          ly = mly
-                      ''       doubleclick = 1
-              ''  Else
+                          Lx = mLx
+                          ly = mLy
                         
                  If Lx <> -1000 And ly <> -1000 Then
                         doubleclick = doubleclick + 1
@@ -4950,21 +4977,33 @@ If item = itemline Then
     End If
                             Button = 0
                        
-            ''End If
-    Else
-''   If mlx <> lx Or mly <> ly Then doubleclick = 0
     End If
     Else
- mlx = -1000
-      mly = -1000
+
+        mLx = -1000
+      mLy = -1000
         doubleclick = 0
        FloatList = True
-       mousepointer = 5
-
     End If
 End If
 End Function
+Function SingleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
+If item = itemline Then
+   If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
+        mousepointer = 1
+        FloatList = False
+            If Button = 1 Then
+            SingleClickCheck = True
+                Exit Function
+    
 
+                       
+            End If
+    Else
+       FloatList = True
+    End If
+End If
+End Function
 
 Public Property Get Parent() As Variant
 On Error GoTo there
@@ -4976,7 +5015,7 @@ Public Sub Curve(Optional t As Boolean = False, Optional factor As Single = 1)
 Dim hRgn As Long
 If Int(25 * factor) > 2 Then
 hRgn = CreateRoundRectRgn(0, 0, WidthPixels, HeightPixels, 25 * factor, 25 * factor)
-SetWindowRgn Me.hWND, hRgn, t
+SetWindowRgn Me.hwnd, hRgn, t
 DeleteObject hRgn
 End If
 End Sub

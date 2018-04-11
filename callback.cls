@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+Option Explicit
 'class for call back
 Private objref As basetask
 Private mineHere$
@@ -49,7 +50,7 @@ End If
 End If
 End Sub
 Public Sub Cli(LoadFileAndSwitches$, Optional Prompt$ = ">")
-Dim ohere$
+Dim ohere$, s$
 If findstack = 0 Then ClaimStack
 If findstack - 100000 > 0 Then
     stacksize = findstack - 100000
@@ -115,7 +116,7 @@ End If
 End If
 End Property
 Public Sub ExecuteStatement(ByVal code$)
-Dim what$, pos As Long, func As Boolean, param$
+Dim what$, pos As Long, func As Boolean, param$, drop$
 If IsLabelOnly(code$, what$) > 4 Then
     func = True
 ElseIf what$ = vbNullString Then
@@ -189,7 +190,7 @@ Run = True
         LastErName = vbNullString
         LastErNameGR = vbNullString
 If Execute(objref, code$, False) <> 1 Then
-        Run = fasle
+        Run = False
                  MOUT = True
 End If
 If clean Or MOUT Or ExTarget Then

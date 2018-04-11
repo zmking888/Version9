@@ -11,14 +11,15 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Dim WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim mCaptext As String
 Public CtrlName As String
-Private mesCtrlName As String, mlocked As Boolean
+Private mesCtrlName As String, mlocked As Boolean, mTimes
 Dim mIndex As Long
 Dim Callback As GuiM2000
-Dim white As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
+Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, shadowcol As Long
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
 End Property
@@ -78,7 +79,7 @@ With glistN
 .CenterText = True
 .VerticalCenterText = True
 .Text = mCaptext
-.BackColor = rgb(200, 120, 60)
+.backcolor = rgb(200, 120, 60)
 Set .Font = ff
 .ForeColor = Callback.Controls(1).ForeColor
 shadowcol = -.ForeColor
@@ -99,12 +100,12 @@ Set glistN = Nothing
 End Sub
 
 Private Sub glistN_BlinkNow(Face As Boolean)
-'
-  If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".Blink(" + Str(mIndex) + "," + Str(Face) + ")"
-   Else
-      Callback.Callback mesCtrlName + ".Blink(" + Str(Face) + ")"
-      End If
+    If mTimes > 0 Then mTimes = mTimes - 1: If mTimes = 0 Then glistN.BlinkON = False
+    If mIndex >= 0 Then
+        Callback.Callback mesCtrlName + ".Blink(" + Str(mIndex) + "," + Str(Face) + ")"
+    Else
+        Callback.Callback mesCtrlName + ".Blink(" + Str(Face) + ")"
+    End If
 End Sub
 
 Private Sub glistN_CheckGotFocus()
@@ -117,7 +118,7 @@ If glistN.BackStyle = 1 Then
       Callback.Callback mesCtrlName + ".GotFocus()"
       End If
 End If
-glistN.BackColor = mycolor(dimm1)
+glistN.backcolor = mycolor(dimm1)
 glistN.ShowMe
 End If
 End Sub
@@ -132,7 +133,7 @@ If glistN.BackStyle = 1 Then
       Callback.Callback mesCtrlName + ".LostFocus()"
       End If
 End If
-If Not mlocked Then glistN.BackColor = mycolor(dimm2)
+If Not mlocked Then glistN.backcolor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 
@@ -261,11 +262,11 @@ End Sub
 Public Sub Curve(RHS As Single)
 glistN.Curve False, RHS
 End Sub
-Public Property Get top() As Variant
-top = Callback.Controls(CtrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(CtrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(CtrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(CtrlName).Left
@@ -287,13 +288,16 @@ Public Property Let locked(ByVal vNewValue As Variant)
 mlocked = vNewValue
 glistN.dropkey = mlocked
 glistN.TabStop = Not mlocked
-glistN.BackColor = mycolor(dimm2)
+glistN.backcolor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
 End Property
 Sub Show()
 glistN.ShowPan
 End Sub
+Public Property Let BlinkTimes(ByVal vNewValue As Variant)
+mTimes = vNewValue
+End Property
 Public Property Let Blink(ByVal vNewValue As Variant)
 glistN.BlinkTime = vNewValue
 End Property
@@ -301,7 +305,7 @@ Sub Transparent()
 Dim x  As Long, y As Long
 glistN.BackStyle = 1
 glistN.GetLeftTop x, y
-glistN.RepaintFromOut Callback.image, x, y
+glistN.RepaintFromOut Callback.Image, x, y
 glistN.ShowMe
 End Sub
 Sub TransparentOff()

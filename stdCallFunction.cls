@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Dim mLib As String
 Dim mFunction As String
 Dim mConctruct As String
@@ -20,7 +21,7 @@ Dim t() As Long
 Dim paramnum As Long
 Public FreeHere As Boolean
 
-Public Sub CallThis(ByVal vNewValue As String, paramList As String, Lang As Long)
+Public Sub CallThis(ByVal vNewValue As String, paramList As String, lang As Long)
 Dim l As Long, check$, m As Long
 l = InStr(vNewValue, ".")
 If l <> 0 Then
@@ -41,7 +42,7 @@ mFunction = Mid$(mFunction, 4)
 End If
 Do While paramList <> ""
 
- If IsLabelSymbolNew(paramList, "Ã¡ —’”", "LONG", Lang) Then
+ If IsLabelSymbolNew(paramList, "Ã¡ —’”", "LONG", lang) Then
  If FastSymbol(paramList, "&") Then l = 16 Else l = 0
  If IsPureLabel(paramList, check$) = 1 Then
  'OK

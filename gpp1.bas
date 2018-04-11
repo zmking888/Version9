@@ -8,15 +8,15 @@ Public pw As Long, ph As Long, psw As Long, psh As Long, pwox As Long, phoy As L
           lpszOutput As String
       End Type
             Private Declare Function StartDoc Lib "gdi32" Alias "StartDocA" _
-          (ByVal hdc As Long, lpdi As DOCINFO) As Long
+          (ByVal hDC As Long, lpdi As DOCINFO) As Long
 
-      Private Declare Function StartPage Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function StartPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndDoc Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function EndDoc Lib "gdi32" (ByVal hDC As Long) _
           As Long
 
-      Private Declare Function EndPage Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function EndPage Lib "gdi32" (ByVal hDC As Long) _
           As Long
 Private mp_hdc As Long
 Public MyDM() As Byte
@@ -29,10 +29,10 @@ Private Const PHYSICALWIDTH As Long = 110
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
 
-Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal iCapabilitiy As Long) As Long
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal iCapabilitiy As Long) As Long
 
       Private Declare Function ResetDC Lib "gdi32" Alias "ResetDCA" _
-          (ByVal hdc As Long, lpInitData As Any) As Long
+          (ByVal hDC As Long, lpInitData As Any) As Long
 Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As String, lpInitData As Any) As Long
@@ -43,7 +43,7 @@ Private Declare Function CreateIC Lib "gdi32" Alias "CreateICA" _
       Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" _
           (ByVal lpDriverName As String, ByVal lpDeviceName As String, _
           ByVal lpOutput As Long, lpInitData As Any) As Long
-      Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) _
+      Private Declare Function DeleteDC Lib "gdi32" (ByVal hDC As Long) _
           As Long
       Private Const NULLPTR = 0&
       ' Constants for DEVMODE
@@ -437,7 +437,7 @@ Const bb = 65536
 HighWord = Int(b / bb)
 End Function
 
-Function cUlng(ByVal a As Currency) As Long ' πέρνει έναν unsign integer και τον κάνει νορμάλ χωρίς αλλαγή των bits
+Function cUlng(ByVal a As Currency) As Long ' πέρνει έναν unsign long και τον κάνει νορμάλ χωρίς αλλαγή των bits
 On Error GoTo cu1
 a = Abs(Int(a))
 If a > 2147483647@ Then

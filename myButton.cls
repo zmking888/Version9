@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Dim WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim mCaptext As String
@@ -26,7 +27,7 @@ With glistN
 .CenterText = True
 .VerticalCenterText = True
 .Text = mCaptext
-.BackColor = rgb(200, 120, 60)
+.backcolor = rgb(200, 120, 60)
 
 ''.FontSize = 12
 .enabled = True
@@ -44,20 +45,20 @@ Set mCallback = Nothing
 End Sub
 
 Private Sub glistN_CheckGotFocus()
-glistN.BackColor = rgb(100, 200, 160)
+glistN.backcolor = rgb(100, 200, 160)
 glistN.ShowMe
 End Sub
 
 Private Sub glistN_CheckLostFocus()
 If Me.enabled Then
-glistN.BackColor = rgb(200, 120, 60)
+glistN.backcolor = rgb(200, 120, 60)
 glistN.PanPos = 0
 glistN.ShowMe
 End If
 End Sub
 
 Private Sub glistN_PanLeftRight(Direction As Boolean)
-    If (Not mCallback Is Nothing) Then mCallback.Press Index
+    If (Not mCallback Is Nothing) Then mCallback.Press index
 End Sub
 
 Private Sub glistN_RegisterGlist(this As gList)
@@ -66,7 +67,7 @@ End Sub
 
 Private Sub glistN_Selected2(item As Long)
 If item >= 0 Then
-    If (Not mCallback Is Nothing) Then mCallback.Press Index
+    If (Not mCallback Is Nothing) Then mCallback.Press index
     End If
 End Sub
 Property Set Callback(ByRef newObj As InterPress)
@@ -81,9 +82,9 @@ Public Property Let Caption(myCap As String)
 mCaptext = myCap
 If Not glistN Is Nothing Then
 If glistN.CenterText Then
-glistN.List(0) = mCaptext
+glistN.list(0) = mCaptext
 Else
-glistN.List(0) = "  " + mCaptext
+glistN.list(0) = "  " + mCaptext
 End If
 glistN.ShowMe
 End If
@@ -92,11 +93,11 @@ Public Property Get Caption() As String
 Caption = mCaptext
 End Property
 
-Public Property Get Index() As Long
-Index = mIndex
+Public Property Get index() As Long
+index = mIndex
 End Property
 
-Public Property Let Index(ByVal RHS As Long)
+Public Property Let index(ByVal RHS As Long)
 mIndex = RHS
 End Property
 Public Property Get enabled() As Long

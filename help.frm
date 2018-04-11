@@ -32,13 +32,21 @@ Begin VB.Form Form4
       TabIndex        =   0
       Top             =   300
       Width           =   6015
-      _extentx        =   10610
-      _extenty        =   6747
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "help.frx":000C
-      showbar         =   0   'False
-      backcolor       =   -2147483624
+      _ExtentX        =   10610
+      _ExtentY        =   6747
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   -2147483624
    End
 End
 Attribute VB_Name = "Form4"
@@ -153,7 +161,7 @@ If Button = 1 Then
     If Helplastfactor = 0 Then Helplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
+    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -161,7 +169,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
+    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -177,9 +185,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -188,11 +196,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (width - 150) Or x > width Then addX = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -205,33 +213,33 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
-        If (addy + Height) / vH_y > 0.4 And ((width + addX) / vH_x) > 0.4 Then
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
+        If (addy + Height) / vH_y > 0.4 And ((Width + addX) / vH_x) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / vH_y)
         Helplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((width * Helplastfactor / factor + addX) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
-        addX = -width * Helplastfactor / factor - 1
+        If ((Width * Helplastfactor / factor + addX) / Height * Helplastfactor / factor) < (vH_x / vH_y) Then
+        addX = -Width * Helplastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
         
-        If Helplastfactor <> factor Then ScaleDialog Helplastfactor, width
+        If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
 
         Lx = x
         
         Else
         Lx = x * Helplastfactor / factor
-             ScaleDialog Helplastfactor, (width + addX) * Helplastfactor / factor
+             ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
          
    
          End If
 
         
-        HelpLastWidth = width
+        HelpLastWidth = Width
 
 
 ''gList1.PrepareToShow
@@ -307,19 +315,18 @@ Label1.EditDoc = True
 End If
 Select Case KeyCode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
+
 gList1.EditFlag = False
-If mHelp Or abt Then MKEY$ = MKEY$ & Chr$(KeyCode): KeyCode = 0
+If mHelp Or abt Then
+MKEY$ = MKEY$ & ChrW$(KeyCode)
+KeyCode = 0
+End If
 End Select
 If mHelp Or abt Then shift = 0
 
 End Sub
 
-Private Sub gList1_KeyDownAfter(KeyCode As Integer, shift As Integer)
-If mHelp Or abt Then
-'KeyCode = 0
-'shift = 0
-End If
-End Sub
+
 
 Private Sub glist1_MarkOut()
 If flagmarkout Then

@@ -1,5 +1,6 @@
 Attribute VB_Name = "Fcall"
 ' This is a module from Olaf Schmidt changed for M2000 needs
+Option Explicit
 Private Declare Function DispCallFunc Lib "oleaut32" (ByVal pvInstance As Long, ByVal offsetinVft As Long, ByVal callconv As Long, ByVal retTYP As Integer, ByVal paCNT As Long, ByRef paTypes As Integer, ByRef paValues As Long, ByRef RETVAR As Variant) As Long
 Private Declare Function GetProcByName Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function GetProcByOrdinal Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal nOrdinal As Long) As Long
@@ -8,6 +9,7 @@ Private Declare Function FreeLibrary Lib "KERNEL32" (ByVal hLibModule As Long) A
 Private Declare Function lstrlenA Lib "KERNEL32" (ByVal lpString As Long) As Long
 Private Declare Function lstrlenW Lib "KERNEL32" (ByVal lpString As Long) As Long
 Private Declare Sub RtlMoveMemory Lib "KERNEL32" (dst As Any, src As Any, ByVal BLen As Long)
+Private Declare Function SysStringLen Lib "oleaut32" (ByVal bstr As Long) As Long
 
 Private Enum CALLINGCONVENTION_ENUM
   cc_fastcall
@@ -22,10 +24,15 @@ Private Enum CALLINGCONVENTION_ENUM
 End Enum
 
 Private LibHdls As New FastCollection, VType(0 To 63) As Integer, VPtr(0 To 63) As Long
+Sub HandleStringInBuffer(a As MemBlock)
 
+End Sub
+Public Sub SetLibHdls()
+    LibHdls.UcaseKeys = True
+End Sub
 
 Public Function stdCallW(sDll As String, sFunc As String, ByVal RetType As Variant, p() As Variant, j As Long)
-Dim v(), HRes As Long
+Dim v(), HRes As Long, i As Long
  
   v = p 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To j - 1 ''UBound(V)
@@ -39,7 +46,7 @@ Dim v(), HRes As Long
     End If
     
   Next i
-  If Left$(func, 1) = "#" Then
+  If Left$(sFunc, 1) = "#" Then
   HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), stdCallW)
   Else
   HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_STDCALL, CInt(RetType), j, VType(0), VPtr(0), stdCallW)
@@ -61,7 +68,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     VType(i) = VarType(v(i))
     VPtr(i) = VarPtr(v(i))
   Next i
-   If Left$(func, 1) = "#" Then
+   If Left$(sFunc, 1) = "#" Then
      HRes = DispCallFunc(0, GetFuncPtrOrd(sDll, sFunc), CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), cdeclCallW)
    Else
   HRes = DispCallFunc(0, GetFuncPtr(sDll, sFunc), CC_CDECL, CInt(RetType), j, VType(0), VPtr(0), cdeclCallW)
@@ -162,6 +169,15 @@ lfunc = val(Mid$(sFunc, 2))
   GetFuncPtrOrd = GetProcByOrdinal(hLib, lfunc)
   If GetFuncPtrOrd = 0 Then MyEr "EntryPoint not found: " & sFunc & " in: " & sLib, "EntryPoint not found: " & sFunc & " στο: " & sLib
 End Function
+Public Function GetBStrFromBstrPtr(lpSrc As Long) As String
+Dim SLen As Long
+  If lpSrc = 0 Then Exit Function
+  SLen = SysStringLen(lpSrc)
+  If SLen Then GetBStrFromBstrPtr = Space$(SLen) Else Exit Function
+
+  RtlMoveMemory ByVal StrPtr(GetBStrFromBstrPtr), ByVal lpSrc, SLen * 2
+
+End Function
 Public Function GetBStrFromPtr(lpSrc As Long, Optional ByVal ANSI As Boolean) As String
 Dim SLen As Long
   If lpSrc = 0 Then Exit Function
@@ -173,7 +189,6 @@ Dim SLen As Long
     Case Else: RtlMoveMemory ByVal StrPtr(GetBStrFromPtr), ByVal lpSrc, SLen * 2
   End Select
 End Function
-
 Public Sub CleanupLibHandles() 'not really needed - but callable (usually at process-shutdown) to clear things up
 Dim LibHdl
 LibHdls.ToStart

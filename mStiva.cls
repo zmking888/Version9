@@ -717,14 +717,14 @@ End Sub
 Sub CopyGroupObj(myobject1 As Object, myobject2 As Object)
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- Set myobject2 = New Group
+ Dim mygroup2 As New Group
   Dim myobject As Group
  Set myobject = myobject1
              With myobject
                 If .IamFloatGroup Then
          
                  .PeekItem 1, vvl
-                 myobject2.BeginFloat vvl + 2
+                 mygroup2.BeginFloat vvl + 2
                  For x1 = 0 To vvl * 2 + 3
                     .PeekItem x1, vvl
                     If Typename(vvl) = "Group" Then
@@ -743,21 +743,22 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set mySecondArray = Nothing
                     End If
                     End If
-                    myobject2.PokeItem x1, vvl
+                    mygroup2.PokeItem x1, vvl
      
                 Next x1
                 End If
         
-                myobject2.HasStrValue = .HasStrValue
-                myobject2.HasValue = .HasValue
-                myobject2.HasSet = .HasSet
-                myobject2.HasParameters = .HasParameters
+                mygroup2.HasStrValue = .HasStrValue
+                mygroup2.HasValue = .HasValue
+                mygroup2.HasSet = .HasSet
+                mygroup2.HasParameters = .HasParameters
 
-             Set myobject2.SuperClassList = .SuperClassList
-                Set myobject2.Events = .Events
-                myobject2.highpriorityoper = .highpriorityoper
-                myobject2.HasUnary = .HasUnary
+             Set mygroup2.SuperClassList = .SuperClassList
+                Set mygroup2.Events = .Events
+                mygroup2.highpriorityoper = .highpriorityoper
+                mygroup2.HasUnary = .HasUnary
             End With
+            Set myobject2 = mygroup2
 End Sub
 Function Copy() As mStiva
 Dim i As Long
@@ -769,7 +770,7 @@ Next i
 End Function
 Property Get Value() As Variant
 Dim aa As VarItem
-If index >= 0 And index <= mMany Then
+If index >= 0 And index < mMany Then
     Set aa = StackPickRef(index + 1)
     If aa.ObjectRef Is Nothing Then
         If aa.Typename = "S" Then

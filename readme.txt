@@ -1,6 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 9.2 Revision 3 active-X
+Version 9.3 active-X
+
+New GUI functions
+Png support using GDI+
+Pointers for groups
 
 
 From version 9.0 revision 50:

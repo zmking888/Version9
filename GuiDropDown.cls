@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Public WithEvents Textbox As myTextBox
 Attribute Textbox.VB_VarHelpID = -1
 Public WithEvents glistN As gList
@@ -29,6 +30,7 @@ Public CtrlName As String
 Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean, mMenuStyle As Boolean, mMenuWidth As Long
 Dim Callback As GuiM2000
+Dim mListText As String
 
 Public Property Get GetCallBack() As Form
 Set GetCallBack = Callback
@@ -107,7 +109,7 @@ End If
 Pad.Move Pad.Left, Pad.Top, .glistN.widthtwips, .glistN.HeightTwips * 5
 End With
 glistN.restrictLines = 5
-glistN.MoveTwips 0, 0, Pad.width, Pad.Height
+glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
 End Sub
 Public Sub deconstruct()
 If Not glistN Is Nothing Then glistN.Shutdown
@@ -212,7 +214,7 @@ Textbox.SkipProcAtExitFocus = True
 
 Textbox.glistN.NoCaretShow = True
 glistN.ForeColor = rgb(0, 0, 0)
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Textbox.glistN.dropkey = False
@@ -268,14 +270,14 @@ End If
 Else
 Textbox.vartext = glistN.list(item): Textbox.SelStart = Len(Textbox.Text) + 1
 End If
-
+ Textbox.SetFocus
    If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(item) + ")"
    Else
       Callback.Callback mesCtrlName + ".DblClick(" + Str(item) + ")"
       End If
       
-   Textbox.SetFocus
+  
 End If
 End Sub
 Private Sub glistN_ScrollMove(item As Long)
@@ -395,24 +397,25 @@ If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipPr
      If gl = 0 Then Exit Sub
      If mMenuStyle Then
      If mMenuWidth > 1000 Then
-     Pad.width = mMenuWidth
+     Pad.Width = mMenuWidth
      Else
-     Pad.width = Callback.Controls(CtrlName).width
+     Pad.Width = Callback.Controls(CtrlName).Width
      End If
      Else
-Pad.width = CLng(Callback.Controls(CtrlName).width / 1.618 * dv15) \ dv15
+Pad.Width = CLng(Callback.Controls(CtrlName).Width / 1.618 * dv15) \ dv15
 End If
 If Callback.Controls(CtrlName).Height * gl < VirtualScreenHeight() * 2 / 3 Then
 
-Pad.Height = Callback.Controls(CtrlName).Height * gl
+
+Pad.Height = (((Callback.Controls(CtrlName).Height * gl) \ dv15) + 1) * dv15
 glistN.restrictLines = gl
 
 Else
 glistN.restrictLines = (VirtualScreenHeight() * 2 / 3) \ Callback.Controls(CtrlName).Height
-Pad.Height = Callback.Controls(CtrlName).Height * glistN.restrictLines
+Pad.Height = (((Callback.Controls(CtrlName).Height * glistN.restrictLines) \ dv15) + 1) * dv15
 
 End If
-glistN.MoveTwips 0, 0, Pad.width, Pad.Height
+glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
     Textbox.SkipProcAtExitFocus = True
     Textbox.glistN.NoCaretShow = True
     Textbox.glistN.ShowPan
@@ -447,7 +450,7 @@ End If
     Callback.PopUpPos Pad, Left, Top, Callback.Controls(CtrlName).Height
     Else
 
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).width - Pad.width, Top, Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, Top, Callback.Controls(CtrlName).Height
 End If
 
 ElseIf KeyCode = vbKeyTab Then
@@ -567,12 +570,12 @@ If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True
 
 If mMenuStyle Then
      If mMenuWidth > 1000 Then
-     Pad.width = mMenuWidth
+     Pad.Width = mMenuWidth
      Else
-     Pad.width = Callback.Controls(CtrlName).width
+     Pad.Width = Callback.Controls(CtrlName).Width
      End If
      Else
-Pad.width = CLng(Callback.Controls(CtrlName).width / 1.618 * dv15) \ dv15
+Pad.Width = CLng(Callback.Controls(CtrlName).Width / 1.618 * dv15) \ dv15
 End If
 
 If Callback.Controls(CtrlName).Height * gl < ScrY() * 2 / 3 Then
@@ -585,7 +588,7 @@ glistN.restrictLines = (ScrY() * 2 / 3) \ Callback.Controls(CtrlName).Height
 Pad.Height = Callback.Controls(CtrlName).Height * glistN.restrictLines
 
 End If
-glistN.MoveTwips 0, 0, Pad.width, Pad.Height
+glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
     Textbox.SkipProcAtExitFocus = True
     glistN.LeaveonChoose = True
   If AutoComplete Then
@@ -615,7 +618,7 @@ glistN.MoveTwips 0, 0, Pad.width, Pad.Height
     If mMenuWidth <> 0 Then
     Callback.PopUpPos Pad, Left, Top, Callback.Controls(CtrlName).Height
     Else
-Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).width - Pad.width, Top, Callback.Controls(CtrlName).Height
+Callback.PopUpPos Pad, Left + Callback.Controls(CtrlName).Width - Pad.Width, Top, Callback.Controls(CtrlName).Height
 End If
 
 
@@ -770,7 +773,7 @@ Property Get ListChecked(item As Long) As Boolean
 ListChecked = glistN.ListChecked(item)
 End Property
 Property Let ListChecked(item As Long, RHS As Boolean)
-LglistN.ListChecked(item) = RHS
+glistN.ListChecked(item) = RHS
 End Property
 Property Get ListMenu(item As Long) As Boolean
 ListMenu = glistN.ListMenu(item)
@@ -797,10 +800,10 @@ Textbox.locked = True
 End Sub
 
 Public Sub SetUp()
-white = rgb(255, 255, 255)
-black = 0
-dimm1 = rgb(100, 200, 160)
-dimm2 = rgb(200, 120, 60)
+'white = rgb(255, 255, 255)
+'black = 0
+'dimm1 = rgb(100, 200, 160)
+'dimm2 = rgb(200, 120, 60)
 
 Dim ff As New StdFont
 Dim ff1 As New StdFont
@@ -827,9 +830,9 @@ With glistN
 .Vertical = True
 .VerticalCenterText = True
 .Text = mListText
-.BackColor = dimm2
+.backcolor = 0 'dimm2
 
-.MoveTwips 0, 0, Pad.width, Pad.Height
+.MoveTwips 0, 0, Pad.Width, Pad.Height
 
 Set .Font = ff
 .ForeColor = Callback.Controls(1).ForeColor
@@ -896,7 +899,6 @@ Public Property Get Find(ByVal FindThis$) As Variant
     Find = glistN.Find(FindThis)
 End Property
 Public Property Get ListIndex() As Variant
-
 ListIndex = glistN.ListIndex
 End Property
 
@@ -995,7 +997,7 @@ Textbox.glistN.MenuGroup = RHS
 End Property
 
 Public Property Get BorderStyle() As Variant
-Bordestyle = glistN.BorderStyle
+BorderStyle = glistN.BorderStyle
 End Property
 
 Public Property Let BorderStyle(ByVal vNewValue As Variant)
@@ -1008,7 +1010,7 @@ Sub Transparent()
 Dim x  As Long, y As Long
 Textbox.glistN.BackStyle = 1
 Textbox.glistN.GetLeftTop x, y
-Textbox.glistN.RepaintFromOut Callback.image, x, y
+Textbox.glistN.RepaintFromOut Callback.Image, x, y
 End Sub
 Public Property Get FadePartColor() As Variant
 FadePartColor = Textbox.FadePartColor

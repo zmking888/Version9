@@ -11,8 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-' not MAKE VALUE AS DEFAULT PROPERTY, changed in version 9
-
+Option Explicit
 Dim VarRef As String
 Dim FuncRef As String
 Public oldFuncRef As String
@@ -34,13 +33,42 @@ Private eventlist As FastCollection  ' we have to copy this
 Public highpriorityoper As String
 Public leftoper$  ' we have to copy this
 Public HasUnary As Boolean
-
+Public IamApointer As Boolean, lasthere$
+Public Original As Long
 Public Property Get Events() As Object
 Set Events = eventlist
 End Property
 Public Property Set Events(RHS As Object)
 Set eventlist = RHS
 End Property
+Public Sub ResetEvents()
+If eventlist Is Nothing Then Exit Sub
+Dim i As Long
+With eventlist
+For i = 0 To .Count - 1
+    .index = i
+    .Done = True
+    .Value = ""
+    .sValue = 0
+Next i
+.Done = False
+End With
+
+End Sub
+Public Sub FlushEvents()
+If eventlist Is Nothing Then Exit Sub
+Dim eventlist2 As New FastCollection
+Dim i As Long
+With eventlist
+For i = 0 To .Count - 1
+    .index = i
+    .Done = True
+    eventlist2.AddKey .KeyToString, ""
+Next i
+.Done = False
+End With
+Set eventlist = eventlist2
+End Sub
 Public Sub RegisterEvent(ByVal a$)
 a$ = myUcase(a$)
 If eventlist Is Nothing Then Set eventlist = New FastCollection
@@ -206,14 +234,14 @@ End Sub
 Public Sub BeginFloat(Total As Long)
 FloatGroup = True
 Set bank = New mArray
-flitems = Total
+'flitems = Total
 bank.PushDim Total * 2
 bank.PushEnd
 End Sub
 
 Public Sub BeginFloat2(Total As Long)
 FloatGroup = True
-flitems = Total
+'flitems = Total
 bank.PushDim Total * 2
 bank.PushEnd
 End Sub
@@ -247,7 +275,7 @@ Public Property Get Link() As Object
 Set Link = LinkToGroup
 End Property
 Public Property Set Sorosref(a As mStiva)
-If FloatGroup Then
+If FloatGroup And Not IamApointer Then
 ' we can't do anything with stored values
 Else
 Set OwnSoros = a
@@ -266,26 +294,16 @@ End Property
 
 
 Public Property Get FuncList() As String
+If IamApointer Then
+FuncList = Me.Link.FuncList
+Else
 FuncList = FuncRef$
+End If
 End Property
 Public Property Let FuncList(ByVal vNewValue As String)
 FuncRef$ = vNewValue
 End Property
-Public Function ArrlistTotal(v(), skip As Boolean) As String
-    Dim i As Long, s As String, Sm As String
-    For i = 1 To OwnSoros.Total
-    s = OwnSoros.StackItem(i)
-    If Left$(s, 1) = "*" Then
-    If Not IsObject(v(val(Split(s)(1)))) Then Set v(val(Split(s)(1))) = New Group
-    Sm = Sm + v(val(Split(s)(1))).ArrlistTotal(v(), 0)
-    End If
-    Next
-    If skip Then
-    ArrlistTotal = ArrRef + Sm$
-    Else
-    ArrlistTotal = Replace(ArrRef + Sm$, Chr$(13) + "__", Chr$(13) + "__" + mName)
-    End If
-End Function
+
 
 Public Property Get LocalList() As String
 LocalList = LocalRef$
@@ -341,7 +359,7 @@ If IamFloatGroup Then EndFloat
 Set LinkToGroup = Nothing
 Set OwnSoros = New mStiva
 HasValue = False
-HasSet = fasle
+HasSet = False
 HasStrValue = False
 HasParameters = False
 IamSuperClass = False

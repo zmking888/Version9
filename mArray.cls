@@ -268,7 +268,7 @@ End Sub
 Public Sub Car(m As Object)
 Dim k As New mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
-If Count > 0 Then
+If count > 0 Then
     k.PushDim 1
     k.PushEnd
     k.SerialItem actualdata(0), 0, 1
@@ -322,7 +322,7 @@ Public Sub Cdr(m As Object)
 Dim k As New mArray
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 If dnum > 0 Then
-k.StartResize: k.PushDim Me.Count - 1: k.PushEnd
+k.StartResize: k.PushDim Me.count - 1: k.PushEnd
 Else
 k.Arr = True
 Set k.GroupRef = Me.GroupRef
@@ -379,14 +379,14 @@ End Sub
 
 Public Sub AppendArray(k As mArray)
 'append this to k
-If k.Count = 0 Then
+If k.count = 0 Then
 Me.CopyArray k
 Exit Sub
 End If
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
 Dim fromhere As Long
 fromhere = k.UpperMonoLimit + 1
-k.SerialItem v, Me.Count + k.Count, 10
+k.SerialItem v, Me.count + k.count, 10
 k.myarrbase = myarrbase
 k.RevOrder = RevOrder
 If Right$(k.arrname, 2) = "%(" Then
@@ -453,6 +453,7 @@ Next i
 
 k.PushEnd
 k.RevOrder = RevOrder
+Set k.GroupRef = Me.GroupRef
 If Right$(k.arrname, 2) = "%(" Then
 For i = 0 To Me.UpperMonoLimit
 
@@ -505,7 +506,7 @@ End If
 Next i
 End If
 '' new
-Set k.GroupRef = Me.GroupRef
+
 k.Arr = Me.Arr
 k.IHaveGui = Me.IHaveGui
 k.IHaveClass = Me.IHaveClass
@@ -515,11 +516,11 @@ End Sub
 Public Function UpperMonoLimit()
 UpperMonoLimit = maxitems1
 End Function
-Public Property Get Count()
+Public Property Get count()
 If dnum = 0 Then
-Count = 0
+count = 0
 Else
-Count = maxitems1 + 1 ' sa
+count = maxitems1 + 1 ' sa
 End If
 End Property
 Public Property Let arrname(aName As String)
@@ -823,7 +824,7 @@ If dnum > 0 Then
 Dim i As Long
 If IHaveClass Then
 For i = 0 To maxitems - 1
-CopyGroupObj GroupRef, aa
+CopyGroupObj GroupRef, aa, True
 Set actualdata(i) = aa
 Next i
 Else
@@ -855,19 +856,24 @@ Dim aa As Object
 Set aa = New Group
 Set var = aa
 End Sub
-Sub CopyGroupObj(myobject1 As Object, myobject2 As Object)
+Sub CopyGroupObj(myobject1 As Object, myobject2 As Object, Optional LinkToMe As Boolean = False)
 'Special Copy
  Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
- Set myobject2 = New Group
+
+Dim mygroup2 As New Group
  Dim myobject As Group
  Set myobject = myobject1
+ If myobject.IamApointer Then
+ Set myobject2 = myobject
+ Exit Sub
+ End If
  
              With myobject
                 If .IamFloatGroup Then
          
                  .PeekItem 1, vvl
-                 myobject2.BeginFloat vvl + 2
+                 mygroup2.BeginFloat vvl + 2
                  For x1 = 0 To vvl * 2 + 2
                     .PeekItem x1, vvl
                     If Typename(vvl) = "Group" Then
@@ -886,22 +892,29 @@ Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArr
                         Set mySecondArray = Nothing
                     End If
                     End If
-                    myobject2.PokeItem x1, vvl
+                    mygroup2.PokeItem x1, vvl
      
                 Next x1
-                myobject2.HasStrValue = myobject.HasStrValue
-                myobject2.HasValue = myobject.HasValue
-                myobject2.HasSet = myobject.HasSet
-                myobject2.HasParameters = myobject.HasParameters
-                myobject2.HasParametersSet = myobject.HasParametersSet
-                Set myobject2.SuperClassList = myobject.SuperClassList
-                Set myobject2.LinkRef = myobject
-                Set myobject2.Events = myobject.Events
-                myobject2.highpriorityoper = myobject.highpriorityoper
-                myobject2.HasUnary = myobject.HasUnary
+                
+                mygroup2.HasStrValue = myobject.HasStrValue
+                mygroup2.HasValue = myobject.HasValue
+                mygroup2.HasSet = myobject.HasSet
+                mygroup2.HasParameters = myobject.HasParameters
+                mygroup2.HasParametersSet = myobject.HasParametersSet
+                Set mygroup2.SuperClassList = myobject.SuperClassList
+                'If Not GroupRef Is Nothing Then
+                If LinkToMe Then
+                    Set mygroup2.LinkRef = myobject
+                Else
+                    .PeekItem x1, vvl
+                    mygroup2.PokeItem x1, vvl
+                End If
+                Set mygroup2.Events = .Events
+                mygroup2.highpriorityoper = .highpriorityoper
+                mygroup2.HasUnary = .HasUnary
                 End If
             End With
-         
+         Set myobject2 = mygroup2
 End Sub
 Property Get IsEmpty() As Variant
 IsEmpty = dnum = 0

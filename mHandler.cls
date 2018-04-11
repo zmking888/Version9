@@ -12,6 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 ' Generic Handler
+Option Explicit
 Public objref As Object
 Public t1 As Variant, indirect As Long
 Public ReadOnly As Boolean

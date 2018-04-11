@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+Option Explicit
 ' Original code made by Elroy Sullivan, PhD (User in VbForums)
 ' Was a module and now is a Class, by George Karras
 ' NOT FINISHED YET
@@ -760,7 +761,7 @@ End Function
 
 Public Function VecMagnitude(a As Long) As Double
     Dim v As VecType
-    CopyMemory VarPtr(v1), a, 24
+    CopyMemory VarPtr(v), a, 24
     VecMagnitude = Sqr(v.x * v.x + v.y * v.y + v.z * v.z)
 End Function
 Private Function VecMag(v As VecType) As Double

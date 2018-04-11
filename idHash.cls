@@ -156,7 +156,7 @@ Property Get LastKnown() As String
 LastKnown = lastfind
 End Property
 
-Friend Function Find(Key As String, num As Long) As Boolean
+Friend Function Find(Key As String, num As Long, Optional badindex As Long = 0) As Boolean
 Dim k As Long
 num = 0
 If Len(Key) = 0 Then Exit Function
@@ -165,7 +165,16 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then
-    num = PriveSpace(k).ndx: Find = True: lastfind = Key: index = k: Exit Function
+    num = PriveSpace(k).ndx
+    If num > 0 Then
+        Find = True: lastfind = Key: index = k: Exit Function
+    ElseIf badindex Then
+        If badindex <= k Then Find = True: lastfind = Key: index = k: Exit Function
+    Else
+    
+    '    Exit Do
+        
+    End If
     End If
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0

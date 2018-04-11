@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 ' From Tools make changed property as default
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
@@ -221,11 +222,11 @@ Private Sub glistN_Selected2(item As Long)
       Callback.Callback mesCtrlName + ".Click(" + Str(checked) + ")"
       End If
 End Sub
-Public Property Get top() As Variant
-top = Callback.Controls(CtrlName).top
+Public Property Get Top() As Variant
+Top = Callback.Controls(CtrlName).Top
 End Property
-Public Property Let top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).top = RHS
+Public Property Let Top(ByVal RHS As Variant)
+Callback.Controls(CtrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(CtrlName).Left
@@ -238,7 +239,7 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = rgb(0, 0, 0)
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 End If
 End Property
 Sub GetFocus()

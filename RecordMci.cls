@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Private Declare Function mciGetErrorString Lib "winmm.dll" Alias "mciGetErrorStringA" (ByVal dwError As Long, ByVal lpstrBuffer As String, ByVal uLength As Long) As Long 'Get the error message of the mcidevice if any
 Private Declare Function mciSendString Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal lpstrReturnString As String, ByVal uReturnLength As Long, ByVal hwndCallback As Long) As Long 'Send command strings to the mci device
 Private data As String * 128 ' Used to store our return data
@@ -105,13 +106,13 @@ Public Function getPositionInMS() As Long
     'Get the position of the movie in milliseconds
     error = mciSendString("set capture time format ms", 0, 0, 0)
     error = mciSendString("status capture position", data, 128, 0)
-    getPositionInMS = Val(data)
+    getPositionInMS = val(data)
 End Function
 Public Function getLengthInMS() As Long
     'Get the position of the movie in milliseconds
     error = mciSendString("set capture time format ms", 0, 0, 0)
     error = mciSendString("status capture length", data, 128, 0)
-    getLengthInMS = Val(data)
+    getLengthInMS = val(data)
 End Function
 Sub recStop()
 error = mciSendString("stop capture", 0, 0, 0)
@@ -149,7 +150,7 @@ error = mciSendString(CommandString, 0&, 0, 0)
 End Sub
 Function AnyMciValue(CommandString As String)
  error = mciSendString(CommandString, data, 128, 0)
-    AnyMciValue = Val(data)
+    AnyMciValue = val(data)
 End Function
 Public Function checkError() As String
     'A very useful function for getting any errors

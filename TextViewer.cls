@@ -2165,8 +2165,13 @@ again4:
   If MaybeIsSymbolNoSpace(a$, "~", True) Then
     addone col(), pos2, 15
     pos2 = k - Len(a$) + 1
+  ElseIf FastSymbol(a$, "=>", , 2) Then
+    addone col(), pos2, 14
+  
+    pos2 = k - Len(a$) + 1
   ElseIf FastSymbol(a$, "=") Then
-  addone col(), pos2, 15
+    addone col(), pos2, 15
+  
     pos2 = k - Len(a$) + 1
   ElseIf MaybeIsSymbol(a$, "+-*/", "=", True) Then
   addone col(), pos2, 15
@@ -2352,7 +2357,7 @@ If IsNumberLabel(a$, drop$) Then
 If pos2 > 0 Then addone col(), pos2, 14
 
 End Sub
-Function IsLabelDot(where$, a$, r$) As Long
+Function IsLabelDot(where$, a$, r$) As Long 'ok
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -2363,8 +2368,8 @@ a$ = NLtrim$(a$)
     Do While Len(a$) > 0
     c$ = Left$(a$, 1)
     If AscW(c$) < 256 Then
-        Select Case c$
-        Case "@"
+        Select Case AscW(c$)
+        Case 64  '"@"
         
             If Mid$(a$, 2, 1) <> "(" And r$ <> "" Then
 
@@ -2373,7 +2378,7 @@ a$ = NLtrim$(a$)
             Else
                 IsLabelDot = 0: a$ = firstdot$ + a$: Exit Function
             End If
-        Case "?"
+        Case 63 '"?"
         If r$ = vbNullString And firstdot$ = vbNullString Then
         r$ = "?"
         a$ = Mid$(a$, 2)
@@ -2387,7 +2392,7 @@ a$ = NLtrim$(a$)
         IsLabelDot = 0
         Exit Function
         End If
-        Case "."
+        Case 46 '"."
             If one Then
             Exit Do
             Exit Do
@@ -2400,10 +2405,10 @@ a$ = NLtrim$(a$)
             firstdot$ = firstdot$ + "."
             a$ = Mid$(a$, 2)
             End If
-       Case "\", "{" To "~", "^"
+       Case 92, 94, 123 To 126 '"\","^", "{" To "~"
         Exit Do
 
-        Case "0" To "9", "_"
+        Case 48 To 57, 95 '"0" To "9", "_"
            If one Then
             If firstdot$ <> "" Then a$ = firstdot$ + a$
             Exit Do
@@ -2414,7 +2419,7 @@ a$ = NLtrim$(a$)
             Else
             Exit Do
             End If
-        Case Is >= "A"
+        Case Is < 0, Is > 64 ' >=A and negative
             If one Then
             Exit Do
             Else
@@ -2422,7 +2427,7 @@ a$ = NLtrim$(a$)
             a$ = Mid$(a$, 2)
             rr& = 1 'is an identifier or floating point variable
             End If
-        Case "$"
+        Case 36 ' "$"
             If one Then Exit Do
             If r$ <> "" Then
             one = True
@@ -2432,7 +2437,7 @@ a$ = NLtrim$(a$)
             Else
             Exit Do
             End If
-        Case "%"
+        Case 37 ' "%"
             If one Then Exit Do
             If r$ <> "" Then
             one = True
@@ -2442,7 +2447,7 @@ a$ = NLtrim$(a$)
             Else
             Exit Do
             End If
-        Case "("
+        Case 40 ' "("
             If r$ <> "" Then
                             If Mid$(a$, 2, 2) = ")@" Then
                                     r$ = r$ & "()."
@@ -2488,7 +2493,7 @@ a$ = NLtrim$(a$)
    'a$ = LTrim(a$)
 
 End Function
-Function IsLabelOnly(a$, r$) As Long
+Function IsLabelOnly(a$, r$) As Long 'ok
 
 Dim rr&, one As Boolean, c$, dot&, Extra&
 r$ = vbNullString
@@ -2497,8 +2502,8 @@ a$ = NLtrim$(a$)
     Do While Len(a$) > 0
      c$ = Left$(a$, 1) 'ANYCHAR HERE
     If AscW(c$) < 256 Then
-        Select Case c$
-                Case "#"
+        Select Case AscW(c$)
+                Case 35 ' "#"
         If r$ <> "" Then
         Exit Do
         Else
@@ -2508,7 +2513,7 @@ a$ = NLtrim$(a$)
           
           rr& = 10
            End If
-        Case "@"
+        Case 64  '"@"
            If r$ = vbNullString Then
               a$ = Mid$(a$, 2)
               ElseIf Mid$(a$, 2, 1) <> "(" And r$ <> "" Then
@@ -2517,7 +2522,7 @@ a$ = NLtrim$(a$)
               Else
                  IsLabelOnly = 0: Exit Function
             End If
-        Case "."
+        Case 46 '"."
             If one Then
             Exit Do
            ElseIf r$ <> "" Then
@@ -2551,10 +2556,10 @@ a$ = NLtrim$(a$)
            End If
             Exit Function
             End If
-     Case "\", "{" To "~", "^"
+     Case 92, 94, 123 To 126 '"\","^", "{" To "~"
 Exit Do
         
-        Case "0" To "9", "_"
+        Case 48 To 57, 95 '"0" To "9", "_"
        
            If one Then
            
@@ -2577,7 +2582,7 @@ Exit Do
             
             Exit Do
             End If
-Case Is >= "A"
+Case Is < 0, Is > 64 ' >=A and negative
 
             If one Then
             Exit Do
@@ -2592,10 +2597,10 @@ Case Is >= "A"
             rr& = 1 'is an identifier or floating point variable
   
             End If
-      Case "&"
+      Case 38 ' "&"
             If r$ = vbNullString Then rr& = 2:    a$ = Mid$(a$, 2)
             Exit Do
-       Case "$"
+       Case 36 ' "$"
        If one Then Exit Do
             If r$ <> "" Then
             one = True
@@ -2605,7 +2610,7 @@ Case Is >= "A"
             Else
             Exit Do
             End If
-        Case "%"
+        Case 37 ' "%"
             If one Then Exit Do
             If r$ <> "" Then
             one = True
@@ -2616,7 +2621,7 @@ Case Is >= "A"
             Else
             Exit Do
             End If
-        Case "("
+        Case 40 ' "("
             If r$ <> "" Then
                 If Mid$(a$, 2, 2) = ")@" Then
                  r$ = r$ & "()."
@@ -3585,7 +3590,7 @@ End Select
 End Select
 
 End Function
-Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional pos As Long = 1) As String
+Private Function aheadstatus(a$, Optional srink As Boolean = True, Optional pos As Long = 1) As String 'ok
 Dim b$, part$, w$, Level&, pos2 As Long, word$
 
 If a$ = vbNullString Then Exit Function

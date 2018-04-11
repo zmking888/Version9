@@ -55,7 +55,7 @@ Dim mlcid As Long
 Dim sortmlcid As Long
 Private pos() As Long, SLen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
-Public Busy As Boolean
+Public busy As Boolean
 Private mSortstyle As VbCompareMethod
 Function IsLast(ByVal ParaNum As Long) As Boolean
 ' for MarkParagraphID
@@ -423,7 +423,7 @@ Property Let textDocFast(norawtext As String)
     End If
 End Property
 Property Let textDoc(norawtext As String)
-    Busy = True
+    busy = True
     Dim where As Long, ok
     Dim a() As String
     where = 1
@@ -440,14 +440,14 @@ Property Let textDoc(norawtext As String)
       a() = Split(norawtext, vbLf)
       For where = LBound(a()) To UBound(a())
       RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Property
+      If ok Then busy = False: Exit Property
       AppendParagraph a(where)
       
       Next where
     End If
     ' colorize at a second stage...(new)
 WrapAgain
-Busy = False
+busy = False
 End Property
 Property Let textDocColor(norawtext As String)
     Dim where As Long
@@ -1471,39 +1471,39 @@ Sub GoTopLineNextParagraph(lineno As Long, thistext As String, ParaNum As Long)
     End If
 End Sub
 Public Sub WrapAgain()
-Busy = True
+busy = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Sub
+      If ok Then busy = False: Exit Sub
 mycur = DocParaNext(mycur)
 Loop
-Busy = False
+busy = False
 End Sub
 Public Sub WrapAgainBlock(startblock As Long, endblock As Long)
-Busy = True
+busy = True
 Dim mycur As Long, ok
 mycur = startblock
 Do While mycur <> 0
  ReWritePara mycur, TextParagraph(mycur), True
        RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Sub
+      If ok Then busy = False: Exit Sub
  If mycur = endblock Then Exit Do
  mycur = DocParaNext(mycur)
 Loop
-Busy = False
+busy = False
 End Sub
 
 Public Sub WrapAgainColor2()
-Busy = False = True
+busy = False = True
 Dim mycur As Long, ok
 mycur = DocParaNext(0)
 
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Sub
+      If ok Then busy = False: Exit Sub
 If para(mycur).colordata(0) = Empty Then
 ColorThis mycur
 Else
@@ -1511,11 +1511,11 @@ mycur = DocParaNext(mycur)
 End If
 
 Loop
-Busy = False
+busy = False
 End Sub
 
 Public Sub WrapAgainColorBlock(startblock As Long, endblock As Long)
-Busy = True
+busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1523,17 +1523,17 @@ ColorThis mycur
 Else
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Sub
+      If ok Then busy = False: Exit Sub
 ColorThis mycur
 If mycur = endblock Then Exit Do
 Loop
 
 If mycur = endblock Then ColorThis mycur
 End If
-Busy = False
+busy = False
 End Sub
 Public Sub WrapAgainColorBlock2(startblock As Long, endblock As Long)
-Busy = True
+busy = True
 Dim mycur As Long, ok
 mycur = startblock
 If startblock = endblock Then
@@ -1552,7 +1552,7 @@ Loop
 
 If mycur = endblock Then ColorThis mycur
 End If
-Busy = False
+busy = False
 End Sub
 Private Sub Class_Initialize()
 ' from this version paramax= docmax
@@ -1840,25 +1840,25 @@ Dim PathLength As Long
 End Function
 Private Function NeoUnicodeFile(FileName$) As Boolean
 Dim hFile
-Dim f$
+Dim F$
 Const FILE_ATTRIBUTE_NORMAL = &H80
 Const GENERIC_WRITE = &H40000000
 If Left$(FileName$, 2) <> "\\" Then
 
-f$ = "\\?\" + FileName$
+F$ = "\\?\" + FileName$
 Else
-f$ = FileName$
+F$ = FileName$
 End If
 On Error Resume Next
-hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
+hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
 ''Sleep 1
 CloseHandle hFile
-NeoUnicodeFile = (GetDosPath(f$) <> "")
+NeoUnicodeFile = (GetDosPath(F$) <> "")
 End Function
 Public Function SaveUnicodeOrAnsi(ByVal FileName As String, Optional mode2save As Long = 0, Optional Append As Boolean = False) As Boolean
 ' using doc as extension you can read it from word...with automatic conversion to unicode
 ' OVERWRITE ALWAYS
-Dim w As Long, a() As Byte, f$, i As Long, bb As Byte, yesswap As Boolean, lf$
+Dim w As Long, a() As Byte, F$, i As Long, bb As Byte, yesswap As Boolean, lf$
 Const Utf8CodePage As Long = 65001
 On Error GoTo t12345
 '' 0 vbcrlf, 1 vblf, 2 vbcr
@@ -1871,10 +1871,10 @@ mode2save = mode2save Mod 10
 If Not Append Then
 If Not NeoUnicodeFile(FileName) Then Exit Function
 End If
-f$ = GetDosPath(FileName)
-If Err.Number > 0 Or f$ = vbNullString Then Exit Function
+F$ = GetDosPath(FileName)
+If Err.Number > 0 Or F$ = vbNullString Then Exit Function
 w = FreeFile
-Open f$ For Binary As w
+Open F$ For Binary As w
 ' mode2save
 ' 0 is utf-le
 If Append Then Seek #w, LOF(w) + 1
@@ -2066,7 +2066,7 @@ Public Function ContainsUTF16(ByRef Source() As Byte) As Long
     End If
 End Function
 Public Sub ReadUnicodeOrANSI(FileName As String, Optional Merge As Boolean = False, Optional feedback As Long)
-Busy = True
+busy = True
 Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte, lbt As Long
 Dim mLof As Long, ok, nobom As Long
 nobom = 1
@@ -2171,7 +2171,7 @@ utf8cont:
     
     
 ErrHandler:
-Busy = False
+busy = False
 If FNr Then Close FNr
 ReDim Buffer(1 To 1) As Byte
 bufOffset = 0
@@ -2249,12 +2249,12 @@ pos = -2
 End Function
 
 Public Sub CompactLines(Optional addtimes As Boolean = True)
-Busy = True
+busy = True
 Dim mycur As Long, nextCur As Long, s$, many As Long, ok
 mycur = DocParaNext(0)
 Do While mycur <> 0
       RaiseEvent MayQuit(ok)
-      If ok Then Busy = False: Exit Sub
+      If ok Then busy = False: Exit Sub
 many = 1
 s$ = TextParagraph(mycur)
 nextCur = DocParaNext(mycur)
@@ -2270,7 +2270,7 @@ Loop
 If addtimes Then TextParagraph(mycur) = TextParagraph(mycur) & " - " & CStr(many)
 mycur = nextCur
 Loop
-Busy = False
+busy = False
 End Sub
 Public Function UniqueWords(Optional uLCID As Long = -1, Optional nowrap As Boolean = True) As Long
 If uLCID = -1 Then uLCID = sortmlcid
@@ -2287,12 +2287,12 @@ End Function
 Private Function CountWords2(a$, uLCID As Long) As Long
 Dim l As Long
 Const NORM_IGNORECASE = &H1001
-Dim top As Long
+Dim Top As Long
 l = Len(a$)
 If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
-top = CountWords2
-If top > 0 Then
+Top = CountWords2
+If Top > 0 Then
 ReDim pos(1 To 1) As Long, SLen(1 To 1) As Long, hit(1 To 1) As Long
 pos(1) = StrPtr(a$)
 SLen(1) = 1
@@ -2311,7 +2311,7 @@ p4 = p2
 Do
          If p4 >= l Then
          If p4 <> p2 Then GoTo there1
-        CountWords2 = top: Exit Function
+        CountWords2 = Top: Exit Function
         End If
             GetMem2 p4, bb
             Select Case bb
@@ -2322,7 +2322,7 @@ Do
             If p4 <> p2 Then
 there1:
                 k = (p4 - p2) \ 2
-                mtop = top
+                mtop = Top
                 mda = 0
                 md = (mtop - mda + 1) \ 2
                 p6 = mda + md
@@ -2341,19 +2341,19 @@ there1:
                     p6 = mda + md
                 Loop
                 If md = 0 Then
-                If top = p5 Then
+                If Top = p5 Then
                 p5 = p5 * 2
                 ReDim Preserve pos(1 To p5) As Long, SLen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
-                    top = top + 1
+                    Top = Top + 1
                     
-                    If mda = top - 1 Then
-                        pos(top) = p2
-                        SLen(top) = k
+                    If mda = Top - 1 Then
+                        pos(Top) = p2
+                        SLen(Top) = k
                     Else
-                        CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (top - mda - 1) * 4
-                        CopyMemory ByVal VarPtr(SLen(1)) + mda * 4 + 4, ByVal VarPtr(SLen(1)) + mda * 4, (top - mda - 1) * 4
-                        CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(SLen(1)) + mda * 4 + 4, ByVal VarPtr(SLen(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (Top - mda - 1) * 4
                         pos(mda + 1) = p2
                         SLen(mda + 1) = k
                         hit(mda + 1) = 0
@@ -2364,7 +2364,7 @@ there1:
             End Select
             p4 = p4 + 2
   Loop
-CountWords2 = top
+CountWords2 = Top
 End If
 End Function
 Private Function MakeString(copythat As Long, ByVal lSize As Long) As String
@@ -2464,12 +2464,12 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
   If LB < M2 Then QuickSortString Arr, LB, M2
   If M1 < UB Then QuickSortString Arr, M1, UB
 End Sub
-Private Function getAnsiStringlINE(f As Long, thislof As Long, Optional linebreaktype As Long) As String
+Private Function getAnsiStringlINE(F As Long, thislof As Long, Optional linebreaktype As Long) As String
 Dim a() As Byte, s1 As String, ss As Long, lbreak As Byte, check As Byte
 Dim se As Long, st1 As Long
 On Error GoTo a11
 Do While Not (thislof < SeekBuf)
-    GetByte f, SeekBuf, check
+    GetByte F, SeekBuf, check
     If check <> 10 And check <> 13 Then
  If LCID_DEF <> 1033 Then
 
@@ -2487,9 +2487,9 @@ Do While Not (thislof < SeekBuf)
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = check
-            GetByte f, SeekBuf, check
+            GetByte F, SeekBuf, check
             If check <> 10 And check <> 13 Or lbreak = check Then
-                NewSeek f, ss  ' restore it
+                NewSeek F, ss  ' restore it
             If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
             End If
             
@@ -2503,14 +2503,14 @@ a11:
 On Error GoTo 0
 SeekBuf = thislof + 1
 End Function
-Private Function getUniStringlINE(f As Long, thislof As Long, Optional LEndian As Boolean = True, Optional linebreaktype As Long) As String
+Private Function getUniStringlINE(F As Long, thislof As Long, Optional LEndian As Boolean = True, Optional linebreaktype As Long) As String
 Dim a() As Byte, s1 As String, ss As Long, lbreak As String, Tmp As Byte
 a = " "
 Dim p As Integer
 On Error GoTo a12
 Do While Not (thislof < SeekBuf)
     ''Get #f, , a()
-    GetWord f, SeekBuf, p
+    GetWord F, SeekBuf, p
     s1 = ChrW(p)
     If Not LEndian Then
     a() = s1
@@ -2526,7 +2526,7 @@ Do While Not (thislof < SeekBuf)
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = s1
-                GetWord f, SeekBuf, p
+                GetWord F, SeekBuf, p
                 s1 = ChrW(p)
                 If Not LEndian Then
                 a() = s1
@@ -2534,7 +2534,7 @@ Do While Not (thislof < SeekBuf)
                 s1 = a()
                 End If
             If s1 <> vbCr And s1 <> vbLf Or lbreak = s1 Then
-                  NewSeek f, ss
+                  NewSeek F, ss
             If s1 = vbLf Then linebreaktype = 10 Else linebreaktype = 20
             End If
         End If
@@ -2546,7 +2546,7 @@ a12:
 On Error GoTo 0
 SeekBuf = thislof + 1
 End Function
-Private Function getUniStringLineUtF8(f As Long, thislof As Long, Optional linebreaktype As Long) As String
+Private Function getUniStringLineUtF8(F As Long, thislof As Long, Optional linebreaktype As Long) As String
 
 Dim ss As Long, lbreak As Byte, check As Byte
 Dim st As Long, WChars&
@@ -2556,7 +2556,7 @@ On Error GoTo a13
 Do While Not (thislof < SeekBuf)
 tryagain:
     If thislof < SeekBuf Then Exit Do
-    GetByte f, SeekBuf, check
+    GetByte F, SeekBuf, check
 
     If (check And &H80) <> 0 Then
         st = st + 1
@@ -2572,13 +2572,13 @@ tryagain:
         If Not (thislof < SeekBuf) Then
             ss = SeekBuf
             lbreak = check
-              GetByte f, SeekBuf, check
+              GetByte F, SeekBuf, check
             If (check And &H80) <> 0 Then GoTo notryother
             
             If (check <> 10) And (check <> 13) Or (lbreak = check) Then
 notryother:
 
-                NewSeek f, ss  ' restore it
+                NewSeek F, ss  ' restore it
                 If check = 10 Then linebreaktype = 10 Else linebreaktype = 20
      
             End If
@@ -2606,48 +2606,48 @@ ReDim para(1 To docmax)
 ReDim DocParaBack(0 To docmax)
 ReDim DocParaNext(0 To docmax)
 End Sub
-Sub FillBuffer(f As Long)
+Sub FillBuffer(F As Long)
 Dim c As Long
 If bufsize = 0 Then
-bufsize = LOF(f) Mod 327680
-If bufsize = 0 Then bufsize = LOF(f)
+bufsize = LOF(F) Mod 327680
+If bufsize = 0 Then bufsize = LOF(F)
 End If
-c = LOF(f) - SeekBuf + 1
+c = LOF(F) - SeekBuf + 1
 If UBound(Buffer()) > 1 Then bufOffset = bufOffset + UBound(Buffer())
 If c > 327680 Then
         ReDim Buffer(1 To 327680) As Byte
-        Get f, , Buffer
+        Get F, , Buffer
 ElseIf c > 0 Then
         ReDim Buffer(1 To c) As Byte
-        Get f, , Buffer
+        Get F, , Buffer
 End If
 End Sub
-Sub NewSeek(f As Long, ByVal location As Long)
+Sub NewSeek(F As Long, ByVal location As Long)
 If bufsize = 0 Then
-bufsize = LOF(f) Mod 327680
-If bufsize = 0 Then bufsize = LOF(f) Else bufsize = 327680
+bufsize = LOF(F) Mod 327680
+If bufsize = 0 Then bufsize = LOF(F) Else bufsize = 327680
 GoTo fillmeplease
 End If
 If location - bufOffset > 0 And location <= bufsize + bufOffset Then
 Else
 fillmeplease:
-Seek #f, (location \ bufsize) * bufsize + 1
-FillBuffer f
+Seek #F, (location \ bufsize) * bufsize + 1
+FillBuffer F
 End If
 SeekBuf = location
 End Sub
-Sub GetByte(f As Long, ByVal location As Long, b As Byte)
+Sub GetByte(F As Long, ByVal location As Long, b As Byte)
 If location > UBound(Buffer) + bufOffset Then
-Seek #f, (location \ bufsize) * bufsize + 1
-FillBuffer f
+Seek #F, (location \ bufsize) * bufsize + 1
+FillBuffer F
 End If
 b = Buffer(location - bufOffset)
 SeekBuf = location + 1
 End Sub
-Sub GetWord(f As Long, ByVal location As Long, b As Integer)
+Sub GetWord(F As Long, ByVal location As Long, b As Integer)
 If location > UBound(Buffer) + bufOffset Then
-Seek #f, (location \ bufsize) * bufsize + 1
-FillBuffer f
+Seek #F, (location \ bufsize) * bufsize + 1
+FillBuffer F
 End If
 GetMem2 VarPtr(Buffer(location - bufOffset)), b
 SeekBuf = location + 2
@@ -2690,22 +2690,22 @@ End If
 Next cu
 End Function
 
-Public Property Get LCID() As Long
-LCID = mlcid
+Public Property Get lcid() As Long
+lcid = mlcid
 End Property
 
-Public Property Let LCID(ByVal RHS As Long)
+Public Property Let lcid(ByVal RHS As Long)
 mlcid = RHS
 End Property
 Function FindWord(Find$, Direction As Boolean, there As Long, cur As Long) As Boolean
-Dim oncemore As Boolean, result As Boolean, res$
+Dim oncemore As Boolean, Result As Boolean, res$
 again:
 If Direction Then
- result = FindStrDown(Find$, there, cur)
+ Result = FindStrDown(Find$, there, cur)
  Else
- result = FindStrUp(Find$, there, cur)
+ Result = FindStrUp(Find$, there, cur)
  End If
-If result Then
+If Result Then
 res$ = TextParagraph(there)
 If cur > 1 Then
     Select Case AscW(Mid$(res$, cur - 1, 1))
@@ -2740,17 +2740,17 @@ End If
 End Function
 Function FindIdentifier(Find$, Direction As Boolean, there As Long, cur As Long) As Boolean
 ' there is paragraph number not paragraph order
-Dim oncemore As Boolean, result As Boolean, res$
+Dim oncemore As Boolean, Result As Boolean, res$
 If Len(Find$) > 1 And Left$(Find$, 1) = "&" Then Find$ = Mid$(Find$, 2): cur = cur + 1
 If InStr(Find$, Chr$(13)) > 0 Then Exit Function
 If InStr(Find$, Chr$(10)) > 0 Then Exit Function
 again:
 If Direction Then
- result = FindStrDown(Find$, there, cur)
+ Result = FindStrDown(Find$, there, cur)
  Else
- result = FindStrUp(Find$, there, cur)
+ Result = FindStrUp(Find$, there, cur)
  End If
-If result Then
+If Result Then
 res$ = TextParagraph(there)
 
 If cur > 1 Then

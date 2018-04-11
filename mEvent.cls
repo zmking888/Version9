@@ -13,8 +13,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 
-
-'
 Dim mEnabled As Boolean
 Private PriveSpace() As GenItem
 Dim MaxSpace As Long

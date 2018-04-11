@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
 Public WithEvents Textbox As myTextBox
 Attribute Textbox.VB_VarHelpID = -1
 Public WithEvents glistN As gList
@@ -43,7 +44,6 @@ Public Property Let Label(a$)
 Textbox.Prompt = a$ + " " + ChrW(&H25BC) & " "
 Textbox.glistN.ShowMe
 End Property
-
 
 Private Sub glistN_RegisterGlist(this As gList)
 Dim mo As Object
@@ -211,33 +211,33 @@ Iam = False
 End If
 End Sub
 Private Sub glistN_SyncKeyboard(item As Integer)
-Static f As Long
-f = glistN.FindItemStartWidth(Chr$(item), Not NoCaseSensitive, f + 1)
-If f >= 0 Then
-glistN.ScrollTo f - glistN.lines / 2, f + 1
+Static F As Long
+F = glistN.FindItemStartWidth(Chr$(item), Not NoCaseSensitive, F + 1)
+If F >= 0 Then
+glistN.ScrollTo F - glistN.lines / 2, F + 1
  RaiseEvent PickOther(glistN.ListValue)
 Else
-f = -1
+F = -1
 End If
 End Sub
 
 Private Sub TextBox_ValidString(ThatString As String, setpos As Long)
 Dim l As Boolean
 If Not AutoComplete Then Exit Sub
-Dim f As Long
+Dim F As Long
 Iam = True
 If ThatString = vbNullString And Textbox.glistN.LastLinePart <> "" Then
-f = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
+F = glistN.FindItemStartWidth(Textbox.glistN.LastLinePart, Not NoCaseSensitive, 0)
 
 Else
-f = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
+F = glistN.FindItemStartWidth(ThatString, Not NoCaseSensitive, 0)
 End If
-If f >= 0 Then
-If Not NoCaseSensitive Then ThatString = Left$(glistN.list(f), Len(ThatString))
-Textbox.glistN.LastLinePart = Mid$(glistN.list(f), Len(ThatString) + 1)
-RaiseEvent AutoCompleteDone(glistN.list(f))
+If F >= 0 Then
+If Not NoCaseSensitive Then ThatString = Left$(glistN.list(F), Len(ThatString))
+Textbox.glistN.LastLinePart = Mid$(glistN.list(F), Len(ThatString) + 1)
+RaiseEvent AutoCompleteDone(glistN.list(F))
 glistN.enabled = False
-glistN.ScrollTo f - glistN.lines / 2, f + 1
+glistN.ScrollTo F - glistN.lines / 2, F + 1
 glistN.enabled = True
 glistN.ShowMe
 
