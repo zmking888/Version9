@@ -29,7 +29,7 @@ Public Function Extern(ParamArray a()) As Long
 Attribute Extern.VB_UserMemId = 0
 ' default function
 Dim ohere$, objref As New basetask
-If Forms.Count >= 4 Then
+If Forms.count >= 4 Then
     Set objref.Owner = Form1.DIS
 Else
 Exit Function
@@ -217,13 +217,12 @@ End Function
 Property Get CurMaxSpace()
 CurMaxSpace = MaxSpace
 End Property
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Friend Function Find(Key As String, func As String) As Boolean
 Dim k As Long
 func = vbNullString
-'If Right$(Key, 2) = "()" Then Stop
 If Len(Key) = 0 Then Exit Function
 k = Hash(HashFunc(Key)) - 1
 
@@ -272,7 +271,6 @@ k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
 Do
     If PriveSpace(k).Key = Key Then ExistKey = True: Exit Function
-  '  If k = PriveSpace(k).Pleft - 1 Then Stop: Exit Do
      k = PriveSpace(k).Pleft - 1
 Loop Until k < 0
 End If
@@ -290,7 +288,7 @@ End With
 place HashFunc(Key), a
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long

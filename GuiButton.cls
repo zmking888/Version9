@@ -15,7 +15,7 @@ Option Explicit
 Dim WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Dim mCaptext As String
-Public CtrlName As String
+Public ctrlName As String
 Private mesCtrlName As String, mlocked As Boolean, mTimes
 Dim mIndex As Long
 Dim Callback As GuiM2000
@@ -27,22 +27,22 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub Move(x, y, Optional w, Optional h)
@@ -100,12 +100,24 @@ Set glistN = Nothing
 End Sub
 
 Private Sub glistN_BlinkNow(Face As Boolean)
+On Error GoTo EX1
     If mTimes > 0 Then mTimes = mTimes - 1: If mTimes = 0 Then glistN.BlinkON = False
+    If Not glistN.BlinkON Then Face = True
     If mIndex >= 0 Then
         Callback.Callback mesCtrlName + ".Blink(" + Str(mIndex) + "," + Str(Face) + ")"
     Else
         Callback.Callback mesCtrlName + ".Blink(" + Str(Face) + ")"
     End If
+    
+    If Not glistN.BlinkON Then
+      If Not glistN.backcolor = mycolor(dimm1) Then
+        If Not glistN.BackStyle = 0 Then
+            glistN.backcolor = mycolor(dimm1)
+            glistN.ShowMe
+        End If
+        End If
+    End If
+EX1:
 End Sub
 
 Private Sub glistN_CheckGotFocus()
@@ -126,6 +138,7 @@ End Sub
 Private Sub glistN_CheckLostFocus()
 
 If Me.enabled Then
+Callback.LastActive = ctrlName
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".LostFocus(" + Str(mIndex) + ")"
@@ -233,11 +246,13 @@ dimm1 = rgb(100, 200, 160)
 dimm2 = rgb(200, 120, 60)
 End Sub
 Sub Colors(white1, Optional dimm21, Optional dimm11)
-
+On Error Resume Next
+If Not glistN Is Nothing Then
 glistN.ForeColor = mycolor(white1)
 If Not IsMissing(dimm21) Then
 dimm2 = dimm21
 If Not IsMissing(dimm11) Then dimm1 = dimm11
+End If
 End If
 'Retired
 End Sub
@@ -263,21 +278,21 @@ Public Sub Curve(RHS As Single)
 glistN.Curve False, RHS
 End Sub
 Public Property Get Top() As Variant
-Top = Callback.Controls(CtrlName).Top
+Top = Callback.Controls(ctrlName).Top
 End Property
 Public Property Let Top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).Top = RHS
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
-Left = Callback.Controls(CtrlName).Left
+Left = Callback.Controls(ctrlName).Left
 End Property
 
 Public Property Let Left(ByVal RHS As Variant)
-Callback.Controls(CtrlName).Left = RHS
+Callback.Controls(ctrlName).Left = RHS
 End Property
 Sub GetFocus()
 On Error Resume Next
-Callback.Controls(CtrlName).SetFocus
+Callback.Controls(ctrlName).SetFocus
 End Sub
 
 Public Property Get locked() As Variant
@@ -298,8 +313,18 @@ End Sub
 Public Property Let BlinkTimes(ByVal vNewValue As Variant)
 mTimes = vNewValue
 End Property
+Public Property Get BlinkTimes()
+BlinkTimes = mTimes
+End Property
 Public Property Let Blink(ByVal vNewValue As Variant)
-glistN.BlinkTime = vNewValue
+    If vNewValue = 0 Then
+        mTimes = 1
+    Else
+    glistN.BlinkTime = vNewValue
+    End If
+End Property
+Public Property Get Blink()
+Blink = glistN.BlinkTime
 End Property
 Sub Transparent()
 Dim x  As Long, y As Long
@@ -309,8 +334,13 @@ glistN.RepaintFromOut Callback.Image, x, y
 glistN.ShowMe
 End Sub
 Sub TransparentOff()
+On Error Resume Next
+If Not glistN Is Nothing Then
 glistN.BackStyle = 0
+glistN.backcolor = mycolor(dimm2)
+glistN.PanPos = 0
 glistN.ShowMe
+End If
 End Sub
 Sub Shadow(ByVal vNewValue As Variant)
 shadowcol = -white
@@ -324,4 +354,12 @@ Colors shadowcol
 Me.locked = False
 Show
 End Sub
+Public Property Let Default(RHS)
+On Error Resume Next
+If CBool(RHS) Then Callback.Default = ctrlName
+End Property
 
+Private Sub glistN_UnregisterGlist()
+On Error Resume Next
+
+End Sub

@@ -360,7 +360,6 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
     Dim pVTbl       As Long
 
     Dim strName     As String
-'If dispid = 4 Then Stop
     ' get IDispatch from the object
     pVTbl = objptr(obj)
     CpyMem pVTbl, ByVal pVTbl, 4

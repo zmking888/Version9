@@ -1,8 +1,23 @@
 Attribute VB_Name = "Module1"
+Option Explicit
 ' M2000 starter
 ' We have to give some stack space
+Private Declare Function GetProcByName Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
+Private Declare Function GetProcByOrdinal Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal nOrdinal As Long) As Long
+Private Declare Function LoadLibrary Lib "KERNEL32" Alias "LoadLibraryW" (ByVal lpLibFileName As Long) As Long
+Private Declare Function FreeLibrary Lib "KERNEL32" (ByVal hLibModule As Long) As Long
+
 Private Declare Sub DisableProcessWindowsGhosting Lib "user32" ()
-Dim m As Object
+Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Private Declare Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function GetDesktopWindow Lib "user32" () As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hDC As Long) As Long
+Private Const LOGPIXELSX = 88
+
+Private Const SM_CXVIRTUALSCREEN = 78
+Private Const SM_CYVIRTUALSCREEN = 79
+Private Declare Function GetSystemMetrics Lib "user32" ( _
+   ByVal nIndex As Long) As Long
 Private Declare Function GetCommandLineW Lib "KERNEL32" () As Long
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
 Private Const SEM_NOGPFAULTERRORBOX = &H2&
@@ -11,6 +26,10 @@ Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Ptr As Long, ByVal Value As Lo
 Private Declare Function SysAllocStringLen Lib "oleaut32" (ByVal Ptr As Long, ByVal Length As Long) As Long
 Private Declare Function SetErrorMode Lib "KERNEL32" ( _
    ByVal wMode As Long) As Long
+Public UnloadForm1 As Boolean, a$
+Public Declare Sub Sleep Lib "KERNEL32" (ByVal dwMilliseconds As Long)
+Public dv15 As Long
+
 
 Public Function commandW() As String
 Static mm$
@@ -31,33 +50,65 @@ Dim Ptr As Long: Ptr = GetCommandLineW
     If mm$ = "" And Command <> "" Then commandW = Command Else commandW = mm$
 End Function
 Sub Main()
+dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
-Dim a$
-On Error Resume Next
-With New cFIE
-.FEATURE_BROWSER_EMULATION = .InstalledVersion
-End With
-Set m = CreateObject("M2000.callback")
-'Dim m As New M2000.callback
-If Err Then
-    MsgBox "Install M2000.dll first", vbCritical
-Exit Sub
-End If
-Debug.Assert (InIDECheck = True)
-m.Run "start"
-m.StackMax -12345
-a$ = commandW
-If Trim$(a$) = "-h" Or Trim$(a$) = "/?" Then frmAbout.Show: Exit Sub
-If m.Status = 0 Then
-m.Cli a$, ">"
-'m.Reset
-End If
-m.ShowGui = False
-Set m = Nothing
-If m_bInIDE Then Exit Sub
-SetErrorMode SEM_NOGPFAULTERRORBOX
+Dim mm As New RunM2000
+mm.doit
+Sleep 500
 End Sub
+Public Sub ShutDownAll()
+Dim z As Form
+If Forms.Count > 0 Then
+For Each z In Forms
+Unload z
+Next z
+End If
+
+If m_bInIDE Then Exit Sub
+
+Sleep 200
+SetErrorMode SEM_NOGPFAULTERRORBOX
+Debug.Print "ShutDown"
+End Sub
+
 Public Function InIDECheck() As Boolean
     m_bInIDE = True
     InIDECheck = True
+End Function
+Public Function DpiScrX() As Long
+Dim lhWNd As Long, lHDC As Long
+    lhWNd = GetDesktopWindow()
+    lHDC = GetDC(lhWNd)
+    DpiScrX = GetDeviceCaps(lHDC, LOGPIXELSX)
+    ReleaseDC lhWNd, lHDC
+End Function
+Public Property Get VirtualScreenWidth() As Long
+If IsWine Then
+   VirtualScreenWidth = (GetSystemMetrics(SM_CXVIRTUALSCREEN)) * dv15 - 1
+Else
+   VirtualScreenWidth = (GetSystemMetrics(SM_CXVIRTUALSCREEN)) * dv15
+   End If
+End Property
+Public Property Get VirtualScreenHeight() As Long
+If IsWine Then
+VirtualScreenHeight = (GetSystemMetrics(SM_CYVIRTUALSCREEN)) * dv15 - 1
+Else
+   VirtualScreenHeight = (GetSystemMetrics(SM_CYVIRTUALSCREEN)) * dv15
+   End If
+End Property
+Function IsWine()
+Static www As Boolean, wwb As Boolean
+If www Then
+Else
+Err.Clear
+Dim hLib As Long, ntdll As String
+On Error Resume Next
+ntdll = "ntdll"
+hLib = LoadLibrary(StrPtr(ntdll))
+wwb = GetProcByName(hLib, "wine_get_version") <> 0
+If hLib <> 0 Then FreeLibrary hLib
+If Err.Number > 0 Then wwb = False
+www = True
+End If
+IsWine = wwb
 End Function

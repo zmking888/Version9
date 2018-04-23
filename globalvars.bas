@@ -15,24 +15,24 @@ Public TopFolder As String
 Public AskLastX As Long, AskLastY As Long
 Public selectorLastX As Long, selectorLastY As Long
 Public FolderOnly As Boolean
-Public Const AskCancelGR = "ΑΚΥΡΟ"
-Public Const AskOkGR = "ΕΝΤΑΞΕΙ"
-Public Const LoadFileCaptionGR = "Φόρτωσε Αρχείο"
-Public Const SaveFileCaptionGR = "Σώσε Αρχείο"
-Public Const SelectFolderCaptionGR = "Επιλογή Φακέλου"
-Public Const SelectFolderButtonGR = "*σύρε δεξιά για επιλογή*"
-Public Const FontSelectorGr = "Γραμματοσειρά"
-Public Const ColorSelectorGr = "Χρωματολόγιο"
-Public Const SetUpGR = "Ρυθμίσεις"
-Public Const AskCancelEn = "CANCEL"
-Public Const AskOkEn = "OK"
-Public Const SetUpEn = "Set Up"
-Public Const LoadFileCaptionEn = "Load File"
-Public Const SaveFileCaptionEn = "Save File"
-Public Const SelectFolderCaptionEn = "Select Folder"
-Public Const SelectFolderButtonEn = "*slide right to select*"
-Public Const FontSelectorEn = "Font Selector"
-Public Const ColorSelectorEn = "Color Selector"
+Public AskCancelGR As String
+Public AskOkGR As String
+Public LoadFileCaptionGR As String
+Public SaveFileCaptionGR As String
+Public SelectFolderCaptionGR As String
+Public SelectFolderButtonGR As String
+Public FontSelectorGr As String
+Public ColorSelectorGr As String
+Public SetUpGR As String
+Public AskCancelEn As String
+Public AskOkEn As String
+Public SetUpEn As String
+Public LoadFileCaptionEn As String
+Public SaveFileCaptionEn As String
+Public SelectFolderCaptionEn As String
+Public SelectFolderButtonEn As String
+Public FontSelectorEn As String
+Public ColorSelectorEn As String
 Public SetUp As String
 Public LoadFileCaption As String
 Public SaveFileCaption As String
@@ -54,9 +54,9 @@ Public ReturnItalic As Boolean
 Public ReturnCharset As Integer
 Public ReturnSize As Single
 Public DialogLang As Long
-Public Sub DialogSetupLang(lang As Long)
-DialogLang = lang
-If lang = 0 Then
+Public Sub DialogSetupLang(Lang As Long)
+DialogLang = Lang
+If Lang = 0 Then
 AskCancel$ = AskCancelGR
 AskOk$ = AskOkGR
  LoadFileCaption = LoadFileCaptionGR
@@ -92,6 +92,11 @@ ColorDialog.Show
 Else
 ColorDialog.Show , Thisform
 End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is ColorDialog Then
+ColorDialog.Show , Screen.ActiveForm
+End If
+End If
 MoveFormToOtherMonitorOnly ColorDialog, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not ColorDialog.Visible Then
@@ -118,6 +123,11 @@ FontDialog.Show
 Else
 FontDialog.Show , Thisform
 End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is FontDialog Then
+FontDialog.Show , Screen.ActiveForm
+End If
+End If
 MoveFormToOtherMonitorOnly FontDialog, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not FontDialog.Visible Then
@@ -133,12 +143,12 @@ If ReturnFontName <> "" Then OpenFont = Not CancelDialog
 ExpandWidth = False
 inUse = False
 End Function
-Public Function OpenImage(bstack As basetask, Thisform As Object, TopDir As String, LastName As String, thattitle As String, TypeList As String) As Boolean
+Public Function OpenImage(bstack As basetask, Thisform As Object, TopDir As String, lastname As String, thattitle As String, TypeList As String) As Boolean
 If inUse Then OpenImage = False: Exit Function
 inUse = True
 ' do something with multifiles..
-ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
+ReturnFile = lastname
+If ReturnFile <> "" Then If ExtractPath(lastname) = vbNullString Then ReturnFile = mcd + lastname
 SaveDialog = False
 FileExist = True
 FolderOnly = False
@@ -171,6 +181,11 @@ LoadFile.Show
 Else
 LoadFile.Show , Thisform
 End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is LoadFile Then
+LoadFile.Show , Screen.ActiveForm
+End If
+End If
 MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
 If Not LoadFile.Visible Then
@@ -187,12 +202,13 @@ inUse = False
 
 ' read files
 End Function
-Public Function OpenDialog(bstack As basetask, Thisform As Object, TopDir As String, LastName As String, thattitle As String, TypeList As String, OpenNew As Boolean, MULTFILES As Boolean) As Boolean
+Public Function OpenDialog(bstack As basetask, Thisform As Object, TopDir As String, lastname As String, thattitle As String, TypeList As String, OpenNew As Boolean, MULTFILES As Boolean) As Boolean
 If inUse Then OpenDialog = False: Exit Function
+Dim foundmulti As Boolean
 inUse = True
 ' do something with multifiles..
-ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
+ReturnFile = lastname
+If ReturnFile <> "" Then If ExtractPath(lastname) = vbNullString Then ReturnFile = mcd + lastname
 SaveDialog = False
 FileExist = OpenNew
 FolderOnly = False
@@ -219,11 +235,23 @@ If InStr(Settings, ",expand") = 0 Then
 Settings = Settings & ",expand"
 End If
 End If
+If MULTFILES Then
 
+If InStr(Settings, ",multi") = 0 Then
+Settings = Settings & ",multi"
+Else
+foundmulti = True
+End If
+End If
 If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
+End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is LoadFile Then
+LoadFile.Show , Screen.ActiveForm
+End If
 End If
 MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False
@@ -239,10 +267,15 @@ If Not Thisform Is Nothing Then
 End If
 Set LastGlist3 = Nothing
 If ReturnListOfFiles <> "" Or ReturnFile <> "" Then OpenDialog = Not CancelDialog
+If MULTFILES And Not FOUNDMILTI Then
+
+Settings = Replace(Settings, ",multi", "")
+
+End If
 inUse = False
 ' read files
 End Function
-Public Function SaveAsDialog(bstack As basetask, Thisform As Object, LastName As String, TopDir As String, thattitle As String, TypeList As String) As Boolean
+Public Function SaveAsDialog(bstack As basetask, Thisform As Object, lastname As String, TopDir As String, thattitle As String, TypeList As String) As Boolean
 If inUse Then SaveAsDialog = False: Exit Function
 inUse = True
 DialogPreview = False
@@ -250,10 +283,10 @@ FileExist = False
 NewFolder = False
 FolderOnly = False
 SaveDialog = True
-UserFileName = LastName
+UserFileName = lastname
 'ReturnFile = ExtractPath(LastName)
-ReturnFile = LastName
-If ReturnFile <> "" Then If ExtractPath(LastName) = vbNullString Then ReturnFile = mcd + LastName
+ReturnFile = lastname
+If ReturnFile <> "" Then If ExtractPath(lastname) = vbNullString Then ReturnFile = mcd + lastname
 FileTypesShow = TypeList
 ''If TopDir <> "" Then TopFolder = TopDir
 If TopDir = vbNullString Then
@@ -269,7 +302,7 @@ ReturnFile = vbNullString
 Else
 TopFolder = TopDir
 End If
-If ReturnFile = vbNullString Then ReturnFile = TopDir + ExtractName(LastName)
+If ReturnFile = vbNullString Then ReturnFile = TopDir + ExtractName(lastname)
 If thattitle <> "" Then
 SaveFileCaption = thattitle
 If InStr(Settings, ",expand") = 0 Then
@@ -281,6 +314,11 @@ If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
+End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is LoadFile Then
+LoadFile.Show , Screen.ActiveForm
+End If
 End If
 MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
  CancelDialog = False
@@ -296,18 +334,20 @@ End If
 If ReturnFile <> "" Then SaveAsDialog = Not CancelDialog
 inUse = False
 End Function
-Public Function GetFile(bstack As basetask, thistitle As String, thisfolder As String, onetype As String) As String
-Dim thatform As Object
-If TypeOf bstack.Owner Is GuiM2000 Then
-Set thatform = bstack.Owner
+Public Function GetFile(bstack As basetask, thistitle As String, thisfolder As String, onetype As String, Optional multifiles As Boolean = False) As String
+Dim thatform As Object, currentpos
+If Not Screen.ActiveForm Is Nothing Then
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+    Set thatform = Screen.ActiveForm
+ElseIf Screen.ActiveForm Is MyPopUp Then
+    Set thatform = MyPopUp.LASTActiveForm
+    MyPopUp.Hide
 Else
-If Form1.Visible Then
-Set thatform = Form1
-Else
-Set thatform = Nothing
+    Set thatform = Screen.ActiveForm
 End If
+
 End If
-    If OpenDialog(bstack, thatform, thisfolder, "", thistitle, onetype, False, False) Then
+    If OpenDialog(bstack, thatform, thisfolder, "", thistitle, onetype, False, multifiles) Then
     GetFile = ReturnFile
     End If
 
@@ -347,6 +387,11 @@ If Thisform Is Nothing Then
 LoadFile.Show
 Else
 LoadFile.Show , Thisform
+End If
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is LoadFile Then
+LoadFile.Show , Screen.ActiveForm
+End If
 End If
 MoveFormToOtherMonitorOnly LoadFile, bstack.Owner.name = "GuiM2000"
 CancelDialog = False

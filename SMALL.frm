@@ -21,8 +21,8 @@ Begin VB.Form Form3
    WindowState     =   1  'Minimized
    Begin VB.Timer Timer1 
       Interval        =   300
-      Left            =   930
-      Top             =   360
+      Left            =   510
+      Top             =   165
    End
 End
 Attribute VB_Name = "Form3"
@@ -40,7 +40,7 @@ End Enum
 #End If
 Public hideme As Boolean
 Private foundform5 As Boolean
-Private reopen4 As Boolean, reopen2 As Boolean
+
 
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As Long) As Long
@@ -49,16 +49,16 @@ Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As 
 Private Declare Function GetProcAddress Lib "KERNEL32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 
 
-Private Declare Function GetWindowLongA Lib "user32" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
+Private Declare Function GetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long) As Long
 
 
-Private Declare Function SetWindowLongA Lib "user32" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowLongW Lib "user32" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongW Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 
 
-Private Declare Function SetWindowTextW Lib "user32" (ByVal hwnd As Long, ByVal lpString As Long) As Long
+Private Declare Function SetWindowTextW Lib "user32" (ByVal hWND As Long, ByVal lpString As Long) As Long
     Private Const GWL_WNDPROC = -4
     Private m_Caption As String
 
@@ -85,7 +85,7 @@ Public Property Let CaptionW(ByVal NewValue As String)
         ' the default Unicode window procedure
         WndProc = GetProcAddress(GetModuleHandleW(StrPtr("user32")), "DefWindowProcW")
         ' window procedure of this form
-        VBWndProc = GetWindowLongA(hwnd, GWL_WNDPROC)
+        VBWndProc = GetWindowLongA(hWND, GWL_WNDPROC)
     End If
     ' ensure we got them
 
@@ -93,11 +93,11 @@ Public Property Let CaptionW(ByVal NewValue As String)
     If WndProc <> 0 Then
         ' replace form's window procedure with t
         '     he default Unicode one
-        SetWindowLongW hwnd, GWL_WNDPROC, WndProc
+        SetWindowLongW hWND, GWL_WNDPROC, WndProc
         ' change form's caption
-        SetWindowTextW hwnd, StrPtr(m_Caption)
+        SetWindowTextW hWND, StrPtr(m_Caption)
         ' restore the original window procedure
-        SetWindowLongA hwnd, GWL_WNDPROC, VBWndProc
+        SetWindowLongA hWND, GWL_WNDPROC, VBWndProc
     Else
         ' no Unicode for us
         Caption = m_Caption
@@ -107,7 +107,6 @@ Public Property Let CaptionW(ByVal NewValue As String)
     Show
     MyDoEvents1 Me, True
    End If
-   
 
      
 End Property
@@ -122,7 +121,7 @@ Public Property Let CaptionWsilent(ByVal NewValue As String)
         ' the default Unicode window procedure
         WndProc = GetProcAddress(GetModuleHandleW(StrPtr("user32")), "DefWindowProcW")
         ' window procedure of this form
-        VBWndProc = GetWindowLongA(hwnd, GWL_WNDPROC)
+        VBWndProc = GetWindowLongA(hWND, GWL_WNDPROC)
     End If
     ' ensure we got them
 
@@ -130,11 +129,11 @@ Public Property Let CaptionWsilent(ByVal NewValue As String)
     If WndProc <> 0 Then
         ' replace form's window procedure with t
         '     he default Unicode one
-        SetWindowLongW hwnd, GWL_WNDPROC, WndProc
+        SetWindowLongW hWND, GWL_WNDPROC, WndProc
         ' change form's caption
-        SetWindowTextW hwnd, StrPtr(m_Caption)
+        SetWindowTextW hWND, StrPtr(m_Caption)
         ' restore the original window procedure
-        SetWindowLongA hwnd, GWL_WNDPROC, VBWndProc
+        SetWindowLongA hWND, GWL_WNDPROC, VBWndProc
     Else
         ' no Unicode for us
         Caption = m_Caption
@@ -169,18 +168,22 @@ If AskCancel$ = vbNullString Then INFOONLY = True
 If AskOk$ = vbNullString Then AskOk$ = "OK"
 
 
-If Form1.Visible Then
-MyDoEvents1 Form1
-Sleep 1
-NeoMsgBox.Show , Form1
-MoveFormToOtherMonitorOnly NeoMsgBox
-
-
+If Not Screen.ActiveForm Is Nothing Then
+If Screen.ActiveForm Is MyPopUp Then
+   If MyPopUp.LASTActiveForm Is Form1 Then
+        NeoMsgBox.Show , Form1
+        MoveFormToOtherMonitorOnly NeoMsgBox, False
+   ElseIf MyPopUp.LASTActiveForm Is Nothing Then
+     NeoMsgBox.Show , MyPopUp.LASTActiveForm
+     MoveFormToOtherMonitorOnly NeoMsgBox, True
+   End If
+ElseIf Screen.ActiveForm Is Form1 Then
+NeoMsgBox.Show , Screen.ActiveForm
+MoveFormToOtherMonitorOnly NeoMsgBox, False
 Else
-If TypeOf bstack.Owner Is GuiM2000 Then
-
-NeoMsgBox.Show , bstack.Owner
+NeoMsgBox.Show , Screen.ActiveForm
 MoveFormToOtherMonitorOnly NeoMsgBox, True
+End If
 ElseIf form5iamloaded Then
 MyDoEvents1 Form5
 Sleep 1
@@ -190,7 +193,7 @@ Else
 NeoMsgBox.Show
 MoveFormToOtherMonitorCenter NeoMsgBox
 End If
-End If
+'End If
 On Error Resume Next
 ''SleepWait3 10
 Sleep 1
@@ -211,11 +214,10 @@ If NeoMsgBox.Visible = False Then
     GoTo conthere
     Exit Function
 End If
-NeoMsgBox.ZOrder 0
+
 If AskInput Then
 NeoMsgBox.gList3.SetFocus
 End If
-    
   If bstack.ThreadsNumber = 0 Then
     On Error Resume Next
     If Not (bstack.toback Or bstack.toprinter) Then If bstack.Owner.Visible Then bstack.Owner.Refresh
@@ -248,7 +250,7 @@ If TaskMaster Is Nothing Then
       Sleep 1
       Else
     
-      If Not TaskMaster.Processing Then
+      If Not TaskMaster.Processing And TaskMaster.QueueCount = 0 Then
         DoEvents
       Else
        TaskMaster.TimerTickNow
@@ -415,6 +417,13 @@ End Sub
 
 
 
+Private Sub Form_DblClick()
+On Error Resume Next
+If lastform Is Nothing Then Exit Sub
+If WindowState = 0 Then lastform.SetFocus
+
+End Sub
+
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 If QRY Or GFQRY Then
 If Form1.Visible Then Form1.SetFocus
@@ -438,7 +447,8 @@ End Sub
 Private Sub Form_Load()
 Debug.Assert (InIDECheck = True)
 Timer1.Interval = 10000
-Set Me.Icon = Form1.Icon
+Timer1.enabled = False
+If Not byPassCallback Then Set Me.Icon = Form1.Icon
 End Sub
 
 
@@ -447,10 +457,10 @@ End Sub
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
 Dim nook As Long, uselastform As Boolean
 Timer1.enabled = False
-If UnloadMode = vbFormControlMenu Then
+If UnloadMode = (vbFormControlMenu Or byPassCallback) And lastform Is Nothing Then
 
 Dim F As Form, i As Long, F1 As GuiM2000
-For i = Forms.Count - 1 To 0 Step -1
+For i = Forms.count - 1 To 0 Step -1
 Set F = Forms(i)
 If TypeOf F Is GuiM2000 Then
     Set F1 = F
@@ -461,24 +471,32 @@ If TypeOf F Is GuiM2000 Then
                 If lastform Is F1 Then
                     If Not F1.Enablecontrol Then Cancel = True: Exit Sub
                     F1.ByeBye2 nook: uselastform = True
+                Else
+                    F1.ByeBye2 nook
                 End If
             End If
         End If
     Else
         If F1.MyName$ <> "" Then
         If lastform Is F1 Then
-        If Not F1.Enablecontrol Then Cancel = True: Exit Sub
-        F1.ByeBye2 nook: uselastform = True
-        End If
+            If Not F1.Enablecontrol Then Cancel = True: Exit Sub
+                F1.ByeBye2 nook: uselastform = True
+            Else
+                F1.ByeBye2 nook
+            End If
         End If
     End If
+
 End If
 
 If nook Then Cancel = True: Exit Sub
 Next i
 Set F = Nothing
 
-If uselastform Then Exit Sub
+If Not lastform Is Nothing Then
+Exit Sub
+End If
+
         If exWnd <> 0 Then
         Form1.IEUP ("")
         Cancel = True
@@ -493,39 +511,59 @@ If uselastform Then Exit Sub
     End If
     NOEDIT = True
     MOUT = True
-    Cancel = True
+    Cancel = Not byPassCallback
 Else
-If lastform Is Nothing Then ttl = False  ' for form1
+
+If lastform Is Nothing Then ttl = False: Exit Sub
+If UnloadMode = vbFormControlMenu Then
+Set F1 = lastform
+F1.ByeBye
+Cancel = True
+End If
 End If
 
 
 End Sub
 
 Private Sub Form_Resize()
+Static once As BOOL
+If Timer1.enabled Then Exit Sub
+If once Then Exit Sub
+once = TRUE 
+If Not lastform Is Nothing Then
+If lastform.WindowState = 1 Then
+lastform.WindowState = 0: Me.skiptimer = True: Me.WindowState = 0: once = False: Exit Sub
+End If
+End If
+
  hideme = (Me.WindowState = 1)
- If hideme Then
+
+  If hideme Then
     reopen2 = False
     reopen4 = False
     If Form4.Visible Then Form4.Visible = False: reopen4 = True
-    If Form3.Visible Then If trace Then Form2.Visible = False: reopen2 = True
-
- 
- 
- 
- 
- 'If reopen2 Or reopen4 Or Forms.Count > 4 Then
-    Timer1.enabled = True: Exit Sub
- ElseIf Forms.Count > 4 Then
-     If Not (CaptionW <> "" And WindowState = 0) Then
-     If Not Form1.TrueVisible Then Exit Sub
+    If Form2.Visible Then If trace Then Form2.Visible = False: reopen2 = True
+     Timer1_Timer
+     once = False
+    Exit Sub
+    
+ ElseIf Forms.count > 4 Then
+ If Not lastform Is Nothing Then
+ Timer1.enabled = True
+     ElseIf Not (CaptionW <> "" And WindowState = 0) Then
+     If Not Form1.TrueVisible Then once = False: Exit Sub
     End If
      ElseIf WindowState = 0 Then
      
      Refresh
     
  End If
+If Not lastform Is Nothing Then
+Timer1.Interval = 30
+Else
  Timer1.enabled = Timer1.Interval < 10000
- 
+ End If
+ once = False
 End Sub
 
 
@@ -536,10 +574,14 @@ End Sub
 
 Private Sub Timer1_Timer()
 ' On Error Resume Next
+Static once As Boolean
+If once Then Exit Sub
+once = True
 Dim F As Form, F1 As GuiM2000, i As Long, thismodal As Double, F2 As GuiM2000
 If DIALOGSHOW Or ASKINUSE Or skiptimer Then
 skiptimer = False
 Timer1.enabled = False
+once = False
 Exit Sub
 End If
 Timer1.enabled = False
@@ -556,7 +598,7 @@ starthere:
             Set F2 = F1
             If F1.Enablecontrol Then
             'we have the top
-                For i = 0 To Forms.Count - 1
+                For i = 0 To Forms.count - 1
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
                         If Not F2 Is F1 Then
@@ -590,7 +632,7 @@ starthere:
             Else
             ' we have something else
                 
-                For i = 0 To Forms.Count - 1
+                For i = 0 To Forms.count - 1
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
                         If F1.Enablecontrol Then
@@ -601,6 +643,7 @@ starthere:
                 Next i
                 ' nothing found something wrong
                 ' do nothing
+                once = False
                 Exit Sub
             End If
         Else
@@ -621,7 +664,7 @@ Else
         F1.Visible = False
         If F1.Modal <> 0 Then
         thismodal = F1.Modal
-        For i = Forms.Count - 1 To 0 Step -1
+        For i = Forms.count - 1 To 0 Step -1
             If TypeOf Forms(i) Is GuiM2000 Then
                 Set F1 = Forms(i)
                 If Not F1.Minimized Then
@@ -637,6 +680,7 @@ Else
         End If
 End If
 End If
+once = False
 Exit Sub
 ElseIf Not hideme Then
 If Not (Form1.TrueVisible Or Form1.Visible) Then
@@ -656,12 +700,16 @@ If Not IsSelectorInUse Then Form1.Show , Form5
 End If
 End If
 'DoEvents
+Else
+If foundform5 Then
+Form5.Visible = True
+'DoEvents
+End If
 End If
 
 'Sleep 500
 Form1.Visible = Form1.Visible Or Form1.TrueVisible
 If Form1.Visible And Not IsSelectorInUse Then
-'Form1.ZOrder
 If Not trace Then reopen2 = False
 If vH_title$ = vbNullString Then reopen4 = False
 If reopen4 Then Form4.Show , Form1: Form4.Visible = True
@@ -673,13 +721,9 @@ If reopen2 Then Form2.Show , Form1: Form2.Visible = True
  
        
 Sleep 1
-If Forms.Count > 5 Then
-
-Else
 
 If Form1.Visible Then Form1.SetFocus:  Form1.KeyPreview = True
-End If
-'Form1.ZOrder 0
+
 If Form1.Visible Then Sleep 2
  Set F = Nothing
  Else

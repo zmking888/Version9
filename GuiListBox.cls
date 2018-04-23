@@ -15,7 +15,7 @@ Option Explicit
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private mEnabled As Boolean
-Public CtrlName As String
+Public ctrlName As String
 Private mesCtrlName As String
 Dim mListText As String
 Dim mIndex As Long, mStayOpen As Boolean
@@ -32,22 +32,22 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub deconstruct()
@@ -77,6 +77,16 @@ If mHideCaret Then glistN.NoCaretShow = True
 End If
 End Sub
 
+
+Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+If myButton And &H2 = 2 Then
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      End If
+      End If
+End Sub
 
 Private Sub glistN_RefreshOnly()
 glistN.PrepareToShow
@@ -111,12 +121,12 @@ If glistN.ListIndex < 0 And glistN.listcount > 0 Then glistN.ListindexPrivateUse
 If Not trans Then
     If enabled Then
     glistN.ForeColor = black
-    glistN.BackColor = white
+    glistN.backcolor = white
     glistN.NoCaretShow = False:
     glistN.PanPos = 0
     Else
     glistN.ForeColor = white
-    glistN.BackColor = dimm1
+    glistN.backcolor = dimm1
     glistN.NoCaretShow = True
     End If
 End If
@@ -127,7 +137,7 @@ End Sub
 Public Sub Retired()
 If Not trans Then
 glistN.ForeColor = white
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 End If
 End Sub
@@ -141,7 +151,7 @@ End If
 If Not trans Then
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 End If
 glistN.PanPos = 0: glistN.PrepareToShow
 End If
@@ -173,7 +183,7 @@ With glistN
 .Vertical = True
 .VerticalCenterText = True
 .Text = mListText
-.BackColor = dimm2
+.backcolor = dimm2
 
 Set .Font = ff
 .ForeColor = white
@@ -243,6 +253,15 @@ VR(1) = shift
       End If
 KeyCode = VR(0)
 shift = VR(1)
+If KeyCode = vbKeyF10 And shift <> 0 Then
+KeyCode = 0
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+      End If
+Exit Sub
+End If
 End Sub
 
 Private Sub glistN_PanLeftRight(Direction As Boolean)
@@ -525,6 +544,7 @@ End Sub
 
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
+Callback.LastActive = ctrlName
 Set LastGlist = Nothing
 If Err.Number > 0 Then glistN.NoWheel = True
 End Sub
@@ -544,7 +564,7 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = rgb(0, 0, 0)
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 End If
 End Property
 Public Property Get Find(ByVal FindThis$) As Variant
@@ -553,7 +573,7 @@ End Property
 
 Sub GetFocus()
 On Error Resume Next
-Callback.Controls(CtrlName).SetFocus
+Callback.Controls(ctrlName).SetFocus
 End Sub
 
 Public Property Let HideCaret(ByVal vNewValue As Variant)
@@ -580,4 +600,8 @@ End If
 End Property
 Public Property Let PanDouble(ByVal vNewValue As Variant)
 glistN.NoPanLeft = Not vNewValue
+End Property
+Public Property Let Default(RHS)
+On Error Resume Next
+If CBool(RHS) Then Callback.Default = ctrlName
 End Property

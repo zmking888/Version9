@@ -645,10 +645,10 @@ End Function
 
 Public Sub QuickSortExtended(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
+Dim Piv As String, tmp As String '<- adjust types here, when switching to something different than Long
      If UB - LB = 1 Then
      M1 = LB
-      If Arr(M1) > Arr(UB) Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+      If Arr(M1) > Arr(UB) Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
       Exit Sub
      Else
        M1 = (LB + UB) \ 2
@@ -658,7 +658,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If Arr(UB) < Arr(LB) Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
+                        If Arr(UB) < Arr(LB) Then tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = tmp
                         Exit Sub
                     End If
                 Loop Until Arr(M1) <> Arr(LB)
@@ -674,7 +674,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
     Do
       Do While (Arr(M2) > Piv): M2 = M2 - 1: Loop
       If M1 <= M2 Then
-        Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp 'swap
+        tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp 'swap
         M1 = M1 + 1
         M2 = M2 - 1
       End If
@@ -687,10 +687,10 @@ End Sub
 Private Sub QuickSortItemsFileNames(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
-Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
+Dim Piv As String, tmp As String '<- adjust types here, when switching to something different than Long
      If UB - LB = 1 Then
      M1 = LB
-       If compareStr4(Arr(M1), Arr(UB)) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+       If compareStr4(Arr(M1), Arr(UB)) = 1 Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
       Exit Sub
      Else
        M1 = (LB + UB) \ 2 '+ 1
@@ -702,12 +702,12 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
+                        If compareStr4(Arr(UB), Piv) = -1 Then tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = tmp
                         Exit Sub
                     End If
                 Loop Until compareStr4(Arr(M1), Piv)
                 Piv = Arr(M1)
-                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then Tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
+                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = tmp: Piv = Arr(M1)
             Else
                 Piv = Arr(M1)
                 M1 = LB
@@ -718,7 +718,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
     Do
       Do While compareStr4(Arr(M2), Piv) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
-       If M1 <> M2 Then Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp
+       If M1 <> M2 Then tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp
         M1 = M1 + 1
         M2 = M2 - 1
       End If
@@ -1003,7 +1003,6 @@ For i = 1 To j
     a1$ = Mid$(a$, i)
     b1$ = Mid$(b$, i)
         IsNumberInFilename a1$, p1
-        If a$ = "aa" Or b$ = "a$" Then Stop
         If IsNumberInFilename(b1$, p2) Then
             compareStr4 = Sgn(MyRound(p1, 8) - MyRound(p2, 8))
             If compareStr4 = 0 Then
@@ -1181,10 +1180,10 @@ End Function
 Sub QuickSortItemsNumbers(Arr() As String, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 On Error GoTo abc1
-Dim Piv As String, Tmp As String '<- adjust types here, when switching to something different than Long
+Dim Piv As String, tmp As String '<- adjust types here, when switching to something different than Long
      If UB - LB = 1 Then
      M1 = LB
-       If compareStr4(Arr(M1), Arr(UB)) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+       If compareStr4(Arr(M1), Arr(UB)) = 1 Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
       Exit Sub
      Else
        M1 = (LB + UB) \ 2 '+ 1
@@ -1197,12 +1196,12 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
                 Do
                     M1 = M1 + 1
                     If M1 > M2 Then
-                        If compareStr4(Arr(UB), Piv) = -1 Then Tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = Tmp
+                        If compareStr4(Arr(UB), Piv) = -1 Then tmp = Arr(LB): Arr(LB) = Arr(UB): Arr(UB) = tmp
                         Exit Sub
                     End If
                 Loop Until compareStr4(Arr(M1), Piv) <> 0
                 Piv = Arr(M1)
-                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then Tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = Tmp: Piv = Arr(M1)
+                If M1 > LB Then If compareStr4(Arr(LB), Piv) = 1 Then tmp = Arr(LB): Arr(LB) = Arr(M1): Arr(M1) = tmp: Piv = Arr(M1)
             Else
                 Piv = Arr(M1)
                 M1 = LB
@@ -1213,7 +1212,7 @@ Dim Piv As String, Tmp As String '<- adjust types here, when switching to someth
     Do
       Do While compareStr4(Arr(M2), Piv) = 1: M2 = M2 - 1: Loop
       If M1 <= M2 Then
-       If M1 <> M2 Then Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp
+       If M1 <> M2 Then tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp
         M1 = M1 + 1
         M2 = M2 - 1
       End If

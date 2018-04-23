@@ -41,19 +41,21 @@ Private Const SEM_NOGPFAULTERRORBOX = &H2&
 Private Sub Form_Activate()
 'If Form1.WindowState <> vbMinimized And Form1.Visible Then Form1.ActiveControl.SetFocus
 Me.ZOrder 1
-'If Form1.Visible Then Form1.SetFocus
+If Form1.Visible Then Form1.SetFocus
 End Sub
 
 Private Sub Form_Load()
 Set LastGlist = Nothing
 form5iamloaded = True
 If Not s_complete Then
-Me.Move -10000
+Me.Move -30000
 If Form1.Visible Then Form1.Hide
 
 End If
 
 End Sub
+
+
 
 Private Sub Form_Unload(Cancel As Integer)
 On Error Resume Next
@@ -68,7 +70,7 @@ Set basestack1.Owner = Nothing
 Set basestack1 = Nothing
 Dim x As Form
 If IsWine Then
-ModalId = 0
+Modalid = 0
 
 For Each x In Forms
 If x.Visible Then x.Visible = False
@@ -100,7 +102,7 @@ MediaPlayer1.closeMovie
   Set TaskMaster = Nothing
   
 Dim x As Form
-ModalId = 0
+Modalid = 0
 
 For Each x In Forms
 If x.name <> Me.name Then
@@ -116,7 +118,11 @@ INK$ = INK$ & GetKeY(KeyAscii)
 End Sub
 Public Sub RestoreSizePos()
 ' calling from form1
-Me.Move Form1.Left, Form1.top, Form1.Width, Form1.Height
+Me.Move Form1.Left, Form1.Top, Form1.Width, Form1.Height
+End Sub
+Public Sub RestorePos()
+' calling from form1
+ 'Me.Move Form1.Left, Form1.Top
 End Sub
  Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long

@@ -22,14 +22,12 @@ Begin VB.Form Form1
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    Moveable        =   0   'False
-   NegotiateMenus  =   0   'False
    OLEDropMode     =   1  'Manual
    ScaleHeight     =   6345
    ScaleWidth      =   9765
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  'Windows Default
    Visible         =   0   'False
-   WindowState     =   1  'Minimized
    Begin VB.PictureBox Picture2 
       BackColor       =   &H00FFFFFF&
       BeginProperty Font 
@@ -238,7 +236,7 @@ Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (By
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hwnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -246,7 +244,7 @@ Const WM_KEYFIRST = &H100
     y As Long
 End Type
  Private Type Msg
-    hwnd As Long
+    hWND As Long
     Message As Long
     wParam As Long
     lParam As Long
@@ -259,7 +257,43 @@ Private Declare Function GetCommandLineW Lib "KERNEL32" () As Long
 
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Ptr As Long, ByVal Value As Long)
 Private Declare Function SysAllocStringLen Lib "oleaut32" (ByVal Ptr As Long, ByVal Length As Long) As Long
+Private Declare Function GetModuleHandleW Lib "KERNEL32" (ByVal lpModuleName As Long) As Long
+Private Declare Function GetProcAddress Lib "KERNEL32" (ByVal hModule As Long, ByVal lpProcName As String) As Long
+Private Declare Function GetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long) As Long
+Private Declare Function SetWindowLongA Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowLongW Lib "user32" (ByVal hWND As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare Function SetWindowTextW Lib "user32" (ByVal hWND As Long, ByVal lpString As Long) As Long
+    Private Const GWL_WNDPROC = -4
+    Private m_Caption As String
+Public Property Get CaptionW() As String
+    If m_Caption = "M2000" Then
+        CaptionW = vbNullString
+    Else
+        CaptionW = m_Caption
+    End If
+End Property
 
+
+Public Property Let CaptionW(ByVal NewValue As String)
+    Static WndProc As Long, VBWndProc As Long
+    'If NewValue = "" Then NewValue = "M2000"
+    m_Caption = NewValue
+
+    If WndProc = 0 Then
+        WndProc = GetProcAddress(GetModuleHandleW(StrPtr("user32")), "DefWindowProcW")
+        VBWndProc = GetWindowLongA(hWND, GWL_WNDPROC)
+    End If
+
+
+    If WndProc <> 0 Then
+        SetWindowLongW hWND, GWL_WNDPROC, WndProc
+        SetWindowTextW hWND, StrPtr(m_Caption)
+        SetWindowLongA hWND, GWL_WNDPROC, VBWndProc
+    Else
+        Caption = m_Caption
+       
+    End If
+End Property
 Public Function commandW() As String
 Static mm$
 If mm$ <> "" Then commandW = mm$: Exit Function
@@ -300,7 +334,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -322,7 +356,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -335,7 +369,7 @@ End Sub
 Private Sub Form_Activate()
 If ttl Then TrueVisible = True
 If ASKINUSE Then
-Me.ZOrder 1
+'Me.ZOrder 1
 Else
 If QRY Or GFQRY Then
 If IsWine Then If DIS.Visible Then DIS.SetFocus
@@ -346,7 +380,7 @@ If Form1.Visible Then releasemouse = True: If lockme Then hookme TEXT1.glistN
 End Sub
 
 Private Sub Form_Deactivate()
-UnHook hwnd
+UnHook hWND
 End Sub
 
 Private Sub Form_GotFocus()
@@ -390,7 +424,7 @@ End If
 UseEsc = False
 End Sub
 
-Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, State As Integer)
+Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -398,6 +432,10 @@ If Not TaskMaster Is Nothing Then
    TaskMaster.TimerTick
 End If
         End If
+End Sub
+
+Private Sub Form_Resize()
+If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 End Sub
 
 Private Sub gList1_ChangeListItem(item As Long, content As String)
@@ -549,7 +587,7 @@ If QRY Or GFQRY Then
 Else
 
 dummy = interpret(basestack1, List1.Tag)
-Me.KeyPreview = True
+'Me.KeyPreview = True
 End If
 End If
 MyEr "Menu Error " & CStr(code), "Λάθος στην ΕΠΙΛΟΓΗ αριθμός " & CStr(code)
@@ -601,7 +639,7 @@ If QRY Or GFQRY Then
 Else
 
 dummy = interpret(basestack1, List1.Tag)
-Me.KeyPreview = True
+'Me.KeyPreview = True
 End If
 Else
 List1.LeaveonChoose = False
@@ -618,7 +656,7 @@ If QRY Or GFQRY Then
 Else
 
 dummy = interpret(basestack1, List1.Tag)
-Me.KeyPreview = True
+'Me.KeyPreview = True
 End If
 Else
 List1.LeaveonChoose = False
@@ -697,6 +735,7 @@ TEXT1.Render
 End Sub
 
 Public Sub rthissub()
+If TEXT1.mDoc.busy Then Exit Sub
 Dim l As Long, w As Long, s$, TempLcid As Long, OldLcid As Long
 Dim el As Long, eW As Long, safety As Long, TT$, w1 As Long, i1 As Long
 Dim neo$, mDoc10 As Document, addthat As Long, w2 As Long
@@ -952,7 +991,7 @@ If lockme Then Exit Sub
 
 
 End If
-If QRY Or GFQRY Then Form1.KeyPreview = True
+'If QRY Or GFQRY Then Form1.KeyPreview = True Else Form1.KeyPreview = False
 End Sub
 
 
@@ -1031,7 +1070,7 @@ MyDoEvents
 view1.Navigate "about:blank"
 Sleep 50
 view1.Visible = False
-If QRY Or GFQRY Then KeyPreview = True
+If QRY Or GFQRY Then KeyPreview = True Else Form1.KeyPreview = False
  End If
 
 End If
@@ -1306,8 +1345,8 @@ STbyST = True
 Form2.Show , Form1
  PrepareLabel basestack1
  
-Form2.Label1(1) = "..."
-Form2.Label1(2) = "..."
+Form2.label1(1) = "..."
+Form2.label1(2) = "..."
     Form2.gList3(2).backcolor = &H3B3B3B
     TestShowCode = False
      TestShowSub = vbNullString
@@ -1378,6 +1417,7 @@ End If
 QRY = False
 RRCOUNTER = 0
 REFRESHRATE = 25
+ResetPrefresh
 INK$ = Chr$(27) + Chr$(27)
 NOEXECUTION = True
 'trace = True
@@ -1397,10 +1437,6 @@ EmptyClipboard
 iamhere = False
 End Sub
 
-Public Sub HideMouse()
-MouseIcon = Form1.Picture2.Picture
-mousepointer = 99
-End Sub
 
 Private Sub Form_Load()
 Set DisStack = New basetask
@@ -1508,7 +1544,7 @@ Switches para$  ' ,TRUE CHECK THIS
   On Error Resume Next
   Dim i As Long
   
-      For i = 0 To Controls.Count - 1
+      For i = 0 To Controls.count - 1
      If Typename(Controls(i)) <> "Menu" Then Controls(i).TabStop = False
       Next i
 End Sub
@@ -1570,6 +1606,7 @@ End Sub
 'End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+If byPassCallback Then Exit Sub
 Cancel = NoAction
 
 End Sub
@@ -1578,7 +1615,7 @@ Private Sub iForm_Resize()
 DIS.Move 0, 0, ScaleWidth, ScaleHeight
 End Sub
 Public Sub Up()
-UpdateWindow hwnd
+UpdateWindow hWND
 End Sub
 
 Sub something()
@@ -1648,7 +1685,11 @@ elevatestatus = -1
 s_complete = True
 ExTarget = False
 Dim helpcnt As Long, qq$
-
+If Not UseMe Is Nothing Then
+If Not UseMe.IamVisible Then
+UseMe.Show
+End If
+End If
 ''MyDoEvents
 
 Dim mybasket As basket
@@ -1664,8 +1705,8 @@ MyDoEvents
 
    If trace Then
    PrepareLabel basestack1
-    Form2.Label1(1) = "..."
-    Form2.Label1(2) = "..."
+    Form2.label1(1) = "..."
+    Form2.label1(2) = "..."
     Form2.gList3(2).backcolor = &H3B3B3B
     TestShowCode = False
      TestShowSub = vbNullString
@@ -1699,6 +1740,7 @@ Form2.ComputeNow
  players(DisForm) = mybasket
  ''reset refresh system
   REFRESHRATE = 25
+  ResetPrefresh
   k1 = 0
  Show
  
@@ -1752,7 +1794,7 @@ Else
 
     mcd = Left$(cLine, rinstr(cLine, "\"))
    End If
-
+    PlaceCaption ExtractNameOnly(cLine)
    cLine = vbNullString
 End If
 
@@ -1801,6 +1843,7 @@ If NERR Then Exit Do
 
                 closeAll
                 mybasket = players(DisForm)
+                If byPassCallback Then Exit Do
                 PlainBaSket DIS, mybasket, "ESC " & qq$
         Else
         ' look last error
@@ -1868,6 +1911,7 @@ Private Sub Form_Unload(Cancel As Integer)
     Set Point2Me = Nothing
     Set fonttest = Nothing
     TrueVisible = False
+    byPassCallback = True
 End Sub
 Public Sub helper1()
 If DisStack Is Nothing Then
@@ -1890,10 +1934,11 @@ Dim dummy As Boolean
 List1.Visible = False
 If List1.Tag <> "" Then
 If QRY Or GFQRY Then
+
 Else
 
 dummy = interpret(basestack1, List1.Tag)
-Me.KeyPreview = True
+'Me.KeyPreview = True
 End If
 End If
 End Sub
@@ -1907,7 +1952,7 @@ If QRY Or GFQRY Then
 Else
 
 dummy = interpret(basestack1, List1.Tag)
-Me.KeyPreview = True
+'Me.KeyPreview = True
 End If
 End If
 End If
@@ -1924,11 +1969,12 @@ KeyCode = 0
  If Not EditTextWord Then
  ' check if { } is ok...
  If Not blockCheck(TEXT1.Text, DialogLang, gothere) Then
- 
+ On Error Resume Next
+ gList1.ListindexPrivateUse = gothere
  Exit Sub
  End If
  End If
- If TEXT1.UsedAsTextBox Then result = 99
+ If TEXT1.UsedAsTextBox Then Result = 99
 NOEDIT = True: noentrance = False: Exit Sub
 End If
 If KeyCode = vbKeyPause Then
@@ -1978,9 +2024,9 @@ End If
 If TEXT1.UsedAsTextBox Then
 Select Case KeyCode
 Case Is = vbKeyTab And (shift Mod 2 = 1), vbKeyUp
-result = -1
+Result = -1
 Case vbKeyReturn, vbKeyTab, vbKeyDown
-result = 1
+Result = 1
 Case Else
 noentrance = False
 Exit Sub

@@ -146,6 +146,19 @@ undomode = 0
 mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, thisdoc
 Render
 End Sub
+Public Sub PasteText(thisdoc As String)
+PushUndo
+undotext = thisdoc + vbCrLf
+undopara = mDoc.MarkParagraphID
+If mDoc.TextParagraphLen(mDoc.MarkParagraphID) = 0 And glistN.SelStart > 0 Then
+undopos = 1 + CharPosStart - glistN.SelStart
+Else
+undopos = CharPosStart
+End If
+undomode = 0
+InsertText = thisdoc + vbCrLf
+End Sub
+
 Private Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
 sr1 = Clipboard.GetText(1)
@@ -852,15 +865,12 @@ skip = True
 End Sub
 
 Public Sub Render()
-' we have charpos and listindex
-'glistN.NoScroll = True
-'glistN.PanPos = 0
+If mDoc.busy Then Exit Sub
 Dim selstart2 As Long
+mDoc.busy = True
 all = mDoc.DocLines
 glistN.ListIndex = mDoc.FirstParagraphLine(mDoc.MarkParagraphID) + mDoc.TextParagraph2Line(mDoc.MarkParagraphID, Charpos, selstart2, NoColor)
 glistN.SelStart = selstart2
-
-'EditDoc = EditDoc
 If glistN.ListIndex < glistN.ScrollFrom Then
 If glistN.ListIndex > glistN.lines Then
 glistN.ScrollToSilent glistN.ListIndex - glistN.lines / 2
@@ -872,7 +882,8 @@ glistN.ScrollToSilent glistN.ListIndex - glistN.lines
 ElseIf glistN.ListIndex > glistN.lines And glistN.listcount - glistN.ListIndex < glistN.lines Then
 glistN.ScrollToSilent glistN.ListIndex - glistN.lines
 End If
-If glistN.enabled Then glistN.ShowPan 'glistN.PrepareToShow 10
+If glistN.enabled Then glistN.ShowPan
+mDoc.busy = False
 End Sub
 
 Public Sub WrapMarkedPara()
@@ -1713,7 +1724,6 @@ Private Sub mDoc_BreakLine(data As String, datanext As String)
     data = vbNullString
  Else
     If showparagraph Then
-   ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
          data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
         
         glistN.BreakLine data1, datanext1, , ChrW(&HB7)
@@ -1811,7 +1821,14 @@ If kind > 0 Then
        End If
         '' for the end
    Else
-   If kind = 10 Then lastcol = 14 Else lastcol = 10
+   If kind = 10 Then
+        lastcol = 13
+   ElseIf kind = 20 Then
+        lastcol = 12
+   Else
+        lastcol = 10
+   End If
+   
    If pos2 > 0 Then
        addone col(), pos2, lastcol
    Else
@@ -1854,7 +1871,11 @@ cont100:
    End If
    Loop
     If FastSymbol(a$, ")") Then
+    If kind >= 10 Then
+    addone col(), pos2, 14
+    Else
   addone col(), pos2, lastcol
+  End If
     pos2 = k - Len(a$) + 1
   End If
   End If
@@ -1990,15 +2011,16 @@ End If
 If MaybeIsSymbol(a$, ":", "\") Then
 a$ = Mid$(a$, 2)
 If AscW(Left$(a$, 1) + " ") = 92 Then
-
-If col(UBound(col())) = 1 Or InStr(" #@.+-~^%$,!({'?|/&)}" + Chr$(34), Mid$(data, pos2 - 1, 1)) > 0 Then
-If pos2 > 0 Then
-addone col(), pos2, 14
-Else
-addone col(), 1, 14
-End If
+If pos2 > 1 Then
+    If col(UBound(col())) = 1 Or InStr(" #@.+-~^%$,!({'?|/&)}" + Chr$(34), Mid$(data, pos2 - 1, 1)) > 0 Then
+    If pos2 > 0 Then
+        addone col(), pos2, 14
+    Else
+        addone col(), 1, 14
+    End If
  pos2 = k - Len(a$) + 1
 GoTo novar
+End If
 End If
 a$ = Mid$(a$, 2)
 End If
@@ -2143,6 +2165,7 @@ GoTo marvel2
   End If
   End If
 '' or here for again4
+
 here3:
 If FastSymbol(a$, ".") Then
 If FastSymbol(a$, ".") Then
@@ -2495,7 +2518,7 @@ a$ = NLtrim$(a$)
 End Function
 Function IsLabelOnly(a$, r$) As Long 'ok
 
-Dim rr&, one As Boolean, c$, dot&, Extra&
+Dim rr&, one As Boolean, c$, dot&, Extra&, num As Boolean
 r$ = vbNullString
 If a$ = vbNullString Then IsLabelOnly = 0: Exit Function
 a$ = NLtrim$(a$)
@@ -2540,9 +2563,12 @@ a$ = NLtrim$(a$)
                             dot& = dot& + 1
                     
                             End If
-                         
+                        If Mid$(a$, 2, 1) Like "[eEåÅ]" Then
+                        r$ = r$ & Mid$(a$, 2, 1)
+                         a$ = Mid$(a$, 3)
+                        Else
                          a$ = Mid$(a$, 2)
-                        
+                        End If
                         
             Else
             If r$ = vbNullString And dot& > 0 Then
@@ -2567,18 +2593,45 @@ Exit Do
             ElseIf r$ <> "" Then
             r$ = r$ & Left$(a$, 1)
             a$ = Mid$(a$, 2)
+            If Extra& > 0 Then
+            If Left$(a$, 1) = "%" Then
+            If Len(r$) > 6 Then rr& = 1: Exit Do
+            a$ = Mid$(a$, 2)
+            Extra& = Extra& + 10
+            rr& = 1: Exit Do
+            
+             ElseIf Left$(a$, 1) = "&" Then
+             Extra& = Extra& + 10
+            a$ = Mid$(a$, 2)
+            rr& = 1: Exit Do
+            End If
+            If Len(r$) = 10 Then rr& = 1: Exit Do
+            End If
                rr& = 1 'is an identifier or floating point variable
             ElseIf Mid$(a$ + "__", 2, 2) Like "[×÷Xx][0-9A-Fa-f]" Then
              r$ = r$ & Left$(a$, 3)
             a$ = Mid$(a$, 4)
                rr& = 1
             Extra& = 9
+            If Left$(a$, 1) = "%" Then
+                a$ = Mid$(a$, 2)
+                Extra& = Extra& + 10
+                rr& = 1: Exit Do
+            
+             ElseIf Left$(a$, 1) = "&" Then
+                 Extra& = Extra& + 10
+                a$ = Mid$(a$, 2)
+                rr& = 1: Exit Do
+            End If
             ElseIf Asc(Mid$(a$, 2, 1) + " ") = 38 Then
             a$ = Mid$(a$, 3)
             Extra& = 100
             Exit Do
             Else
-            If dot& > 0 Then a$ = "." + a$: dot& = 0
+           
+          If dot& > 0 Then
+            a$ = "." + a$: dot& = 0
+            End If
             
             Exit Do
             End If
@@ -2588,13 +2641,35 @@ Case Is < 0, Is > 64 ' >=A and negative
             Exit Do
             Else
   If Extra& > 0 Then
-  If Len(r$) = 10 Then Exit Do
-  If Not c$ Like "[0-9a-fA-F]" Then Exit Do
+        If Not c$ Like "[a-fA-F]" Then Exit Do
+        r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+            
+            If Left$(a$, 1) = "%" Then
+                If Len(r$) > 6 Then rr& = 1: Exit Do
+                Extra& = Extra& + 10
+                a$ = Mid$(a$, 2)
+                rr& = 1: Exit Do
+            
+             ElseIf Left$(a$, 1) = "&" Then
+             Extra& = Extra& + 10
+                a$ = Mid$(a$, 2)
+                rr& = 1: Exit Do
+            End If
+            If Len(r$) = 10 Then rr& = 1: Exit Do
+        
+        
+  Else
+            r$ = r$ & Left$(a$, 1)
+            a$ = Mid$(a$, 2)
+       
+            rr& = 1 'is an identifier or floating point variable
+  
+  
   
   End If
-              r$ = r$ & Left$(a$, 1)
-            a$ = Mid$(a$, 2)
-            rr& = 1 'is an identifier or floating point variable
+              
+        
   
             End If
       Case 38 ' "&"
@@ -2792,9 +2867,6 @@ glistN.NoScroll = Not mNoWrap
     
     HorSrcoll 0
     Render
-    Else
-   '' Stop
-    
     End If
 End If
 End Property
@@ -3022,15 +3094,15 @@ End Property
 Public Property Set Font(New_Font As Font)
     Set glistN.Font = New_Font
 End Property
-Public Property Let BackColor(ByVal RHS As OLE_COLOR)
+Public Property Let backcolor(ByVal RHS As OLE_COLOR)
 
     
-glistN.BackColor = RHS
+glistN.backcolor = RHS
   
     
 End Property
-Public Property Get BackColor() As OLE_COLOR
-    BackColor = glistN.BackColor
+Public Property Get backcolor() As OLE_COLOR
+    backcolor = glistN.backcolor
 End Property
 Public Property Get ForeColor() As OLE_COLOR
     ForeColor = glistN.ForeColor
@@ -3548,7 +3620,13 @@ Dim b As Integer
 
 Select Case ColorSet
 Case 0
+If ch = 13 Then
+M2000 = rgb(&HEE, &HEE, &H33)
+ElseIf ch = 12 Then
+M2000 = rgb(&HDD, &HAA, 0)
+Else
 M2000 = QBColor(ch Mod 16)
+End If
 Case 1
 Select Case ch
 Case 7
@@ -3557,6 +3635,10 @@ Case 10
 M2000 = 0   '' black  '' basic
 Case 11
 M2000 = rgb(32, 32, 255)
+Case 12
+M2000 = rgb(&H80, &H40, &H10)
+Case 13
+M2000 = rgb(&HAA, &H90, &H20)
 Case 14
 M2000 = rgb(&HAA, &H60, &H30)
 Case 15
@@ -3571,8 +3653,14 @@ Dim b As Integer
 
 Select Case Abs(pagiohtml$ = "DARK")
 Case 0
+If ch = 13 Then
+htmlM2000 = rgb(&H33, &HEE, &HEE)
+ElseIf ch = 12 Then
+htmlM2000 = rgb(0, &HAA, &HDD)
 
+Else
 htmlM2000 = (QBColor(ch Mod 16) And &HFF00&) + (QBColor(ch Mod 16) \ &H10000) + ((QBColor(ch Mod 16) And &HFF) * &H10000)
+End If
 Case 1
 Select Case ch
 Case 7
@@ -3581,6 +3669,10 @@ Case 10
 htmlM2000 = 0   '' black  '' basic
 Case 11
 htmlM2000 = rgb(255, 32, 32)
+Case 12
+htmlM2000 = rgb(&H10, &H40, &H80)
+Case 13
+htmlM2000 = rgb(&H20, &H37, &H97)
 Case 14
 htmlM2000 = rgb(&H30, &H60, &HAA)
 Case 15

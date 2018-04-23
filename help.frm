@@ -148,10 +148,17 @@ End If
 ''setupxy = Me.FontSize * 20 / 15 * DYP / 15 + 4
 
 End Sub
-Public Sub MoveMe()
+Public Sub moveMe()
 ScaleDialog Helplastfactor, HelpLastWidth
 Hook2 hWND, gList1
 Label1.glistN.SoftEnterFocus
+If IsWine Then
+If Not Screen.ActiveForm Is Nothing Then
+If Not Screen.ActiveForm Is Form4 Then
+Form4.Show , Screen.ActiveForm
+End If
+End If
+End If
 End Sub
 
 Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)

@@ -237,6 +237,7 @@ GetKeyError:      ' Cleanup After An Error Has Occured...
     rc = RegCloseKey(hKey)                                  ' Close Registry Key
 End Function
 
-Private Sub lblDescription_Click()
-'
+Private Sub Form_Resize()
+If Me.WindowState <> 0 Then WindowState = 0: Exit Sub
 End Sub
+

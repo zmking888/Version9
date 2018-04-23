@@ -21,7 +21,7 @@ Public structref As FastCollection
 Public UseStruct As Boolean
 Private mExecBloc As Boolean
 Private Strings As LongHash
-Private BasicItemString As Boolean
+Private BasicItem As Integer
 
 Private Type SAFEARRAYBOUND
     cElements As Long
@@ -36,12 +36,17 @@ Private Type SAFEARRAY1D
     onebound(0 To 0) As SAFEARRAYBOUND
 End Type
 Private Width As Long, Height As Long
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
-Sub Costruct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False)
+Sub Costruct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
 
 If mItems <> 0 Then ErrorMes = 1: Exit Sub
 If Times < 1 Then ErrorMes = 2: Exit Sub
-BasicItemString = ByteLen < 0
+If ByteLen < 0 Then
+BasicItem = vbString
+ElseIf Not IsMissing(thatbasicitem) Then
+BasicItem = thatbasicitem
+End If
 ByteLen = Abs(ByteLen)
 
 If ByteLen < 1 Then ErrorMes = ErrorMes + 4
@@ -102,7 +107,10 @@ Else
 End If
 End Sub
 Public Property Get ItemsAreStrings() As Boolean
-ItemsAreStrings = BasicItemString
+ItemsAreStrings = BasicItem = vbString
+End Property
+Public Property Get WhatAreBasicItem() As Integer
+WhatAreBasicItem = BasicItem
 End Property
 
 Public Property Get GetBytePtr(offset As Variant) As Long
@@ -467,4 +475,17 @@ If mItems > 0 Then
     End If
     Set Copy = aCopy
 End If
+End Function
+Public Function Search(from As Long, what) As Long
+Dim limit As Long, b As Byte, i As Long, w As Byte
+b = Abs(what) And &HFF
+limit = SizeByte - 1
+
+For i = from To limit
+    GetMem1 GetBytePtr(i), w
+    If b = w Then
+    Search = i + 1: Exit Function
+    End If
+Next
+Search = i + 1
 End Function

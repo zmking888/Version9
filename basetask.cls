@@ -23,7 +23,7 @@ Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As 
 Public nokillvars As Boolean
 Public finalFlag As Boolean
 Public IFCTRL As Boolean, jump As Boolean
-Public Vars As Long
+Public Vars As Long, ByName As Long
 Public usestack As Boolean
 Public commnum As Long
 Public strnum As Long
@@ -87,7 +87,6 @@ End Sub
 Public Sub SetVar(ByVal name$, var As Variant)
 
     If Not StaticCollection.Find(name$) Then
-   ' If StaticCollection.Count = 1 Then Stop
     StaticCollection.AddKey name$
     End If
    StaticCollection.Value = var
@@ -520,7 +519,7 @@ Dim aa As New mThreadref
 checkialive
 Set aa.thread = Nothing  ' no thread
 aa.Id = Threadid
-aa.VarName = threadvar
+aa.varname = threadvar
 If Not threadsnames.Find(Threadid) Then threadsnames.AddKey Threadid
 Set threadsnames.ValueObj = aa
 
@@ -530,7 +529,7 @@ Public Function Exist(Threadid As Long, ThreadName As String) As Boolean
 If threadsnames Is Nothing Then Exist = False: Exit Function
 If threadsnames.Find(Threadid) Then
  With threadsnames.ValueObj
-    Exist = .VarName = ThreadName
+    Exist = .varname = ThreadName
 End With
 End If
 
@@ -559,25 +558,25 @@ Else
 End If
 Set aa = Nothing
 End Function
-Public Function ThreadsStr(Optional ByVal lang As Long = 0)
+Public Function ThreadsStr(Optional ByVal Lang As Long = 0)
 '' use threadsnames
 
 Dim aa As mThreadref, a$
 If threadsnames Is Nothing Then Exit Function
 
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 ' For Each aa In threadsnames
 Set aa = threadsnames.ValueObj
-If Left$(aa.VarName, 1) = "_" Then
-If lang = 0 Then
+If Left$(aa.varname, 1) = "_" Then
+If Lang = 0 Then
 a$ = a$ & "есытеяийо мгла "
 Else
 a$ = a$ & "INTERNAL THREAD "
 End If
 Else
-a$ = a$ & aa.VarName + Str$(aa.Id) & " "
+a$ = a$ & aa.varname + Str$(aa.Id) & " "
 End If
 threadsnames.NextIndex
 Wend
@@ -586,7 +585,7 @@ Set aa = Nothing
 End If
 If Me.IamChild Then
 If Not Me.Parent Is Nothing Then
-ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(lang))
+ThreadsStr = Trim$(a$ & Me.Parent.ThreadsStr(Lang))
 Else
 ThreadsStr = vbNullString
 End If
@@ -598,11 +597,11 @@ Public Function ThreadsNumber() As Long
 '' use threadsnames
 Dim aa As mThreadref, kk
 If threadsnames Is Nothing Then ThreadsNumber = kk: Exit Function
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
-If Left$(aa.VarName, 5) <> "_multi" Then kk = kk + 1
+If Left$(aa.varname, 5) <> "_multi" Then kk = kk + 1
 threadsnames.NextIndex
 Wend
 Set aa = Nothing
@@ -615,7 +614,7 @@ Dim aa As mThreadref, Tid As Long
 Dim thatProcess As TaskInterface
 Dim thatBasetask As basetask
 CONT:
-If threadsnames.Count > 0 Then
+If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
 Set aa = threadsnames.ValueObj
@@ -639,19 +638,18 @@ End If
 
 End Sub
 
-Private Sub Class_Initialize()
-'Set parentSoros = New mStiva ' maybe this will change
-Set Owner = Nothing
-Set lastobj = Nothing
-Set FuncObj = Nothing
-End Sub
+'Private Sub Class_Initialize()
+'Set Owner = Nothing
+'Set lastobj = Nothing
+'Set FuncObj = Nothing
+'End Sub
 Public Function IsOptionalForArray(check As Boolean) As Boolean
 If parentSoros.LookNull Then
     IsOptionalForArray = False
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptionalForArray = check
-ElseIf parentSoros.Count = 0 Then
+ElseIf parentSoros.count = 0 Then
   IsOptionalForArray = check
 End If
 End Function
@@ -661,7 +659,7 @@ If parentSoros.LookNull Then
 ElseIf parentSoros.PopType = ">" Then
     parentSoros.drop 1
     IsOptional = True
-ElseIf parentSoros.Count = 0 Then
+ElseIf parentSoros.count = 0 Then
   IsOptional = True
 End If
 End Function
@@ -785,11 +783,9 @@ End Property
 
 Public Property Let GroupName(ByVal vNewValue As String)
 
-''If InStr(vNewValue, "..") > 0 Then Stop
 If vNewValue <= "." Then
 mGroupName = vbNullString
 Else
-''''If Right$(vNewValue, 1) <> "." Then Stop
 mGroupName = vNewValue
 End If
 End Property

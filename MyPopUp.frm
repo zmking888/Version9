@@ -60,6 +60,9 @@ Dim Lx As Long, ly As Long, dr As Boolean
 Dim bordertop As Long, borderleft As Long, lastshift As Integer
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Private myobject As Object
+Public LASTActiveForm As Form
+Dim ttl$(1 To 2)
+
 Public Sub Up(Optional x As Variant, Optional y As Variant)
 If IsMissing(x) Then
 x = CSng(MOUSEX())
@@ -68,11 +71,11 @@ Else
 x = x + Form1.Left
 y = y + Form1.Top
 End If
-If x + width > VirtualScreenWidth() Then
+If x + Width > VirtualScreenWidth() Then
 If y + Height > VirtualScreenHeight() Then
-Move VirtualScreenWidth() - width, VirtualScreenHeight() - Height
+Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
 Else
-Move VirtualScreenWidth() - width, y
+Move VirtualScreenWidth() - Width, y
 End If
 ElseIf y + Height > VirtualScreenHeight() Then
 Move x, VirtualScreenHeight() - Height
@@ -95,11 +98,11 @@ x = x + that.Left
 y = y + that.Top
 
 
-If x + width > VirtualScreenWidth() Then
+If x + Width > VirtualScreenWidth() Then
 If y + Height > VirtualScreenHeight() Then
-Move VirtualScreenWidth() - width, VirtualScreenHeight() - Height
+Move VirtualScreenWidth() - Width, VirtualScreenHeight() - Height
 Else
-Move VirtualScreenWidth() - width, y
+Move VirtualScreenWidth() - Width, y
 End If
 ElseIf y + Height > VirtualScreenHeight() Then
 Move x, VirtualScreenHeight() - Height
@@ -188,6 +191,14 @@ If k = 0 Then
 .AddSep
 .additemFast "Τμήματα/Συναρτήσεις F12"
 .menuEnabled(23 - k) = SubsExist()
+ttl$(1) = "Εισαγωγή Αρχείου"
+
+.additemFast ttl$(1)
+.menuEnabled(24 - k) = True
+ttl$(2) = "Εισαγωγή Πόρου"
+.additemFast ttl$(2)
+.menuEnabled(25 - k) = True
+
 End If
 End If
 End With
@@ -246,6 +257,14 @@ If k = 0 Then
 .AddSep
 .additemFast "Modules/Functions F12"
 .menuEnabled(23 - k) = SubsExist()
+ttl$(1) = "Insert File"
+.additemFast ttl$(1)
+.menuEnabled(24 - k) = True
+ttl$(2) = "Load Resource"
+.additemFast ttl$(2)
+
+.menuEnabled(25 - k) = True
+
 End If
 End If
 
@@ -274,6 +293,10 @@ End Sub
 
 
 
+Private Sub Form_Load()
+Set LASTActiveForm = Screen.ActiveForm
+End Sub
+
 Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
@@ -281,7 +304,7 @@ If Button = 1 Then
     If Pouplastfactor = 0 Then Pouplastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
+    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -289,7 +312,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
+    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -304,9 +327,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -315,11 +338,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (width - 150) Or x > width Then addX = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -332,33 +355,33 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
-        If (addy + Height) / height1 > 0.4 And ((width + addX) / width1) > 0.4 Then
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then helpSizeDialog = ((addy + Height) / height1)
         Pouplastfactor = ScaleDialogFix(helpSizeDialog)
 
 
-        If ((width * Pouplastfactor / factor + addX) / Height * Pouplastfactor / factor) < (width1 / height1) Then
-        addX = -width * Pouplastfactor / factor - 1
+        If ((Width * Pouplastfactor / factor + addX) / Height * Pouplastfactor / factor) < (width1 / height1) Then
+        addX = -Width * Pouplastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
         
-        If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, width
+        If Pouplastfactor <> factor Then ScaleDialog Pouplastfactor, Width
 
         Lx = x
         
         Else
         Lx = x * Pouplastfactor / factor
-             ScaleDialog Pouplastfactor, (width + addX) * Pouplastfactor / factor
+             ScaleDialog Pouplastfactor, (Width + addX) * Pouplastfactor / factor
          
    
          End If
 
         
-        PopUpLastWidth = width
+        PopUpLastWidth = Width
 
 
 ''gList1.PrepareToShow
@@ -380,6 +403,7 @@ End Sub
 
 
 Private Sub Form_Unload(Cancel As Integer)
+Set LASTActiveForm = Nothing
 Set myobject = Nothing
 End Sub
 
@@ -501,6 +525,7 @@ Private Sub gList1_selected2(item As Long)
 End Sub
 Private Sub DoCommand(item As Long)
 Dim k As Long, l As Long
+Dim b As basetask, fname$, files() As String, reader As Document, neo$, s$
 If Typename(myobject) = "GuiEditBox" Then k = 4: l = 100
 Select Case item - 1
 Case -2
@@ -562,9 +587,9 @@ Else
 End If
 Case 13 - k
 If k = 0 Then
-    Form1.mscatsub
+    Form1.rthissub
 Else
-    myobject.mscatsub
+    myobject.rthissub
 End If
 Case 15 - k
 gList1.ListSelectedNoRadioCare(17 - k) = Not gList1.ListChecked(17 - k)
@@ -584,6 +609,107 @@ Else
 End If
 Case 23 - l
 showmodules
+Case 24 - l
+''Debug.Print GetFile("file to load")
+
+Set b = New basetask
+Set b.Owner = LASTActiveForm
+If b.Owner Is Nothing Then Set b.Owner = Form1
+Form1.TEXT1.glistN.enabled = False
+fname$ = GetFile(b, ttl$(1), mcd, "TXT|GSB|BCK|GM2", True)
+Set reader = New Document
+If fname$ <> "" Then
+If ReturnListOfFiles <> "" Then
+    files() = Split(ReturnListOfFiles, "#")
+    For k = 0 To UBound(files())
+    Form1.TEXT1.PasteText "\\$ " + files(k)
+    reader.ReadUnicodeOrANSI files(k), True
+    Form1.TEXT1.PasteText reader.textDoc
+    Next k
+Else
+    Form1.TEXT1.PasteText "\\$ " + fname$
+    reader.ReadUnicodeOrANSI fname$, True, , True
+    Form1.TEXT1.PasteText reader.textDoc
+End If
+Form1.TEXT1.Render
+End If
+Form1.TEXT1.glistN.enabled = True
+Unload Me
+Case 26 - 1
+    Set b = New basetask
+    Set b.Owner = LASTActiveForm
+    If b.Owner Is Nothing Then Set b.Owner = Form1
+Set reader = New Document
+Form1.TEXT1.glistN.enabled = False
+fname$ = GetFile(b, ttl$(2), mcd, "", True)
+
+If fname$ <> "" Then
+If pagio$ = "GREEK" Then
+s$ = "Πόρος"
+neo$ = Trim$(InputBoxN("Όνομα Μεταβλητής (αριθμητική ή αλφαριθμητική)", "Συγγραφή Κειμένου", s$))
+If neo$ = "" Then neo$ = "Πόρος"
+Else
+s$ = "Resource"
+neo$ = Trim$(InputBoxN("Variable Name (numeric or string)", "Text Editor", s$))
+If neo$ = "" Then neo$ = "Resource"
+End If
+If Right$(neo$, 1) = "$" Then
+    s$ = "$"
+    neo$ = Left$(neo$, Len(neo$) - 1)
+ElseIf Right$(neo$, 1) = ")" Then
+    s$ = ")"
+    neo$ = Left$(neo$, Len(neo$) - 1)
+Else
+    s$ = ""
+End If
+    If ReturnListOfFiles <> "" Then
+        files() = Split(ReturnListOfFiles, "#")
+        For k = 0 To UBound(files())
+        Form1.TEXT1.PasteText "\\$ " + files(k)
+        If pagio$ = "GREEK" Then
+            Form1.TEXT1.PasteText "Δυαδικό {"
+            Form1.TEXT1.PasteText FileToEncode64(files(k), 6)
+            If s$ = ")" Then
+            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(k) + s$
+            Else
+            Form1.TEXT1.PasteText "} Ως " + neo$ + CStr(k + 1) + s$
+            End If
+        Else
+            Form1.TEXT1.PasteText "Binary {"
+            Form1.TEXT1.PasteText FileToEncode64(files(k), 6)
+            If s$ = ")" Then
+            Form1.TEXT1.PasteText "} As " + neo$ + CStr(k) + s$
+            Else
+            Form1.TEXT1.PasteText "} As " + neo$ + CStr(k + 1) + s$
+            End If
+        End If
+        
+        Next k
+    Else
+        Form1.TEXT1.PasteText "\\$ " + fname$
+        If pagio$ = "GREEK" Then
+        Form1.TEXT1.PasteText "Δυαδικό {"
+        Form1.TEXT1.PasteText FileToEncode64(fname$, 6)
+        If s$ = ")" Then
+        Form1.TEXT1.PasteText "} Ως " + neo$ + "0" + s$
+        Else
+        Form1.TEXT1.PasteText "} Ως " + neo$ + s$
+        End If
+        Else
+        Form1.TEXT1.PasteText "Binary {"
+        Form1.TEXT1.PasteText FileToEncode64(fname$, 6)
+        If s$ = ")" Then
+        Form1.TEXT1.PasteText "} As " + neo$ + "0" + s$
+        Else
+        Form1.TEXT1.PasteText "} As " + neo$ + s$
+        End If
+        End If
+
+    End If
+Form1.TEXT1.Render
+End If
+Form1.TEXT1.glistN.enabled = True
+Unload Me
 Case 17 - k
 With myobject
 shortlang = Not shortlang

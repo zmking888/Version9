@@ -27,14 +27,14 @@ Friend Sub NoPublic(bstack As basetask, where$)
         mineHere$ = where$
 End Sub
 Property Let ShowGui(RHS As Boolean)
-If Forms.Count = 0 Then Exit Property
+If Forms.count = 0 Then Exit Property
 If RHS Then
 Form1.Visible = True
 Form1.WindowState = 0
 If Form1.Top >= VirtualScreenHeight Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
 If Form1.WindowState = 0 Then
-If Not (QRY Or GFQRY Or Forms.Count > 5) Then Form1.Visible = False
+If Not (QRY Or GFQRY Or Forms.count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
@@ -42,7 +42,7 @@ Public Sub EventRef(RHS As Object, Optional name As String)
 Set mObjRef = RHS
 mName$ = name$
 End Sub
-Sub MethodType(ByVal mName$, mType$)
+Public Sub MethodType(ByVal mName$, mType$)
 mName$ = myUcase(mName$)
 reghash.AddKey mName$, mType$
 End Sub
@@ -209,7 +209,7 @@ If IhaveSignature Then
 look = IsLabelOnly(sign$, dummy$)
 If look = 2 Then ' byref
 look = IsLabelOnly(sign$, dummy$)
-look = globalvar("b" + CStr(var2used) + "." + dummy$, True)
+look = globalvar("b" + CStr(var2used) + "." + dummy$, True) ' perhaps this is a fault, why is true??
 ElseIf look > 4 Then
 FastSymbol sign, ")", True
 mS.DataObj ar
@@ -225,6 +225,8 @@ Erase v()
 Else
 mS.DataValLong 0
 End If
+
+
 Case vbEmpty
 mS.DataValLong 0
 Case vbVariant, vbString
@@ -448,7 +450,23 @@ Private Sub Class_Initialize()
         Set objref.Owner = Form1.DIS
         mineHere$ = vbNullString 'HERE$
 End Sub
-
+Public Function SpellUnicode(a$)
+' use spellunicode to get numbers
+' and make a ListenUnicode...with numbers for input text
+Dim b$, i As Long
+For i = 1 To Len(a$) - 1
+b$ = b$ & CStr(AscW(Mid$(a$, i, 1))) & ","
+Next i
+SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
+SpellUnicode = b$ & CStr(AscW(Right$(a$, 1)))
+End Function
+Public Function ListenUnicode(ParamArray aa() As Variant) As String
+Dim all$, i As Long
+For i = 0 To UBound(aa)
+    all$ = all$ & ChrW(aa(i))
+Next i
+ListenUnicode = all$
+End Function
 Private Sub Class_Terminate()
 Set mObjRef = Nothing
 mName$ = vbNullString

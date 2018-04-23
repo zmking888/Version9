@@ -1,5 +1,7 @@
 Attribute VB_Name = "Module5"
 Option Explicit
+Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (ByVal ByteLen As Long, ByVal Destination As Long, ByVal Source As Long) As Long
+
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Const Pi = 3.14159265359
@@ -23,6 +25,17 @@ Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
             photo.SaveDib sFile
        
 End Sub
+Public Function Decode64toMemBloc(ByVal a$, ok As Boolean) As Object
+    Dim mem As New MemBlock, BLen As Long
+    a$ = Decode64(a$, ok)
+    If ok Then
+        BLen = LenB(a$)
+        mem.Costruct 1, BLen, , &H8
+        CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
+        Set Decode64toMemBloc = mem
+    End If
+    
+End Function
 Public Function File2newMemblock(FileName As String, r, p) As Object
     Dim mem As New MemBlock, BLen As Long, i As Long
     r = -1#

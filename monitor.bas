@@ -105,16 +105,18 @@ Private Function MonitorEnumProc(ByVal hmonitor As Long, ByVal hdcMonitor As Lon
     GetMonitorInfo hmonitor, mi
     
     With ScrInfo(dwData)
+    'If IsWine And mi.rcMonitor.Left = 0 And mi.rcMonitor.Top = 0 Then
+     '   .Left = 1
+      '  .Top = 1
+        
+   ' Else
     .Left = mi.rcMonitor.Left * dv15
+    
     .Top = mi.rcMonitor.Top * dv15
-   ' If IsWine Then
-    '.Height = (mi.rcMonitor.Bottom - mi.rcMonitor.Top) * dv15 - 1
-    '.Width = (mi.rcMonitor.Right - mi.rcMonitor.Left) * dv15 - 1
-    'Else
+    'End If
     
     .Height = (mi.rcMonitor.Bottom - mi.rcMonitor.Top + 1) * dv15
     .Width = (mi.rcMonitor.Right - mi.rcMonitor.Left + 1) * dv15
-    'End If
     .primary = CBool(mi.dwFlags = MONITORINFOF_PRIMARY)
     .handler = hmonitor
     End With

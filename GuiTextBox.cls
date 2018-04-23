@@ -56,7 +56,7 @@ Private Declare Function CloseClipboard Lib "user32" _
     (ByVal wFormat As Long) As Long
     Private Pad$
     ' for Gui purposes
-Public CtrlName As String
+Public ctrlName As String
 Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
@@ -68,22 +68,22 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Property Get Text() As String
@@ -153,17 +153,17 @@ End If
 End Property
 
 Public Property Get Top() As Variant
-Top = Callback.Controls(CtrlName).Top
+Top = Callback.Controls(ctrlName).Top
 End Property
 Public Property Let Top(ByVal RHS As Variant)
-Callback.Controls(CtrlName).Top = RHS
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
-Left = Callback.Controls(CtrlName).Left
+Left = Callback.Controls(ctrlName).Left
 End Property
 
 Public Property Let Left(ByVal RHS As Variant)
-Callback.Controls(CtrlName).Left = RHS
+Callback.Controls(ctrlName).Left = RHS
 End Property
 
 
@@ -187,7 +187,7 @@ If .listcount = 0 Then Text = vbNullString
 .NoCaretShow = True
 .VerticalCenterText = True
 If Not .CenterText Then .LeftMarginPixels = 8 Else .LeftMarginPixels = 0
-.BackColor = rgb(200, 120, 60)
+.backcolor = rgb(200, 120, 60)
 Set .Font = ff
 .ForeColor = white
 .dcolor = Callback.Controls(1).dcolor
@@ -214,8 +214,15 @@ End Property
 Private Sub Class_Terminate()
 Set glistN = Nothing
 End Sub
-
-
+Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
+If myButton And &H2 = 2 Then
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      End If
+      End If
+End Sub
 
 Private Sub glistN_RegisterGlist(this As gList)
 If Not glistN.Spinner Then this.NoWheel = True
@@ -295,7 +302,7 @@ If enabled Then
 glistN.FadeLastLinePart = mPartColor
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
-glistN.BackColor = white
+glistN.backcolor = white
 End If
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
@@ -303,7 +310,7 @@ Else
 glistN.FadeLastLinePart = black
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
-glistN.BackColor = dimm1
+glistN.backcolor = dimm1
 End If
 glistN.NoCaretShow = True
 End If
@@ -316,14 +323,14 @@ If mStayOpen Then
 glistN.FadeLastLinePart = mPartColor
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = black
-glistN.BackColor = white
+glistN.backcolor = white
 End If
 glistN.NoCaretShow = False
 Else
 If glistN.BackStyle <> 1 Then
 glistN.FadeLastLinePart = 0
 glistN.ForeColor = white
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 End If
 glistN.NoCaretShow = True
 End If
@@ -332,6 +339,7 @@ End Sub
 
 Private Sub glistN_CheckLostFocus()
 If Not locked Then
+Callback.LastActive = ctrlName
 If mStayOpen Then
 glistN.NoCaretShow = True
 
@@ -341,7 +349,7 @@ End If
 If Not SkipProcAtExitFocus Then
 If glistN.BackStyle <> 1 Then
 glistN.ForeColor = white
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 End If
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 Else
@@ -367,6 +375,15 @@ VR(1) = shift
       End If
 KeyCode = VR(0)
 shift = VR(1)
+If KeyCode = vbKeyF10 And shift <> 0 Then
+KeyCode = 0
+If mIndex >= 0 Then
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+   Else
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
+      End If
+Exit Sub
+End If
 If KeyCode = vbKeyUp Then
 ElseIf KeyCode = vbKeyDown Then
 ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
@@ -557,6 +574,7 @@ End Function
 
 Private Sub glistN_UnregisterGlist()
 If Not glistN.Spinner Then glistN.NoWheel = True
+Callback.LastActive = ctrlName
 On Error Resume Next
 Set LastGlist = Nothing
 If Err.Number > 0 Then glistN.NoWheel = True
@@ -600,20 +618,24 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = rgb(0, 0, 0)
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 End If
 End Property
 Sub GetFocus()
 On Error Resume Next
-Callback.Controls(CtrlName).SetFocus
+Callback.Controls(ctrlName).SetFocus
 End Sub
+Public Property Let Default(RHS)
+On Error Resume Next
+If CBool(RHS) Then Callback.Default = ctrlName
+End Property
 Sub Transparent()
 Dim x  As Long, y As Long
 glistN.FadeLastLinePart = mPartColor
 glistN.ForeColor = black
 glistN.BackStyle = 1
 glistN.GetLeftTop x, y
-glistN.RepaintFromOut Callback.image, x, y
+glistN.RepaintFromOut Callback.Image, x, y
 End Sub
 Sub ColorsReset()
 white = rgb(255, 255, 255)

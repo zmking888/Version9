@@ -127,7 +127,7 @@ Dim nopreview As Boolean
 Dim oldLeftMarginPixels As Long
 Dim firstpath As Long
 Dim setupxy As Single
-Dim Lx As Long, Ly As Long, dr As Boolean
+Dim Lx As Long, ly As Long, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -341,7 +341,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-Ly = y
+ly = y
 End If
 
 Else
@@ -349,7 +349,7 @@ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < W
 dr = True
 mousepointer = vbSizeNWSE
 Lx = x
-Ly = y
+ly = y
 End If
 
 End If
@@ -366,7 +366,7 @@ If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mo
  If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else mousepointer = 0
 End If
 If dr Then
-    If y < (Height - bordertop) Or y > Height Then addy = (y - Ly)
+    If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
     If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     
    If Not ExpandWidth Then addX = 0
@@ -415,13 +415,13 @@ If dr Then
         gList1.PrepareToShow
        
       
-        Ly = Ly * lastfactor / factor
+        ly = ly * lastfactor / factor
     
         'End If
         End If
         Else
         Lx = x
-        Ly = y
+        ly = y
    
 End If
 once = False
@@ -940,9 +940,11 @@ mySelector.mselChecked = False
 multifileselection = False
 ExpandWidth = False
 For i = LBound(a()) To UBound(a())
-While gList1.Id(j) <> a(i)
+j = 0
+Do While gList1.Id(j) <> a(i)
 j = j + 1
-Wend
+If j >= gList1.listcount Then Exit Do
+Loop
 j = j + 1  ' now we are in base 1
 Select Case j
 Case 2, 3, 4

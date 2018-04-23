@@ -44,7 +44,7 @@ Dim filetypes As String
 Dim ReturnFile As String
 Private Declare Function GetDriveType Lib "KERNEL32" Alias "GetDriveTypeA" (ByVal nDrive As String) As Long
 Private Declare Function GetVolumeInformation Lib "KERNEL32" Alias "GetVolumeInformationA" (ByVal lpRootPathName As String, ByVal lpVolumeNameBuffer As String, ByVal nVolumeNameSize As Long, lpVolumeSerialNumber As Long, lpMaximumComponentLength As Long, lpFileSystemFlags As Long, ByVal lpFileSystemNameBuffer As String, ByVal nFileSystemNameSize As Long) As Long
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Text1Dir As String
 Private topoffsetpixel As Long
 
@@ -110,7 +110,7 @@ Private Sub glistN_CtrlPlusF1()
 '
 End Sub
 
-Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal X As Long, ByVal Y As Long)
+Private Sub glistN_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
 If NostateDir Then
 ' as a setup menu
 Else
@@ -118,7 +118,7 @@ If Not mselChecked Then Exit Sub
 If Mydir.list(item) = "..." Or Mid$(Mydir.list(item), 1) = Chr$(2) Or item < 0 Then Exit Sub
 If Button = 1 Then
 
-If X < 20 * lastfactor And Y < 20 * lastfactor Then
+If x < 20 * lastfactor And y < 20 * lastfactor Then
 If Mydir.ReadMark(item) Then
 Mydir.unMarkLevel item
 Else
@@ -178,7 +178,7 @@ If Mydir.abort Then where = -1: Exit Sub
 End Sub
 
 
-Private Sub glistN_ScrollSelected(item As Long, Y As Long)
+Private Sub glistN_ScrollSelected(item As Long, y As Long)
 Dim m As Double
 If NostateDir Then
 ' as a setup menu
@@ -395,10 +395,10 @@ If item < 0 Then  ' this is a headline
 If Not skip Then FillBack thisHDC, b, glistN.CapColor
       mDoc1.TextParagraphLine 1, what$, ThatPara
       glistN.HeadlineHeight = mDoc1.DocLines * (onelineheight + 1) + 2
-      a.top = a.top + 1
+      a.Top = a.Top + 1
       For i = 1 To mDoc1.DocLines
         PrintItem thisHDC, mDoc1.TextLine(i), a
-        a.top = a.top + onelineheight + 1
+        a.Top = a.Top + onelineheight + 1
       Next i
  If topoffsetpixel = 0 Then topoffsetpixel = glistN.LineTopOffsetPixels
      
@@ -410,7 +410,7 @@ If Not skip Then FillBack thisHDC, b, glistN.CapColor
 
 ElseIf Left$(Mydir.list(item), 1) = Chr$(2) Then
         a.Left = a.Left + 1
-        a.top = a.top + topoffsetpixel
+        a.Top = a.Top + topoffsetpixel
         If item = glistN.ListIndex And Not glistN.ListSep(item) Then
             FillBack thisHDC, b, &HBFBFBB
             SetTextColor thisHDC, &HF0F0FF
@@ -446,7 +446,7 @@ Else
             
             End If
             SetTextColor thisHDC, &HF0F0FF ' 0
-              b.top = b.Bottom - 1
+              b.Top = b.Bottom - 1
        
             FillBack thisHDC, b, &H777777
            
@@ -455,11 +455,11 @@ Else
                 FillBack thisHDC, b, &HAA
             End If
             SetTextColor thisHDC, glistN.ForeColor
-            b.top = b.Bottom - 1
+            b.Top = b.Bottom - 1
             FillBack thisHDC, b, 0
     End If
     a.Left = a.Left + 1 + (Mydir.ReadLevel(item) - 1) * 30 * lastfactor
-    a.top = a.top + topoffsetpixel
+    a.Top = a.Top + topoffsetpixel
     PrintItem thisHDC, Mydir.ExtractName(Mydir.list(item)), a
 End If
 skip = True
@@ -544,7 +544,6 @@ If recnow3checked Then myDir2.LevelStop = 3 Else myDir2.LevelStop = 0
 If Mydir.path = vbNullString Then
 anystr = myDir2.Dir2("", filetypes, recnowchecked)
 Else
-''''If GetPath <> Mydir.path Then Stop
 anystr = myDir2.Dir2(GetPath, filetypes, recnowchecked)
 End If
 
@@ -568,9 +567,9 @@ Private Sub FillBackSmall(thathDC As Long, there As RECT, bgcolor As Long)
 Dim my_brush As Long, one As RECT
 one = there
 one.Left = one.Left + 1
-one.top = one.top + 2
-one.Right = one.Left + 4 + (one.Bottom - one.top) \ 5
-one.Bottom = one.top + 2 + (one.Bottom - one.top) \ 5
+one.Top = one.Top + 2
+one.Right = one.Left + 4 + (one.Bottom - one.Top) \ 5
+one.Bottom = one.Top + 2 + (one.Bottom - one.Top) \ 5
 my_brush = CreateSolidBrush(bgcolor)
 FillRect thathDC, one, my_brush
 DeleteObject my_brush

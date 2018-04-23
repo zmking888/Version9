@@ -28,7 +28,7 @@ tmPitchAndFamily As Byte
 tmCharSet As Byte
 End Type
 Dim tm As TEXTMETRIC
-
+Public UseMe As Callback, byPassCallback As Boolean
 Public osnum As Long
 Private Declare Function GdiFlush Lib "gdi32" () As Long
 Private Declare Function GetSystemMetrics Lib "user32" _
@@ -293,6 +293,34 @@ Private Declare Function TranslateCharsetInfo Lib "gdi32" ( _
     lpcs As CHARSETINFO, _
     ByVal dwFlags As Long _
 ) As Long
+Public reopen4 As Boolean, reopen2 As Boolean
+Public Sub PlaceIcon(a As StdPicture)
+On Error Resume Next
+If UseMe Is Nothing Then Exit Sub
+UseMe.GetIcon a
+End Sub
+Public Sub PlaceCaption(ByVal a$)
+Dim m As Callback, F As Form
+On Error Resume Next
+Set F = Screen.ActiveForm
+If UseMe Is Nothing Then Exit Sub
+If Not UseMe.IamVisible Then
+If a = "" Then a$ = "M2000"
+Form1.CaptionW = a$
+Else
+If a$ = "" Then
+UseMe.SetExtCaption a$
+Else
+UseMe.SetExtCaption a$
+Form1.CaptionW = ""
+End If
+End If
+ttl = False
+If Not F Is Nothing Then
+If F.Visible Then F.SetFocus
+End If
+Err.Clear
+End Sub
 Public Function StartJoypadk(Optional ByVal jn As Long = 0) As Boolean
     If joyGetDevCapsA(jn, MYJOYCAPS, 404) <> 0 Then 'Get Joypadk info
     MYJOYSTAT(jn).enabled = False
@@ -534,14 +562,9 @@ End Function
 Public Function DIBtoSTR(mdib As cDIBSection) As String
 Dim a As String
 If mdib.Width > 0 Then
-If my_system < Platform_Windows_NT_2K_XP Then
-a = String$(mdib.BytesPerScanLine * mdib.Height, Chr(0))
-
-Else
-a = String$(mdib.BytesPerScanLine * mdib.Height \ 2, Chr(0))
-End If
-CopyMemory ByVal StrPtr(a), ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
-a = "cDIB" & Right$("0000" & Hex$(mdib.Width), 4) + Right$("0000" & Hex$(mdib.Height), 4) + a
+a = String$(mdib.BytesPerScanLine * mdib.Height \ 2 + 12, Chr(0))
+Mid$(a, 1, 12) = "cDIB" & Right$("0000" & Hex$(mdib.Width), 4) + Right$("0000" & Hex$(mdib.Height), 4)
+CopyMemory ByVal StrPtr(a) + 24, ByVal mdib.DIBSectionBitsPtr, mdib.BytesPerScanLine * mdib.Height
 DIBtoSTR = a
 End If
 End Function
@@ -725,7 +748,7 @@ nomalo = Not (ang Mod 90 = 0)
      
 End Function
 
-Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional reverse As Boolean = False)
+Public Function Merge3Dib(backdib As cDIBSection, maskdib As cDIBSection, frontdib As cDIBSection, Optional Reverse As Boolean = False)
 
 Dim x As Long, y As Long
 
@@ -771,7 +794,7 @@ Dim tSA2 As SAFEARRAY2D
     End With
     CopyMemory ByVal VarPtrArray(bDib2()), VarPtr(tSA2), 4
         '-----------------------------------------------
-        If reverse Then
+        If Reverse Then
         
     For x = 0 To (xmax * 3) Step 3
         For y = yMax To 0 Step -1
@@ -1810,7 +1833,7 @@ If PobjNum > 0 Then
 For i = PobjNum To 1 Step -1
 players(i).x = 0: players(i).y = 0
 PobjNum = i
-If Form1.dSprite.Count > PobjNum Then Unload Form1.dSprite(PobjNum)
+If Form1.dSprite.count > PobjNum Then Unload Form1.dSprite(PobjNum)
 Next i
 PobjNum = 0
 
@@ -2480,32 +2503,32 @@ End If
           AskInput = False
 End Function
 Public Function ask(a$, Optional retry As Boolean = False) As Double
-If Form3.Visible Then
-If Form3.WindowState = 1 Then
-Form3.Timer1.enabled = False
-Form3.Timer1.Interval = 32760
-Form3.WindowState = 0
+'If Form3.Visible Then
+'If Form3.WindowState = 1 Then
+'Form3.Timer1.enabled = False
+'Form3.Timer1.Interval = 32760
+'Form3.WindowState = 0
 If retry Then
-If Form1.Visible Then
-ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
-Else
-ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
-End If
+    If Form1.Visible Then
+    ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
+    Else
+    ask = MsgBoxN(a$, vbRetryCancel + vbQuestion + vbSystemModal, MesTitle$)
+    End If
 
 Else
-If Form1.Visible Then
-ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
-Else
-ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+    If Form1.Visible Then
+    ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+    Else
+    ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+    End If
 End If
-End If
-Form3.WindowState = 1
-Form3.Timer1.enabled = False
-Form3.Timer1.Interval = 100
-Exit Function
-End If
-End If
-ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
+'Form3.WindowState = 1
+'Form3.Timer1.enabled = False
+'Form3.Timer1.Interval = 100
+'Exit Function
+'End If
+'End If
+'ask = MsgBoxN(a$, vbOKCancel + vbQuestion + vbSystemModal, MesTitle$)
 End Function
 Public Function SpellUnicode(a$)
 ' use spellunicode to get numbers
@@ -2646,8 +2669,8 @@ Function ismine1(ByVal a$) As Boolean  '  START A BLOCK
 ismine1 = True
 a$ = myUcase(a$, True)
 Select Case a$
-Case "DO", "REPEAT", "PART", "LIB", "PROTOTYPE"
-Case "епамекабе", "епамакабе", "леяос", "пяытотупо"
+Case "BINARY", "DO", "REPEAT", "PART", "LIB", "PROTOTYPE"
+Case "дуадийо", "епамекабе", "епамакабе", "леяос", "пяытотупо"
 Case Else
 ismine1 = False
 End Select
@@ -2723,7 +2746,7 @@ Case "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LOCALE$(", "LOCALE(", "LOG(", "LONG
 Case "LOWORD(", "LOWWORD(", "MAIN.TASK", "MARK", "MASTER", "MATCH(", "MAX(", "MAX.DATA$("
 Case "MAX.DATA(", "MDB(", "MEDIA", "MEDIA.COUNTER", "MEMBER$(", "MEMBER.TYPE$(", "MEMO", "MEMORY", "MENU"
 Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MIN(", "MIN.DATA$(", "MIN.DATA("
-Case "MOD", "MODE", "MODULE", "MODULE$", "MODULE(", "MODULES", "MONITOR", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
+Case "MOD", "MODE", "MODULE", "MODULE$", "MODULE(", "MODULES", "MODULE.NAME$", "MONITOR", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
 Case "MOTION.WY", "MOTION.X", "MOTION.XW", "MOTION.Y", "MOTION.YW", "MOUSE", "MOUSE.ICON", "MOUSE.KEY", "MOUSE.X"
 Case "MOUSE.Y", "MOUSEA.X", "MOUSEA.Y", "MOVE", "MOVIE", "MOVIE.COUNTER", "MOVIE.DEVICE$", "MOVIE.ERROR$", "MOVIE.STATUS$"
 Case "MOVIES", "MUSIC", "MUSIC.COUNTER", "NAME", "NEW", "NEXT"
@@ -2731,7 +2754,7 @@ Case "NORMAL", "NOT", "NOTHING", "NOW", "NUMBER", "OFF", "OLE", "ON"
 Case "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPERATOR", "OPTIMIZATION", "OR", "ORDER", "ORDER(", "OSBIT", "OS$", "OUT", "OUTPUT"
 Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
 Case "PATH", "PATH$(", "PAUSE", "PEN", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
-Case "PLAYER", "PLAYSCORE", "POINT", "POINT(", "POLYGON", "POS", "POS.X", "POS.Y", "PRINT"
+Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINT(", "POLYGON", "POS", "POS.X", "POS.Y", "PRINT"
 Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
 Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REVISION"
@@ -2751,7 +2774,7 @@ Case "UP", "UPDATABLE", "UPDATE", "USE", "USER", "USERS", "USER.NAME$", "USGN("
 Case "VAL(", "VALID(", "VALUE", "VALUE(", "VALUE$", "VERSION", "VIEW", "VOID", "VOLUME"
 Case "WAIT", "WCHAR", "WEAK", "WEAK$(", "WHILE", "WIDE", "WIDTH", "WIN", "WINDOW"
 Case "WITH", "WITHEVENTS", "WORDS", "WRITABLE(", "WRITE", "WRITER", "X.TWIPS", "XOR", "Y.TWIPS", "адеиас"
-Case "адеиасе", "ай(", "айеяаио.дуадийо(", "айеяаиос", "акгхес", "акгхгс", "аккацг", "аккацг$("
+Case "адеиасе", "ай(", "айеяаио.дуадийо(", "айеяаио", "айеяаиос", "акгхес", "акгхгс", "аккацг", "аккацг$("
 Case "аккане", "аккиыс", "аккиыс.ам", "ам", "ам(", "ам$(", "ама", "амафгтгсг", "амахеыягсг", "амайтгсг", "амакоцио"
 Case "амакоцио$", "амакусг.охомгс", "амакусг.у", "амакусг.в", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье"
 Case "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "амы", "аниа", "аниа(", "аниа$", "аниа(", "апедысе"
@@ -2789,7 +2812,7 @@ Case "лекыдиа", "леяос", "леяос$(", "лес$(", "лета", "летахесг", "летахесг(", "л
 Case "лийяо(", "лийяо.сеияас$(", "лийяо.сеияас(", "лийяос.йатакоцос$(", "лмглг", "ломадиаио", "ломадиаиос", "ломадийо", "лояжг$(", "лоусийг", "лоусийг.летягтгс", "лпип"
 Case "лпяоста(", "маи", "меа", "мео", "меои", "меос", "мгла", "мглата", "мглата$"
 Case "нейима", "одгциа", "одгцос$(", "охомг", "олака", "ойм$(", "олада", "олада(", "олада$(", "олада.сумоко(", "омола", "омола.аявеиоу$("
-Case "омола.аявеиоу.ломо$(", "омола.вягстг$", "ояио.амадяолгс", "ояисе", "ояож(", "оуяа", "ови", "паифеижымг", "паийтгс", "паине", "памта"
+Case "омола.аявеиоу.ломо$(", "омола.тлглатос$", "омола.вягстг$", "ояио.амадяолгс", "ояисе", "ояож(", "оуяа", "ови", "паифеижымг", "паийтгс", "паине", "памта"
 Case "памы", "памылисо(", "паяацяажос$(", "паяацяажос(", "паяал(", "паяал$(", "паяахесг$(", "паяахуяо", "паяалетяои$", "паяе", "паяейаяе$"
 Case "паяелбокг", "патглемо(", "павос", "педиа", "педио", "педио$(", "пеф$(", "пема", "пеяи"
 Case "пеяи$", "пеяихыяио", "пета", "пи", "пимайас", "пимайас$(", "пимайас(", "пимайес", "писы("
@@ -3181,7 +3204,7 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   For i = p2 To p4 Step 2
   GetMem2 i, p1
   Select Case p1
-    Case 32, 160
+    Case 32, 160, 7
     Case Else
      MyTrimL = (i - p2) \ 2 + 1
    Exit Function
@@ -3253,7 +3276,7 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
 
 End Function
-Function IsLabelAnew(where$, a$, r$, lang As Long) As Long
+Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, gr As Boolean
@@ -3261,7 +3284,7 @@ r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
-l = Len(a$): If l = 0 Then IsLabelAnew = 0: lang = 1: Exit Function
+l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
 
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
@@ -3298,7 +3321,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    lang = 1
+    Lang = 1
     Exit Function
     Case 32, 160
     Case Else
@@ -3328,7 +3351,7 @@ p2 = StrPtr(a$): l = l - 1
         End If
         a$ = Mid$(a$, (i - p2) \ 2)
         IsLabelAnew = 1
-        lang = -1
+        Lang = -1
               
         Exit Function
 
@@ -3448,13 +3471,13 @@ i1233:
     Next i
   If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
        r$ = myUcase(r$, gr)
-       lang = 1 + CLng(gr)
+       Lang = 1 + CLng(gr)
 
     IsLabelAnew = rr&
 
 
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, r$, lang As Long, Optional p1 As Integer = 0) As Long
+Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional p1 As Integer = 0) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -3462,7 +3485,7 @@ rrr$ = vbNullString
 r$ = vbNullString
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p4 As Long  '', excludesp As Long
-  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: lang = 1: Exit Function
+  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3497,7 +3520,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    lang = 1
+    Lang = 1
     Exit Function
     Case 0 To 7, 32, 160
     Case Else
@@ -3535,7 +3558,12 @@ p2 = StrPtr(a$): l = l - 1
               IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
             End If
             Else
-              IsLabelDotSub = 0: a$ = firstdot$ + Mid$(a$, (i - p2) \ 2): Exit Function
+            If r$ = "" And i < p4 Then
+            r$ = r$ + "@"
+
+            Else
+              IsLabelDotSub = 0: a$ = "": Exit Function
+              End If
             End If
     Case 63 '"?"
         If r$ = vbNullString And firstdot$ = vbNullString Then
@@ -3545,14 +3573,14 @@ p2 = StrPtr(a$): l = l - 1
         a$ = Mid$(a$, (i - p2) \ 2) ' mid$(a$, 2)
         IsLabelDotSub = 1
         
-        lang = -1
+        Lang = -1
       
         Exit Function
     
         ElseIf firstdot$ = vbNullString Then
         IsLabelDotSub = 1
-        lang = 1 + CLng(gr)
-        If lang = 1 Then
+        Lang = 1 + CLng(gr)
+        If Lang = 1 Then
         rrr$ = UCase(r$)
         Else
         rrr$ = myUcase(r$)
@@ -3681,7 +3709,7 @@ i123:
   If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
   End If
        rrr$ = firstdot$ + myUcase(r$, gr)
-       lang = 1 + CLng(gr)
+       Lang = 1 + CLng(gr)
     IsLabelDotSub = rr&
    'a$ = LTrim(a$)
 
@@ -3700,7 +3728,8 @@ myid() = Array("ABOUT$", 1, "пеяи$", 1, "CONTROL$", 2, "THREADS$", 3, "мглата$",
 , "PRINTERNAME$", 17, "ейтупытгс$", 17, "PROPERTIES$", 18, "идиотгтес$", 18, "MOVIE.STATUS$", 19, "йатастасг.таимиас$", 19 _
 , "MOVIE.DEVICE$", 20, "сусйеуг.пяобокгс$", 20, "MOVIE.ERROR$", 21, "кахос.таимиас$", 21, "PLATFORM$", 22, "пкатжояла$", 22 _
 , "FONTNAME$", 23, "цяаллатосеияа$", 23, "BROWSER$", 24, "амакоцио$", 24, "SPRITE$", 25, "диажамеиа$", 25 _
-, "APPDIR$", 26, "ежаялоцг.йат$", 26, "DIR$", 27, "йат$", 27, "KEY$", 28, "йол$", 28, "INKEY$", 29, "емйол$", 29, "LETTER$", 30, "цяалла$", 30, "LAMBDA$", 31, "калда$", 35, "жояла$", 32)
+, "APPDIR$", 26, "ежаялоцг.йат$", 26, "DIR$", 27, "йат$", 27, "KEY$", 28, "йол$", 28, "INKEY$", 29, "емйол$", 29, "LETTER$", 30, "цяалла$", 30, "LAMBDA$", 31, "калда$", 35, "жояла$", 32 _
+, "омола.тлглатос$", 36, "MODULE.NAME$", 36)
 If Not ahashbackup Is Nothing Then
     For i = 0 To UBound(myid()) Step 2
         ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
@@ -3797,14 +3826,14 @@ End Function
 
 Public Function allcommands(aHash As sbHash) As Boolean
 Dim mycommands(), i As Long
-mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "BACK", "BACKGROUND", "BASE", "BEEP", "BITMAPS", "BOLD", "BREAK", "BROWSER", "BUFFER", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURSOR", "CURVE", "DATA", "DB.PROVIDER", "DB.USER" _
+mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "BACK", "BACKGROUND", "BASE", "BEEP", "BINARY", "BITMAPS", "BOLD", "BREAK", "BROWSER", "BUFFER", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURSOR", "CURVE", "DATA", "DB.PROVIDER", "DB.USER" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
 , "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRUCTURE" _
 , "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "адеиасе", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
 , "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "апедысе", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аявеиа", "аявеио", "аявг", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
-, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
+, "бгла", "богхеиа", "цецомос", "целисе", "цемийес", "цемийг", "цемийо", "циа", "цяаллатосеияа", "цяаллг", "цяаье", "цягцояа", "деийтг.лояжг", "деине", "дейаен", "дес", "диабасе", "диацяажг", "диайопг", "диайоптес", "диалесоу", "диаяхяысг", "диаяйеиа", "диастиво", "диажамеиа", "диажамо", "диажуцг", "диейоье", "диояхысе", "дипка", "дипкос", "дойилг", "долг", "дяолеас", "дуадийо", "дысе", "еццяажо", "еийома", "еийомес", "еийомидио" _
 , "еисацыцг", "ейдосг", "ейтекесг", "ейтупысг", "ейтупытгс", "екецвос", "еккгмийа", "емхесг", "емтасг", "емы", "емысе", "енацыцг", "енодос", "епамакабе", "епамекабе", "епекене", "епекене.амтийеилемо", "епекене.цяаллатосеияа", "епекене.ояцамо", "епекене.вяыла", "епицяажг", "епийаияо", "епикене", "епикене.амтийеилемо", "епикене.цяаллатосеияа", "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцг", "епикоцгс" _
 , "епипедо", "епистяожг", "епижамеиа", "еполемо", "етийета.жоялас", "еуяесг", "глеяолгмиа", "гвоцяажгсг", "гвои", "гвос", "хесе", "хесг", "идиотгтес", "исвмг", "ивмос", "йахаяг", "йахаяо", "йахе", "йакесе", "йалпукг", "йаме", "йамомийа", "йат", "йатакоцои", "йатакоцос", "йатастасг", "йатавыягсг", "йеилемо", "йемг", "йимгсг", "йимгсг.п", "йкасг", "йкеиди", "йкеисе", "йомсока", "йяата", "йяатгсе", "йяуье" _
 , "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцос", "лайяус", "ле", "леходос", "лекыдиа", "леяос", "лета", "летахесг", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
@@ -4058,6 +4087,8 @@ Case "GLOBAL", "цемийо", "цемийг", "цемийес"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 35   'Global A, B=6, X
 Case "CONST", "стахеяг", "стахеяес"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 36
+Case "BINARY", "дуадийо"
+    aHash.ItemCreator2 CStr(mycommands(i)), 0, 39  ' REMINDER: 39 LAST GOTO, IN EXECUTE()
 Case Else
     aHash.ItemCreator CStr(mycommands(i)), 0
 End Select
@@ -4090,5 +4121,4 @@ On Error Resume Next
 InternalLeadingSpace = (tm.tmInternalLeading = 0) Or Not (tm.tmInternalLeading > 0)
 End With
 End Function
-
 

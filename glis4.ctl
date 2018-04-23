@@ -68,7 +68,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'m2000 ver 9.3
+'m2000 ver 9.3 rev 1
+' repair undo for continous keystroke
 Option Explicit
 Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
@@ -109,15 +110,15 @@ End Type
 Private ehat$
 Private fast As Boolean
 Private Declare Function GdiFlush Lib "gdi32" () As Long
-Private Declare Function SetWindowRgn Lib "user32" (ByVal hwnd As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
+Private Declare Function SetWindowRgn Lib "user32" (ByVal hWND As Long, ByVal hRgn As Long, ByVal bRedraw As Long) As Long
 Private Declare Function SetBkColor Lib "gdi32" (ByVal hDC As Long, ByVal crColor As Long) As Long
 Private Declare Function CreateHatchBrush Lib "gdi32" (ByVal nIndex As Long, ByVal crColor As Long) As Long
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Private Declare Function DestroyCaret Lib "user32" () As Long
-Private Declare Function CreateCaret Lib "user32" (ByVal hwnd As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
-Private Declare Function ShowCaret Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function CreateCaret Lib "user32" (ByVal hWND As Long, ByVal hBitmap As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long
+Private Declare Function ShowCaret Lib "user32" (ByVal hWND As Long) As Long
 Private Declare Function SetCaretPos Lib "user32" (ByVal x As Long, ByVal y As Long) As Long
-Private Declare Function HideCaret Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function HideCaret Lib "user32" (ByVal hWND As Long) As Long
 Private Declare Function DrawText Lib "user32" Alias "DrawTextW" (ByVal hDC As Long, ByVal lpStr As Long, ByVal nCount As Long, lpRect As RECT, ByVal wFormat As Long) As Long
 Private Declare Function FillRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
 Private Declare Function FrameRect Lib "user32" (ByVal hDC As Long, lpRect As RECT, ByVal hBrush As Long) As Long
@@ -336,7 +337,7 @@ Private Declare Function GetLocaleInfo Lib "KERNEL32" Alias "GetLocaleInfoW" (By
 Private Declare Function GetKeyboardLayout& Lib "user32" (ByVal dwLayout&) ' not NT?
 Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
-Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hwnd As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
+Private Declare Function PeekMessageW Lib "user32" (lpMsg As Msg, ByVal hWND As Long, ByVal wMsgFilterMin As Long, ByVal wMsgFilterMax As Long, ByVal wRemoveMsg As Long) As Long
 Const WM_KEYFIRST = &H100
  Const WM_KEYLAST = &H108
  Private Type POINTAPI
@@ -344,7 +345,7 @@ Const WM_KEYFIRST = &H100
     y As Long
 End Type
  Private Type Msg
-    hwnd As Long
+    hWND As Long
     Message As Long
     wParam As Long
     lParam As Long
@@ -450,8 +451,8 @@ Public Property Let sync(ByVal New_sync As String)
     m_sync = New_sync
     PropertyChanged "sync"
 End Property
-Public Property Get hwnd() As Long
-hwnd = UserControl.hwnd
+Public Property Get hWND() As Long
+hWND = UserControl.hWND
 End Property
 Public Property Let Text(ByVal new_text As String)
 Clear True
@@ -919,11 +920,11 @@ Else
             Else
             kk$ = kk$ + pair$
             End If
-           mSelstart = mSelstart + 1
+          ' mSelstart = mSelstart + 1
            
-           mSelstart = mSelstart - 1
-           Else
-                RaiseEvent RemoveOne(kk$)
+          ' mSelstart = mSelstart - 1
+          ' Else
+           '     RaiseEvent RemoveOne(kk$)
            End If
            RaiseEvent RemoveOne(kk$)
             SelStartEventAlways = SelStart + 1
@@ -1767,7 +1768,7 @@ Public Sub CheckMark()
 End Sub
 
 Private Sub UserControl_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
-'If Not myt = mytPixels * SCRTWIPS Then Stop
+
 If dropkey Then Exit Sub
 If missMouseClick Then missMouseClick = False: Exit Sub
 If Button = 1 Then mLx = CLng(x / scrTwips): mLy = CLng(y / scrTwips): RaiseEvent MouseUp(x / scrTwips, y / scrTwips)
@@ -2638,7 +2639,7 @@ Public Sub Clear(Optional ByVal interface As Boolean = False)
 SELECTEDITEM = -1
 LastSelected = -2
 itemcount = 0
-If hwnd <> 0 Then HideCaret (hwnd)
+If hWND <> 0 Then HideCaret (hWND)
 state = True
 mValue = 0  ' if here you have an error you forget to apply VALUE as default property
 showshapes
@@ -3020,7 +3021,7 @@ nr.Bottom = nr.Top + mytPixels + 1
                                 End If
                 End If
         Else
-        HideCaret (hwnd)
+        HideCaret (hWND)
         End If
     End If
     
@@ -3043,7 +3044,7 @@ Dim YYT As Long, nr As RECT, j As Long, i As Long, skipme As Boolean, fg As Long
 barwidth = UserControlTextWidth("W")
 If listcount = 0 And HeadLine = vbNullString Then
 Repaint
-HideCaret (hwnd)
+HideCaret (hWND)
 Exit Sub
 End If
 If MultiSelect And LeftMarginPixels < mytPixels Then LeftMarginPixels = mytPixels
@@ -3252,7 +3253,7 @@ If SELECTEDITEM > 0 Then
         End If
         Else
 
-        HideCaret (hwnd)
+        HideCaret (hWND)
     End If
 Else
 
@@ -3269,7 +3270,7 @@ End Sub
 
 Property Get lines() As Long
 Dim l As Long
-On Error GoTo ex1
+On Error GoTo EX1
  myt = UserControlTextHeight() + addpixels * scrTwips
 If restrictLines > 0 Then
 l = restrictLines - 1
@@ -3280,7 +3281,7 @@ l = Int((UserControl.ScaleHeight - mHeadlineHeightTwips) / myt) - 1
 End If
 mytPixels = myt / scrTwips
 myt = mytPixels * scrTwips
-ex1:
+EX1:
 If l <= 0 Then
 l = 0
 End If
@@ -3572,11 +3573,11 @@ Dim that As Long
 If CenterText Then that = DT_CENTER
 If VerticalCenterText Then that = that Or DT_VCENTER
 If WrapText Then
-If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
-DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or that
+    If r.Right = 0 Then r.Right = UserControl.Width / scrTwips
+    DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_WORDBREAK Or DT_NOPREFIX Or DT_MODIFYSTRING Or that
 Else
     DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or that
-    End If
+End If
 
 End Sub
 Private Sub CalcRect1(mHdc As Long, c As String, r As RECT)
@@ -4000,7 +4001,6 @@ mpercent = RHS
 PropertyChanged "Percent"
 End Property
 Private Sub UserControl_KeyDown(KeyCode As Integer, shift As Integer)
-
 If KeyCode = 27 And NoEscapeKey Then
 KeyCode = 0
 Exit Sub
@@ -4673,16 +4673,16 @@ End If
 End Property
 Private Sub ShowMyCaretInTwips(x1 As Long, y1 As Long)
 
-If hwnd <> 0 Then
+If hWND <> 0 Then
  With UserControl
  If Not caretCreated Then
 
- CreateCaret hwnd, 0, .ScaleX(1, 1, 3) + 2, .ScaleY(myt, 1, 3) - 2: caretCreated = True
+ CreateCaret hWND, 0, .ScaleX(1, 1, 3) + 2, .ScaleY(myt, 1, 3) - 2: caretCreated = True
  End If
 ' we can set caret pos if we don't have the focus
 
 SetCaretPos .ScaleX(x1, 1, 3), .ScaleY(y1, 1, 3) + 1
-ShowCaret (hwnd)
+ShowCaret (hWND)
 
 
 End With
@@ -4699,7 +4699,7 @@ End Property
 
 Public Property Let EditFlag(ByVal RHS As Boolean)
 mEditFlag = RHS
-If Not RHS Then If hwnd <> 0 Then DestroyCaret: caretCreated = False
+If Not RHS Then If hWND <> 0 Then DestroyCaret: caretCreated = False
 End Property
 Public Sub FillThere(thathDC As Long, thatRect As Long, thatbgcolor As Long, Optional ByVal offsetx As Long = 0)
 Dim a As RECT
@@ -5015,7 +5015,7 @@ Public Sub Curve(Optional t As Boolean = False, Optional factor As Single = 1)
 Dim hRgn As Long
 If Int(25 * factor) > 2 Then
 hRgn = CreateRoundRectRgn(0, 0, WidthPixels, HeightPixels, 25 * factor, 25 * factor)
-SetWindowRgn Me.hwnd, hRgn, t
+SetWindowRgn Me.hWND, hRgn, t
 DeleteObject hRgn
 End If
 End Sub
@@ -5027,6 +5027,9 @@ BlinkON = True <> 0
 mBlinkTime = t
 Timer1.Interval = t
 Timer1.enabled = True
+End Property
+Public Property Get BlinkTime() As Variant
+BlinkTime = mBlinkTime
 End Property
 Sub DestCaret()
  DestroyCaret
@@ -5056,4 +5059,9 @@ End Function
 Public Property Get FontName() As Variant
 FontName = UserControl.Font
 End Property
+Public Sub PaintPicture1(pic As StdPicture, x1 As Long, y1 As Long, width1 As Long, height1 As Long)
+    UserControl.ScaleMode = 3
+    UserControl.PaintPicture pic, x1, y1, width1, height1
+    UserControl.ScaleMode = 1
+End Sub
 

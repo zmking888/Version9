@@ -1,5 +1,20 @@
 Attribute VB_Name = "Module4"
 Option Explicit
+Private Const clOneMask = 16515072          '000000 111111 111111 111111
+Private Const clTwoMask = 258048            '111111 000000 111111 111111
+Private Const clThreeMask = 4032            '111111 111111 000000 111111
+Private Const clFourMask = 63               '111111 111111 111111 000000
+
+Private Const clHighMask = 16711680         '11111111 00000000 00000000
+Private Const clMidMask = 65280             '00000000 11111111 00000000
+Private Const clLowMask = 255               '00000000 00000000 11111111
+
+Private Const cl2Exp18 = 262144             '2 to the 18th power
+Private Const cl2Exp12 = 4096               '2 to the 12th
+Private Const cl2Exp6 = 64                  '2 to the 6th
+Private Const cl2Exp8 = 256                 '2 to the 8th
+Private Const cl2Exp16 = 65536              '2 to the 16th
+
 Public mSysHandlerWasSet
 Public clickMe As Long, clickMe2 As Long
 Public Const FILE_ATTRIBUTE_NORMAL = &H80
@@ -60,7 +75,7 @@ Private Declare Sub CopyMemoryStr Lib "KERNEL32" Alias "RtlMoveMemory" ( _
 
 Private Declare Function SetWindowLong Lib "user32" _
     Alias "SetWindowLongA" _
-   (ByVal hWnd As Long, _
+   (ByVal hWND As Long, _
     ByVal nIndex As Long, _
     ByVal dwNewLong As Long) As Long
 Public Const GWL_STYLE = (-16)
@@ -85,16 +100,16 @@ Private Const EM_EMPTYUNDOBUFFER = &HCD
 Private Const EM_UNDO = WM_USER + 23
 Public defWndProc As Long
 Private Declare Function SetLayeredWindowAttributes Lib "user32" ( _
-                ByVal hWnd As Long, _
+                ByVal hWND As Long, _
                 ByVal crKey As Long, _
                 ByVal bAlpha As Byte, _
                 ByVal dwFlags As Long) As Long
                 
 Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" ( _
-                ByVal hWnd As Long, _
+                ByVal hWND As Long, _
                 ByVal nIndex As Long) As Long
 Private Declare Function SendMessageAsLong Lib "user32" _
-       Alias "SendMessageA" (ByVal hWnd As Long, ByVal wMsg As Long, _
+       Alias "SendMessageA" (ByVal hWND As Long, ByVal wMsg As Long, _
        ByVal wParam As Long, ByVal lParam As Long) As Long
 Private Const SND_APPLICATION = &H80 ' look for application specific association
 Private Const SND_ALIAS = &H10000 ' name is a WIN.INI [sounds] entry
@@ -115,7 +130,7 @@ Declare Function GetShortPathName Lib "KERNEL32" Alias _
 ByVal lpszShortPath As Long, ByVal cchBuffer As Long) As Long
 
 Private Type SHFILEOPSTRUCT
-    hWnd As Long
+    hWND As Long
     wFunc As Long
     pFrom As String
     pTo As String
@@ -126,7 +141,7 @@ Private Type SHFILEOPSTRUCT
 End Type
 
 Private Type SHFILEOPSTRUCTW
-    hWnd As Long
+    hWND As Long
     wFunc As Long
     pFrom As Long 'String
     pTo As Long 'String
@@ -163,6 +178,49 @@ End Enum
    
    
 Private Declare Function CreateDirectory Lib "KERNEL32" Alias "CreateDirectoryW" (ByVal lpszPath As Long, ByVal lpSA As Long) As Long
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+    lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
+Private EncbTrans(63) As Byte, EnclPowers8(255) As Long, EnclPowers16(255) As Long
+Dim lPowers18(63) As Long, bTrans(255) As Byte, lPowers6(63) As Long, lPowers12(63) As Long
+    
+Public Sub SetUp64()
+    Dim lTemp As Long
+    For lTemp = 0 To 63                                 'Fill the translation table.
+        Select Case lTemp
+            Case 0 To 25
+                EncbTrans(lTemp) = 65 + lTemp              'A - Z
+            Case 26 To 51
+                EncbTrans(lTemp) = 71 + lTemp              'a - z
+            Case 52 To 61
+                EncbTrans(lTemp) = lTemp - 4               '1 - 0
+            Case 62
+                EncbTrans(lTemp) = 43                      'Chr(43) = "+"
+            Case 63
+                EncbTrans(lTemp) = 47                      'Chr(47) = "/"
+        End Select
+         lPowers6(lTemp) = lTemp * cl2Exp6
+        lPowers12(lTemp) = lTemp * cl2Exp12
+        lPowers18(lTemp) = lTemp * cl2Exp18
+    Next lTemp
+    For lTemp = 0 To 255                                'Fill the translation table.
+        Select Case lTemp
+            Case 65 To 90
+                bTrans(lTemp) = lTemp - 65              'A - Z
+            Case 97 To 122
+                bTrans(lTemp) = lTemp - 71              'a - z
+            Case 48 To 57
+                bTrans(lTemp) = lTemp + 4               '1 - 0
+            Case 43
+                bTrans(lTemp) = 62                      'Chr(43) = "+"
+            Case 47
+                bTrans(lTemp) = 63                      'Chr(47) = "/"
+        End Select
+        EnclPowers8(lTemp) = lTemp * cl2Exp8
+        EnclPowers16(lTemp) = lTemp * cl2Exp16
+    Next lTemp
+
+End Sub
+
    
 Public Function PathMakeDirs(ByVal Pathd As String) As Boolean
         Pathd = PurifyPath(Pathd)
@@ -218,7 +276,7 @@ End If
 End If
 End Sub
 Public Function RenameFile(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
-Dim f$, fd$, flag As Long
+Dim F$, fd$, flag As Long
 If Not CanKillFile(sSourceFile) Then Exit Function
 If ExtractType(sSourceFile) = vbNullString Then sSourceFile = sSourceFile + ".gsb"
 If ExtractType(sDesFile) = vbNullString Then
@@ -236,9 +294,9 @@ Else
 sDesFile = ExtractPath(sSourceFile) + ExtractName(sDesFile)
 End If
 If Left$(sSourceFile, 2) <> "\\" Then
-f$ = "\\?\" + sSourceFile
+F$ = "\\?\" + sSourceFile
 Else
-f$ = sSourceFile
+F$ = sSourceFile
 End If
 If Left$(sDesFile, 2) <> "\\" Then
 fd$ = "\\?\" + sDesFile
@@ -246,7 +304,7 @@ Else
 fd$ = sDesFile
 End If
 flag = 1
-RenameFile = 0 <> MoveFile(StrPtr(f$), StrPtr(fd$))
+RenameFile = 0 <> MoveFile(StrPtr(F$), StrPtr(fd$))
 
 End Function
 
@@ -274,11 +332,11 @@ End If
 End Function
 Public Function MakeACopy(ByVal sSourceFile As String, ByVal sDesFile As String) As Boolean
 If Not CanKillFile(sSourceFile) Then Exit Function
-Dim f$, fd$, flag As Long
+Dim F$, fd$, flag As Long
 If Left$(sSourceFile, 2) <> "\\" Then
-f$ = "\\?\" + sSourceFile
+F$ = "\\?\" + sSourceFile
 Else
-f$ = sSourceFile
+F$ = sSourceFile
 End If
 If Left$(sDesFile, 2) <> "\\" Then
 fd$ = "\\?\" + sDesFile
@@ -287,29 +345,29 @@ fd$ = sDesFile
 End If
 
 
-MakeACopy = 0 <> CopyFile(StrPtr(f$), StrPtr(fd$), flag)
+MakeACopy = 0 <> CopyFile(StrPtr(F$), StrPtr(fd$), flag)
 End Function
 
 Public Function NeoUnicodeFile(FileName$) As Boolean
 Dim hFile, counter
-Dim f$, F1$
+Dim F$, F1$
 Sleep 10
 If Not CanKillFile(FileName$) Then Exit Function
 If Left$(FileName$, 2) <> "\\" Then
-f$ = "\\?\" + FileName$
+F$ = "\\?\" + FileName$
 Else
-f$ = FileName$
+F$ = FileName$
 End If
 On Error Resume Next
-F1$ = Dir(f$)  '' THIS IS THEWORKAROUND FOR THE PROBLEMATIC CREATIFILE (I GOT SOME HANGS)
+F1$ = Dir(F$)  '' THIS IS THEWORKAROUND FOR THE PROBLEMATIC CREATIFILE (I GOT SOME HANGS)
 
-hFile = CreateFile(StrPtr(f$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
+hFile = CreateFile(StrPtr(F$), GENERIC_WRITE, ByVal 0, ByVal 0, 2, FILE_ATTRIBUTE_NORMAL, ByVal 0)
 FlushFileBuffers hFile
 Sleep 10
 
 CloseHandle hFile
 
-NeoUnicodeFile = (CFname(GetDosPath(f$)) <> "")
+NeoUnicodeFile = (CFname(GetDosPath(F$)) <> "")
 
 Sleep 10
 
@@ -336,14 +394,14 @@ Dim PathLength As Long
 
 End Function
 
-Sub PlaySoundNew(f As String)
+Sub PlaySoundNew(F As String)
 
-If f = vbNullString Then
+If F = vbNullString Then
 PlaySound 0&, 0&, SND_PURGE
 Else
-If ExtractType(f) = vbNullString Then f = f & ".WAV"
-f = CFname(f)
-PlaySound StrPtr(f), ByVal 0&, SND_FILENAME Or SND_ASYNC
+If ExtractType(F) = vbNullString Then F = F & ".WAV"
+F = CFname(F)
+PlaySound StrPtr(F), ByVal 0&, SND_FILENAME Or SND_ASYNC
 End If
 End Sub
 
@@ -351,12 +409,12 @@ End Sub
        
 Public Sub SetTrans(oForm As Form, Optional bytAlpha As Byte = 255, Optional lColor As Long = 0, Optional TRMODE As Boolean = False)
     Dim lStyle As Long
-    lStyle = GetWindowLong(oForm.hWnd, GWL_EXSTYLE)
+    lStyle = GetWindowLong(oForm.hWND, GWL_EXSTYLE)
     If Not (lStyle And WS_EX_LAYERED) = WS_EX_LAYERED Then _
-        SetWindowLong oForm.hWnd, GWL_EXSTYLE, lStyle Or WS_EX_LAYERED
+        SetWindowLong oForm.hWND, GWL_EXSTYLE, lStyle Or WS_EX_LAYERED
        
-    SetLayeredWindowAttributes oForm.hWnd, lColor, bytAlpha, IIf(TRMODE, LWA_COLORKEY Or LWA_Defaut, LWA_Defaut)
-    UpdateWindow oForm.hWnd
+    SetLayeredWindowAttributes oForm.hWND, lColor, bytAlpha, IIf(TRMODE, LWA_COLORKEY Or LWA_Defaut, LWA_Defaut)
+    UpdateWindow oForm.hWND
 End Sub
 
 
@@ -411,7 +469,7 @@ Else
     Sleep 1
     Set a = New Document
     
-    a.LCID = cLid
+    a.lcid = cLid
     a.ReadUnicodeOrANSI afile$, , what
     If InStr(simple$, vbCr) > 0 Then
     'work with any char but using computer locale
@@ -430,3 +488,354 @@ Else
 End If
 inc1:
 End Function
+
+' from VbForoums after corrections by me.
+' http://www.vbforums.com/showthread.php?379072-VB-Fast-Base64-Encoding-and-Decoding
+Public Function Decode64(sString As String, ok As Boolean) As String
+    ok = True
+    If Len(sString) = 0 Then Exit Function
+    Dim bOut() As Byte, bIn() As Byte, lQuad As Long, iPad As Integer, lChar As Long, lPos As Long, sOut As String
+    Dim lTemp As Long
+
+    bIn = StrConv(sString, vbFromUnicode)              'Load the input byte array.
+    ReDim bOut((((UBound(bIn) + 1) \ 4) * 3) - 1 + 4)     'Prepare the output buffer.
+    lChar = 0
+    Dim lChar2 As Long, lChar3 As Long, lChar4 As Long, lchar1 As Long
+    Dim ubnd As Long
+    ubnd = UBound(bIn)
+    lChar3 = lChar - 1
+    Do
+        ' take 4
+        
+        lChar = lChar3 + 1
+        If lChar >= ubnd Then lChar3 = lChar: GoTo finish
+        ok = False
+        Do
+        Select Case bIn(lChar)
+            Case 65 To 90, 97 To 122, 48 To 57, 43, 47
+            Exit Do
+            Case 61
+            lChar3 = lChar: GoTo finish
+            Exit Do
+            Case 10, 13, 32
+            lChar = lChar + 1
+            If lChar > ubnd Then lChar3 = lChar: GoTo finish
+            Case Else
+            
+            lChar = lChar + 1
+            lChar3 = lChar: GoTo finish
+            GoTo finish
+        End Select
+        Loop
+        lchar1 = lChar + 1
+        If lchar1 > ubnd Then lChar3 = lchar1: GoTo finish
+        Do
+        Select Case bIn(lchar1)
+            Case 65 To 90, 97 To 122, 48 To 57, 43, 47
+            Exit Do
+            Case 61
+            lChar3 = lchar1: GoTo finish
+            Case 10, 13, 32
+            lchar1 = lchar1 + 1
+            If lchar1 > ubnd Then lChar3 = lchar1: GoTo finish
+            Case Else
+            lchar1 = lchar1 + 1
+            lChar3 = lchar1: GoTo finish
+        End Select
+        Loop
+        lChar2 = lchar1 + 1
+        If lChar2 > ubnd Then lChar3 = lChar2: GoTo finish
+        Do
+        Select Case bIn(lChar2)
+            Case 65 To 90, 97 To 122, 48 To 57, 43, 47
+            Exit Do
+            Case 61
+           lChar3 = lChar2: GoTo finish
+            Exit Do
+            Case 10, 13, 32
+            lChar2 = lChar2 + 1
+            If lChar2 > ubnd Then lChar3 = lChar2: GoTo finish
+            Case Else
+            lChar2 = lChar2 + 1
+            'If lChar2 > ubnd Then
+            lChar3 = lChar2: GoTo finish
+            'GoTo finish
+        End Select
+        Loop
+        lChar3 = lChar2 + 1
+        If lChar3 > ubnd Then GoTo finish
+        Do
+        Select Case bIn(lChar3)
+            Case 65 To 90, 97 To 122, 48 To 57, 43, 47
+            Exit Do
+            Case 61
+            GoTo finish
+            Case 10, 13, 32
+            lChar3 = lChar3 + 1
+            If lChar3 > ubnd Then GoTo finish
+            Case Else
+            lChar3 = lChar3 + 1
+            If lChar3 > ubnd Then GoTo finish
+            GoTo finish
+        End Select
+        Loop
+        ok = True
+        lQuad = lPowers18(bTrans(bIn(lChar))) + lPowers12(bTrans(bIn(lchar1))) + _
+                lPowers6(bTrans(bIn(lChar2))) + bTrans(bIn(lChar3))           'Rebuild the bits.
+        lTemp = lQuad And clHighMask                    'Mask for the first byte
+        bOut(lPos) = lTemp \ cl2Exp16                   'Shift it down
+        lTemp = lQuad And clMidMask                     'Mask for the second byte
+        bOut(lPos + 1) = lTemp \ cl2Exp8                'Shift it down
+        bOut(lPos + 2) = lQuad And clLowMask            'Mask for the third byte
+        lPos = lPos + 3
+    Loop
+finish:
+    If Not ok Then
+    iPad = 0
+    
+    Dim offset As Long
+        Do While lChar3 + offset <= ubnd
+        Select Case bIn(lChar3 + offset)
+            Case 10, 13, 32
+            If iPad > 0 Then offset = 0: Exit Do
+            offset = offset + 1
+            
+            Case 61
+            iPad = iPad + 1
+            offset = offset + 1
+            Case Else
+             If lChar2 = 0 Then GoTo error1
+                
+              If iPad = 0 Then
+                  iPad = Int(-(lChar3 = lChar2) - (lChar3 = lchar1) - (lChar3 = lChar)) * 3
+              Else
+                If lChar3 <> lChar2 + 1 And iPad = 1 Then
+                   iPad = Int(-(lChar3 = lChar2) - (lChar3 = lchar1) - (lChar3 = lChar)) * 3
+                
+                End If
+              End If
+            
+             offset = 0
+            
+            Exit Do
+         
+        End Select
+        Loop
+        If iPad > 3 Then GoTo error1
+        If iPad = 0 Then
+            If (lPos + 2) Mod 3 + 1 <> 3 Then
+                GoTo error1
+            End If
+        Else
+            If (lPos + 3 - iPad) Mod 3 + iPad <> 3 Then
+                GoTo error1
+            End If
+        End If
+ 
+        ok = True
+        If lChar3 > ubnd Then GoTo cont1
+        If lChar = lChar3 Then
+        lChar = lChar + 1: lChar3 = lChar3 + 1
+        lchar1 = lChar3
+        lChar2 = lChar3
+        End If
+        If lchar1 = lChar3 Then
+        lchar1 = lchar1 + 1: lChar3 = lChar3 + 1
+        lChar2 = lChar3
+        End If
+        If lChar2 = lChar3 Then
+        lChar2 = lChar2 + 1: lChar3 = lChar3 + 1
+        End If
+        If lChar3 <= ubnd Then
+        lQuad = lPowers18(bTrans(bIn(lChar))) + lPowers12(bTrans(bIn(lchar1))) + _
+        lPowers6(bTrans(bIn(lChar2))) + bTrans(bIn(lChar3))           'Rebuild the bits.
+        lTemp = lQuad And clHighMask                    'Mask for the first byte
+        bOut(lPos) = lTemp \ cl2Exp16                   'Shift it down
+        lTemp = lQuad And clMidMask                     'Mask for the second byte
+        bOut(lPos + 1) = lTemp \ cl2Exp8                'Shift it down
+        bOut(lPos + 2) = lQuad And clLowMask
+        lPos = lPos + 3 - iPad
+        End If
+        
+        GoTo cont1
+error1:
+            Exit Function
+    End If
+cont1:
+If lPos Mod 2 = 1 Then
+    sOut = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
+Else
+    sOut = String$((lPos + 1) \ 2, Chr(0))
+    End If
+    CopyMemory ByVal StrPtr(sOut), bOut(0), LenB(sOut)
+    Decode64 = sOut
+End Function
+
+
+Public Function Encode64(sString As String, Optional compact As Boolean = False, Optional ByVal leftmargin As Long = 0) As String
+
+    Dim bOut() As Byte, bIn() As Byte
+    Dim lChar As Long, lTrip As Long, iPad As Integer, lLen As Long, lTemp As Long, lPos As Long, lOutSize As Long
+    
+        If LenB(sString) = 0 Then Exit Function
+    iPad = (3 - LenB(sString) Mod 3) Mod 3                          'See if the length is divisible by 3
+    ReDim bIn(0 To LenB(sString) - 1 + iPad)
+    CopyMemory bIn(0), ByVal StrPtr(sString), LenB(sString)
+    lLen = ((UBound(bIn) + 1) \ 3) * 4                  'Length of resulting string.
+    ' set to 60 wchar for each line break
+    lTemp = lLen \ 60                                   'Added space for vbCrLfs.
+    lOutSize = ((lTemp * 2) + leftmargin * (lTemp + 1) + lLen) - 1        'Calculate the size of the output buffer.
+    ReDim bOut(lOutSize)                                'Make the output buffer.
+    
+    lLen = 0                                            'Reusing this one, so reset it.
+    Dim insertspace As Boolean
+    If leftmargin > 0 Then insertspace = True
+    For lChar = LBound(bIn) To UBound(bIn) - 2 Step 3
+        If insertspace Then
+        If leftmargin > 0 Then
+            For lPos = lPos To lPos + leftmargin - 1
+                bOut(lPos) = 32
+            Next lPos
+        End If
+        insertspace = False
+        End If
+        lTrip = EnclPowers16(bIn(lChar)) + EnclPowers8(bIn(lChar + 1)) + bIn(lChar + 2)    'Combine the 3 bytes
+        lTemp = lTrip And clOneMask                     'Mask for the first 6 bits
+        bOut(lPos) = EncbTrans(lTemp \ cl2Exp18)           'Shift it down to the low 6 bits and get the value
+        lTemp = lTrip And clTwoMask                     'Mask for the second set.
+        bOut(lPos + 1) = EncbTrans(lTemp \ cl2Exp12)       'Shift it down and translate.
+        lTemp = lTrip And clThreeMask                   'Mask for the third set.
+        bOut(lPos + 2) = EncbTrans(lTemp \ cl2Exp6)        'Shift it down and translate.
+        bOut(lPos + 3) = EncbTrans(lTrip And clFourMask)   'Mask for the low set.
+        If lLen = 60 And Not compact Then                               'Ready for a newline
+            bOut(lPos + 4) = 13                         'Chr(13) = vbCr
+            bOut(lPos + 5) = 10                         'Chr(10) = vbLf
+            lLen = 0                                    'Reset the counter
+            lPos = lPos + 6
+            insertspace = True
+        Else
+            lLen = lLen + 4
+            lPos = lPos + 4
+        End If
+    Next lChar
+    ReDim Preserve bOut(lPos - 1)
+    lOutSize = lPos - 1
+    If bOut(lOutSize) = 10 Then lOutSize = lOutSize - 2 'Shift the padding chars down if it ends with CrLf.
+    
+    
+    If iPad = 1 Then                                    'Add the padding chars if any.
+        bOut(lOutSize) = 61                             'Chr(61) = "="
+    ElseIf iPad = 2 Then
+        bOut(lOutSize) = 61
+        bOut(lOutSize - 1) = 61
+    End If
+    
+    Encode64 = StrConv(bOut, vbUnicode)                 'Convert back to a string and return it.
+    
+End Function
+
+'
+Public Function FileToEncode64(F$, leftmargin As Long) As String
+Dim i As Long, fl As Long
+
+fl = FileLen(GetDosPath(F$))
+If fl = 0 Then Exit Function
+    i = FreeFile
+    Open GetDosPath(F$) For Binary Access Read As i
+    Dim bOut() As Byte, bIn() As Byte
+    Dim lChar As Long, lTrip As Long, iPad As Integer, lLen As Long, lTemp As Long, lPos As Long, lOutSize As Long
+    iPad = (3 - FileLen(GetDosPath(F$)) Mod 3) Mod 3                          'See if the length is divisible by 3
+    ReDim bIn(0 To fl - 1)
+    Get #i, , bIn()
+    Close i
+    ReDim Preserve bIn(0 To fl - 1 + iPad)
+    lLen = ((UBound(bIn) + 1) \ 3) * 4                  'Length of resulting string.
+    ' set to 60 wchar for each line break
+    lTemp = lLen \ 60                                   'Added space for vbCrLfs.
+    lOutSize = ((lTemp * 2) + leftmargin * (lTemp + 1) + lLen) - 1        'Calculate the size of the output buffer.
+    ReDim bOut(lOutSize)                                'Make the output buffer.
+    
+    lLen = 0                                            'Reusing this one, so reset it.
+    Dim insertspace As Boolean
+    If leftmargin > 0 Then insertspace = True
+    For lChar = 0 To fl - 2 + iPad Step 3
+        If insertspace Then
+        If leftmargin > 0 Then
+            For lPos = lPos To lPos + leftmargin - 1
+                bOut(lPos) = 32
+            Next lPos
+          '  lLen = lLen + LeftMargin
+        End If
+        insertspace = False
+        End If
+        lTrip = EnclPowers16(bIn(lChar)) + EnclPowers8(bIn(lChar + 1)) + bIn(lChar + 2)    'Combine the 3 bytes
+        lTemp = lTrip And clOneMask                     'Mask for the first 6 bits
+        bOut(lPos) = EncbTrans(lTemp \ cl2Exp18)           'Shift it down to the low 6 bits and get the value
+        lTemp = lTrip And clTwoMask                     'Mask for the second set.
+        bOut(lPos + 1) = EncbTrans(lTemp \ cl2Exp12)       'Shift it down and translate.
+        lTemp = lTrip And clThreeMask                   'Mask for the third set.
+        bOut(lPos + 2) = EncbTrans(lTemp \ cl2Exp6)        'Shift it down and translate.
+        bOut(lPos + 3) = EncbTrans(lTrip And clFourMask)   'Mask for the low set.
+        If lLen = 60 Then                               'Ready for a newline
+            bOut(lPos + 4) = 13                         'Chr(13) = vbCr
+            bOut(lPos + 5) = 10                         'Chr(10) = vbLf
+            lLen = 0                                    'Reset the counter
+            lPos = lPos + 6
+            insertspace = True
+        Else
+            lLen = lLen + 4
+            lPos = lPos + 4
+        End If
+    Next lChar
+    ReDim Preserve bOut(lPos - 1)
+    lOutSize = lPos - 1
+    If bOut(lOutSize) = 10 Then lOutSize = lOutSize - 2 'Shift the padding chars down if it ends with CrLf.
+    
+    
+    If iPad = 1 Then                                    'Add the padding chars if any.
+        bOut(lOutSize) = 61                             'Chr(61) = "="
+    ElseIf iPad = 2 Then
+        bOut(lOutSize) = 61
+        bOut(lOutSize - 1) = 61
+    End If
+    
+    FileToEncode64 = StrConv(bOut, vbUnicode)
+
+
+
+End Function
+
+
+
+Public Sub ShowForm1()
+On Error Resume Next
+If Form1.Visible Then
+If Screen.ActiveForm Is Form1 Then
+Form1.Show , Form5
+Else
+Form1.Show , Form5
+Form1.SetFocus
+End If
+End If
+If UseMe Is Nothing Then Exit Sub
+UseMe.StopTimer2
+End Sub
+
+' TASK MASTER TIMING ROUTINE
+Public Sub RunMe()
+Dim Cancel As Integer
+Static once
+If once Then Exit Sub
+once = True
+UseMe.StopTimer
+backhere:
+UseMe.CliRun
+If UseMe Is Nothing Then Exit Sub
+UseMe.Shutdown Cancel
+If Cancel Then GoTo backhere
+Set UseMe = Nothing
+once = False
+End Sub
+
+
+

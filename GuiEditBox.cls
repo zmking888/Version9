@@ -134,7 +134,7 @@ Private Const DWL_ANYTHREAD& = 0
 Const LOCALE_ILANGUAGE = 1
     ' for Gui purposes
 Private s$
-Public CtrlName As String
+Public ctrlName As String
 Private mesCtrlName As String
 Dim mIndex As Long, mStayOpen As Boolean
 Dim Callback As GuiM2000
@@ -149,22 +149,22 @@ Public Sub Construct(there As Form, name$)
  mIndex = -1
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 Public Sub ConstructArray(there As Form, name$, i As Long)
  Set Callback = there
  On Error Resume Next
- CtrlName = GetTag$
- Set glistN = there.Controls.Add("m2000.glist", CtrlName)
+ ctrlName = GetTag$
+ Set glistN = there.Controls.Add("m2000.glist", ctrlName)
  mIndex = i
  there.AddGuiControl Me
  glistN.Dynamic
- there.Controls(CtrlName).TabStop = True
+ there.Controls(ctrlName).TabStop = True
  mesCtrlName = name$
 End Sub
 
@@ -201,7 +201,7 @@ mNoColor = True
 mNoColor1 = True
 FileName = vbNullString
 glistN.DragEnabled = False
-.BackColor = rgb(200, 120, 60)
+.backcolor = rgb(200, 120, 60)
 Set .Font = ff
 .ForeColor = white
 .dcolor = Callback.Controls(1).dcolor
@@ -508,13 +508,13 @@ glistN.NoCaretShow = NoMark
 
 mNoColor = mNoColor1
 glistN.ForeColor = black
-glistN.BackColor = white
+glistN.backcolor = white
 
 Else
 mNoColor = True
 glistN.NoCaretShow = False Or NoMark
 glistN.ForeColor = white
-glistN.BackColor = dimm1
+glistN.backcolor = dimm1
 End If
 glistN.ShowMe
 Else
@@ -547,7 +547,7 @@ glistN.HideCaretOnexit = True
 glistN.ForeColor = white
 If glistN.BackStyle <> 1 Then
 
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 End If
 glistN.PanPos = 0: glistN.PrepareToShow
 
@@ -558,6 +558,7 @@ End If
 Else
 
 End If
+
 'RaiseEvent LostFocus
 End Sub
 
@@ -626,9 +627,9 @@ End Sub
 Private Sub glistN_OutPopUp(x As Single, y As Single, myButton As Integer)
 '
 If mIndex >= 0 Then
-   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+   Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
    Else
-      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(CtrlName).Left) + "," + Str(y + Callback.Controls(CtrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
+      Callback.Callback mesCtrlName + ".PopUp(" + Str(x + Callback.Controls(ctrlName).Left) + "," + Str(y + Callback.Controls(ctrlName).Top) + "," + Str(myButton) + "," + Str(glistN.ListIndex + 1) + ")"
       End If
 End Sub
 
@@ -1955,6 +1956,7 @@ If Err.Number > 0 Then this.NoWheel = True
 End Sub
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
+Callback.LastActive = ctrlName
 Set LastGlist = Nothing
 If Err.Number > 0 Then glistN.NoWheel = True
 End Sub
@@ -1975,7 +1977,6 @@ Private Sub mDoc_BreakLine(data As String, datanext As String)
     data = vbNullString
  Else
     If showparagraph Then
-   ' If InStr(data, ChrW(&HB7)) > 0 Then Stop
          data1 = Replace(Replace(data, " ", ChrW(&HB7)), ChrW(&H2007), ChrW(&H2423))
         
         glistN.BreakLine data1, datanext1, , ChrW(&HB7)
@@ -2994,9 +2995,6 @@ glistN.NoScroll = Not mNoWrap
     
     HorSrcoll 0
     Render
-    Else
-   '' Stop
-    
     End If
 End If
 End Property
@@ -3214,15 +3212,15 @@ End Property
 Public Property Set Font(New_Font As Font)
     Set glistN.Font = New_Font
 End Property
-Public Property Let BackColor(ByVal RHS As OLE_COLOR)
+Public Property Let backcolor(ByVal RHS As OLE_COLOR)
 
     
-glistN.BackColor = RHS
+glistN.backcolor = RHS
   
     
 End Property
-Public Property Get BackColor() As OLE_COLOR
-    BackColor = glistN.BackColor
+Public Property Get backcolor() As OLE_COLOR
+    backcolor = glistN.backcolor
 End Property
 Public Property Get ForeColor() As OLE_COLOR
     ForeColor = glistN.ForeColor
@@ -3235,18 +3233,18 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 End Property
 
 Public Property Get Top() As Long
-Top = Callback.Controls(CtrlName).Top
+Top = Callback.Controls(ctrlName).Top
 End Property
 
 Public Property Let Top(ByVal RHS As Long)
-Callback.Controls(CtrlName).Top = RHS
+Callback.Controls(ctrlName).Top = RHS
 End Property
 Public Property Get Left() As Variant
-Left = Callback.Controls(CtrlName).Left
+Left = Callback.Controls(ctrlName).Left
 End Property
 
 Public Property Let Left(ByVal RHS As Variant)
-Callback.Controls(CtrlName).Left = RHS
+Callback.Controls(ctrlName).Left = RHS
 End Property
 Public Property Get Height() As Long
 Height = glistN.HeightTwips
@@ -4622,7 +4620,7 @@ Else ' goto that paragraph
 End If
 End Sub
 Private Sub SetME()
-If (600 - hueconv(BackColor)) Mod 360 > 30 And lightconv(BackColor) >= 128 Then ColorSet = 1 Else ColorSet = 0
+If (600 - hueconv(backcolor)) Mod 360 > 30 And lightconv(backcolor) >= 128 Then ColorSet = 1 Else ColorSet = 0
 Select Case fState
 Case 0
 shortlang = False
@@ -4679,8 +4677,8 @@ Form1supEnabled = i > 0 And SelStart > SelLength
 Form1mscatEnabled = Form1sdnEnabled Or Form1supEnabled
 Form1rthisEnabled = Form1mscatEnabled
 
-oldModalId = ModalId
-ModalId = Rnd * 113314324
+oldModalId = Modalid
+Modalid = Rnd * 113314324
 'UnHook Callback.hWnd
 MyPopUp.feedlabels Me, False
 MyPopUp.UpGui Callback, x, y, poptitle$
@@ -4695,7 +4693,7 @@ End If
                 '     mywait basestack1, 1
                 If ExTarget Then Exit Do
                 Loop
-                ModalId = oldModalId
+                Modalid = oldModalId
          '  Hook Callback.hWnd, Nothing
 End Sub
 
@@ -4787,13 +4785,13 @@ Public Property Let ShowAlways(ByVal vNewValue As Variant)
 mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = black 'rgb(0, 0, 0)
-glistN.BackColor = white ' rgb(255, 255, 255)
+glistN.backcolor = white ' rgb(255, 255, 255)
 End If
 End Property
 
 Sub GetFocus()
 On Error Resume Next
-Callback.Controls(CtrlName).SetFocus
+Callback.Controls(ctrlName).SetFocus
 End Sub
 Sub ReColor()
 On Error GoTo end1
@@ -4875,11 +4873,11 @@ End Sub
 Public Sub Retired()
 If mStayOpen Then
 glistN.ForeColor = black
-glistN.BackColor = white
+glistN.backcolor = white
 glistN.NoCaretShow = False
 Else
 glistN.ForeColor = white
-glistN.BackColor = dimm2
+glistN.backcolor = dimm2
 glistN.NoCaretShow = True
 End If
  glistN.PanPos = 0: glistN.ShowMe
@@ -4932,4 +4930,8 @@ Else
     Else
     Text = vbNullString
     End If
+End Property
+Public Property Let Default(RHS)
+On Error Resume Next
+If CBool(RHS) Then Callback.Default = ctrlName
 End Property
