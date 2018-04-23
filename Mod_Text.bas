@@ -31957,7 +31957,7 @@ cont1:
         If IsStrExp(bstack, rest$, w$) Then
             If Not CanKillFile(w$) Then FilePathNotForUser:  Exit Function
             Set photo = New cDIBSection
-            If Not ihavepic Or aPic Is Nothing Then
+            If Not ihavepic And Not aPic Is Nothing Then
                  MyEr "No found Image in String or Buffer", "Δεν βρήκα εικόνα σε αλφαριθμητικό ή σε διάρθρωση μνήμης"
                  ProcImage = False
                  Exit Function
