@@ -3,10 +3,10 @@ Attribute VB_Name = "Module1"
 ' Some code are work of others, and included using info when possible.
 ' Licensed under the GNU GENERAL PUBLIC LICENSE,  Version 3, 29 June 2007
 ' Before loading the code in VB6 IDE, change editor's text to a Greek font.
+' Also to run greek commands from IDE you have to turn support for Non Unicode Programs to Greek Language
 ' Local References: File idispatch.tlb
-' You have to run it, and then you have to execute M2000.exe to call it, using in a second IDE the mexe.vbp, or just run M2000.exe
-
-
+' First run this, and then you have to execute M2000.exe to call it, using a second IDE with the mexe.vbp, or just run M2000.exe
+' In 9.3 rev >2 Asc() and Chr$() in M2000 use Locale. In previous versions these functions works for greek ascii.
 
 Option Explicit
 Global OsInfo As New clsOSInfo
@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 1
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2909,7 +2909,7 @@ PopStage bstack
 Exit Sub
 End If
 End If
-If ok Then Set bstack.lastobj = CopyGroupObj(var(where))
+If ok Then Set bstack.lastobj = CopyGroupObj(var(where)) Else Set bstack.lastobj = Nothing
 bstack.DropNdot 2
 PopStage bstack
 End Sub
@@ -3021,10 +3021,20 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
             Exit Function
         End If
         ' check for iamglobal ??
+If safegroup.LastOpen <> vbNullString Then
+        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
+        w$ = safegroup.LastOpen
+        Set safegroup = safegroup.Link
+            GoTo cont3030
+        Else
+        safegroup.LastOpen = vbNullString
+        End If
+        End If
         y1 = globalvar(w$, 0#, , True, here$ = vbNullString)
           Set safegroup = safegroup.Link
         UnFloatGroup bstack, w$, y1, safegroup, , True
         globalvar w$, y1, True, True
+cont3030:
         Else
          y1 = globalvar(w$, 0#, , here$ = vbNullString)
         If Not safegroup.IamFloatGroup Then
@@ -3097,11 +3107,20 @@ ElseIf Prefix = "VAL$" Then
             Exit Function
         End If
     ' check for iamglobal ??
+            If safegroup.LastOpen <> vbNullString Then
+        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
+        w$ = safegroup.LastOpen
+            GoTo cont5050
+        Else
+        safegroup.LastOpen = vbNullString
+        End If
+        End If
         y1 = globalvar(w$, 0#, , True, here$ = vbNullString)
         Set safegroup = safegroup.Link
         UnFloatGroup bstack, w$, y1, safegroup, , True
         var(y1).FloatGroupName = w$
         globalvar w$, y1, True, True
+cont5050:
     Else
         y1 = globalvar(w$, 0#, , here$ = vbNullString)
         If Not safegroup.IamFloatGroup Then
@@ -3117,6 +3136,7 @@ ElseIf Prefix = "VAL$" Then
     If safegroup Is Nothing Then GoTo fastexit
     If Left$(b$, 1) = "." Then
         b$ = w$ + b$
+        Set bstack.lastpointer = Nothing
         If IsStrExp(bstack, b$, bb$) Then GoTo conthere
     ElseIf var(y1).HasValue Then
         If var(y1).HasParameters Then
@@ -3126,9 +3146,11 @@ ElseIf Prefix = "VAL$" Then
                 Else
                     b$ = w$ + "$(" + b$
                 End If
+                 Set bstack.lastpointer = Nothing
                 If IsStrExp(bstack, b$, bb$) Then GoTo conthere
             ElseIf FastSymbol(b$, ")(", , 2) Then
                 b$ = w$ + "(" + b$
+                 Set bstack.lastpointer = Nothing
                 If IsStrExp(bstack, b$, bb$) Then GoTo conthere
             Else
                 ec$ = w$ + "(" + BlockParam(b$) + ")"
@@ -3234,15 +3256,16 @@ RetStackSize = bstack.RetStackTotal
         If TypeOf var(y1) Is Group Then
                 If var(y1).IamApointer Then
                 If var(y1).Link.IamFloatGroup Then
-                
+     ' 1
                 Set pppp = BoxGroupVar(var(y1).Link)
-                
+                Set pppp.refgroup = var(y1)
+                pppp.refgroup.LastOpen = pppp.CodeName + "0"
                 'w$ = ""
                 v = 0
                 GoTo CONT104010
                 Else
                 bstack.MoveNameDot var(y1).lasthere + "." + var(y1).GroupName
-                
+                v = -1
                 End If
                 Else
             bstack.MoveNameDot w$
@@ -3268,14 +3291,10 @@ RetStackSize = bstack.RetStackTotal
     Else
 CONT104010:
         If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr(Abs(v))
+        
         Set dd = New Group
-        If GetVar(bstack, w$, y1) Then
-                 
-        GoTo mer123
+       
         
-        
-        End If
-         y1 = globalvar(w$, dd)
          
          If Not MyIsObject(pppp.item(v)) Then
             GoTo fastexit
@@ -3284,22 +3303,29 @@ CONT104010:
         Set safegroup = pppp.item(v)
         If safegroup Is Nothing Then GoTo fastexit
         If safegroup.IamApointer Then
-
                 If safegroup.Link.IamFloatGroup Then
                 Set pppp = BoxGroupVar(safegroup.Link)
+                Set pppp.refgroup = safegroup
+                safegroup.LastOpen = w$
+                Set safegroup = Nothing
                 v = 0
                 Else
                 bstack.MoveNameDot safegroup.lasthere + "." + safegroup.GroupName
-                v = 0
+                v = -1
                 GoTo contheretoo1
                 End If
         
         End If
         On Error Resume Next
                ' check for iamglobal ??
-               
+    If Not GetVar(bstack, w$, y1) Then
+                 
+        y1 = globalvar(w$, dd)
         UnFloatGroup bstack, w$, y1, pppp.item(v), , True
         globalvar w$, y1, True, True
+        
+        End If
+        
 If Err.Number > 0 Then
 mer123:
 MyEr "This For can't be done", " Αυτή η Για δεν μπορεί να γίνει"
@@ -3347,12 +3373,26 @@ contheretoo:
                                              w$ = pppp.CodeName + CStr(v)
                                              If pppp.item(v).IamApointer Then
                                              If pppp.item(v).Link.IamFloatGroup Then
+                                             Set safegroup = pppp.item(v)
+                                             
                                              Set pppp = BoxGroupObj(pppp.item(v).Link)
+                                             Set pppp.refgroup = safegroup
+                                             
                                              v = 0
                                              Else
                                           
                                                          w$ = pppp.item(v).lasthere + "." + pppp.item(v).GroupName
                                                          GoTo conthere3
+                                             End If
+                                             End If
+                                             If safegroup.LastOpen <> vbNullString Then
+                                                
+                                             If GetVar(bstack, safegroup.LastOpen, y1, , , True) Then
+                                                    w$ = safegroup.LastOpen
+                                                 y1 = globalvar(w$, (y1), True)
+                                                 GoTo cont1010
+                                                 Else
+                                                 safegroup.LastOpen = vbNullString
                                              End If
                                              End If
                                                 Set dd = New Group
@@ -3362,6 +3402,7 @@ contheretoo:
                                                         ' check for iamglobal ??
                                                 UnFloatGroup bstack, w$, y1, pppp.item(v), , True
                                                 globalvar w$, y1, True, True
+cont1010:
                                                 bstack.MoveNameDot myUcase(w$)
                                                 depth = depth + 1
                                                 mm.DataVal CDbl(y1)
@@ -3414,6 +3455,7 @@ w$ = myUcase(w$)
         If GetPointer(bstack, (w$)) Then
         
             If bstack.lastpointer.Link.IamFloatGroup Then
+            ' 2nd,...
             Set pppp = BoxGroupObj(bstack.lastpointer)
                 i = 5
             v = 0
@@ -3636,7 +3678,13 @@ breakexit:
             If Not MyIsObject(pppp.item(v)) Then
                 Set pppp.item(v) = CopyGroupObj(var(y1), pppp.IHaveClass)
             Else
+                If Not pppp.refgroup Is Nothing Then
+                Set safegroup = pppp.refgroup
+                Set safegroup.LinkRef = CopyGroupObj(var(y1))
+                Set safegroup = Nothing
+                Else
                 Set pppp.item(v) = CopyGroupObj(var(y1), Not pppp.item(v).Link Is Nothing)
+                End If
                 End If
             Else
                 If pppp.Arr Then
@@ -3652,7 +3700,9 @@ breakexit:
             End If
             Set tempRef = pppp.GroupRef  '  pppp.item(v).Link
             If Not pppp.IsEmpty Then
+            
             If TypeOf pppp.item(v) Is Group Then Set pppp.item(v).LinkRef = tempRef
+        
             End If
         End If
     Wend
@@ -3674,6 +3724,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
 
                 If safegroup.Link.IamFloatGroup Then
                 Set pppp = BoxGroupVar(safegroup.Link)
+                
                 v = 0
                 Else
                 bstack.MoveNameDot safegroup.lasthere + "." + safegroup.GroupName
@@ -3682,10 +3733,20 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
                 End If
         
         End If
-              
-        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
+        If safegroup.LastOpen <> vbNullString Then
+        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
+        w$ = safegroup.LastOpen
+            GoTo cont2020
+        Else
+        safegroup.LastOpen = vbNullString
+        End If
+        End If
         
+        UnFloatGroup bstack, w$, y1, pppp.item(v), , True
+        'Set bstack.lastpointer = Nothing
+
   globalvar w$, y1, True, True
+cont2020:
         If Prefix <> "" Then
         If Prefix = "@READ2" Then
                           
@@ -3728,9 +3789,11 @@ If LastErNum <> 0 Then
 If FK$(13) = vbNullString Then FK$(13) = GetNextLine((sbf(Abs(bstack.OriginalCode)).sb))
     End If
 If safegroup.IamApointer Then
-                    Set tempRef = pppp.GroupRef   'pppp.item(v).Link
+                    If safegroup.LastOpen = vbNullString Then
+                    Set tempRef = pppp.GroupRef
                     Set safegroup.LinkRef = CopyGroupObj(var(y1))
                     Set safegroup.Link.LinkRef = pppp.GroupRef
+                    End If
 Else
                        Set safegroup.LinkRef = Nothing
                         Set tempRef = pppp.GroupRef
@@ -4437,7 +4500,7 @@ Do
 Loop
 End Function
 Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True) As Boolean
-Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant
+Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant, ut$
 Dim logic As Boolean, l As Boolean, park As Object, objlist As mStiva, rightlevel As Long
 On Error Resume Next
 IsExpA = False
@@ -4466,9 +4529,23 @@ again2:
         If Not bstack.lastobj Is Nothing Then
         If MaybeIsSymbol(aa$, "/*-+=~^&|<>?") Then
                 '' get operator
-                If TypeOf bstack.lastobj Is Group Then
-                MUL = MyTrimL(aa$)
                 Dim ss$, ss1$
+                If TypeOf bstack.lastobj Is Group Then
+                
+                If Not bstack.lastpointer Is Nothing Then
+                If bstack.lastpointer.IamFloatGroup Then
+                Set bstack.lastobj = bstack.lastpointer
+                Else
+                With bstack.lastobj
+                    ut$ = "Group(" + .lasthere + "." + .GroupName + ")"
+                End With
+                 IsNumber bstack, ut$, r
+                End If
+                Set bstack.lastpointer = Nothing
+                End If
+                
+                MUL = MyTrimL(aa$)
+                
             If Mid$(aa$, MUL, 1) Like "[<>]*" Then
                 If MaybeIsSymbol(Mid$(aa$, MUL + 1, 1), "=>") Then
                     ss$ = Mid$(aa$, MUL, 2)
@@ -4526,6 +4603,17 @@ getnextnum:
                 ' check if we have group
                 If bstack.lastobj Is Nothing Then MissingGroup: IsExpA = False: Exit Function
                 If Not TypeOf bstack.lastobj Is Group Then MissingGroup: IsExpA = False: Exit Function
+                If Not bstack.lastpointer Is Nothing Then
+                    If bstack.lastpointer.IamFloatGroup Then
+                Set bstack.lastobj = bstack.lastpointer
+                Else
+                With bstack.lastobj
+                    ut$ = "Group(" + .lasthere + "." + .GroupName + ")"
+                End With
+                 IsNumber bstack, ut$, r
+                End If
+                Set bstack.lastpointer = Nothing
+                End If
                 ' process unary if we have one
                 If po = -1 Then
                     If bstack.lastobj.HasUnary Then ProcessOper bstack, Nothing, "-:", r, (0)
@@ -4536,6 +4624,18 @@ processobjlist:
                 
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is Group Then
+                If Not bstack.lastpointer Is Nothing Then
+                If bstack.lastpointer.IamFloatGroup Then
+                Set bstack.lastobj = bstack.lastpointer
+                Else
+                With bstack.lastobj
+                    ut$ = "Group(" + .lasthere + "." + .GroupName + ")"
+                End With
+                 IsNumber bstack, ut$, r
+                End If
+                Set bstack.lastpointer = Nothing
+                End If
+                    
                     MUL = MyTrimL(aa$)
 
                 If MaybeIsSymbol(Mid$(aa$, MUL, 1), "/*-+=~^&|<>?") Then
@@ -4744,6 +4844,17 @@ cont4567:
                 ' maybe is an error or not ???
                 End If
             ElseIf po = -1 And TypeOf bstack.lastobj Is Group Then
+                If Not bstack.lastpointer Is Nothing Then
+                    If bstack.lastpointer.IamFloatGroup Then
+                Set bstack.lastobj = bstack.lastpointer
+                Else
+                With bstack.lastobj
+                    ss$ = "Group(" + .lasthere + "." + .GroupName + ")"
+                End With
+                 IsNumber bstack, ss$, r
+                End If
+                Set bstack.lastpointer = Nothing
+                End If
                     po = -po
                     Set park = Nothing
                     If bstack.lastobj.HasUnary Then ProcessOper bstack, park, "-:", r, (0)
@@ -4762,6 +4873,7 @@ again3:
                     End If
 
                         If MaybeIsSymbol(aa$, ")") Then
+                     
                                 If parenthesis > 0 Then
                                 FastSymbol aa$, ")"
                                     parenthesis = parenthesis - 1
@@ -7264,6 +7376,7 @@ IsNumber = False  ''         " " + & String$(w2 - Len(a$), " ")
  If FindNameForGroup(bstack, v$) Then
   UnknownProperty1 a$, v$
  Else
+ If v$ = "" Then v$ = s1$
  UnknownVariable1 a$, v$
 End If
 End If
@@ -11993,7 +12106,7 @@ Case 1, 2
         IsString = ISSTRINGA(a$, r$)
 Case Else
     IsString = IsStr1(bstackstr, a$, r$)
-End Select
+  End Select
 Exit Function
 err1111:
 MyErMacroStr a$, "No closed string, open with " & ChrW(q), "Ανοιχτό αλφαριθμητικό, με " & ChrW(q)
@@ -12099,6 +12212,7 @@ GoTo rvalObjectstring
 Case 6
 GoTo itisarrayorfunction
 Case Else
+checkpointer:
 If w1& = 1 Then
 If GetVar(bstackstr, q$, w1&) Then
     If MyIsObject(var(w1&)) Then
@@ -12126,6 +12240,8 @@ End If
 End Select
 End If
 Select Case w1&
+Case 1
+GoTo checkpointer
 Case 5
             ' check again
 rvalObjectstring:
@@ -12590,8 +12706,8 @@ foundprivate:
                              If FindNameForGroup(bstackstr, q$) Then
                              MyErMacroStr a$, "Unknown property  " & q$, "’γνωστη ιδιότητα " & q$
                              Else
-                                MyErMacroStr a$, "Unknown variable " & q$, "’γνωστη μεταβλητή " & q$
-                            
+                                'MyErMacroStr A$, "Unknown variable " & q$, "’γνωστη μεταβλητή " & q$
+                            UnknownVariable1 a$, q$
                             End If
                     End If
                 
@@ -17875,7 +17991,7 @@ contherecom:
 If MaybeIsSymbolNoSpace(b$, "[+/*~-]") Then
 GoTo VarOnly
 '
-ElseIf MaybeIsSymbol(b$, "<=") Then
+ElseIf MaybeIsSymbol(b$, "<=_") Then
 GoTo VarOnly
 ElseIf Not comhash.Find2(w$, i, v) Then
                 iscom = True
@@ -19499,7 +19615,7 @@ ContTry:
          NOEXECUTION = False
          NERR = False
          LastErNum = 0
-       '  LastErNum1 = 0
+         LastErNum1 = 0
          If LastErName <> "" Then LastErName = Chr(0) + LastErName
          If LastErNameGR <> "" Then LastErNameGR = Chr(0) + LastErNameGR
             Execute = 1
@@ -19521,6 +19637,7 @@ ContTry:
          NOEXECUTION = False
          NERR = False
          LastErNum = 0
+         LastErNum1 = 0
          End If
          Execute = 1
         End Select
@@ -20264,8 +20381,9 @@ LONGERR:
 Exit Function
 forfloatpointers:
 Set pppp = BoxGroupObj(bstack.lastpointer)
-v = 0
 
+v = 0
+ Set bstack.lastpointer = Nothing
  Execute = SpeedGroup(bstack, pppp, "", w$, b$, v)
                                       If Execute = 0 Then
                                       Exit Function
@@ -20301,6 +20419,14 @@ If Len(b$) > 1 Then
              GoTo VarOnly
             Else
                 w$ = .lasthere + "." + .GroupName + "." + w$
+                If MaybeIsSymbol2(b$, "=", i) Then
+                If i = 1 Then
+                Mid$(b$, 1, 1) = "_"
+                Else
+                Mid$(b$, i - 1, 1) = "<"
+                End If
+                
+                End If
             End If
             End With
             Set bstack.lastpointer = Nothing
@@ -22465,8 +22591,14 @@ Dim i As Long, Vlist As Boolean, FList, F$, aa$, v As Long
 Dim s() As String, ThisGroup As Group, OtherGoup As Group
 If Typename(q) <> "Group" Then Exit Function
 'Debug.Print "link to ", name$
+
 Dim OLD1 As String
 OLD1 = bstack.UseGroupname
+If q.IamApointer Then
+Exit Function
+If q.Link.IamFloatGroup Then Exit Function
+
+End If
 
 If Not usefinal Then
 If here$ = vbNullString Then
@@ -22487,6 +22619,8 @@ End If
 Else
 
 End If
+
+
 bstack.UseGroupname = vbNullString
 cont1:
 With q
@@ -38286,9 +38420,12 @@ checkconstant:
             MakeitObject2 var(it)
             If var(i).IamApointer Then
             If var(i).Link.IamFloatGroup Then
-            MyEr "There is no reference for this pointer", "Δεν υπάρχει αναφορά για αυτόν τον δείκτη"
-            MyRead = False
-            Exit Function
+               Set var(it).LinkRef = var(i).Link
+                var(it).IamApointer = True
+                var(it).isref = True
+         '   MyEr "There is no reference for this pointer", "Δεν υπάρχει αναφορά για αυτόν τον δείκτη"
+          '  MyRead = False
+          '  Exit Function
             Else
             With var(i).Link
             
@@ -38679,13 +38816,13 @@ contpointer:
                     MyRead = False
                     Exit Function
                     End If
-                End If
+               
                 If LCase(Typename(var(myobject.indirect))) <> LCase(ss$) Then
                         WrongObject
                         MyRead = False
                         Exit Function
                 End If
-            
+             End If
                 Set var(i) = MakeitObjectGeneric(myobject.indirect)
                 Else
                 If Fast2VarNoTrim(rest$, "ΩΣ", 2, "AS", 2, 2, F) Then
@@ -50187,6 +50324,7 @@ Exit Function
 found:
             CheckThis = 1
                 If FastSymbol(b$, "=") Then Exit Function
+               
                 If FastSymbol(b$, "<=", , 2) Then Exit Function
                                 CheckThis = 2
                  Exit Function
@@ -53063,6 +53201,10 @@ End If
 
 Else
 If IsExp(bstack, a$, p) Then
+If Not bstack.lastpointer Is Nothing Then
+Set bstack.lastobj = bstack.lastpointer
+Set bstack.lastpointer = Nothing
+End If
     If bstack.lastobj Is Nothing Then
     If p = 0 Then
         Set p = New Group
@@ -53430,8 +53572,48 @@ ElseIf NewStat Then
         End If
         
 ElseIf nchr > 31 Then
-
-If MaybeIsSymbol(b$, "/*-+=~^&|<>") Then
+If Left$(b$, 1) = "_" Then
+        If nchr <> 61 Then
+            SyntaxError
+            Exit Function
+        End If
+        If GetVar(bstack, w$, v, True, , , , usetype) Then
+        w$ = varhash.lastkey
+            Mid$(b$, 1, 1) = " "
+            
+            GoTo assignvalue
+        ElseIf GetlocalVar(w$, v) Then
+            If TypeOf var(v) Is Group Then
+            If Not var(v).IamRef Then
+            w$ = varhash.lastkey
+            End If
+            Else
+            
+            w$ = varhash.lastkey
+            End If
+            
+            Mid$(b$, 1, 1) = " "
+            GoTo assignvalue
+        Else
+        Mid$(b$, 1, 1) = "="
+        If AscW(Left$(w$, 1)) = &H1FFF Then
+        
+            If here$ = vbNullString Then
+                If varhash.Find(w$, v) Then
+                GoTo fromthis
+                End If
+            Else
+                If varhash.Find(here$ + "." + w$, v) Then
+                GoTo fromthis
+                End If
+            End If
+        Else
+            UnknownVariable w$
+        End If
+            Exec1 = 0: ExecuteVar = 8
+            Exit Function
+        End If
+ElseIf MaybeIsSymbol(b$, "/*-+=~^&|<") Then
         If Mid$(b$, i, 2) = "<=" Then
         ' LOOK GLOBAL
         If GetVar(bstack, w$, v, True, , , , usetype) Then
@@ -53676,6 +53858,18 @@ assigngroup:
                                         here$ = vbNullString
                                         UnFloatGroupReWriteVars bstack, w$, v, myobject
                                         here = sw$
+                                    ElseIf var(v).IamApointer And myobject.IamApointer Then
+                                    If var(v).IamFloatGroup Then
+                                    If myobject.IamFloatGroup Then
+                                  '    CopyGroup1 var(v), myobject
+                                      Set var(v) = myobject
+                                      Else
+                                      Set var(v) = myobject
+                                    End If
+
+                                    Else
+                                    Set var(v) = myobject
+                                    End If
                                     Else
                                         Set myobject = Nothing
                                         bstack.GroupName = ss$
@@ -53687,7 +53881,7 @@ assigngroup:
                                 End If
                                 Set myobject = Nothing
                                 bstack.GroupName = ss$
-                            
+                                Set bstack.lastpointer = Nothing
                             Else
                                 WrongObject
                                 Exec1 = 0: ExecuteVar = 8
@@ -54062,8 +54256,24 @@ checksyntax:
                 If ss$ = "->" Then
                  GoTo assignpointer
                 End If
+                If var(v).IamApointer Then
+                If var(v).Link.IamFloatGroup Then
+                    MyPush bstack, b$
+                    Set bstack.lastobj = var(v).Link
+                    ProcessOper bstack, myobject, ss$, (0), 1
+                    If Not bstack.lastobj Is Nothing Then
+                    Set var(v).LinkRef = bstack.lastobj
+                    Set bstack.lastobj = Nothing
+                    ExecuteVar = 7: Exit Function
+                    Else
+                    GoTo here1234
+                    End If
+                    Else
+                    w$ = var(v).lasthere + "." + var(v).GroupName
+                End If
+                End If
                 Set myobject = bstack.soros
-                
+comeoper:
                 Set bstack.Sorosref = New mStiva
                     If IsExp(bstack, b$, p) Then
                         If bstack.lastobj Is Nothing Then
@@ -54077,6 +54287,7 @@ checksyntax:
                             Set bstack.lastobj = Nothing
                         End If
                     End If
+
                     NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", ok
                      Set bstack.Sorosref = myobject
                  Set myobject = Nothing
@@ -54255,6 +54466,7 @@ assignpointer:
                        Set bstack.lastobj = Nothing
                      Exec1 = 0: ExecuteVar = 8: Exit Function
                     End If
+                    
                     ExecuteVar = 7: Exit Function
 '***********************
 '' Case 2
@@ -54274,7 +54486,15 @@ End Select
 End If
 
         ss$ = vbNullString
-        If FastSymbol(b$, ".") Then
+        If Left$(b$, 1) = "_" Then
+        If nchr <> 61 Then
+            SyntaxError
+            Exit Function
+        End If
+        ss$ = "g"
+        Mid$(b$, 1, 1) = " "
+        GoTo again12345
+        ElseIf FastSymbol(b$, ".") Then
         If GetVar(bstack, w$, v) Then  'GetlocalVar(w$, V) Then
              If MaybeIsSymbol(b$, "-+*/<~") Then
              b$ = var(v) + b$
@@ -54603,8 +54823,17 @@ Exec1 = 0: ExecuteVar = 8: Exit Function
 End Select
 
 End If
-If MaybeIsSymbol(b$, "=-+*/<~") Then
+        If Left$(b$, 1) = "_" Then
+        If nchr <> 61 Then
+            SyntaxError
+            Exit Function
+        End If
+        ss$ = "g"
+        Mid$(b$, 1, 1) = " "
+        GoTo again1234567
+        ElseIf MaybeIsSymbol(b$, "=-+*/<~") Then
     If FastSymbol(b$, "=") Then
+    
     If VarStat Then
     
     If IsExp(bstack, b$, p) Then
@@ -55038,12 +55267,30 @@ ExecuteVar = 7: Exit Function
 
 End If
 Else
+
+If .item(v).IamApointer Then
+If .item(v).Link.IamFloatGroup Then
+MyPush bstack, b$
+Set bstack.lastobj = .item(v).Link
+Else
+w$ = .item(v).lasthere + "." + .item(v).GroupName
+Set bstack.lastobj = Nothing
+Set bstack.lastpointer = Nothing
+GoTo comeoper
+End If
+Else
 MyPush bstack, b$
 Set bstack.lastobj = .item(v)
+End If
+
     ProcessOper bstack, myobject, ss$, (0), 1
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is Group Then
+            If .item(v).IamApointer Then
+            Set .item(v).LinkRef = bstack.lastobj
+            Else
             Set .item(v) = bstack.lastobj
+            End If
             Set bstack.lastobj = Nothing
             ExecuteVar = 7: Exit Function
             End If
@@ -55174,7 +55421,7 @@ If IsOperatorNoRemove(b$, ".") Then
         Else
         
        Mid$(b$, 1, 1) = ChrW(7)
-       
+    
         Exec1 = SpeedGroup(bstack, pppp, "", w$, b$, v)
         End If
         If Exec1 = 0 Then ExecuteVar = 8: Exit Function

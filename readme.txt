@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 2 active-X
+Version 9.3 revision 3 active-X
 
-
-The best
+Finish "pointer to group objects" part
 
 
 From version 9.0 revision 50:

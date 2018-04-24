@@ -418,7 +418,30 @@ End If
 End If
 End Sub
 Sub UnknownVariable1(a$, v$)
-MyErMacro a$, "Unknown Variable " & v$, "’γνωστη μεταβλητή " & v$
+Dim i As Long
+i = rinstr(v$, "." + ChrW(8191))
+If i > 0 Then
+    i = rinstr(v$, ".")
+    MyErMacro a$, "Unknown Variable " & Mid$(v$, i), "’γνωστη μεταβλητή " & Mid$(v$, i)
+Else
+    i = rinstr(v$, "].")
+    If i > 0 Then
+        MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 2), "’γνωστη μεταβλητή " & Mid$(v$, i + 2)
+    Else
+        i = rinstr(v$, ChrW(8191))
+    If i > 0 Then
+        i = InStr(i + 1, v$, ".")
+        If i > 0 Then
+            MyErMacro a$, "Unknown Variable " & Mid$(v$, i + 1), "’γνωστη μεταβλητή " & Mid$(v$, i + 1)
+        Else
+            MyErMacro a$, "Unknown Variable", "’γνωστη μεταβλητή"
+        End If
+    Else
+        MyErMacro a$, "Unknown Variable " & v$, "’γνωστη μεταβλητή " & v$
+    End If
+    End If
+End If
+
 End Sub
 Sub UnknownProperty1(a$, v$)
 MyErMacro a$, "Unknown Property " & v$, "’γνωστη ιδιότητα " & v$
@@ -6817,14 +6840,29 @@ End Sub
 Public Sub UnknownProperty(w$)
 MyEr "Unknown Property " & w$, "’γνωστη ιδιότητα " & w$
 End Sub
-Public Sub UnknownVariable(w$)
+Public Sub UnknownVariable(v$)
 Dim i As Long
-i = rinstr(w$, "." + ChrW(8191))
+i = rinstr(v$, "." + ChrW(8191))
 If i > 0 Then
-i = rinstr(w$, ".")
-MyEr "Unknown Variable " & Mid$(w$, i), "’γνωστη μεταβλητή " & Mid$(w$, i)
+    i = rinstr(v$, ".")
+    MyEr "Unknown Variable " & Mid$(v$, i), "’γνωστη μεταβλητή " & Mid$(v$, i)
 Else
-MyEr "Unknown Variable " & w$, "’γνωστη μεταβλητή " & w$
+    i = rinstr(v$, "].")
+    If i > 0 Then
+        MyEr "Unknown Variable " & Mid$(v$, i + 2), "’γνωστη μεταβλητή " & Mid$(v$, i + 2)
+    Else
+        i = rinstr(v$, ChrW(8191))
+    If i > 0 Then
+        i = InStr(i + 1, v$, ".")
+        If i > 0 Then
+            MyEr "Unknown Variable " & Mid$(v$, i + 1), "’γνωστη μεταβλητή " & Mid$(v$, i + 1)
+        Else
+            MyEr "Unknown Variable", "’γνωστη μεταβλητή"
+        End If
+    Else
+        MyEr "Unknown Variable " & v$, "’γνωστη μεταβλητή " & v$
+    End If
+    End If
 End If
 End Sub
 Sub indexout(a$)
@@ -7000,7 +7038,7 @@ Public Sub NeedAGroupInRightExpression()
 MyEr "Need a group from right expression", "Χρειάζομαι μια ομάδα από την δεξιά έκφραση"
 End Sub
 Public Sub NotAfter(a$)
-MyErMacro a$, "not an expression after not", "δεν υπάρχει παράσταση δεξιά τού όχι"
+MyErMacro a$, "not an expression after not operator", "δεν υπάρχει παράσταση δεξιά τού τελεστή όχι"
 End Sub
 Public Sub EmptyArray()
 MyEr "Empty Array", "’δειος Πίνακας"
@@ -7666,11 +7704,11 @@ Dim varv As New Group
         .BeginFloat 2
         Set .Sorosref = v.soros
         If Not v.IamFloatGroup Then
-        If bstack.UseGroupname <> "" Then
-        .lasthere = Mid$(bstack.UseGroupname, 1, Len(bstack.UseGroupname) - 1)
-        Else
+       ' If bstack.UseGroupname <> "" Then
+       ' .lasthere = Mid$(bstack.UseGroupname, 1, Len(bstack.UseGroupname) - 1)
+       ' Else
         .lasthere = here$
-        End If
+       ' End If
         If Len(v.GroupName) > 1 Then
             .GroupName = Mid$(v.GroupName, 1, Len(v.GroupName) - 1)
         End If

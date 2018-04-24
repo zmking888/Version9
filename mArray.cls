@@ -65,7 +65,7 @@ Private Type SAFEARRAY1D
     cElements As Long
     lLBound As Long
 End Type
-Public index As Long, final As Boolean
+Public index As Long, final As Boolean, refgroup As Object
 Public Sub Compute0(p As Variant, ss$)
 If final Then CantAssignValue: Exit Sub
 Dim v As Long

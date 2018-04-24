@@ -35,6 +35,8 @@ Public leftoper$  ' we have to copy this
 Public HasUnary As Boolean
 Public IamApointer As Boolean, lasthere$
 Public Original As Long
+Public isref As Boolean ' One time use
+Public LastOpen As String
 Public Property Get Events() As Object
 Set Events = eventlist
 End Property
@@ -45,7 +47,7 @@ Public Sub ResetEvents()
 If eventlist Is Nothing Then Exit Sub
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
+For i = 0 To .count - 1
     .index = i
     .Done = True
     .Value = ""
@@ -60,7 +62,7 @@ If eventlist Is Nothing Then Exit Sub
 Dim eventlist2 As New FastCollection
 Dim i As Long
 With eventlist
-For i = 0 To .Count - 1
+For i = 0 To .count - 1
     .index = i
     .Done = True
     eventlist2.AddKey .KeyToString, ""
