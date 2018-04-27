@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 4 active-X
+Version 9.3 revision 5 active-X
 
-new switch -Ext (default)
-+Ext make interpreter to extend variable's scope in modules, so we can read variables from parent module using parent name plus dot plus variable name.
+the best so far
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

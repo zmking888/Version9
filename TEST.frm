@@ -23,15 +23,23 @@ Begin VB.Form Form2
       TabIndex        =   5
       Top             =   810
       Width           =   3705
-      _extentx        =   6535
-      _extenty        =   3387
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":000C
-      borderstyle     =   1
-      showbar         =   0   'False
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6535
+      _ExtentY        =   3387
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      BorderStyle     =   1
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   600
@@ -41,13 +49,21 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   810
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1058
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":0030
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1058
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   161
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList0 
       Height          =   555
@@ -55,14 +71,22 @@ Begin VB.Form Form2
       TabIndex        =   1
       Top             =   4620
       Width           =   7665
-      _extentx        =   13520
-      _extenty        =   979
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":0054
-      showbar         =   0   'False
-      backcolor       =   657930
-      forecolor       =   16777215
+      _ExtentX        =   13520
+      _ExtentY        =   979
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   657930
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList1 
       Height          =   1800
@@ -70,14 +94,22 @@ Begin VB.Form Form2
       TabIndex        =   0
       Top             =   2775
       Width           =   7665
-      _extentx        =   13520
-      _extenty        =   3175
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":0078
-      showbar         =   0   'False
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   13520
+      _ExtentY        =   3175
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -87,14 +119,22 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   1455
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1085
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":009C
-      showbar         =   0   'False
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1085
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -104,14 +144,22 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   2115
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1085
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":00C0
-      showbar         =   0   'False
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1085
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList2 
       Height          =   495
@@ -120,15 +168,23 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   135
       Width           =   7635
-      _extentx        =   13467
-      _extenty        =   873
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "TEST.frx":00E4
-      enabled         =   -1  'True
-      backcolor       =   3881787
-      forecolor       =   16777215
-      capcolor        =   16777215
+      _ExtentX        =   13467
+      _ExtentY        =   873
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   161
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Enabled         =   -1  'True
+      Backcolor       =   3881787
+      ForeColor       =   16777215
+      CapColor        =   16777215
    End
 End
 Attribute VB_Name = "Form2"
@@ -180,11 +236,11 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub compute_KeyDown(KeyCode As Integer, Shift As Integer)
 If KeyCode = 13 Then
 KeyCode = 0
     If Compute.Prompt = "? " Then
-        gList3(2).BackColor = &H3B3B3B
+        gList3(2).backcolor = &H3B3B3B
         TestShowCode = False
         stackshow MyBaseTask
     Else
@@ -247,9 +303,9 @@ Private Sub Form_Activate()
 '
 trace = True
 If stolemodalid = 0 Then
-If ModalId <> 0 Then
-stolemodalid = ModalId
-ModalId = Rnd * 645677887
+If Modalid <> 0 Then
+stolemodalid = Modalid
+Modalid = Rnd * 645677887
 End If
 
 End If
@@ -257,12 +313,12 @@ End Sub
 
 Private Sub Form_Deactivate()
 If stolemodalid <> 0 Then
-ModalId = stolemodalid
+Modalid = stolemodalid
 stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
 If KeyCode = 27 Then
 KeyCode = 0
 Unload Me
@@ -412,13 +468,13 @@ End Sub
 
 
 Private Sub gList1_CheckGotFocus()
-gList1.BackColor = &H606060
+gList1.backcolor = &H606060
 gList1.ShowMe2
 End Sub
 
 Private Sub gList1_CheckLostFocus()
 
-gList1.BackColor = &H3B3B3B
+gList1.backcolor = &H3B3B3B
 gList1.ShowMe2
 End Sub
 
@@ -430,13 +486,13 @@ monitor = FindFormSScreen(Form1)
 Else
 monitor = FindFormSScreen(Form4)
 End If
-sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+sHelp gList2.HeadLine, testpad.Text, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 If TestShowCode Then
-Form4.Label1.SelStartSilent = testpad.SelStart
-Form4.Label1.SelLength = 0
-Form4.Label1.SelectionColor = rgb(255, 64, 128)
-If testpad.SelStart > 0 And testpad.SelLength > 0 Then Form4.Label1.SelLength = testpad.SelLength
+Form4.label1.SelStartSilent = testpad.SelStart
+Form4.label1.SelLength = 0
+Form4.label1.SelectionColor = rgb(255, 64, 128)
+If testpad.SelStart > 0 And testpad.SelLength > 0 Then Form4.label1.SelLength = testpad.SelLength
 'Form4.Label1.Show
 End If
 End Sub
@@ -462,11 +518,11 @@ Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)
 Label(index).Prompt = RHS
 End Property
 
-Public Property Get Label1(ByVal index As Long) As String
-Label1 = Label(index)
+Public Property Get label1(ByVal index As Long) As String
+label1 = Label(index)
 End Property
 
-Public Property Let Label1(ByVal index As Long, ByVal RHS As String)
+Public Property Let label1(ByVal index As Long, ByVal RHS As String)
 Label(index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
@@ -510,7 +566,7 @@ doubleclick = 0
 
 End Sub
 
-Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList2_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Button <> 0 Then tracecounter = 100
 End Sub
 
@@ -518,10 +574,7 @@ Private Sub gList2_MouseUp(x As Single, y As Single)
 tracecounter = 0
 End Sub
 
-Private Sub gList2_NeedDoEvents()
-'
 
-End Sub
 
 
 Private Sub glist3_CheckGotFocus(index As Integer)
@@ -612,14 +665,14 @@ Else
 monitor = FindFormSScreen(Form4)
 End If
 If aa > 0 Then
-sHelp s$, aaa, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+sHelp s$, aaa, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 ElseIf subHash.Find(s$, aa) Then
-sHelp s$, SBcode(aa), (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+sHelp s$, SBcode(aa), (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 
 ElseIf subHash.Find(subHash.LastKnown, aa) Then
-sHelp s$, SBcode(aa), (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+sHelp s$, SBcode(aa), (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 vHelp Not Form4.Visible
 Else
     fHelp MyBaseTask, s$, AscW(s$ + Mid$(" Ó", Abs(pagio$ = "GREEK") + 1)) < 128
@@ -634,10 +687,10 @@ End If
 ElseIf index = 2 Then
 TestShowCode = Not TestShowCode
 If TestShowCode Then
-gList3(2).BackColor = &H606060
+gList3(2).backcolor = &H606060
 Label(2) = Label(2)
 Else
-gList3(2).BackColor = &H3B3B3B
+gList3(2).backcolor = &H3B3B3B
 Label(2) = Label(2)
 End If
 stackshow MyBaseTask
@@ -712,7 +765,7 @@ If Not TaskMaster Is Nothing Then
 TaskMaster.Dispose
 MyBaseTask.ThrowThreads
 End If
-ModalId = 0
+Modalid = 0
 NOEXECUTION = True
 trace = True
 STq = False
@@ -731,14 +784,14 @@ End Sub
  Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
     DrawText mHdc, StrPtr(c), -1, r, way
     End Sub
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
     
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
+    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     tracecounter = 100
     mousepointer = vbSizeNWSE
@@ -747,7 +800,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
+    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     tracecounter = 100
     mousepointer = vbSizeNWSE
@@ -758,14 +811,14 @@ If Button = 1 Then
 
 End If
 End Sub
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -774,11 +827,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (width - 150) Or x > width Then addX = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -791,31 +844,31 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
-        If (addy + Height) / height1 > 0.4 And ((width + addX) / width1) > 0.4 Then
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
-        addX = -width * lastfactor / factor - 1
+        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -Width * lastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
-        If lastfactor <> factor Then ScaleDialog lastfactor, width
+        If lastfactor <> factor Then ScaleDialog lastfactor, Width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (width + addX) * lastfactor / factor
+         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
         
          
         
-        LastWidth = width
+        LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
         gList1.PrepareToShow
@@ -830,7 +883,7 @@ End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 
 If dr Then Me.mousepointer = 0
 tracecounter = 0

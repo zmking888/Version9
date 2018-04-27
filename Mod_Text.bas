@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11776,6 +11776,7 @@ lit34: '    Case "ERROR$"
                     IsStr1 = True
                     Exit Function
 lit36: ' case "MODULE.NAME$", "омола.тлглатос$"
+            If SecureNames Then
              r$ = GetName(here$)
              If AscW(r$) = 8191 Then
              If InStr(here$, r$) > 0 Then
@@ -11795,8 +11796,8 @@ lit36: ' case "MODULE.NAME$", "омола.тлглатос$"
              
              IsStr1 = True
             Exit Function
+            End If
  
-            
 lit16: '    Case "MODULE$", "тлгла$"
                     r$ = here$
                     IsStr1 = True
@@ -49129,7 +49130,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, w$, SBB$) As Boo
             Exit Function
         End If
     Else
-If tracecounter > 0 Then MyDoEvents1 Form2, True
+If tracecounter > 0 Then If Not IsWine Then MyDoEvents1 Form2, True
 
     End If
     If STEXIT Then
