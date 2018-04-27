@@ -464,6 +464,7 @@ Property Let textDoc(norawtext As String)
       Next where
     End If
     ' colorize at a second stage...(new)
+MarkParagraphID = 0
 WrapAgain
 busy = False
 End Property
@@ -572,7 +573,6 @@ thiscur = thiscur + l
 mycur = DocParaNext(mycur)
 Loop
 If Typename(thiscur) = "Empty" Then
-
 Else
 textDoc = Left$(textDoc, thiscur - 1)
 End If
@@ -1350,6 +1350,7 @@ Property Get TextParagraph2Line(ByVal ParaNum As Long, ByVal Charpos As Long, ne
 Dim mlines As Long, counter As Long
     If ParaNum = 0 Then Exit Property
     If para(ParaNum).lines = 0 Then Exit Property
+    
     If Not skipcolor Then
 If para(ParaNum).colordata(0) = Empty Then
     ColorThis (ParaNum)

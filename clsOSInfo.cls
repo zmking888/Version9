@@ -104,7 +104,7 @@ Private Type TOKEN_PRIVILEGES
     Attributes      As Long
 End Type
 
-Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCTYPE As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
+Private Declare Function GetLocaleInfo Lib "kernel32.dll" Alias "GetLocaleInfoW" (ByVal lcid As Long, ByVal LCType As Long, ByVal lpLCData As Long, ByVal cchData As Long) As Long
 Private Declare Function GetUserDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultUILanguage Lib "kernel32.dll" () As Long
 Private Declare Function GetSystemDefaultLCID Lib "kernel32.dll" () As Long
@@ -652,8 +652,7 @@ Function IsProcessElevated(Optional hProcess As Long) As Boolean
     Dim dwLengthNeeded   As Long
     Dim dwIsElevated     As Long
     
-    ' < Win Vista. Устанавливаем true, если пользователь состоит в группе "Администраторы"
-    If osi.dwMajorVersion < 6 Then IsProcessElevated = (GetUserType() = "Administrator"): Exit Function
+     If osi.dwMajorVersion < 6 Then IsProcessElevated = (GetUserType() = "Administrator"): Exit Function
 
     If hProcess = 0 Then hProcess = GetCurrentProcess()
     

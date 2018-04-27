@@ -211,6 +211,7 @@ End Sub
 
 Private Sub glistN_CheckGotFocus()
 Textbox.SkipProcAtExitFocus = True
+If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
 
 Textbox.glistN.NoCaretShow = True
 glistN.ForeColor = rgb(0, 0, 0)
@@ -223,6 +224,7 @@ Private Sub glistN_CheckLostFocus()
 If Textbox.SkipProcAtExitFocus Then
 Textbox.Retired
 Textbox.SkipProcAtExitFocus = False
+Callback.LastActive = ""
 Else
 Pad.Visible = False
 End If
@@ -230,13 +232,12 @@ Iam = True
 
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
-
+Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
 If Textbox.glistN.EditFlag Then
 Iam = True
 glistN.BypassLeaveonChoose = True
-
+If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
 Textbox.SetFocus
 Else
 KeyCode = 9
@@ -333,12 +334,13 @@ Private Sub Textbox_CtrlPlusF1()
 End Sub
 
 Private Sub Textbox_DeployMenu()
-'UnHook Callback.hWnd
+On Error Resume Next
 Textbox.SetFocus
+'If Iam Then
 ShowMenu
 End Sub
 
-Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub textbox_KeyDown(KeyCode As Integer, Shift As Integer)
 Dim b$
 Dim gl As Long, x As Long, x1 As gList, XX As Boolean
 Iam = True
@@ -346,12 +348,19 @@ If KeyCode = vbKeyRight And Len(MenuGroup) <> 0 Then
 Set x1 = Textbox.glistN
 Dim obj As gList
 With Callback
+.LastActive = vbNullString
 For x = 1 To .Controls.count - 1
 
     If TypeOf .Controls(x) Is gList Then
     If XX Then
-        If .Controls(x).enabled Then
-            If .Controls(x).MenuGroup = x1.MenuGroup Then .Controls(x).ShowMenu: Exit For
+        If .Controls(x).enabled And .Controls(x).TabStop Then
+            If .Controls(x).MenuGroup = x1.MenuGroup Then
+  
+            Textbox.Retired
+
+            .Controls(x).ShowMenu: Exit For
+            
+            End If
         End If
     Else
     Set obj = .Controls(x)
@@ -367,11 +376,17 @@ Set x1 = Nothing
 ElseIf KeyCode = vbKeyLeft And Len(MenuGroup) <> 0 Then
 Set x1 = Textbox.glistN
 With Callback
+.LastActive = vbNullString
 For x = .Controls.count - 1 To 1 Step -1
     If TypeOf .Controls(x) Is gList Then
     If XX Then
-        If .Controls(x).enabled Then
-            If .Controls(x).MenuGroup = x1.MenuGroup Then .Controls(x).ShowMenu: Exit For
+        If .Controls(x).enabled And .Controls(x).TabStop Then
+            If .Controls(x).MenuGroup = x1.MenuGroup Then
+         
+                    Textbox.Retired
+                    .Controls(x).ShowMenu: Exit For
+           End If
+         
         End If
     Else
      Set obj = .Controls(x)
@@ -384,6 +399,8 @@ End With
 Set x1 = Nothing
 ElseIf KeyCode = vbKeyDown Or (KeyCode = vbKeyReturn And UseOnlyTheList) Then
 Iam = False
+If glistN.listcount > 0 Then Callback.LastActive = ""
+
 If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True: glistN.SetFocus: Exit Sub
 
     KeyCode = 0
@@ -394,7 +411,7 @@ If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipPr
       End If
     gl = glistN.listcount
      If gl = 0 Then
-       If Callback.Visible Then Callback.SetFocus
+     '  If Callback.Visible Then Callback.SetFocus
         Exit Sub
      End If
      If mMenuStyle Then
@@ -450,11 +467,12 @@ End If
     If mMenuWidth <> 0 Then
     Callback.PopUpPos Pad, Left, Top, Callback.Controls(ctrlName).Height
     Else
-
 Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, Top, Callback.Controls(ctrlName).Height
 End If
+If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
 
 ElseIf KeyCode = vbKeyTab Then
+Callback.LastActive = ""
 Textbox.SkipProcAtExitFocus = False
 Pad.Visible = False
 'glistN.Visible = False
@@ -464,6 +482,8 @@ If b$ <> "" Then Textbox.glistN.LastLinePart = Mid$(Textbox.glistN.LastLinePart,
 Textbox.Text = Textbox.Text + b$
 ElseIf KeyCode = vbKeyReturn Then
 If Edit Then
+If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
+
   If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".DblClick(" + Str(mIndex) + "," + Str(-1) + ")"
    Else
@@ -485,15 +505,19 @@ End Sub
 
 Private Sub textbox_LostFocus()
 Textbox.glistN.NoCaretShow = True
-If Not mMenuStyle Then Callback.LastActive = ctrlName
+'If Iam Or Not mMenuStyle Or glistN.listcount = 0 Then
+
 If Textbox.glistN.BackStyle = 1 Then Textbox.glistN.CenterText = True
-Textbox.glistN.ShowMe
+
+If Callback.LastActive <> ctrlName Then Textbox.glistN.ShowMe: Callback.LastActive = ctrlName
 
 glistN.BypassLeaveonChoose = False
 If Iam Then
+
 Pad.Visible = False
 
 Else
+
 If Not glistN.enabled Then
 
 glistN.enabled = True
@@ -503,6 +527,8 @@ End If
 End Sub
 Private Sub textbox_GotFocus()
  Textbox.glistN.NoCaretShow = Not Textbox.enabled
+ If Not Iam Then If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
+
  If Textbox.glistN.BackStyle = 1 Then Textbox.glistN.CenterText = False
  
  Textbox.glistN.ShowMe
@@ -542,7 +568,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub textbox_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Dim gl As Long
 
 If Textbox.glistN.DblClick Then
@@ -1005,7 +1031,9 @@ Public Property Let BorderStyle(ByVal vNewValue As Variant)
 glistN.BorderStyle = vNewValue
 End Property
 Public Sub ShowMenu()
-If mMenuStyle Then textbox_KeyDown vbKeyDown, 0
+If mMenuStyle Then
+    If glistN.listcount <> 0 Then textbox_KeyDown vbKeyDown, 0
+End If
 End Sub
 Sub Transparent()
 Dim x  As Long, y As Long

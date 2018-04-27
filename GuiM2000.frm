@@ -133,7 +133,7 @@ Attribute glistN.VB_VarHelpID = -1
 Public UseReverse As Boolean, UseInfo As Boolean
 Private moveMe As Boolean, movemeX As Single, movemeY As Single, mTimes, mIcon As Boolean
 Private lastBlink As Long, LastBlinkmTimes As Boolean, lastBlinkOn As Boolean, Stored As Boolean
-Private DefaultName As String
+Private DefaultName As String, ByPassColor As Boolean
 Public LastActive As String
 Friend Property Let Default(ctrlName$)
 DefaultName = ctrlName$
@@ -271,7 +271,10 @@ gList2.enabled = RHS
 gList2.mousepointer = 0
 ElseIf w.Visible Then
 w.enabled = RHS
-If TypeOf w Is gList Then w.TabStop = RHS
+If TypeOf w Is gList Then
+w.TabStop = w.TabStopSoft
+
+End If
 End If
 Next w
 End If
@@ -280,8 +283,6 @@ End Property
 Public Property Get Enablecontrol() As Boolean
 If Len(mMyName$) = 0 Then Enablecontrol = False: Exit Property
 Enablecontrol = mEnabled
-
-
 End Property
 
 
@@ -372,6 +373,7 @@ Refresh
 End Sub
 
 Private Sub Form_Click()
+On Error Resume Next
 If gList2.Visible Then gList2.SetFocus
 If mIndex > -1 Then
     Callback mMyName$ + ".Click(" + CStr(index) + ")"
@@ -420,7 +422,9 @@ End If
 If IamPopUp Then Exit Sub
 If Not moveMe Then
 If LastActive <> "" Then
+    If Controls(LastActive).enabled Then
     If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+    End If
 End If
 End If
 If mNoTaskBar Then Exit Sub
@@ -495,9 +499,8 @@ End Sub
 Private Sub Form_Initialize()
 mEnabled = True
 End Sub
-
-
 Private Sub Form_KeyPress(KeyAscii As Integer)
+On Error Resume Next
 If Me.Visible Then
 If ActiveControl Is Nothing Then
 Dim w As Object
@@ -532,16 +535,16 @@ UnHook hWND
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Not Relax Then
 
 
 
 Relax = True
 If mIndex > -1 Then
-    Callback mMyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback mMyName$ + ".MouseDown(" + CStr(index) + "," + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
-    Callback mMyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+    Callback mMyName$ + ".MouseDown(" + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
 
 
@@ -550,29 +553,29 @@ Relax = False
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Not Relax Then
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseMove(" + CStr(index) + "," + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
-Callback mMyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseMove(" + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
 Relax = False
 End If
 
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Not Relax Then
 
 Relax = True
 
 If mIndex > -1 Then
-Callback mMyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseUp(" + CStr(index) + "," + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 Else
-Callback mMyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(shift) + "," + CStr(x) + "," + CStr(y) + ")"
+Callback mMyName$ + ".MouseUp(" + CStr(Button) + "," + CStr(Shift) + "," + CStr(x) + "," + CStr(y) + ")"
 End If
 Relax = False
 End If
@@ -650,7 +653,11 @@ lastBlinkOn = gList2.BlinkON
 Stored = True
 End Sub
 Private Sub RestoreBlibkStatus()
-If Not Stored Then Exit Sub
+On Error Resume Next
+If Not Stored Then
+ gList2.ShowMe
+Exit Sub
+End If
 mTimes = LastBlinkmTimes
 gList2.BlinkTime = lastBlink
 gList2.BlinkON = lastBlinkOn
@@ -708,7 +715,9 @@ End If
 End Sub
 
 Private Sub gList2_ExposeItemMouseMove(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long)
+On Error Resume Next ' for set focus
 If Button <> 1 Then Exit Sub
+ByPassColor = True
 If UseReverse Then
 If UseInfo Then
 If gList2.SingleClickCheck(Button, item, x, y, setupxy * (1 + 2 * infopos) / 2, setupxy / 3, Abs(setupxy / 2 - 2) + 1, -1) Then
@@ -736,13 +745,17 @@ If mSizable And mShowMaximize Then
             If IsWine And .Left = 0 And .Top = 0 And .Width - 1 = Width And .Height - 1 = Height And (.Left <> Left Or .Top <> Top) Then
                 Me.Move .Left, .Top
                 If LastActive <> "" Then
+                    If Controls(LastActive).enabled Then
                     If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+                    End If
                 End If
                 Exit Sub
             ElseIf .Width = Width And .Height = Height And (.Left <> Left Or .Top <> Top) Then
                 Me.Move .Left, .Top
                 If LastActive <> "" Then
+                    If Controls(LastActive).enabled Then
                     If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+                    End If
                 End If
                 Exit Sub
             Else
@@ -1114,6 +1127,14 @@ FillThere thathDC, VarPtr(a), thatbgcolor
 End Sub
 Private Sub FillThereMyVersion4(thathDC As Long, thatRect As Long, butPos As Long, Reverse As Boolean)
 Dim a As RECT, b As Long, c As Long
+Dim color1 As Long
+If Not moveMe And Not ByPassColor Then
+If Screen.ActiveForm Is Me Then
+If Screen.ActiveControl Is gList2 Then
+color1 = 16777215
+End If
+End If
+End If
 b = 2 * lastfactor
 If b < 2 Then b = 2
 If setupxy - b < 0 Then b = setupxy \ 4 + 1
@@ -1135,13 +1156,13 @@ a.Top = a.Bottom - 1
 Else
 a.Top = setupxy - b
 End If
-FillThere thathDC, VarPtr(a), 0
+FillThere thathDC, VarPtr(a), color1
 a.Top = a.Top - b
 a.Bottom = a.Bottom - b
-FillThere thathDC, VarPtr(a), 0
+FillThere thathDC, VarPtr(a), color1
 a.Top = a.Top - b
 a.Bottom = a.Bottom - b
-FillThere thathDC, VarPtr(a), 0
+FillThere thathDC, VarPtr(a), color1
 
 End Sub
 Public Property Get Title() As Variant
@@ -1291,9 +1312,9 @@ End If
 
 End Sub
 
-Private Sub gList2_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub gList2_KeyDown(KeyCode As Integer, Shift As Integer)
 If moveMe Then
-If shift = 0 Then
+If Shift = 0 Then
 Select Case KeyCode
 Case vbKeyLeft
 movemeX = movemeX - 10 * dv15
@@ -1306,8 +1327,11 @@ movemeY = movemeY + 10 * dv15
 Case Else
     RestoreBlibkStatus
      moveMe = False
+     On Error Resume Next
         If LastActive <> "" Then
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+            End If
         End If
     Exit Sub
 End Select
@@ -1331,13 +1355,13 @@ Else
 
 Dim VR(2)
 VR(0) = KeyCode
-VR(1) = shift
+VR(1) = Shift
 If mIndex > -1 Then
     CallbackNow mMyName$ + ".KeyDown(" + CStr(index) + ")", VR()
 Else
     CallbackNow mMyName$ + ".KeyDown()", VR()
 End If
-shift = VR(1)
+Shift = VR(1)
 KeyCode = VR(0)
 If KeyCode = 40 Then
 If NoEventInfo Then
@@ -1349,12 +1373,13 @@ End Sub
 
 Private Sub gList2_LostFocus()
 RestoreBlibkStatus
+ByPassColor = False
 moveMe = False
 gList2.mousepointer = 1
 End Sub
 
 
-Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList2_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Button <> 0 Then RestoreBlibkStatus: moveMe = False
 End Sub
 
@@ -1366,8 +1391,15 @@ If Pad.Visible Then Exit Sub
 End If
 
         If LastActive <> "" Then
+            On Error Resume Next
+            If Me.WindowState = 1 Then Exit Sub
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
-            LastActive = ""
+            End If
+            If Err Then Debug.Print "error": Exit Sub
+            If MyForm3 Is Nothing Then LastActive = "": Exit Sub
+            If MyForm3.WindowState <> 1 Then LastActive = ""
+            
         End If
 End Sub
 
@@ -1441,23 +1473,34 @@ End Sub
 
 
 Private Sub glistN_CheckLostFocus()
+On Error Resume Next
 If Not moveMe Then
                 If LastActive <> "" Then
+
+                    If Controls(LastActive).enabled Then
                     If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+                    End If
                 End If
                 Else
-               If IsWine Then gList2.SetFocus
+               If IsWine Then If glistN.Visible Then gList2.SetFocus
                 End If
 End Sub
+Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
 
+KeyCode = 0
+
+Pad.Visible = False
+ElseIf KeyCode = 9 Then
+KeyCode = 0
+Pad.Visible = False
+End If
+End Sub
 Private Sub mDoc_MayQuit(Yes As Variant)
 If mQuit Or Not Visible Then Yes = True
 MyDoEvents1 Me
 End Sub
-
-
-
-Private Sub ResizeMark_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Sizable And Not dr Then
     x = x + ResizeMark.Left
     y = y + ResizeMark.Top
@@ -1474,7 +1517,7 @@ If Sizable And Not dr Then
 End If
 End Sub
 
-Private Sub ResizeMark_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub ResizeMark_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Dim addy As Single, addX As Single
 If Not Relax Then
     x = x + ResizeMark.Left
@@ -1593,6 +1636,7 @@ Friend Sub MinimizeON()
 End Sub
 Private Sub glistN_PanLeftRight(Direction As Boolean)
 Dim item As Long
+On Error Resume Next
 If Direction = True Then
 item = glistN.ListIndex
 
@@ -1604,9 +1648,12 @@ End If
 
     If LastActive <> "" Then
         If EnableStandardInfo And item = 5 Then
+        
             If gList2.Visible Then gList2.SetFocus
         Else
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+            End If
             LastActive = ""
             End If
         Else
@@ -1672,7 +1719,9 @@ If item >= 0 Then
         If EnableStandardInfo And item = 5 Then
             If gList2.Visible Then gList2.SetFocus
         Else
+            If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
+            End If
             LastActive = ""
             End If
         Else
@@ -1920,6 +1969,7 @@ Public Sub Minimize()
 If IsWine Then Exit Sub
 If Minimized Then Exit Sub
 If MyForm3 Is Nothing Then Exit Sub
+On Error Resume Next
 If gList2.Visible Then gList2.SetFocus
 MyForm3.Timer1.enabled = False
 MyForm3.Timer1.Interval = 20

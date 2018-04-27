@@ -1,9 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 3 active-X
+Version 9.3 revision 4 active-X
 
-Finish "pointer to group objects" part
-
+new switch -Ext (default)
++Ext make interpreter to extend variable's scope in modules, so we can read variables from parent module using parent name plus dot plus variable name.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

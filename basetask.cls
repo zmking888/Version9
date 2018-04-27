@@ -256,7 +256,7 @@ End If
 there:
 Err.Clear
 MyRound = a
-If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγύλευσης εκτός περιοχής από 0 έως 28"
+If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
 End Function
 
 Public Function ExistVar(ByVal name$) As Boolean
@@ -268,7 +268,7 @@ Public Function ExistVar2(ByVal name$) As Boolean
 End Function
 Public Sub ReadVar(ByVal name$, var As Variant)
     Dim i As Long, vv As Variant
-   ' If StaticCollection Is Nothing Then Exit Sub
+    If StaticCollection Is Nothing Then Exit Sub
     With StaticCollection
         If .Find(name$) Then
             If .IsObj Then
@@ -613,7 +613,7 @@ If threadsnames Is Nothing Then Exit Sub
 Dim aa As mThreadref, Tid As Long
 Dim thatProcess As TaskInterface
 Dim thatBasetask As basetask
-CONT:
+cont:
 If threadsnames.count > 0 Then
 threadsnames.ToStart
 While threadsnames.Done
@@ -624,7 +624,7 @@ If Not TaskMaster Is Nothing Then
         ThrowOne aa.Id
         ElseIf Not IamThread Then
         threadsnames.RemoveWithNoFind
-        GoTo CONT
+        GoTo cont
         End If
 Else
 ThrowOne aa.Id

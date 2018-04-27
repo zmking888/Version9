@@ -255,6 +255,6 @@ If CBool(RHS) Then Callback.Default = ctrlName
 End Property
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
-Callback.LastActive = ctrlName
+If glistN.TabStopSoft Then Callback.LastActive = ctrlName
 End Sub
 

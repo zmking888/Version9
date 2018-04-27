@@ -100,7 +100,7 @@ Set glistN = Nothing
 End Sub
 
 Private Sub glistN_BlinkNow(Face As Boolean)
-On Error GoTo EX1
+On Error GoTo ex1
     If mTimes > 0 Then mTimes = mTimes - 1: If mTimes = 0 Then glistN.BlinkON = False
     If Not glistN.BlinkON Then Face = True
     If mIndex >= 0 Then
@@ -117,11 +117,19 @@ On Error GoTo EX1
         End If
         End If
     End If
-EX1:
+ex1:
 End Sub
 
 Private Sub glistN_CheckGotFocus()
-If mlocked Then Exit Sub
+If mlocked Then
+On Error Resume Next
+'Callback.Controls(ctrlName).TabStop = False
+If Callback.LastActive = "" Then
+Callback.LastActive = "gList2"
+End If
+Callback.Controls(Callback.LastActive).SetFocus
+Exit Sub
+End If
 If Me.enabled Then
 If glistN.BackStyle = 1 Then
   If mIndex >= 0 Then
@@ -361,5 +369,5 @@ End Property
 
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
-
+If glistN.TabStopSoft Then Callback.LastActive = ctrlName
 End Sub

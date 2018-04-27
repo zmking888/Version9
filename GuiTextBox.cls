@@ -364,18 +364,18 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
 Dim VR(2)
 VR(0) = KeyCode
-VR(1) = shift
+VR(1) = Shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
 KeyCode = VR(0)
-shift = VR(1)
-If KeyCode = vbKeyF10 And shift <> 0 Then
+Shift = VR(1)
+If KeyCode = vbKeyF10 And Shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -386,7 +386,7 @@ Exit Sub
 End If
 If KeyCode = vbKeyUp Then
 ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
 If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
@@ -422,7 +422,7 @@ On Error Resume Next
 glistN.SetFocus
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub glistN_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 ' RaiseEvent MouseMove(Button, shift, x, y)
 End Sub
 
@@ -574,7 +574,7 @@ End Function
 
 Private Sub glistN_UnregisterGlist()
 If Not glistN.Spinner Then glistN.NoWheel = True
-Callback.LastActive = ctrlName
+If glistN.TabStopSoft Then Callback.LastActive = ctrlName
 On Error Resume Next
 Set LastGlist = Nothing
 If Err.Number > 0 Then glistN.NoWheel = True

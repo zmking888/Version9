@@ -1483,7 +1483,7 @@ er11:
 Err.Clear
 On Error Resume Next
 If fh <> 0 Then Close fh
-MyEr "Can't read image", "Δεν βμπροώ να διαβάσω το αρχείο"
+MyEr "Can't read image", "Δεν μπορώ να διαβάσω το αρχείο"
 End Sub
 
 Private Sub SentToClipBoard()

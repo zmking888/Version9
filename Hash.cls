@@ -131,8 +131,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Friend Function Find2(Key As String, num As Long, Optional checktype As Boolean, Optional isglobal As Boolean) As Boolean
 Dim k As Long
@@ -235,7 +235,7 @@ place HashFunc(Key), a
 exxx:
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long

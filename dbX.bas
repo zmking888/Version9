@@ -82,7 +82,7 @@ monitor = FindFormSScreen(Form1)
 Else
 monitor = FindFormSScreen(Form4)
 End If
-If HelpLastWidth > ScrInfo(monitor).width Then HelpLastWidth = -1
+If HelpLastWidth > ScrInfo(monitor).Width Then HelpLastWidth = -1
 doriginal$ = d$
 d$ = Replace(d$, "'", "")
 If d$ <> "" Then If Right$(d$, 1) = "(" Then d$ = d$ + ")"
@@ -92,19 +92,24 @@ If Right$(d$, 1) = "(" Then d$ = d$ + ")"
 p$ = subHash.Show
 
 While ISSTRINGA(p$, c$)
-IsLabelA "", c$, b$
+'IsLabelA "", c$, b$
+b$ = GetName(GetStrUntil(" ", c$))
+
 If Right$(b$, 1) = "(" Then b$ = b$ + ")"
 If gp$ <> "" Then gp$ = b$ + ", " + gp$ Else gp$ = b$
 Wend
 If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf Else b$ = vbNullString
 If Eng Then
-        sHelp "User Modules/Functions [F12]", b$ & gp$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp "User Modules/Functions [F12]", b$ & gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 Else
-        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ & gp$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp "Τμήματα/Συναρτήσεις Χρήστη [F12]", b$ & gp$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
 End If
 vHelp Not Form4.Visible
 Exit Sub
-ElseIf GetSub(d$, i) Or d$ = here$ Then
+ElseIf GetSub(d$, i) Then
+GoTo CONTHERE
+ElseIf GetlocalSubExtra(d$, i) Or d$ = here$ Then
+CONTHERE:
 If d$ = here$ Then i = bstack.OriginalCode
 If vH_title$ <> "" Then
 b$ = "<| " & vH_title$ & vbCrLf & vbCrLf
@@ -130,7 +135,7 @@ Dim ss$
     Else
      ss$ = SBcode(i)
      End If
-        sHelp d$, c$ + "  " & b$ & ss$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp d$, c$ + "  " & b$ & ss$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
 Exit Sub
@@ -196,7 +201,7 @@ Dim sec$
         End If
         If vH_title$ <> "" Then b$ = "<| " & vH_title$ & vbCrLf & vbCrLf & b$ Else b$ = vbCrLf & b$
         
-        sHelp gp$, sec$ + c$ & "  " & b$, (ScrInfo(monitor).width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        sHelp gp$, sec$ + c$ & "  " & b$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
     
         vHelp Not Form4.Visible
         End If
@@ -469,11 +474,11 @@ End If
         Set TBL = CreateObject("ADOX.TABLE")
            Set cat = CreateObject("ADOX.Catalog")
            Set cat.activeconnection = myBase
-           If cat.activeconnection.errors.Count > 0 Then
+           If cat.activeconnection.errors.count > 0 Then
            MyEr "Can't connect to Base", "Δεν μπορώ να συνδεθώ με τη βάση"
            Exit Sub
            End If
-        If cat.TABLES.Count > 0 Then
+        If cat.TABLES.count > 0 Then
         For Each TBL In cat.TABLES
         
         If TBL.Type = "TABLE" Then
@@ -483,8 +488,8 @@ End If
         
         cnt = cnt + 1
                             stac1.DataStr TBL.name
-                       If TBL.indexes.Count > 0 Then
-                                         For j = 0 To TBL.indexes.Count - 1
+                       If TBL.indexes.count > 0 Then
+                                         For j = 0 To TBL.indexes.count - 1
                                                    With TBL.indexes(j)
                                                    If (.unique = False) And (.indexnulls = 0) Then
                                                         KB = True
@@ -509,9 +514,9 @@ End If
          cnt = 1
                      rs.Open "Select * From [" & TBL.name & "] ;", myBase, 3, 4 'adOpenStatic, adLockBatchOptimistic
                                          stac1.Flush
-                                        stac1.DataVal CDbl(rs.FIELDS.Count)
-                                        If TBL.indexes.Count > 0 Then
-                                         For j = 0 To TBL.indexes.Count - 1
+                                        stac1.DataVal CDbl(rs.FIELDS.count)
+                                        If TBL.indexes.count > 0 Then
+                                         For j = 0 To TBL.indexes.count - 1
                                                    With TBL.indexes(j)
                                                    If (.unique = False) And (.indexnulls = 0) Then
                                                    vindx = True
@@ -528,7 +533,7 @@ End If
                                             Else
                                             stac1.DataVal CDbl(0)
                                         End If
-                     For i = 0 To rs.FIELDS.Count - 1
+                     For i = 0 To rs.FIELDS.count - 1
                      With rs.FIELDS(i)
                              stac1.DataStr .name
                              If .Type = 203 And .DEFINEDSIZE >= 536870910# Then
@@ -564,12 +569,12 @@ End If
                      Next i
                      rs.Close
                      If vindx Then
-                    If TBL.indexes.Count > 0 Then
-                             For j = 0 To TBL.indexes.Count - 1
+                    If TBL.indexes.count > 0 Then
+                             For j = 0 To TBL.indexes.count - 1
                           With TBL.indexes(j)
                           If (.unique = False) And (.indexnulls = 0) Then
-                          stac1.DataVal CDbl(.Columns.Count)
-                          For k = 0 To .Columns.Count - 1
+                          stac1.DataVal CDbl(.Columns.count)
+                          For k = 0 To .Columns.count - 1
                             stac1.DataStr .Columns(k).name
                              stac1.DataStr inames(.Columns(k).sortorder, Lang)
                           Next k
@@ -733,7 +738,7 @@ MyEr "Can't append " & Err.Description, "Αδυναμία προσθήκης:" & Err.Description
 End If
 
 End Sub
-Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
+Public Sub getrow(bstackstr As basetask, r$, Optional ERL As Boolean = True, Optional Search$ = " = ", Optional Lang As Long = 0, Optional IamHelpFile As Boolean = False)
 
 Dim base As String, table$, from As Long, first$, Second$, ok As Boolean, fr As Double, stac1$, p As Double, i&
 ok = False
@@ -746,18 +751,18 @@ from = CLng(fr)
 If FastSymbol(r$, ",") Then
 If IsStrExp(bstackstr, r$, first$) Then
 If FastSymbol(r$, ",") Then
-If search$ = vbNullString Then
-    If IsStrExp(bstackstr, r$, search$) Then
-    search$ = " " & search$ & " "
+If Search$ = vbNullString Then
+    If IsStrExp(bstackstr, r$, Search$) Then
+    Search$ = " " & Search$ & " "
         If FastSymbol(r$, ",") Then
                 If IsExp(bstackstr, r$, p) Then
-                Second$ = search$ & Str$(p)
+                Second$ = Search$ & Str$(p)
                 ok = True
             ElseIf IsStrExp(bstackstr, r$, Second$) Then
             If InStr(Second$, "'") > 0 Then
-                Second$ = search$ & Chr(34) & Second$ & Chr(34)
+                Second$ = Search$ & Chr(34) & Second$ & Chr(34)
             Else
-                Second$ = search$ & "'" & Second$ & "'"
+                Second$ = Search$ & "'" & Second$ & "'"
                 End If
                 ok = True
             End If
@@ -766,13 +771,13 @@ If search$ = vbNullString Then
         End If
     Else
      If IsExp(bstackstr, r$, p) Then
-            Second$ = search$ & Str$(p)
+            Second$ = Search$ & Str$(p)
             ok = True
             ElseIf IsStrExp(bstackstr, r$, Second$) Then
                       If InStr(Second$, "'") > 0 Then
-                Second$ = search$ & Chr(34) & Second$ & Chr(34)
+                Second$ = Search$ & Chr(34) & Second$ & Chr(34)
             Else
-                Second$ = search$ & "'" & Second$ & "'"
+                Second$ = Search$ & "'" & Second$ & "'"
                 End If
             ok = True
         End If
@@ -929,7 +934,7 @@ If from >= 0 Then
   rec.Move from - 1
   End If
 End If
-    For i& = rec.FIELDS.Count - 1 To 0 Step -1
+    For i& = rec.FIELDS.count - 1 To 0 Step -1
 
    Select Case rec.FIELDS(i&).Type
 Case 1, 2, 3, 4, 5, 6
@@ -1209,7 +1214,7 @@ Dim myBase
            If Err.Number > 0 Then Err.Clear: myBase.errors.Clear
             myBase.Execute com2execute
 
-If myBase.errors.Count <> 0 Then
+If myBase.errors.count <> 0 Then
 MyEr "Can't execute command", "Δεν μπορώ εκτελέσω εντολή"
  myBase.errors.Clear
 End If
@@ -1309,7 +1314,7 @@ mcat.TABLES(tablename).indexes("ndx").Remove
 Err.Clear
 mcat.TABLES(tablename).indexes.Refresh
 
-   If mcat.TABLES.Count > 0 Then
+   If mcat.TABLES.count > 0 Then
    okntable = True
         For Each mtable In mcat.TABLES
         If mtable.Type = "TABLE" Then
@@ -1332,7 +1337,7 @@ Else
  mtable.indexes("ndx").Remove  ' remove the old index/
  End If
  Err.Clear
- If mcat.activeconnection.errors.Count > 0 Then
+ If mcat.activeconnection.errors.count > 0 Then
  mcat.activeconnection.errors.Clear
  End If
  Err.Clear
@@ -1356,7 +1361,7 @@ Else
                  
         End If
         Wend
-        If pIndex.Columns.Count > 0 Then
+        If pIndex.Columns.count > 0 Then
         mtable.indexes.Append pIndex
              If Err.Number Then
           '   mtable.Append pIndex
@@ -1371,7 +1376,7 @@ End If
 End Sub
 Public Sub NewTable(bstackstr As basetask, r$)
 'BASE As String, tablename As String, ParamArray flds()
-Dim base As String, tablename As String, fs As String, i&, N As Double, l As Double, ok As Boolean
+Dim base As String, tablename As String, fs As String, i&, n As Double, l As Double, ok As Boolean
 ok = False
 If IsStrExp(bstackstr, r$, base) Then
 If FastSymbol(r$, ",") Then
@@ -1454,7 +1459,7 @@ End If
          
 ' check if table exist
 
-           If cat.TABLES.Count > 0 Then
+           If cat.TABLES.count > 0 Then
         For Each mtable In cat.TABLES
           If mtable.Type = "TABLE" Then
         If mtable.name = tablename Then
@@ -1476,18 +1481,18 @@ End If
                         If IsStrExp(bstackstr, r$, fs) Then
                         one_ok = True
                                 If FastSymbol(r$, ",") Then
-                                        If IsExp(bstackstr, r$, N) Then
+                                        If IsExp(bstackstr, r$, n) Then
                                 
                                             If FastSymbol(r$, ",") Then
                                                 If IsExp(bstackstr, r$, l) Then
-                                                If N = 8 Then N = 7: l = 0
-                                                If N = 10 Then N = 202
-                                                If N = 12 Then N = 203: l = 0
+                                                If n = 8 Then n = 7: l = 0
+                                                If n = 10 Then n = 202
+                                                If n = 12 Then n = 203: l = 0
                                                     If l <> 0 Then
                                                 
-                                                     .Append fs, N, l
+                                                     .Append fs, n, l
                                                     Else
-                                                     .Append fs, N
+                                                     .Append fs, n
                                            
                                                     End If
                                         
@@ -1748,7 +1753,7 @@ Dim rec
    Else
    myBase.errors.Clear
    myBase.Execute "DELETE * FROM [" & table$ & "] WHERE " & first$ & " = " & Second$
-   If myBase.errors.Count > 0 Then
+   If myBase.errors.count > 0 Then
    MyEr "Can't delete " & table$, "Δεν μπορώ να διαγράψω"
    Else
     DELfields = True
@@ -1789,10 +1794,10 @@ Sub CloseAllConnections()
 Dim v As Variant, bb As Boolean
 On Error Resume Next
 If Not Init Then Exit Sub
-If conCollection.Count > 0 Then
+If conCollection.count > 0 Then
 Dim i As Long
 Err.Clear
-For i = conCollection.Count - 1 To 0 Step -1
+For i = conCollection.count - 1 To 0 Step -1
 On Error Resume Next
 conCollection.index = i
 If conCollection.IsObj Then

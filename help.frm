@@ -55,8 +55,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
-Public WithEvents Label1 As TextViewer
-Attribute Label1.VB_VarHelpID = -1
+Public WithEvents label1 As TextViewer
+Attribute label1.VB_VarHelpID = -1
 Private l As Long
 Private t As Long
 Private mt As Integer
@@ -78,7 +78,7 @@ End Sub
 
 
 
-Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
 If KeyCode = vbKeyF12 Then
 showmodules
 End If
@@ -104,28 +104,28 @@ setupxy = 20 * Helplastfactor
 scrTwips = Screen.TwipsPerPixelX
 gList1.CapColor = rgb(255, 160, 0)
 gList1.LeftMarginPixels = 4
-Set Label1 = New TextViewer
-Set Label1.Container = gList1
-Label1.FileName = vbNullString
-Label1.glistN.NoMoveDrag = True
-Label1.glistN.DropEnabled = False
-Label1.glistN.DragEnabled = Not abt
-Label1.NoMark = True
-Label1.NoColor = True
-Label1.EditDoc = False
-Label1.nowrap = False
-Label1.enabled = False    '' true before
-Label1.glistN.FloatList = True
-Label1.glistN.MoveParent = True
-With Label1.glistN
+Set label1 = New TextViewer
+Set label1.Container = gList1
+label1.FileName = vbNullString
+label1.glistN.NoMoveDrag = True
+label1.glistN.DropEnabled = False
+label1.glistN.DragEnabled = Not abt
+label1.NoMark = True
+label1.NoColor = True
+label1.EditDoc = False
+label1.nowrap = False
+label1.enabled = False    '' true before
+label1.glistN.FloatList = True
+label1.glistN.MoveParent = True
+With label1.glistN
 If FeedbackExec$ = vbNullString Or Not abt Then
-.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "(", ")", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
-.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", ")", "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
-.WordCharRightButIncluded = "(" + ChrW(160) ' so aaa(sdd) give aaa( as word
+.WordCharLeft = ConCat(":", "{", "}", "[", "]", ",", "!", "'", ";", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
+.WordCharRight = ConCat(":", "{", "}", "[", "]", ",", , "!", ";", "'", "=", ">", "<", """", " ", "+", "-", "/", "*", "^")
+.WordCharRightButIncluded = ChrW(160) ' so aaa(sdd) give aaa( as word
 Else
 .WordCharLeft = "['"
 .WordCharRight = "']"
-.WordCharRightButIncluded = "(" + ChrW(160)
+.WordCharRightButIncluded = ChrW(160)
 End If
 End With
 mt = DXP
@@ -151,7 +151,7 @@ End Sub
 Public Sub moveMe()
 ScaleDialog Helplastfactor, HelpLastWidth
 Hook2 hWND, gList1
-Label1.glistN.SoftEnterFocus
+label1.glistN.SoftEnterFocus
 If IsWine Then
 If Not Screen.ActiveForm Is Nothing Then
 If Not Screen.ActiveForm Is Form4 Then
@@ -161,7 +161,7 @@ End If
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
     
@@ -187,7 +187,7 @@ If Button = 1 Then
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
@@ -260,7 +260,7 @@ End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 
 If dr Then Me.mousepointer = 0
 dr = False
@@ -288,8 +288,8 @@ End Sub
 
 
 Private Sub Form_Unload(Cancel As Integer)
-Label1.Dereference  ' to ensure that no reference hold objects..
-Set Label1 = Nothing
+label1.Dereference  ' to ensure that no reference hold objects..
+Set label1 = Nothing
 Helplastfactor = 1
 helpSizeDialog = 1
 End Sub
@@ -314,11 +314,11 @@ gList1.EditFlag = False
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
-If shift <> 0 Then
-If Label1.SelectionColor = rgb(255, 64, 128) Then Label1.SelectionColor = 0
-Label1.NoMark = False
-Label1.EditDoc = True
+Private Sub gList1_KeyDown(KeyCode As Integer, Shift As Integer)
+If Shift <> 0 Then
+If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
+label1.NoMark = False
+label1.EditDoc = True
 End If
 Select Case KeyCode
 Case vbKeyDelete, vbKeyBack, vbKeyReturn, vbKeySpace
@@ -329,7 +329,7 @@ MKEY$ = MKEY$ & ChrW$(KeyCode)
 KeyCode = 0
 End If
 End Select
-If mHelp Or abt Then shift = 0
+If mHelp Or abt Then Shift = 0
 
 End Sub
 
@@ -337,29 +337,29 @@ End Sub
 
 Private Sub glist1_MarkOut()
 If flagmarkout Then
-If Label1.SelectionColor = rgb(255, 64, 128) Then Label1.SelectionColor = 0
+If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 flagmarkout = False: Exit Sub
 End If
 End Sub
 
-Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub gList1_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 flagmarkout = True
 If mHelp Then
-shift = 0
+Shift = 0
 End If
 End Sub
 
 Private Sub gList1_selected2(item As Long)
 
-Label1.NoMark = False
-Label1.EditDoc = True
+label1.NoMark = False
+label1.EditDoc = True
 End Sub
 
 Private Sub glist1_WordMarked(ThisWord As String)
 If abt Then
 feedback$ = Trim$(Replace(ThisWord, ChrW(160), " "))
 feednow$ = FeedbackExec$
-Label1.SelLengthSilent = 0
+label1.SelLengthSilent = 0
 CallGlobal feednow$
 Else
 If Not mHelp Then
@@ -368,17 +368,17 @@ If Form2.Visible Then
     sHelp Form2.gList2.HeadLine, Form2.testpad.Text, vH_x, vH_y
     vHelp
     If TestShowCode Then
-    Label1.SelStartSilent = Form2.testpad.SelStart
-    Label1.SelLengthSilent = 0
-    Label1.SelectionColor = rgb(255, 64, 128)
-    If Form2.testpad.SelStart > 0 And Form2.testpad.SelLength > 0 Then Label1.SelLength = Form2.testpad.SelLength
+    label1.SelStartSilent = Form2.testpad.SelStart
+    label1.SelLengthSilent = 0
+    label1.SelectionColor = rgb(255, 64, 128)
+    If Form2.testpad.SelStart > 0 And Form2.testpad.SelLength > 0 Then label1.SelLength = Form2.testpad.SelLength
     End If
     Else
     ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
     End If
     Else
-    Label1.SelLengthSilent = 0
-    Label1.SelectionColor = 0
+    label1.SelLengthSilent = 0
+    label1.SelectionColor = 0
 ffhelp Trim$(Replace(ThisWord, ChrW(160), " "))
 End If
 
@@ -465,10 +465,10 @@ myform Me, Left, Top, allwidth, allheight, True, factor
 
   
 gList1.addpixels = 4 * factor
-Label1.Move borderleft, bordertop, itemWidth, allheight - bordertop * 2
+label1.Move borderleft, bordertop, itemWidth, allheight - bordertop * 2
 
-Label1.NewTitle vH_title$, (4 + UAddPixelsTop) * factor
-Label1.Render
+label1.NewTitle vH_title$, (4 + UAddPixelsTop) * factor
+label1.Render
 gList1.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
 gList1.FloatLimitLeft = VirtualScreenWidth() - borderleft * 3
 
