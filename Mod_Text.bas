@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3035,7 +3035,7 @@ If safegroup.LastOpen <> vbNullString Then
         safegroup.LastOpen = vbNullString
         End If
         End If
-        y1 = globalvar(w$, 0#, , True, here$ = vbNullString)
+        y1 = globalvar(w$, 0#, , here$ = vbNullString)
           Set safegroup = safegroup.Link
         UnFloatGroup bstack, w$, y1, safegroup, , True
         globalvar w$, y1, True, True
@@ -3250,6 +3250,7 @@ RetStackSize = bstack.RetStackTotal
         End If
         End If
         Else
+        
             MyEr "Double use of SuperClass", "Διπλή χρήση της Υπερκλάσης"
             GoTo fastexit
         End If
@@ -4915,8 +4916,120 @@ again3:
             Else
             If TypeOf bstack.lastobj Is Group Then GoTo again3
             End If
+         If MaybeIsSymbol(aa$, "IiΕε") Then
+             If Fast2Label(aa$, "IS", 2, "ΕΙΝΑΙ", 5, 5) Then
+    Set r1 = bstack.lastobj
+    If r1 Is Nothing Then
+        MyEr "No object found", "Δεν βρήκα αντικείμενο"
+        IsExpA = False
+        Exit Function
+    Else
+        If TypeOf r1 Is Group Then
+            If r1.IamApointer Then
+            If r1.Link.IamFloatGroup Then
+                Set r1 = r1.Link
+            Else
+            If GetVar(bstack, r1.lasthere + "." + r1.GroupName, rightlevel) Then
+            Set r1 = var(rightlevel)
+                rightlevel = 0
+            Else
+            Set r1 = New Group
+            End If
+            
+            End If
+            End If
+        End If
+        Set bstack.lastobj = Nothing
+        Set bstack.lastpointer = Nothing
+        If TypeOf r1 Is Group Then
+            If GetPointer(bstack, aa$) Then
+                Set r = bstack.lastpointer
+                Set bstack.lastpointer = Nothing
+                Set bstack.lastobj = Nothing
+            Else
+                Set bstack.lastobj = Nothing
+                    MyEr "No object found", "Δεν βρήκα αντικείμενο"
+                IsExpA = False
+                Exit Function
+            End If
+            If TypeOf r Is Group Then
+                If r.IamApointer Then
+                If r.Link.IamFloatGroup Then
+                    Set r = r.Link
+                    Else
+                        If GetVar(bstack, r.lasthere + "." + r.GroupName, rightlevel) Then
+                            Set r = var(rightlevel)
+                            rightlevel = 0
+                        Else
+                            Set r1 = New Group
+                        End If
+                    End If
+                End If
+            End If
+        ElseIf IsSymbol(aa$, "NOTHING", 7) Then
+            If TypeOf r1 Is mHandler Then
+            If CheckLastHandlerVariant(r1, var()) Then
+            If r1.indirect > 0 Then
+            Set r1 = var(r1.indirect)
+            Else
+            Set r1 = r1.objref
+            End If
+            End If
+            End If
+            Set r = Nothing
+         ElseIf IsSymbol(aa$, "ΤΙΠΟΤΑ", 6) Then
+            If TypeOf r1 Is mHandler Then
+            If CheckLastHandlerVariant(r1, var()) Then
+            If r1.indirect > 0 Then
+            Set r1 = var(r1.indirect)
+            Else
+            Set r1 = r1.objref
+            End If
+            End If
+            End If
+            Set r = Nothing
+        ElseIf IsNumber(bstack, aa$, r) Then
+            Set bstack.lastpointer = Nothing
+            If bstack.lastobj Is Nothing Then
+                MyEr "No object found", "Δεν βρήκα αντικείμενο"
+                IsExpA = False
+                Exit Function
+                
+            End If
+            Set r = bstack.lastobj
+            Set bstack.lastobj = Nothing
+            If TypeOf r1 Is mHandler Then
+            If CheckLastHandlerVariant(r1, var()) Then
+            If r1.indirect > 0 Then
+            Set r1 = var(r1.indirect)
+            Else
+            Set r1 = r1.objref
+            End If
+            End If
+            End If
+            If TypeOf r Is mHandler Then
+            If CheckLastHandlerVariant(r, var()) Then
+            If r.indirect > 0 Then
+            Set r = var(r.indirect)
+            Else
+            Set r = r.objref
+            End If
+            End If
+            
+            End If
+        
+        End If
+            IsExpA = True
+            ac = 0
+            r = CBool(r1 Is r)
+            r1 = 1
+        End If
+    End If
+
+End If
         End If
 LeaveIt:
+       
         IsExpA = True
         If po = 1 Then
             po = r
@@ -4976,6 +5089,7 @@ LeaveIt:
 r1 = 1
 MUL = 0
 ''second  loop Logic...
+secodlooplogic:
 Do
   If Fast2Symbol(aa$, "**", 2, "^", 1) Then
             ' get from right number or expression
@@ -7703,7 +7817,6 @@ If FastSymbol(a$, "@") Then
      If Right$(s$, 1) = "(" Then FastSymbol a$, ")"
     If GetVar(bstack, s$, VR) Then
     r = SG * True
-
  w1 = Abs(Asc(v$) < 128)
 If IsLabelSymbolNew(a$, "ΩΣ", "AS", w1) Then
 If IsLabel(bstack, a$, s$) Then
@@ -25549,12 +25662,17 @@ If Not MyIsObject(var(Number)) Then
 Set var(Number) = aa
 aa.t1 = 0
 Else
+If var(Number) Is Nothing Then
+Number = -1
+
+Else
 Do While TypeOf var(Number) Is mHandler
 If var(Number).indirect < 0 Then Exit Do
 If k > 20 Then MyEr "too many references", "πολλές αναφορές": Exit Do
 Number = var(Number).indirect
 k = k + 1
 Loop
+End If
 there:
 aa.indirect = Number
 End If
@@ -45641,6 +45759,7 @@ If IsLabelSymbolNew(rest$, "ΑΥΤΟ", "THIS", Lang) Then
 Else
     x1 = Abs(IsLabel(basestack, rest$, what$))
 End If
+again:
 If x1 = 3 Then
 HasStrName = True
 strName$ = what$
@@ -45648,8 +45767,6 @@ what$ = Left$(what$, Len(what$) - 1)
 x1 = 1
 End If
 If x1 = 1 Then
-'    If entrypoint > 98 Then
-    
     If IsLabelSymbolNew(rest$, "ΤΥΠΟΣ", "TYPE", Lang) Then
         If IsStrExp(basestack, rest$, ss$) Then
             s$ = basestack.GroupName
@@ -45766,6 +45883,7 @@ contthere:
                     MyEr "Used only with Group WithEvents", "Χρησιμοποιείται μόνο με την Ομάδα ΜεΓεγονότα"
                     ProcGroup = False
                     End If
+                    
                 ElseIf entrypoint = 99 Then
 
                                 var(i).IamGlobal = True
@@ -45783,7 +45901,14 @@ contthere:
                             
                                 Set basestack.lastobj = Nothing
                 Else
-                var(i).GroupName = what$ + "."
+                             var(i).GroupName = what$ + "."
+                             If FastSymbol(rest$, ",") Then
+                             x1 = Abs(IsLabel(basestack, rest$, what$))
+                            If x1 = 1 Or x1 = 3 Then GoTo again
+                            SyntaxError
+                            ProcGroup = False
+                            Exit Function
+                            End If
                 End If
             
                 Exit Function
@@ -49668,6 +49793,7 @@ MyEr "Not string found", "Δεν βρήκα αλφαριθμητικό"
 End Function
 
 Function CheckTwo(v1&, v2&) As Boolean
+Dim one As Group, two As Group
 If Typename(var(v1&)) <> "Group" Then
     Dim a1 As Variant, b1 As Variant
     If Typename(var(v1&)) = "mHandler" Then
@@ -49705,24 +49831,32 @@ If Typename(var(v1&)) <> "Group" Then
     CheckTwo = Typename(a1) = Typename(b1)
 
 ElseIf Typename(var(v2&)) = "Group" Then
-If var(v1&).IamSuperClass Then
-If var(v2&).IamSuperClass Then
+Set one = var(v1&)
+If one.IamApointer Then
+Set one = one.Link
+End If
+Set two = var(v2&)
+If two.IamApointer Then
+Set two = two.Link
+End If
+If one.IamSuperClass Then
+If two.IamSuperClass Then
     CheckTwo = False ' no two superclass as the same, (maybe they have the same kind of members)
     ' because superclass may have unique members, but also have unique values
 Else
 ' check if second is kind of superclass
-    CheckTwo = var(v1&).SuperClassList Is var(v2&).SuperClassList
+    CheckTwo = one.SuperClassList Is two.SuperClassList
 End If
 Else ' check first if has the same superclass
-If var(v1&).SuperClassList Is var(v2&).SuperClassList Then
-If var(v2&).IamSuperClass Then
+If one.SuperClassList Is two.SuperClassList Then
+If two.IamSuperClass Then
     ' so v1& as V2& if v2& is a superclass (same as before)
     CheckTwo = True
 Else
 ' so now we have to check lists
 Dim mS As mStiva, ms2 As mStiva
-Set mS = var(v1&).PrepareSorosToCompare(var())
-Set ms2 = var(v2&).PrepareSorosToCompare(var())
+Set mS = one.PrepareSorosToCompare(var())
+Set ms2 = two.PrepareSorosToCompare(var())
 ' check ms2 against ms
 ' every time we found one in ms2 we remove it from both
 Dim i As Long, j As Long
@@ -53448,21 +53582,15 @@ assigngroup:
                                         UnFloatGroupReWriteVars bstack, w$, v, myobject
                                         here = sw$
                                     ElseIf var(v).IamApointer And myobject.IamApointer Then
-                                    If var(v).IamFloatGroup Then
-                                    If myobject.IamFloatGroup Then
-                                  '    CopyGroup1 var(v), myobject
-                                      Set var(v) = myobject
-                                      Else
-                                      Set var(v) = myobject
-                                    End If
-
-                                    Else
-                                    Set var(v) = myobject
-                                    End If
+                                        Set var(v) = myobject
                                     Else
                                         Set myobject = Nothing
                                         bstack.GroupName = ss$
-                                        GroupWrongUse
+                                        If var(v).IamApointer Then
+                                            MyEr "Use -> to get a pointer to group", "Χρησιμοποίησε το -> για να πάρεις δείκτη σε ομάδα"
+                                        Else
+                                            GroupWrongUse
+                                        End If
                                         Exec1 = 0: ExecuteVar = 8
                                         Exit Function
                                     End If
@@ -53832,7 +53960,10 @@ checksyntax:
                     Case Else
                         var(v) = CDbl(Not CBool(var(v)))
                         End Select
+                    Case "->"
+                    GoTo assignpointer
                     Case Else
+                    
                     ExecuteVar = 6: Exit Function
 
                 End Select
@@ -54047,9 +54178,23 @@ End If
 Exit Function
 assignpointer:
                     If GetPointer(bstack, b$) Then
+                    If MyIsObject(var(v)) Then
+                    If var(v).IamApointer Then
+                    Set var(v) = bstack.lastpointer
+                    ElseIf var(v).soros.count > 0 Or var(v).FuncList <> vbNullString Then
+                    MyEr "Can't assign pointer to named group", "Δεν μπορώ να βάλω δείκτη σε επώνυμη ομάδα"
+                    Set bstack.lastpointer = Nothing
+                        Set bstack.lastobj = Nothing  '???
+                     Exec1 = 0: ExecuteVar = 8: Exit Function
+                    Else
                      Set var(v) = bstack.lastpointer
+                     End If
+                     Else
+                     Set var(v) = bstack.lastpointer
+                     End If
                      Set bstack.lastpointer = Nothing
                         Set bstack.lastobj = Nothing  '???
+                        
                     Else
                      MyEr "No Pointer Found", "Δεν βρήκα δείκτη"
                        Set bstack.lastobj = Nothing

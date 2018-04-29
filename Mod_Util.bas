@@ -1042,10 +1042,10 @@ Err.Clear
                             Set LoadMyPicture = LoadPicture(s1$)
                                 If Err.Number > 0 Then
                                     Err.Clear
-                                    GoTo CONTHERE
+                                    GoTo conthere
                                 End If
                             Else
-CONTHERE:
+conthere:
                           If useback Then
                               Set LoadMyPicture = LoadPictureGDIPlus(s1$, , , bcolor, True)
                            Else
@@ -2063,7 +2063,7 @@ If Not nopr Then
     
     ruller& = ddd.CurrentX \ mybasket.Xt
 End If
-CONTHERE:
+conthere:
 If Not nopr Then LCTbasket ddd, mybasket, npy, PX: ddd.CurrentX = ddd.CurrentX + dv2x15
 End If
 Case Else
@@ -2922,7 +2922,7 @@ Next i
 
 End Sub
 
-Sub Original(bstack As basetask, COM$)
+Sub original(bstack As basetask, COM$)
 Dim d As Object, b$
 
 If COM$ <> "" Then QUERYLIST = vbNullString
@@ -5426,7 +5426,7 @@ again:
             ' after
             If part$ = "S" And Level& = 0 Then
             '
-             If Mid$(a$, pos + 1, 1) = ")" Then pos = pos + 2: GoTo CONTHERE
+             If Mid$(a$, pos + 1, 1) = ")" Then pos = pos + 2: GoTo conthere
              
             End If
             ElseIf Right$(b$, 1) = "a" Then
@@ -5562,7 +5562,7 @@ again22:
          Case "="
             If Mid$(a$, pos + 1, 1) = ">" Then
                 pos = pos + 2
-                GoTo CONTHERE
+                GoTo conthere
                 End If
 there1:
                 If b$ & part$ <> "" Then
@@ -5617,7 +5617,7 @@ there1:
 End If
         pos = pos + 1
         
-CONTHERE:
+conthere:
   
 Loop
 
@@ -6655,6 +6655,35 @@ If TypeOf obj Is mHandler Then
     
 End If
 If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandler = True: Exit Function
+Set obj = first
+End Function
+Public Function CheckLastHandlerVariant(obj, vv() As Variant) As Boolean
+Dim oldobj As Object, first As Object
+If obj Is Nothing Then Exit Function
+Set first = obj
+
+Dim kk As Long
+again:
+If kk > 20 Then Set obj = first: Exit Function
+If obj Is Nothing Then Exit Function
+If TypeOf obj Is mHandler Then
+    'If obj.t1 = 3 Then
+        If obj.indirect >= 0 And obj.indirect <= var2used Then
+                Set oldobj = obj
+                Set obj = vv(obj.indirect)
+                kk = kk + 1
+                GoTo again
+        Else
+                kk = kk + 1
+                Set oldobj = obj
+                Set obj = obj.objref
+                GoTo again
+        End If
+
+    'End If
+    
+End If
+If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandlerVariant = True: Exit Function
 Set obj = first
 End Function
 Public Function CheckLastHandlerOrIterator(obj As Object, vv() As Variant, lastindex As Long) As Boolean
@@ -9554,10 +9583,10 @@ Else
     r = CCur(ig$ & DE$)
     sng = sng + 1
     Case Else
-GoTo CONTHERE
+GoTo conthere
     End Select
     Else
-CONTHERE:
+conthere:
         If useRtypeOnly Then
 conthere1:
         If usespecial Then
