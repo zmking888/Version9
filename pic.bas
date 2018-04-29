@@ -3505,6 +3505,8 @@ p2 = StrPtr(a$): l = l - 1
     GetMem2 i, p1
     If p1 = 32 Or p1 = 160 Then
     i = i + 2
+    ElseIf p1 = 160 Then
+    i = i + 2
     Else
     GetMem2 i + 2, p3
     If p1 <> 13 And p3 <> 10 Then Exit Do

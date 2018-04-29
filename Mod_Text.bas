@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 5
+Global Const Revision = 6
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1609,7 +1609,6 @@ End If
        
 End Sub
 Public Sub PopStage(basestack As basetask)
-Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant
         With basestack.RetStack
         If .LookTopVal = -1 Then
         basestack.SubLevel = basestack.SubLevel - 1
@@ -2877,7 +2876,7 @@ End Sub
 
 Private Sub ProcessOper(bstack As basetask, first As Object, oper$, r As Variant, Lang As Long)
 Dim where As Long, w$, ok As Boolean
-Dim soroslen As Long, flag As Boolean
+Dim soroslen As Long, flag As Boolean, backup As Object
 flag = Not first Is Nothing
 PushStage bstack, False
 
@@ -2886,6 +2885,7 @@ If soroslen < 0 Then SyntaxError: Exit Sub
 ' if flag Then bstack.soros.PushObj first
 ' change in Version 9.2 revision 3
  If flag Then
+ Set backup = bstack.lastobj
  bstack.soros.PushObj bstack.lastobj
  Set bstack.lastobj = first
  End If
@@ -2901,13 +2901,18 @@ End If
 var(where).FloatGroupName = w$
 NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + oper$ + "()", ok
 If soroslen < bstack.soros.Total Then
-If soroslen + 1 = bstack.soros.Total And flag Then
-r = bstack.soros.PopVal
-Set bstack.lastobj = Nothing
-bstack.DropNdot 2
-PopStage bstack
-Exit Sub
-End If
+    If soroslen + 1 = bstack.soros.Total And flag Then
+    r = bstack.soros.PopVal
+   If ok Then
+   Set bstack.lastobj = Nothing
+   ElseIf flag Then
+   ' when we add two groups which we don't define operator now set result as the last group
+       Set bstack.lastobj = backup
+   End If
+    bstack.DropNdot 2
+    PopStage bstack
+    Exit Sub
+    End If
 End If
 If ok Then Set bstack.lastobj = CopyGroupObj(var(where)) Else Set bstack.lastobj = Nothing
 bstack.DropNdot 2
@@ -2979,7 +2984,7 @@ End Function
 
 Private Function SpeedGroup(bstack As basetask, pppp As mArray, Prefix$, ByVal w$, b$, v As Long) As Long
 Dim Vars As Long, VName As Long, y1 As Long, subs As Long, snames As Long, i As Long, ec$, ohere$, p As Variant
-Dim depth As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, S3 As Long, Rest1$
+Dim depth As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, S3 As Long, Rest1$, vvv As Long
 Dim safegroup As Group
 Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant, subsfc As FastCollection
 Vars = var2used: VName = varhash.count
@@ -3552,10 +3557,19 @@ faultback:
                                                                 GoTo fastexit
                                                         End If
                                                         If p < -1 Then
-                                                                subspoint = True
+                                                    
+                                                               ' subspoint = True  ' ????
+                                                                vvv = Abs(p + 2)
                                                                 bstack.IsInRetStackNumber p
-                                                        
+                                                        If vvv <> bstack.OriginalCode And vvv <> 0 Then
+                                                            i = Len(sbf(vvv).sb) - CLng(p) + 1
+                                                                       bb$ = Mid$(sbf(vvv).sb, i)
+                                                                       S3 = bstack.OriginalCode  ' ?? maybe negative???
+                                                                       PopStage bstack
+                                                                   GoTo subsentry10
+                                                                   Else
                                                                 bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                                End If
                                                         ElseIf p < 0 Then
                                                                 subspoint = False
                                                                 bstack.IsInRetStackNumber p
@@ -3582,7 +3596,7 @@ faultback:
                                        
                                     ElseIf bstack.IsInRetStackString(bb$) Then
                                                                  If InStr(bb$, " ") > 0 Then
-                                                                       If subspoint Then bstack.RetStack.PushVal -2 Else bstack.RetStack.PushVal -1
+                                                                       If subspoint Then bstack.RetStack.PushVal -2 - S3 Else bstack.RetStack.PushVal -1
                                                                         S3 = bstack.OriginalCode
                                                                         If searchsub(S3, bb$, i, S3) Then
                                                                           subspoint = False
@@ -3592,7 +3606,7 @@ faultback:
                                                                                End If
                                                                              End If
                                                                             bb$ = Mid$(sbf(S3).sb, i)
-                                                                            
+                                                                            subspoint = S3 <> bstack.OriginalCode
                                                        
                                                                             kolpo = False
                                                                             GoTo subsentry10
@@ -4911,6 +4925,7 @@ LeaveIt:
         Else
         po = po * r
         End If
+       
     ElseIf parenthesis = 1 Then
     Dim s$
     If IsStrExp(bstack, aa$, s$) Then
@@ -19332,7 +19347,6 @@ contHereFromOn:
                 If FastSymbol(b$, ")") Then
                  PushStage bstack, False
                 bstack.RetStack.PushVal Len(b$)
-                 
                 If Lang Then
                 bstack.RetStack.PushStr "SUB " + w$
                 Else
@@ -19583,6 +19597,7 @@ conthere111:
 exitdo:
 Exit Do
 exitfunc:
+Set bstack.lastpointer = Nothing
 Exit Function
 Else
     If bstack.callx1 > 0 Then
@@ -19946,9 +19961,18 @@ subsentry10:
                                                                 GoTo fastexit
                                                         End If
                                                         If p < -1 Then
-                                                              subspoint = True
+                                                              vvv = Abs(p + 2)
+                                                              'subspoint = True
                                                               mystack.IsInRetStackNumber p
+                                                               If vvv <> mystack.OriginalCode And vvv <> 0 Then
+                                                                  i = Len(sbf(vvv).sb) - CLng(p) + 1
+                                                                       bb$ = Mid$(sbf(vvv).sb, i)
+                                                                       S3 = mystack.OriginalCode  ' ?? maybe negative???
+                                                                       PopStage mystack
+                                                                   GoTo subsentry10
+                                                               Else
                                                               bb$ = Mid$(sbf(Abs(mystack.Parent.OriginalCode)).sb, Len(sbf(Abs(mystack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                              End If
                                                         ElseIf p < 0 Then
                                                                 subspoint = False
                                                         
@@ -19982,7 +20006,7 @@ subsentry10:
                                     
                                                                  If InStr(bb$, " ") > 0 Then
                                                                        
-                                                              If subspoint Then mystack.RetStack.PushVal -2 Else mystack.RetStack.PushVal -1
+                                                              If subspoint Then mystack.RetStack.PushVal -2 - S3 Else mystack.RetStack.PushVal -1
                                                               
                                                                S3 = mystack.OriginalCode
                                                                         If searchsub(S3, bb$, i, S3) Then
@@ -19992,7 +20016,7 @@ subsentry10:
                                                                             Else
                                                                                     bb$ = Mid$(sbf(S3).sb, i)
                                                                             End If
-                                                       
+                                                                            subspoint = S3 <> mystack.OriginalCode
                                                                             ok = False
                                                                             GoTo subsentry10
                                                                         ElseIf mystack.IamChild Then
@@ -32128,6 +32152,7 @@ ProcModuleEntry = False: Exit Function
 End If
  Do
   frm$ = Mid$(sbf(x1).sb, i)
+
 againmod:
        If LastErNum = -1 Then
        GoTo myerror1
@@ -32266,10 +32291,22 @@ thh1:
                              
                                      If bs.IsInRetStackNumber(p) Then
                                      If p < -1 Then
+                                     vvv = Abs(p + 2)
                                      bs.IsInRetStackNumber p
                                      subspoint = True
-                                     i = Len(sbf(basestack.OriginalCode)) - CLng(p) + 1
-
+                                     If vvv <> x1 And vvv <> 0 Then
+                                     i = Len(sbf(vvv).sb) - CLng(p) + 1
+                                                frm$ = Mid$(sbf(vvv).sb, i)
+                                                S3 = x1
+                                                PopStage bs
+                                            GoTo againmod
+                                            
+                                     Else
+                                     i = Len(sbf(FindPrevOriginal(basestack)).sb) - CLng(p) + 1
+                                                frm$ = Mid$(sbf(S3).sb, i)
+                                                PopStage bs
+                                             GoTo againmod
+                                             End If
                                      ElseIf p < 0 Then
                                      subspoint = False
                                      bs.IsInRetStackNumber p
@@ -32280,25 +32317,30 @@ thh1:
                                        
                              ElseIf bs.IsInRetStackString(frm$) Then
                                       If InStr(frm$, " ") > 0 Then
-                                   If subspoint Then bs.RetStack.PushVal -2 Else bs.RetStack.PushVal -1
+                                   If subspoint Then bs.RetStack.PushVal -2 - S3 Else bs.RetStack.PushVal -1
                                    S3 = x1
                                         If searchsub(S3, frm$, i, S3) Then
                                      
                                          subspoint = False
                                                 If frm$ <> "" Then If Not MyRead(7, basestack, frm$, 1) Then GoTo thh
-                                               frm$ = Mid$(sbf(S3).sb, i)
-                                                             GoTo againmod
+                                                    frm$ = Mid$(sbf(S3).sb, i)
+                                                    subspoint = S3 <> x1
+                                                    GoTo againmod
                                                  ElseIf x1 <> basestack.OriginalCode And basestack.OriginalCode <> 0 Then
                                                 
-                                                 If searchsub(FindPrevOriginal(basestack), frm$, i, S3) Then
+                                                 If searchsub(FindPrevOriginal(bs), frm$, i, S3) Then
                                                  subspoint = True
                                                  
                                                              If frm$ <> "" Then If Not MyRead(7, basestack, frm$, 1) Then GoTo thh
                                                              frm$ = Mid$(sbf(S3).sb, i)
                                                              GoTo againmod
                                                              Else
+                                                            'Debug.Print "Bad pop"
+                                                            MyEr "sub not found", "δεν βρέθηκε η ρουτίνα"
+                                                            
                                                             bs.RetStack.drop 5
-                                                             Exit Do
+                                                             GoTo myerror1
+                                                             'Exit Do
                                                  End If
                                                  Else
                                                  If frm$ <> "" Then MyEr "sub not found", "δεν βρέθηκε η ρουτίνα"
@@ -32828,7 +32870,7 @@ Function executeblock(Exec As Long, bstack As basetask, b$, once As Boolean, kol
 executeblock = True
 'bstack.LastComm = VbNullString
 Dim i As Long, ec$, ec1$, LL As Long, oldLL As Long, bb$, p As Variant, x2 As Long, y2 As Long, monce As Long, w3 As Long, removebracket As Boolean
-Dim myLevel As Long, oldexec As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, subs As FastCollection
+Dim myLevel As Long, oldexec As Long, loopthis As Boolean, subspoint As Boolean, RetStackSize As Long, subs As FastCollection, vvv As Long
 RetStackSize = bstack.RetStackTotal
 If Exec = 0 Then Exec = 1
 oldexec = Exec
@@ -32986,12 +33028,9 @@ from123:
 findelsesub0:
 
                                                         If InStr(bb$, " ") > 0 Then
-                                                                If subspoint Then bstack.RetStack.PushVal -2 Else bstack.RetStack.PushVal -1
+                                                          If subspoint Then bstack.RetStack.PushVal -2 - w3 Else bstack.RetStack.PushVal -1
                                                              w3 = bstack.OriginalCode
-                                                             If w3 = 0 Then
-                                                              
-                                                             End If
-                                                                If searchsub(w3, bb$, i, w3) Then
+                                                                  If searchsub(w3, bb$, i, w3) Then
                                                                 
                                                                         subspoint = False
                                                                     If bb$ <> "" Then
@@ -33017,7 +33056,7 @@ findelsesub0:
                                                                         GoTo contSub
                                                                 ElseIf bstack.IamChild Then
                                                                 If bstack.IamLambda Then
-                                                                MyEr "Sub  Not Found", "Η ρουτίνα δεν βρέθηκε"
+                                                                MyEr "Sub Not Found", "Η ρουτίνα δεν βρέθηκε"
                                                                          Exec = 0
                                                                                             Exit Function
                                                                         ElseIf searchsub(FindPrevOriginal(bstack), bb$, i, w3) Then
@@ -33032,7 +33071,7 @@ findelsesub0:
                                                                                                                                                         
 
                                                                         bb$ = Mid$(sbf(w3).sb, i)
-                                                                        
+                                                                        subspoint = w3 <> bstack.OriginalCode
                                                                         WaitShow = Len(bb$)
                                                                              
                                                                         kolpo = False
@@ -33062,18 +33101,26 @@ subsub02:
                                                                                                     If bstack.IsInRetStackNumber(p) Then
                                                                                               
                                                                                                             If p < -1 Then
+                                                                                                            vvv = Abs(p + 2)
                                                                                                                     subspoint = True
                                                                                                                     bstack.IsInRetStackNumber p
                                                                                                     
-                                                                                                                    bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
-                                                                                                                    
+                                                                                                                   ' bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                                                                                     bb$ = Mid$(sbf(vvv).sb, Len(sbf(vvv).sb) - CLng(p) + 1)
+                                                                                                                     w3 = Abs(bstack.OriginalCode)
+                                                                                                                     
                                                                                                             ElseIf p < 0 Then
                                                                                                                     subspoint = False
                                                                                                                     bstack.IsInRetStackNumber p
                                                                                                   If bstack.OriginalCode = 0 Then
                                                                                                     bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
                                                                                                   Else
-                                                                                                                    bb$ = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(sbf(Abs(bstack.OriginalCode)).sb) - CLng(p) + 1)
+                                                                                                                '    bb$ = Mid$(sbf(Abs(bstack.OriginalCode)).sb, Len(sbf(Abs(bstack.OriginalCode)).sb) - CLng(p) + 1)
+                                                                                                                If w3 < 0 Then
+                                                                                                                    bb$ = Mid$(var(-w3).code$, Len(var(-w3).code$) - CLng(p) + 1)
+                                                                                                                Else
+                                                                                                                    bb$ = Mid$(sbf(w3).sb, Len(sbf(w3).sb) - CLng(p) + 1)
+                                                                                                                    End If
                                                                                                                     End If
                                                                                                                     
                                                                                                             End If
@@ -33122,6 +33169,8 @@ subsub02:
                                                                                             Exit Function
                                                                                     End If
                                                                             Else
+                                                                             MyEr "sub not found", "δεν βρέθηκε η ρουτίνα"
+                                                                             Exec = 0
                                                                                     bstack.RetStack.drop 5
                                                                                     Exit Do
                                                                             End If
@@ -38199,6 +38248,9 @@ contread123:
                                         here$ = vbNullString
                                         UnFloatGroupReWriteVars bstack, what$, i, myobject
                                         here = s$
+                                    ElseIf var(i).IamApointer And myobject.IamApointer Then
+                                    Set var(i) = myobject
+                                    
                                     Else
                                         Set myobject = Nothing
                                         bstack.GroupName = ss$
@@ -39145,8 +39197,10 @@ Do
                         bstack.soros.PushObjVarItem bstack.lastobj
                     Else
                         bstack.soros.PushObj bstack.lastobj
+                        Set bstack.lastpointer = Nothing
                     End If
                          Set bstack.lastobj = Nothing
+                         
                 End If
         ElseIf IsStrExp(bstack, rest$, s$) Then
                 If bstack.lastobj Is Nothing Then
@@ -39154,6 +39208,7 @@ Do
                 Else
                         bstack.soros.PushObj bstack.lastobj
                          Set bstack.lastobj = Nothing
+                           Set bstack.lastpointer = Nothing
                 End If
         Else
                 Exit Do
@@ -39193,6 +39248,7 @@ Do
                     bstack.soros.DataObjVaritem bstack.lastobj
                       Else
                       bstack.soros.DataObj bstack.lastobj
+                    Set bstack.lastpointer = Nothing
                     End If
                       Set bstack.lastobj = Nothing
                 End If
@@ -39202,6 +39258,7 @@ Do
                 Else
                         bstack.soros.DataObj bstack.lastobj
                         Set bstack.lastobj = Nothing
+                          Set bstack.lastpointer = Nothing
                 End If
         Else
                 Exit Do
@@ -53286,6 +53343,7 @@ checkobject:
                                 End If
                                 Exec1 = 0: ExecuteVar = 8: Exit Function
                             End If
+                            Set bstack.lastpointer = Nothing
                             Set bstack.lastobj = Nothing
                             Set myobject = Nothing
                         End If

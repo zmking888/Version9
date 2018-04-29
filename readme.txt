@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 5 active-X
+Version 9.3 revision 6 active-X
 
 the best so far
 

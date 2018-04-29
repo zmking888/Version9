@@ -2205,6 +2205,7 @@ If TEXT1.SelText <> "" Then
 
     a$ = vbCrLf + TEXT1.SelText & "*"
     If Shift <> 0 Then  ' тумых
+        a$ = Replace(a$, vbCrLf + String$(6 + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod 6, ChrW(160)), vbCrLf)
         a$ = Replace(a$, vbCrLf + Space$(6 + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod 6), vbCrLf)
         TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
          TEXT1.SelStartSilent = ii
@@ -2221,7 +2222,7 @@ If TEXT1.SelText <> "" Then
 Else
 If Shift <> 0 Then
 
-    If Mid$(TEXT1.CurrentParagraph, 1, 6) = Space$(6) Then
+    If Mid$(TEXT1.CurrentParagraph, 1, 6) = Space$(6) Or Mid$(TEXT1.CurrentParagraph, 1, 6) = String$(6, ChrW(160)) Then
 
             TEXT1.SelStartSilent = ii
             TEXT1.SelLengthSilent = 6

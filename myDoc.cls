@@ -2788,9 +2788,9 @@ If Direction Then
  End If
 If Result Then
 res$ = TextParagraph(there)
-
 If cur > 1 Then
     Select Case AscW(Mid$(res$, cur - 1, 1))
+    Case 160
     Case 46, 65 To 90, 95, 97 To 122, Is > 127
     If Direction Then cur = cur + 1 Else cur = cur - 1
     GoTo again
