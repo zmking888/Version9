@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 7
+Global Const Revision = 8
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3027,10 +3027,17 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         End If
         ' check for iamglobal ??
 If safegroup.LastOpen <> vbNullString Then
-        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
+        If GetVar(bstack, (safegroup.LastOpen), y1, True) Then
+        If safegroup.lasthere$ = here$ Then
         w$ = safegroup.LastOpen
+        Else
+        w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+        End If
+
+       ' w$ = safegroup.LastOpen
         Set safegroup = safegroup.Link
             GoTo cont3030
+    
         Else
         safegroup.LastOpen = vbNullString
         End If
@@ -3113,8 +3120,14 @@ ElseIf Prefix = "VAL$" Then
         End If
     ' check for iamglobal ??
             If safegroup.LastOpen <> vbNullString Then
-        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
+        If GetVar(bstack, (safegroup.LastOpen), y1, True) Then
+'        w$ = safegroup.LastOpen
+                If safegroup.lasthere$ = here$ Then
         w$ = safegroup.LastOpen
+        Else
+        w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+        End If
+
             GoTo cont5050
         Else
         safegroup.LastOpen = vbNullString
@@ -3262,11 +3275,8 @@ RetStackSize = bstack.RetStackTotal
         If TypeOf var(y1) Is Group Then
                 If var(y1).IamApointer Then
                 If var(y1).Link.IamFloatGroup Then
-     ' 1
                 Set pppp = BoxGroupVar(var(y1).Link)
                 Set pppp.refgroup = var(y1)
-                pppp.refgroup.LastOpen = pppp.CodeName + "0"
-                'w$ = ""
                 v = 0
                 GoTo CONT104010
                 Else
@@ -3296,7 +3306,22 @@ RetStackSize = bstack.RetStackTotal
        
     Else
 CONT104010:
+If pppp.refgroup Is Nothing Then
         If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr(Abs(v))
+        Else
+        If pppp.refgroup.LastOpen = vbNullString Then
+        w$ = pppp.CodeName + CStr(v)
+        pppp.refgroup.LastOpen = w$
+        pppp.refgroup.lasthere$ = here$
+        Else
+        If pppp.refgroup.lasthere$ = here$ Then
+        w$ = pppp.refgroup.LastOpen
+        Else
+        w$ = pppp.refgroup.lasthere$ + "." + pppp.refgroup.LastOpen
+        End If
+        
+        End If
+        End If
         
         Set dd = New Group
        
@@ -3467,10 +3492,13 @@ w$ = myUcase(w$)
             Set pppp = BoxGroupObj(bstack.lastpointer)
                 i = 5
             v = 0
+            Set bstack.lastobj = Nothing
+            Set bstack.lastpointer = Nothing
             GoTo contheretoo
             Else
             w$ = bstack.lastpointer.lasthere + "." + bstack.lastpointer.GroupName
-            
+            Set bstack.lastobj = Nothing
+            Set bstack.lastpointer = Nothing
             End If
             
             
@@ -3731,6 +3759,7 @@ i = w$ = "."
 If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr(Abs(v))
 
 
+
         Set dd = New Group
          y1 = globalvar(w$, dd)
         
@@ -3751,12 +3780,20 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
         
         End If
         If safegroup.LastOpen <> vbNullString Then
-        If GetVar(bstack, (safegroup.LastOpen), y1, , , True) Then
-        w$ = safegroup.LastOpen
+        If GetVar(bstack, (safegroup.LastOpen), y1, True) Then
+            If safegroup.lasthere$ = here$ Then
+                w$ = safegroup.LastOpen
+            Else
+                w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+            End If
             GoTo cont2020
         Else
-        safegroup.LastOpen = vbNullString
+                'safegroup.LastOpen = w$
+                'safegroup.lasthere$ = here$
         End If
+        Else
+'                safegroup.LastOpen = w$
+ '               safegroup.lasthere$ = here$
         End If
         
         UnFloatGroup bstack, w$, y1, pppp.item(v), , True
@@ -22257,15 +22294,12 @@ Function neoGetArray(bstack As basetask, ByVal nm$, ga As mArray, Optional searc
 Dim k As Long, myobject As Object
 Dim n$
 nm$ = myUcase(nm$)
-'If bstack.GroupName <> "" Then Stop
 If useglobalname Or here$ = vbNullString Then
-'n$ = bstack.GroupName + nm$
-n$ = nm$
+n$ = bstack.GroupName + nm$
 ElseIf Left$(nm$, 5) = "ауто." Or Left$(nm$, 5) = "THIS." Then
 GoTo here12
 Else
-'n$ = here$ & "." + bstack.GroupName + nm$
-n$ = here$ & "." + nm$
+n$ = here$ & "." + bstack.GroupName + nm$
 End If
 
 
@@ -52849,7 +52883,7 @@ End If
 Exit Function
 End Function
 Private Function GetPointer(bstack As basetask, a$) As Boolean
-Dim w1 As Long, s$, pppp As mArray, w2 As Long, p, nbstack As basetask
+Dim w1 As Long, s$, pppp As mArray, w2 As Long, p, nbstack As basetask, myobj As Object, i As Long
 
 w1 = Abs(IsLabel(bstack, a$, s$))
 If w1 = 1 Or w1 = 3 Then
@@ -52859,7 +52893,22 @@ If var(w1).IamApointer Then
         Set bstack.lastobj = var(w1)
         Set bstack.lastpointer = var(w1)
 Else
-    MakeGroupPointer bstack, var(w1)
+                        If var(w1).IamSuperClass Then
+                        PushStage bstack, False
+                    
+                            i = globalvar("_1", 0, , True)
+                            Set myobj = var(w1)
+                            UnFloatGroup bstack, "_1", i, myobj, True
+                            
+                        Set p = CopyGroupObj(var(i))
+                        PopStage bstack
+                            MakeGroupPointer bstack, p
+                        Else
+                            MakeGroupPointer bstack, var(w1)
+                        End If
+
+
+
     
 End If
     GetPointer = True
@@ -52886,6 +52935,16 @@ If GetSub(s$ + ")", w2) Then
                         If p.IamApointer Then
                         Set bstack.lastpointer = p
                         Else
+                        If p.IamSuperClass Then
+                        PushStage bstack, False
+                    
+                            i = globalvar("_1", 0, , True)
+                            Set myobj = p
+                            UnFloatGroup bstack, "_1", i, myobj, True
+                            
+                        Set p = CopyGroupObj(var(i))
+                        PopStage bstack
+                        End If
                         MakeGroupPointer bstack, p
                         End If
                         GetPointer = True
@@ -52941,6 +53000,20 @@ End If
     Else
     If TypeOf bstack.lastobj Is Group Then
         Set p = bstack.lastobj
+        
+
+                        If p.IamSuperClass Then
+                        PushStage bstack, False
+                    
+                            i = globalvar("_1", 0, , True)
+                            Set myobj = p
+                            UnFloatGroup bstack, "_1", i, myobj, True
+                            
+                        Set p = CopyGroupObj(var(i))
+                        PopStage bstack
+                        End If
+        
+        
         MakeGroupPointer bstack, p
         GetPointer = True
         Exit Function
@@ -54511,7 +54584,13 @@ a325674:
                             If Not ok Then GoTo here1234
                                 
                 Else
+                If sw$ = "" Or sw$ = "g" Or sw$ = "+=" Then
                CheckVar var(v), ss$, sw$ = "+="
+               Else
+                            NoValueForVar w$
+                            Exec1 = 0: ExecuteVar = 8
+                            Exit Function
+               End If
                
                End If
                Else
@@ -55634,7 +55713,16 @@ ElseIf Not FastSymbol(b$, "=") Then
     End If
     End With
    Exec1 = 0: ExecuteVar = 8: Exit Function
-
+   ElseIf FastSymbol(b$, "+=", , 2) Then
+   If IsStrExp(bstack, b$, ss$) Then
+    
+          CheckVar pppp.item(v), ss$, True
+    
+        
+  Exit Function
+  Else
+  Exec1 = 0: ExecuteVar = 8: Exit Function
+  End If
     Else
         Exec1 = 0: ExecuteVar = 8: Exit Function
     End If
