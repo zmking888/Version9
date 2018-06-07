@@ -25,12 +25,12 @@ Public Sub SaveBmp(sFile As String, ByVal Scr As Object)
             photo.SaveDib sFile
        
 End Sub
-Public Function Decode64toMemBloc(ByVal a$, ok As Boolean) As Object
+Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As Boolean = False) As Object
     Dim mem As New MemBlock, BLen As Long
     a$ = Decode64(a$, ok)
     If ok Then
         BLen = LenB(a$)
-        mem.Costruct 1, BLen, , &H8
+        mem.Costruct 1, BLen, , forcode
         CopyBytes BLen, mem.GetPtr(0), StrPtr(a$)
         Set Decode64toMemBloc = mem
     End If

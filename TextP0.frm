@@ -170,7 +170,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -3055,5 +3055,8 @@ shortlang = True
 TEXT1.NoColor = True
 fState = -1
 End Select
+
+TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
+
 End Sub
 

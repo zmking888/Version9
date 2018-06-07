@@ -167,7 +167,7 @@ Else
 TopFolder = TopDir
 End If
 ReturnListOfFiles = vbNullString
-If TypeList = vbNullString Then FileTypesShow = "BMP|JPG|GIF|WMF|EMF|DIB|ICO|CUR" Else FileTypesShow = TypeList
+If TypeList = vbNullString Then FileTypesShow = "BMP|JPG|GIF|WMF|EMF|DIB|ICO|CUR|PNG|TIF" Else FileTypesShow = TypeList
 DialogPreview = True
 If thattitle <> "" Then
 LoadFileCaption = thattitle

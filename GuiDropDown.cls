@@ -423,17 +423,23 @@ If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipPr
      Else
 Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
 End If
-If Callback.Controls(ctrlName).Height * gl < VirtualScreenHeight() * 2 / 3 Then
+If Callback.Controls(ctrlName).Height * gl < VirtualScreenHeight() * 2 / 5 Then
 
-Pad.Height = (((Callback.Controls(ctrlName).Height * gl) \ dv15) + 1) * dv15
+'Pad.Height = (((Callback.Controls(ctrlName).Height * gl) \ dv15) + 1) * dv15
+'glistN.restrictLines = gl
+Pad.Height = Callback.Controls(ctrlName).Height * gl
+Debug.Print Pad.Height
 glistN.restrictLines = gl
-
 Else
-glistN.restrictLines = (VirtualScreenHeight() * 2 / 3) \ Callback.Controls(ctrlName).Height
-Pad.Height = (((Callback.Controls(ctrlName).Height * glistN.restrictLines) \ dv15) + 1) * dv15
+glistN.restrictLines = (VirtualScreenHeight() * 2 / 5) \ Callback.Controls(ctrlName).Height
+Pad.Height = Callback.Controls(ctrlName).Height * glistN.restrictLines
 
 End If
+glistN.AutoHide = False
+glistN.StickBar = False
+glistN.ShowBar = False
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
+
     Textbox.SkipProcAtExitFocus = True
     Textbox.glistN.NoCaretShow = True
     Textbox.glistN.ShowPan
@@ -444,7 +450,8 @@ glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
   If glistN.ListIndex < 0 Then
   glistN.ListIndex = 0
   Else
-  glistN.ShowPan ' glistN.ListIndex + 1
+  'glistN.ShowPan '
+ glistN.ShowThis glistN.ListIndex + 1
   
   End If
   Else
@@ -605,17 +612,21 @@ If mMenuStyle Then
 Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
 End If
 
-If Callback.Controls(ctrlName).Height * gl < ScrY() * 2 / 3 Then
+If Callback.Controls(ctrlName).Height * gl < ScrY() * 2 / 5 Then
 
 Pad.Height = Callback.Controls(ctrlName).Height * gl
 glistN.restrictLines = gl
 
 Else
-glistN.restrictLines = (ScrY() * 2 / 3) \ Callback.Controls(ctrlName).Height
+glistN.restrictLines = (ScrY() * 2 / 5) \ Callback.Controls(ctrlName).Height
 Pad.Height = Callback.Controls(ctrlName).Height * glistN.restrictLines
 
 End If
+
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
+glistN.AutoHide = False
+glistN.StickBar = False
+glistN.ShowBar = False
     Textbox.SkipProcAtExitFocus = True
     glistN.LeaveonChoose = True
   If AutoComplete Then

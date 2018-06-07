@@ -2572,9 +2572,7 @@ Function Convert2Ansi(a$, localeid As Long) As String
 Dim b$, i&
 If a$ <> "" Then
 For i& = 1 To Len(a$)
-' change 1032 to lcid_def
-b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
-
+    b$ = b$ + Left$(StrConv(ChrW$(AscW(Left$(StrConv(Mid$(a$, i, 1) + Chr$(0), 128, localeid), 1))), 64, LCID_DEF), 1)
 Next i&
 Convert2Ansi = b$
 End If
@@ -2669,8 +2667,8 @@ Function ismine1(ByVal a$) As Boolean  '  START A BLOCK
 ismine1 = True
 a$ = myUcase(a$, True)
 Select Case a$
-Case "BINARY", "DO", "REPEAT", "PART", "LIB", "PROTOTYPE"
-Case "дуадийо", "епамекабе", "епамакабе", "леяос", "пяытотупо"
+Case "DO", "REPEAT", "PART", "LIB", "PROTOTYPE"
+Case "епамекабе", "епамакабе", "леяос", "пяытотупо"
 Case Else
 ismine1 = False
 End Select
@@ -2687,7 +2685,15 @@ Case Else
 ismine2 = False
 End Select
 End Function
-
+Function ismine22(ByVal a$) As Boolean  ' CAN START A BLOCK AFTER AN EXPRESSION, WE CAN PASS STRING BLOCK IN EXPRESSION
+ismine22 = True
+a$ = myUcase(a$, True)
+Select Case a$
+Case "FOR", "WHILE", "циа", "емы"
+Case Else
+ismine22 = False
+End Select
+End Function
 Function ismine5(ByVal a$) As Boolean  '  make
 ismine5 = True
 a$ = myUcase(a$, True)
@@ -3200,6 +3206,7 @@ Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
   l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
   p2 = StrPtr(s): l = l - 1
+  
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1

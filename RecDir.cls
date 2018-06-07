@@ -491,21 +491,13 @@ End If
 If fhandle > 0 Then
 lookpath = StripNulls(wfd.cFileName)
 End If
-
-
-'' abort = True
-
 If Level = 3 Then mywait basestack1, 5
 
 While lookpath <> ""
-'
-' skip file if not proper
 If Pattern <> "" Then
 If StripNulls(wfd.cAlternate) <> "" Then
 If Not LCase(lookpath) Like LCase(Pattern) Then
-'    If LCase(Left$(lookpath, 1)) <> LCase(Left$(StripNulls(wfd.cAlternate), 1)) Then
-''    Debug.Print StripNulls(wfd.cFileName), StripNulls(wfd.cAlternate), wfd.dwFileAttributes
-        
+      
     GoTo conthere
     End If
 End If
@@ -513,13 +505,10 @@ End If
 
 If fff Mod 30 = 29 Then mywait basestack1, 1
     If isdirP(wfd) Or lookpath = ".." Then
-       '' If Right$("\" & lookpath, 2) = "\." Or Right$("\" & lookpath, 3) = "\.." Then
          If lookpath = "." Or lookpath = ".." Then
-        ' skip
         Else
         fff = fff + 1
         If fff > thatmaxtoo Then thatmaxtoo = thatmaxtoo * 2: ReDim Preserve fold$(1 To thatmaxtoo)
-        '' If foldersonly And level > 1 Then RaiseEvent feedback("\" & lookpath)
         If foldersonly Then RaiseEvent feedback("\" & lookpath)
         Select Case SortType
         Case 1, 2

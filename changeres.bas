@@ -73,8 +73,8 @@ Private Declare Function CallWindowProc Lib "user32" Alias "CallWindowProcA" (By
 '
 Private Const GWL_WNDPROC = (-4)
 Private Const WM_MOUSEWHEEL = &H20A
-Private Const WM_MOUSELAST = &H20A
-Private Const WM_MOUSEHWHEEL = &H20E
+'Private Const WM_MOUSELAST = &H20A
+'Private Const WM_MOUSEHWHEEL = &H20E
 Public defWndProc As Long, defWndProc2 As Long
 Public LastGlist As gList, LastGlist2 As gList
 Public defWndProc3 As Long

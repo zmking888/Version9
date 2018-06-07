@@ -107,9 +107,9 @@ End If
 vHelp Not Form4.Visible
 Exit Sub
 ElseIf GetSub(d$, i) Then
-GoTo CONTHERE
+GoTo conthere
 ElseIf GetlocalSubExtra(d$, i) Or d$ = here$ Then
-CONTHERE:
+conthere:
 If d$ = here$ Then i = bstack.OriginalCode
 If vH_title$ <> "" Then
 b$ = "<| " & vH_title$ & vbCrLf & vbCrLf
@@ -2058,7 +2058,7 @@ Sub GeneralErrorReport(aBasBase As Variant)
 Dim errorObject
 
  For Each errorObject In aBasBase.activeconnection.errors
- Debug.Print "Description :"; errorObject.Description
- Debug.Print "Number:"; Hex(errorObject.Number)
+ 'Debug.Print "Description :"; errorObject.Description
+ 'Debug.Print "Number:"; Hex(errorObject.Number)
  Next
 End Sub

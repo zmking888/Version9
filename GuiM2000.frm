@@ -701,11 +701,14 @@ gl = glistN.listcount
 If gl = 0 Then Exit Sub
 Pad.Width = mMenuWidth    'CLng(Width / 1.618 * dv15) \ dv15
 If gl > 8 Then gl = 8
+
 glistN.restrictLines = gl
+
 Pad.Height = (((glistN.HeadlineHeightTwips * gl) \ dv15) + 1) * dv15
 glistN.MoveTwips 0, 0, Pad.Width, Pad.Height
 glistN.LeaveonChoose = True
 glistN.ListindexPrivateUseFirstFree 0
+glistN.ShowBar = False
 glistN.PanPos = 0
 If Not UseReverse Then
 PopUpPos Pad, Width - mMenuWidth, gList2.Height / 2, gList2.Height / 2
@@ -1914,19 +1917,20 @@ glistN.ListSep(item) = RHS
 End Property
 
 Sub MakeInfo(ByVal RHS As Long)
-If EnableStandardInfo Then
-' destoy standard
-    glistN.Clear
-    EnableStandardInfo = False
-End If
- UseInfo = True
+
+
+
  NoEventInfo = True
  Dim PadGui As New GuiM2000
  Set Pad = PadGui
  On Error Resume Next
  Set glistN = Pad.Controls(1)
-
-
+If EnableStandardInfo Then
+    glistN.Clear
+   
+    EnableStandardInfo = False
+End If
+ UseInfo = True
 With glistN
     .addpixels = 4
     .FontSize = Me.CtrlFontSize
@@ -1940,7 +1944,8 @@ With glistN
     .LeaveonChoose = True
     .LeftMarginPixels = 8
     .VerticalCenterText = True
-    .StickBar = True ' try with false - or hold shift to engage false
+    .ShowBar = False
+    .StickBar = False ' True ' try with false - or hold shift to engage false
     .NoFreeMoveUpDown = True
      .CapColor = gList2.CapColor
     .dcolor = rgb(200, 200, 200)

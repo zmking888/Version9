@@ -15,7 +15,7 @@ Option Explicit
 Public Event MayQuit(Yes)
 Public Event BreakLine(data$, datanext$)
 Public Event Lastline()
-Public Event ColorDataEvent(thispara As Long, data$, col() As Variant, feedback As Long)
+Public Event ColorDataEvent(thispara As Long, data$, feedback As Long)
 Private lastlinelastchar As Long
 Private lastcolordatacur As Long
 Private Declare Function GetShortPathName Lib "KERNEL32" Alias _
@@ -57,6 +57,7 @@ Private pos() As Long, SLen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
 Public busy As Boolean
 Private mSortstyle As VbCompareMethod
+Public ColorEvent As Boolean, ForEditBox As Boolean
 Function IsLast(ByVal ParaNum As Long) As Boolean
 ' for MarkParagraphID
 IsLast = (DocParaNext(ParaNum) = 0)
@@ -107,7 +108,9 @@ Sub RemoveDocParaIndex(ParaNum As Long)
     DocParaBack(DocParaNext(ParaNum)) = DocParaBack(ParaNum)
     para(ParaNum).lines = 0   ' clear' also can be a flag to show that this is deleted
     ReDim para(ParaNum).content(1 To 1)
-    ReDim para(ParaNum).colordata(1)
+    para(ParaNum).content(1) = vbNullString
+    Dim emp() As Variant
+    para(ParaNum).colordata() = emp()
     DocParaNext(ParaNum) = delDocPara
     para(ParaNum).startfrom = 0
     delDocPara = ParaNum
@@ -127,7 +130,6 @@ Sub WritePara(ParaNum As Long, ByVal data$)
     thatmax = 10
     ReDim Preserve para(ParaNum).content(1 To thatmax)
         ReDim para(ParaNum).colordata(1)
-       '' RaiseEvent ColorDataEvent(Paranum, data$, para(Paranum).ColorData(), LookThis)
           
     End If
     thatmax = UBound(para(ParaNum).content())
@@ -161,10 +163,15 @@ Public Sub ResetColor(ParaNum)
 On Error Resume Next
 ReDim para(ParaNum).colordata(2)
 End Sub
-
-Public Sub ColorThis(mNum As Long)
-
-Dim docback As Long, lookthis As Long, data$, oldstart As Long, lenfinal As Long
+Public Sub ColorThis(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+If ForEditBox Then
+    ColorThis3 mNum, count, LookDown
+Else
+    ColorThis2 mNum, count, LookDown
+End If
+End Sub
+Private Sub ColorThis3(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+Dim docback As Long, lookthis As Long, data$, oldstart As Long, lenfinal As Long, closed As Long, lastnum As Long
 lenfinal = Len(final$)
 If lenfinal = 0 Then final$ = ";": lenfinal = 1
     If mNum = 0 Then Exit Sub
@@ -179,8 +186,8 @@ If lenfinal = 0 Then final$ = ";": lenfinal = 1
                                     If para(mNum).startfrom <> mNum Then
                                             para(mNum).startfrom = para(lookthis).startfrom
                                     End If
-                    Else
-                                para(mNum).startfrom = 0
+                   ' Else
+                              '  para(mNum).startfrom = 0
                     End If
         End If
         GoTo finish
@@ -191,7 +198,21 @@ If lenfinal = 0 Then final$ = ";": lenfinal = 1
 again:
             oldstart = para(mNum).startfrom
             data$ = TextParagraph(mNum)
-            RaiseEvent ColorDataEvent(mNum, data$, para(mNum).colordata(), lookthis)
+            
+again55:
+            RaiseEvent ColorDataEvent(mNum, data$, lookthis)
+            If UBound(para(mNum).colordata()) = 0 Then
+                  ReDim para(mNum).colordata(1)
+                            para(mNum).colordata(0) = 14
+                            para(mNum).colordata(1) = 1
+            ElseIf para(mNum).colordata(0) = vbEmpty Then
+                             para(mNum).colordata(0) = 14
+                            para(mNum).colordata(1) = 1
+            End If
+            If final$ = "}" Then
+                        closed = -1
+                       count = countbrakcet(data$, closed, count)
+                       End If
             If lookthis = 15 Then
                     
                         para(mNum).startfrom = mNum
@@ -203,7 +224,7 @@ again:
                                 Do While lookthis > 0
                                         If para(lookthis).startfrom <> oldstart Then mNum = lookthis: GoTo finish
                                         para(lookthis).startfrom = 0
-                                        ColorThis lookthis
+                                        ColorThis1 lookthis, 0
                                         
                                 Loop
                         Else
@@ -216,25 +237,52 @@ again2:
             lookthis = DocParaNext(mNum)
             Do While lookthis > 0
                         data$ = TextParagraph(lookthis)
-                        If Left$(Trim$(data$), lenfinal) = final$ Or Right$(RTrim(data$), lenfinal) = final$ Then
+                        If final$ = "}" Then
+                        closed = -1
+                        count = countbrakcet(data$, closed, count)
+                        If closed > -1 Then
+                        
+
+                                       
+
+                                        If closed < Len(data$) Then
+                                           oldstart = mNum
+                                         ReDim para(lookthis).colordata(1)
+                                        para(lookthis).colordata(0) = 15
+                                        para(lookthis).colordata(1) = 1
+                                         mNum = lookthis
+                                            lookthis = closed
+                                            GoTo again55
+                                        End If
+                                         ReDim para(lookthis).colordata(3)
+                                        para(lookthis).colordata(0) = 15
+                                        para(lookthis).colordata(1) = 1
+                                        para(lookthis).colordata(2) = 14
+                                        para(lookthis).colordata(3) = closed + 1
+                                      ' para(lookthis).startfrom = mNum
+                                         mNum = lookthis
+                                        GoTo finish
+                        Else
+                        GoTo conthere
+                        End If
+                        ElseIf Left$(Trim$(data$), lenfinal) = final$ Or Right$(RTrim(data$), lenfinal) = final$ Then
                                         ReDim para(lookthis).colordata(4)
                                         para(lookthis).colordata(0) = 15
                                         para(lookthis).colordata(1) = 1
                                         para(lookthis).colordata(2) = 14
                                         para(lookthis).colordata(3) = rinstr(data$, final$) + lenfinal
                                         para(lookthis).startfrom = para(docback).startfrom
-                                        ' restore break
                                         mNum = lookthis
-again3:
                                         lookthis = DocParaNext(mNum)
                                         Do While lookthis > 0
                                             If para(lookthis).startfrom <> para(docback).startfrom Then GoTo finish
                                             para(lookthis).startfrom = 0
-                                            ColorThis lookthis
+                                            ColorThis1 lookthis, count
                                         Loop
                                         mNum = lookthis
                                         GoTo finish
                     Else
+conthere:
                     If data$ <> "" Then
                             ReDim para(lookthis).colordata(3)
                             para(lookthis).colordata(0) = 15
@@ -261,8 +309,13 @@ again3:
         lookthis = 0
     GoTo again
     Else
+    lastnum = mNum
         mNum = docback
         If para(docback).startfrom = docback Then
+        lookthis = 0: GoTo again
+        End If
+        If final = "}" Then
+        If para(docback).startfrom > 0 Then mNum = para(docback).startfrom: count = 0
         lookthis = 0: GoTo again
         End If
          GoTo again2
@@ -271,6 +324,85 @@ again3:
 finish:
 If mNum = 0 Then Exit Sub
     mNum = DocParaNext(mNum)
+End Sub
+
+Private Sub ColorThis2(mNum As Long, Optional count As Long = 0, Optional LookDown As Boolean = True)
+Dim mNum1 As Long, laststart As Long
+If count = 0 Then laststart = para(mNum).startfrom
+If ColorEvent Then
+mNum1 = mNum
+ColorThis1 mNum, count
+If Not mNum1 = mNum Then
+If laststart <> para(mNum).startfrom Then
+If count = 0 Then
+laststart = para(mNum).startfrom
+mNum1 = DocParaNext(mNum)
+Do While mNum1 <> 0
+If para(mNum1).startfrom = laststart Then
+para(mNum1).startfrom = 0
+ColorThis1 mNum1, (0)
+mNum1 = DocParaNext(mNum1)
+Else
+Exit Do
+End If
+Loop
+
+End If
+
+
+
+End If
+End If
+End If
+mNum = DocParaNext(mNum)
+
+End Sub
+Private Sub ColorThis1(mNum As Long, count As Long)
+Dim lookthis As Long, data$, mNum1 As Long
+If para(mNum).startfrom <> 0 Then
+
+    mNum1 = para(mNum).startfrom
+    
+    mNum = mNum1
+data$ = TextParagraph(mNum1)
+
+RaiseEvent ColorDataEvent(mNum1, data$, lookthis)
+If mNum1 = mNum Then
+If lookthis = 0 Then
+lookthis = para(mNum).startfrom
+mNum1 = mNum
+Do While mNum1 <> 0
+    If para(mNum1).startfrom = lookthis Then ReDim para(mNum1).colordata(1)
+     para(mNum1).startfrom = 0
+    mNum1 = DocParaNext(mNum1)
+    
+Loop
+
+End If
+count = -1
+Else
+
+If lookthis = 0 And False Then
+lookthis = para(mNum1).startfrom
+mNum1 = DocParaNext(mNum1)
+Do While mNum1 <> 0
+    If para(mNum1).startfrom = lookthis Then ReDim para(mNum1).colordata(1)
+     para(mNum1).startfrom = 0
+    mNum1 = DocParaNext(mNum1)
+    
+Loop
+count = -1
+End If
+
+
+End If
+
+Else
+
+data$ = TextParagraph(mNum)
+RaiseEvent ColorDataEvent(mNum, data$, lookthis)
+count = 0
+End If
 End Sub
  
 
@@ -304,9 +436,8 @@ Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = Fa
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
     Loop Until data$ = vbNullString
-     If Not skipcolor Then
+     If ColorEvent And Not skipcolor Then
             ColorThis (ParaNum)
-        
     End If
 End Sub
 Sub AppendParagraphOneLine(myparagraph$)
@@ -349,7 +480,6 @@ Function AppendParagraphPlusColor(myparagraph$, colordata() As Variant, Optional
     Dim getAparaNum As Long, mColor() As Variant
     mColor() = colordata()
     getAparaNum = FindNewPara
-    
     ' getAparaNum is paragraph absolute address
     If docpara = 0 Then
     WritePara getAparaNum, myparagraph$
@@ -367,14 +497,18 @@ Function InsertAfterParagraph(ParaNum As Long, myparagraph$) As Long
     Dim getAparaNum As Long
     getAparaNum = FindNewPara
     WritePara getAparaNum, myparagraph$
+    
     If ParaNum = -1 Then
      If docpara = 0 Then
         InsertDocPara getAparaNum, 0, 0  ' back is 0 and next is zero.
     Else
+        
         InsertDocPara getAparaNum, DocParaBack(0), 0  ' DocParaBack(0) link to last
     End If
     Else
+    para(getAparaNum).startfrom = para(ParaNum).startfrom
     InsertDocPara getAparaNum, ParaNum, DocParaNext(ParaNum)
+    
     End If
     InsertAfterParagraph = getAparaNum
 End Function
@@ -424,6 +558,7 @@ Function InsertBeforeParagraph(ParaNum As Long, myparagraph$) As Long
     getAparaNum = FindNewPara
     WritePara getAparaNum, myparagraph$
        InsertDocPara getAparaNum, DocParaBack(ParaNum), ParaNum
+       para(getAparaNum).startfrom = para(ParaNum).startfrom
     InsertBeforeParagraph = getAparaNum
 End Function
 Property Let textDocFast(norawtext As String)
@@ -697,6 +832,9 @@ Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String
     Dim t_text As String, once As Boolean
     Dim a() As String, t() As String
     Dim b$
+    If para(ParaNum).startfrom = ParaNum Then
+    para(ParaNum).startfrom = 0
+    End If
     once = True
       a() = Split(norawtext, vbCrLf)
         norawtext = Join(a(), vbLf)
@@ -704,7 +842,7 @@ Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String
 Dim i As Long, k As Long, j As Long, ii As Long
     i = LBound(a())
     Do
-   ' If i > UBound(A()) Then Exit Do
+    If i > UBound(a()) Then Exit Do
     
     If tabwidth > 0 Then
     t() = Split(a(i), Chr(9))
@@ -945,6 +1083,7 @@ If oldone = 0 Then
     para(ParaNum).lines = 1  ' clear
     ReDim para(ParaNum).content(1 To 1)
     ReDim para(ParaNum).colordata(1)
+    para(ParaNum).startfrom = 0
 Else
 RemoveDocParaIndex ParaNum
 ParaNum = oldone
@@ -1031,11 +1170,9 @@ If lineno < 1 Then Exit Property
     Loop
     If lineno <= mlines Then
     
-    If Not skipcolor Then
-    If Trim(para(mycur).content(1)) <> "" Then
+    If ColorEvent And Not skipcolor Then
     If para(mycur).colordata(0) = Empty Then
     ColorThis (mycur)
-        End If
         End If
 End If
     lastcolordatacur = mycur
@@ -1075,6 +1212,16 @@ Property Get ParagraphFromOrder(ByVal order As Long) As Long
         mycur = DocParaNext(mycur)
     Loop
 End Property
+Property Let startfrom(ParaNum As Long, there As Long)
+para(ParaNum).startfrom = there
+End Property
+Property Get startfrom(ParaNum As Long) As Long
+startfrom = para(ParaNum).startfrom
+End Property
+Property Let Paracolordata(ParaNum As Long, col() As Variant)
+If ParaNum <> 0 Then para(ParaNum).colordata() = col()
+End Property
+
 Property Get Paracolordata(ParaNum As Long) As Variant()
 ' it is valid
 Paracolordata = para(ParaNum).colordata()
@@ -1351,9 +1498,10 @@ Dim mlines As Long, counter As Long
     If ParaNum = 0 Then Exit Property
     If para(ParaNum).lines = 0 Then Exit Property
     
-    If Not skipcolor Then
+    If ColorEvent And Not skipcolor Then
 If para(ParaNum).colordata(0) = Empty Then
     ColorThis (ParaNum)
+    If para(ParaNum).colordata(0) = Empty Then para(ParaNum).startfrom = 0
 End If
 End If
      For mlines = 1 To para(ParaNum).lines
@@ -1548,9 +1696,9 @@ Do While mycur <> 0
       RaiseEvent MayQuit(ok)
       If ok Then busy = False: Exit Sub
 ColorThis mycur
+
 If mycur = endblock Then Exit Do
 Loop
-
 If mycur = endblock Then ColorThis mycur
 End If
 busy = False
@@ -1566,7 +1714,8 @@ Do While mycur <> 0
       RaiseEvent MayQuit(ok)
       If ok Then Exit Sub
 If para(mycur).colordata(0) = Empty Then
-ColorThis mycur
+ColorThis (mycur)
+mycur = DocParaNext(mycur)
 Else
 mycur = DocParaNext(mycur)
 End If
@@ -2104,7 +2253,12 @@ bufsize = 0
 SeekBuf = 1
 On Error GoTo ErrHandler
   BLen = FileLen(GetDosPath(FileName))
-  If BLen = 0 Then Exit Sub
+    If BLen = 0 Then
+  If DocLines = 0 Then
+  textDoc = ""
+  End If
+  Exit Sub
+  End If
   
   FNr = FreeFile
   Open GetDosPath(FileName) For Binary Access Read As FNr
@@ -2196,7 +2350,6 @@ utf8cont:
     Dim cc$
     cc$ = Space$(30)
     LSet cc$ = buf()
-   ' Debug.Print FoundLocaleId(Convert2(cc$, 0))
 lbt = 0
 If mlcid < 4 Then mlcid = Module1.cLid
 
@@ -2533,7 +2686,6 @@ Do While Not (thislof < SeekBuf)
         Exit Do
     End If
 Loop
-''Debug.Print getAnsiStringlINE
 Exit Function
 a11:
 On Error GoTo 0
@@ -2754,7 +2906,21 @@ End If
 If (Len(res$) - cur + 1) > Len(Find$) Then
     Select Case AscW(Mid$(res$, cur + Len(Find$), 1))
     Case 39, 65 To 90, 97 To 122, Is > 127
-    If Direction Then cur = cur + 1 Else cur = cur - 1
+    If Direction Then
+    cur = cur + 1
+    Else
+        If cur <= 0 Then
+            there = DocParaBack(there)
+                If there > 0 Then
+                    cur = TextParagraphLen(there)
+                Else
+                    Result = False
+                Exit Function
+            End If
+        Else
+        cur = cur + 1
+        End If
+    End If
     GoTo again
     Case Else
     End Select
@@ -2774,6 +2940,7 @@ End If
 oncemore = True
 End If
 End Function
+
 Function FindIdentifier(Find$, Direction As Boolean, there As Long, cur As Long) As Boolean
 ' there is paragraph number not paragraph order
 Dim oncemore As Boolean, Result As Boolean, res$
@@ -2803,7 +2970,21 @@ Case Else
 If (Len(res$) - cur + 1) > Len(Find$) Then
     Select Case AscW(Mid$(res$, cur + Len(Find$), 1))
     Case 40, 46, 48 To 57, 65 To 90, 95, 97 To 122, Is > 127
-    If Direction Then cur = cur + 1 Else cur = cur - 1
+    If Direction Then
+    cur = cur + 1
+    Else
+        If cur <= 0 Then
+            there = DocParaBack(there)
+                If there > 0 Then
+                    cur = TextParagraphLen(there)
+                Else
+                    Result = False
+                Exit Function
+            End If
+        Else
+        cur = cur + 1
+        End If
+    End If
     GoTo again
     Case Else
     End Select
@@ -2851,4 +3032,24 @@ CompareStr2 = -2 + CompareString(0, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(b$))
 
 End Function
 
+Private Function countbrakcet(a$, k As Long, counter As Long) As Long
+Dim i As Long, j As Integer, blind As Boolean
+countbrakcet = counter
+For i = Abs(k) To Len(a$)
+j = AscW(Mid$(a$, i, 1))
+Select Case j
+Case 34
+blind = Not blind
+Case 123
+If Not blind Then countbrakcet = countbrakcet + 1
+Case 125
+If Not blind Then countbrakcet = countbrakcet - 1: If countbrakcet = 0 Then k = i: Exit For
+End Select
+Next i
 
+End Function
+Property Get IsPart(ParaNum As Long) As Boolean
+If Not InvalidPara(ParaNum) Then
+IsPart = para(ParaNum).startfrom > 0
+End If
+End Property

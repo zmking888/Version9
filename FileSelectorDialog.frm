@@ -331,7 +331,7 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 If Button = 1 Then
 
 If lastfactor = 0 Then lastfactor = 1
@@ -356,7 +356,7 @@ End If
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False
@@ -427,7 +427,7 @@ End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 If dr Then Me.mousepointer = 0
 dr = False
 End Sub
@@ -550,7 +550,7 @@ gList1.ShowMe2
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, Shift As Integer)
 If KeyCode = vbKeyEscape Then
 mySelector.AbordAll
 CancelDialog = True
@@ -643,7 +643,7 @@ End Sub
 
 
 
-Private Sub glist3_KeyDown(KeyCode As Integer, shift As Integer)
+Private Sub glist3_KeyDown(KeyCode As Integer, Shift As Integer)
 If Not mySelector.Mydir.isReadOnly(mySelector.Mydir.path) Then
 If Not gList3.EditFlag Then
 
@@ -859,7 +859,8 @@ On Error Resume Next
 Err.Clear
 'If FileLen(file) > 1500000 Then Image1.refresh
     s$ = CFname(file)
-    Set aPic = LoadMyPicture(GetDosPath(s$))
+    Set aPic = LoadMyPicture(GetDosPath(s$), True, gList2.backcolor)
+     MyEr "", ""
      If Not aPic Is Nothing Then
         Set aImage = aPic
         If file = vbNullString Or Err.Number > 0 Then Exit Sub
@@ -874,6 +875,7 @@ mySelector.glistN.enabled = True
 ihave = False
 End If
 End If
+Err.Clear
 End Sub
 
 

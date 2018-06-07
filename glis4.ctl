@@ -968,7 +968,7 @@ Else
     Timer1.Interval = 30
     If Not enabled Then Exit Sub
 
-    If listcount > 0 Then
+    If listcount > 0 Or MultiLineEditBox Then
       ShowMe2
     Else
     
@@ -1170,6 +1170,7 @@ Else
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
 End If
 Case vbKeyPageUp
+    If Shift = 0 Then RaiseEvent MarkDestroyAny
     If SELECTEDITEM - lines < 0 Then
        If SELECTEDITEM - 1 > 0 Then
        ShowThis SELECTEDITEM - 1
@@ -1202,52 +1203,62 @@ Case vbKeyPageUp
 Case vbKeyUp
 If Spinner Then Exit Sub
     Do
-    
         ShowThis SELECTEDITEM - 1
-        
+    
     Loop Until Not ListSep(ListIndex) Or ListIndex = 0
     
     If ListSep(ListIndex) Then ListIndex = lastlistindex
-' FIND RIGHT SELSTART...
-
-    RaiseEvent ChangeSelStart(SelStart)
+     RaiseEvent ChangeSelStart(SelStart)
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
        If Shift <> 0 Then
-   ' KeyCode = 0
+   
     PrepareToShow 5
     If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, Shift)
     Else
       RaiseEvent MarkDestroyAny
     MarkNext = 0
-    If NoFreeMoveUpDown Then ShowMe2: Exit Sub
+    If NoFreeMoveUpDown Then
+        ShowMe2
+    Else
+    KeyCode = 0
+
+      PrepareToShow 5
+    End If
+        Exit Sub
+        
+    
     End If
       Shift = 0: KeyCode = 0: Exit Sub
     
 Case vbKeyDown
 If Spinner Then Exit Sub
     Do
-     
     ShowThis SELECTEDITEM + 1
-
     Loop Until Not ListSep(ListIndex) Or ListIndex = listcount - 1
     If ListSep(ListIndex) Then ListIndex = lastlistindex
+  
     SelStartEventAlways = SelStart
     If Not NoEvents Then If SELECTEDITEM > 0 Then RaiseEvent selected(SELECTEDITEM)
     If Shift <> 0 Then
-    'KeyCode = 0
+
     PrepareToShow 5
   If MarkNext > 0 Then RaiseEvent KeyDownAfter(KeyCode, Shift)
     Else
     RaiseEvent MarkDestroyAny
     MarkNext = 0
-    If NoFreeMoveUpDown Then ShowMe2: Exit Sub
+        If NoFreeMoveUpDown Then
+        ShowMe2
+    Else
+    KeyCode = 0
+    PrepareToShow 5
+    End If
+    Exit Sub
     End If
   
-      KeyCode = 0: Exit Sub
+     KeyCode = 0: Exit Sub
 Case vbKeyPageDown
-''RaiseEvent ScrollMove(topitem)
+If Shift = 0 Then RaiseEvent MarkDestroyAny
     If SELECTEDITEM + (lines + 1) \ 2 >= listcount Then
-     'FindRealCursor SELECTEDITEM + 1
      If listcount > SELECTEDITEM Then
     ShowThis SELECTEDITEM + 1
     Else
@@ -1531,6 +1542,11 @@ dr = True
 
 If cY = y \ myt Then Timer3.enabled = False: cY = y \ myt
 End If
+
+                  If MarkNext = 4 Then
+                  
+            RaiseEvent MarkDestroyAny
+            End If
 End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -1557,7 +1573,7 @@ TIMESTAMP = Timer
 If Not FreeMouse Then Exit Sub
 If Button = 0 Then If mousepointer < 2 Then mousepointer = 1
 If (x > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
-Hidebar = True: BarVisible = True
+Hidebar = True: BarVisible = m_showbar Or MultiLineEditBox
 ElseIf (x < Width - barwidth) And Button = 0 And BarVisible And (StickBar Or AutoHide) Then
 Hidebar = False
 BarVisible = False
@@ -1752,8 +1768,11 @@ If (cX > ScaleWidth / 4 And cX < ScaleWidth * 3 / 4) And scrollme = 0 Then x = l
           If Not EditFlag Then scrollme = 0
             End If
             
-
+            If MarkNext = 4 Then
+            RaiseEvent MarkDestroyAny
+            End If
             Timer1.Interval = 20
+            
             Timer1.enabled = True
             End If
             Timer3.enabled = False
@@ -1808,7 +1827,9 @@ If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
 End With
 cX = x
 If Hidebar Then Hidebar = False: Redraw Hidebar Or m_showbar
-If Timer3.enabled Then cY = y: DOT3
+If Timer3.enabled Then
+cY = y: DOT3
+End If
 Timer3.enabled = False
 If Timer2.enabled Then
  Timer2.enabled = False
@@ -1866,6 +1887,7 @@ If (Button And 3) > 0 And myEnabled Then
       MarkWord
       
       Else
+
       RaiseEvent Selected2(SELECTEDITEM - 1)
       Exit Sub
                 End If
@@ -1951,7 +1973,7 @@ Effect = 0
 RaiseEvent MarkDestroyAny
 HideCaretOnexit = False
 Timer2.enabled = False
-RaiseEvent CorrectCursorAfterDrag
+If marvel Then RaiseEvent CorrectCursorAfterDrag
 End Sub
 
 Private Sub UserControl_OLEDragDrop(data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -2064,7 +2086,12 @@ ElseIf (y - mHeadlineHeightTwips) < myt / 2 And (topitem + YYT > 0) Then
                 Timer2.enabled = False
              '  If marvel Then
              
-                If Not Timer1.enabled Then HideCaretOnexit = False: MovePos x, y
+                If Not Timer1.enabled Then
+                HideCaretOnexit = False: MovePos x, y
+                If CBool(Shift And 1) Then ShowMe
+                
+                End If
+
                               
                               
                                
@@ -2091,6 +2118,7 @@ If Not ok Then
         Effect = vbDropEffectNone
         HideCaretOnexit = True
         MovePos x, y
+        If CBool(Shift And 1) Then ShowMe
     End If
 ElseIf state = vbEnter Then
 ok = False
@@ -2099,6 +2127,7 @@ If Not marvel Then RaiseEvent DragOverNow(ok)
  If Not Timer1.enabled Then
  HideCaretOnexit = False
  MovePos x, y
+ If CBool(Shift And 1) Then ShowMe
  End If
 End If
 
@@ -2191,8 +2220,6 @@ End If
 RaiseEvent selected(SELECTEDITEM)
 
 RaiseEvent ChangeSelStart(SelStart)
-
-'If Not marvel Then ExternalCursor SelStart, List(ListIndex), Me.ForeColor
 dragslow = 1
 End Sub
 Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
@@ -2598,17 +2625,22 @@ Set mo = UserControl.Parent.Controls(nm$)
 End If
 
 If listcount <= lines + 1 Then
-BarVisible = False
+    BarVisible = False
 Else
-BarVisible = m_showbar And mo.Visible
+    BarVisible = m_showbar And mo.Visible
 
 End If
 If item > 0 And item <= listcount Then
-If MultiLineEditBox Then FindRealCursor item
+    If MultiLineEditBox Then FindRealCursor item
     If item - topitem > 0 And item - topitem <= lines + 1 Then
+        If restrictLines > 0 Then
+            If listcount - topitem < lines Then
+                topitem = listcount - lines - 1
+                If topitem < 0 Then topitem = 0
+            End If
+        End If
     
-        SELECTEDITEM = item
-        
+            SELECTEDITEM = item
             If SELECTEDITEM = listcount Then
             state = True
             Value = max
@@ -2617,29 +2649,39 @@ If MultiLineEditBox Then FindRealCursor item
             
         
     Else
+    If MultiLineEditBox And False Then
     If item < lines / 2 Then
-    topitem = 0
+        topitem = 0
     Else
-    If item + lines / 2 > listcount Then
-
-    topitem = listcount - lines - 1
-
+        If item + lines / 2 > listcount Then
+            topitem = listcount - lines - 1
+        Else
+            topitem = item - lines / 2
+        End If
+    End If
     Else
-    topitem = item - lines / 2
+    If item - topitem > lines Then
+    topitem = item - lines + 1
+    Else
+    topitem = item - 1
+    
     End If
+    
     End If
+    
 
-CalcAndShowBar1
-        SELECTEDITEM = item
-        ''ShowMe
-     End If
+    CalcAndShowBar1
+    SELECTEDITEM = item
+       ShowMe
+    End If
    If Not noselect Then If Not Timer1.enabled Then PrepareToShow 10
+Exit Sub
+
 End If
 If noselect Then
-SELECTEDITEM = 0: ShowMe2
-
- 
+SELECTEDITEM = 0
   End If
+ShowMe2
 skipthis:
 End Sub
 Public Sub RepaintScrollBar()
@@ -2778,7 +2820,7 @@ Timer1.enabled = True
 
 End Sub
 Public Sub ShowMe(Optional visibleme As Boolean = False)
- Dim REALX As Long, REALX2 As Long, myt1
+ Dim REALX As Long, REALX2 As Long, myt1, oldtopitem As Long
 If visibleme Then
  barwidth = UserControlTextWidth("W")
  CalcAndShowBar1
@@ -2854,6 +2896,7 @@ BarVisible = False
 Exit Sub
 End If
 If SELECTEDITEM > 0 Then
+oldtopitem = topitem
 topitem = 0
 
        j = SELECTEDITEM - lines / 2 - 1
@@ -2862,12 +2905,30 @@ topitem = 0
     If listcount <= lines + 1 Then
        topitem = 0
     Else
-    If j + lines > listcount Then
-    If listcount - lines >= 0 Then
-    topitem = listcount - lines - 1
-    End If
+    If j + lines >= listcount Then
+    
+        If listcount - lines >= 0 Then
+        topitem = listcount - lines - 1
+        End If
     Else
-        topitem = j
+        If dragslow < 1 Or Not MultiLineEditBox Then
+        If Not MultiLineEditBox Then
+         If SELECTEDITEM - oldtopitem > 0 And SELECTEDITEM - oldtopitem <= lines + 1 Then
+         topitem = oldtopitem
+            ElseIf SELECTEDITEM - oldtopitem > lines Then
+                topitem = SELECTEDITEM - lines + 1
+                Else
+                topitem = SELECTEDITEM - 1
+    
+            End If
+            j = topitem
+        Else
+        topitem = oldtopitem
+        j = oldtopitem
+        End If
+        Else
+               topitem = j
+        End If
     End If
         state = True
             On Error Resume Next

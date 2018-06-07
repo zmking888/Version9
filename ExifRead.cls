@@ -216,7 +216,7 @@ Public Property Get Tag(Optional ByVal ExifTag As EXIF_TAG) As Variant
     If IsLoaded = False Then Exit Property
     Dim i As Long
     On Error Resume Next
-    For i = 1 To No_of_Entries  'UBound(IFDDirectory)
+    For i = 1 To No_of_Entries
         If IFDDirectory(i).Tag_No = ExifTag Then
             Tag = IFDDirectory(i).Value
             Exit For
@@ -226,8 +226,6 @@ Public Property Get Tag(Optional ByVal ExifTag As EXIF_TAG) As Variant
 End Property
 
 Public Sub Load(Optional ByVal picFile As String)
-'Debug.Print "["; picFile; "]"
-''If norest Then Exit Sub
 If No_of_Entries > 0 Then Exit Sub
     If m_file = vbNullString Then
         m_file = picFile
