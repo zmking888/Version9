@@ -1,8 +1,7 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 9 active-X
+Version 9.3 revision 10 active-X
 
-Improve editor's color on code algorithm to use multiline strings in braces { } inside expressions. Also there is a check on numerical literals for floating point with exponet part, as we type (check for second dot). 
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

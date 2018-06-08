@@ -9652,7 +9652,7 @@ conthere1:
         End Select
         End If
         End If
-
+         If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = cdecimaldot$
         Select Case VarType(r)
         Case vbDecimal
         r = CDec(ig$ & DE$)
@@ -9689,7 +9689,7 @@ Exit Function
 End Function
 
 
-Function IsNumberD2(a$, d As Variant, Optional noendtypes As Boolean = False, Optional ecxeptspecial As Boolean) As Boolean
+Function IsNumberD2(a$, d As Variant, Optional noendtypes As Boolean = False, Optional exceptspecial As Boolean) As Boolean
 ' for inline stacitems
 If VarType(d) = vbEmpty Then d = 0#
 Dim a1 As Long
@@ -9704,7 +9704,7 @@ Exit For
 End Select
 Next a1
 If a1 > Len(a$) Then a1 = Len(a$) + 1
-If IsNumberOnly(a$, 1, d, a1, noendtypes, ecxeptspecial) Then
+If IsNumberOnly(a$, 1, d, a1, noendtypes, exceptspecial) Then
 a$ = Mid$(a$, a1)
 
 IsNumberD2 = True
