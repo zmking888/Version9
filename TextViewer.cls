@@ -1840,7 +1840,7 @@ again:
 If RTrim$(a$) = vbNullString Then
 If pos2 > 0 Then
 If col((UBound(col()) \ 2) * 2) <> lastcol Then
-addone pos2, lastcol
+addone pos2 + 1, lastcol
 ElseIf UBound(col()) < 2 Then
 addone pos2, lastcol
 End If
