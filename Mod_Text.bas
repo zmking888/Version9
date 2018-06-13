@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -33258,12 +33258,13 @@ subsub02:
                                                                                            
                                                                                                     If bstack.IsInRetStackNumber(p) Then
                                                                                               
-                                                                                                            If p < -1 Then
+                                                                                                            If p < -2 Then
                                                                                                             vvv = Abs(p + 2)
                                                                                                                     subspoint = True
                                                                                                                     bstack.IsInRetStackNumber p
                                                                                                     
-                                                                                                                   ' bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                                                                                '   bb$ = Mid$(sbf(Abs(bstack.Parent.OriginalCode)).sb, Len(sbf(Abs(bstack.Parent.OriginalCode)).sb) - CLng(p) + 1)
+                                                                                                        
                                                                                                                      bb$ = Mid$(sbf(vvv).sb, Len(sbf(vvv).sb) - CLng(p) + 1)
                                                                                                                      w3 = Abs(bstack.OriginalCode)
                                                                                                                      

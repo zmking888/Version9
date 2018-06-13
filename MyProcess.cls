@@ -135,7 +135,9 @@ poulos:
   
 End Sub
 
-Private Sub TaskInterface_TickolD()
+
+
+Private Sub TaskInterface_TickOLD()
  Dim x As Long, mycnt As Long, ohere$, look As Boolean
  Static offset As Double
  Dim NowProcess As basetask
