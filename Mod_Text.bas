@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4600,7 +4600,7 @@ again2:
                 
                 MUL = MyTrimL(aa$)
                 
-            If Mid$(aa$, MUL, 1) Like "[<>]*" Then
+            If Mid$(aa$, MUL, 1) Like "[<>]" Then
                 If MaybeIsSymbol(Mid$(aa$, MUL + 1, 1), "=>") Then
                     ss$ = Mid$(aa$, MUL, 2)
                     Mid$(aa$, 1, MUL + 1) = Space(MUL + 1)
@@ -4609,7 +4609,7 @@ again2:
                     Mid$(aa$, 1, MUL) = Space(MUL)
                 End If
             Else
-                If MaybeIsSymbol(Mid$(aa$, MUL + 1, 1), "*") Then
+                If MaybeIsSymbol(Mid$(aa$, MUL + 1, 1), "[^|!~=*/]") Then
                     ss$ = Mid$(aa$, MUL, 2)
                     Mid$(aa$, 1, MUL + 1) = Space(MUL + 1)
                 Else
