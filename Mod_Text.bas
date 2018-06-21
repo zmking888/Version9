@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3031,7 +3031,11 @@ If safegroup.LastOpen <> vbNullString Then
         If safegroup.lasthere$ = here$ Then
         w$ = safegroup.LastOpen
         Else
+        If safegroup.lasthere$ = vbNullString Then
+        w$ = safegroup.LastOpen
+        Else
         w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+        End If
         End If
 
        ' w$ = safegroup.LastOpen
@@ -3125,7 +3129,12 @@ ElseIf Prefix = "VAL$" Then
                 If safegroup.lasthere$ = here$ Then
         w$ = safegroup.LastOpen
         Else
+        
+         If safegroup.lasthere$ = vbNullString Then
+        w$ = safegroup.LastOpen
+        Else
         w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+        End If
         End If
 
             GoTo cont5050
@@ -3323,7 +3332,7 @@ If pppp.refgroup Is Nothing Then
         End If
         End If
         
-        Set dd = New Group
+ 
        
         
          
@@ -3338,6 +3347,7 @@ If pppp.refgroup Is Nothing Then
                 Set pppp = BoxGroupVar(safegroup.Link)
                 Set pppp.refgroup = safegroup
                 safegroup.LastOpen = w$
+                 safegroup.lasthere = here$
                 Set safegroup = Nothing
                 v = 0
                 Else
@@ -3350,7 +3360,7 @@ If pppp.refgroup Is Nothing Then
         On Error Resume Next
                ' check for iamglobal ??
     If Not GetVar3(bstack, w$, y1) Then
-                 
+                Set dd = New Group
         y1 = globalvar(w$, dd)
         UnFloatGroup bstack, w$, y1, pppp.item(v), , True
         globalvar w$, y1, True, True
@@ -3727,6 +3737,7 @@ breakexit:
                 Set safegroup = pppp.refgroup
                 Set safegroup.LinkRef = CopyGroupObj(var(y1))
                 Set safegroup = Nothing
+                
                 Else
                 Set pppp.item(v) = CopyGroupObj(var(y1), Not pppp.item(v).Link Is Nothing)
                 End If
@@ -3770,7 +3781,7 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
 
                 If safegroup.Link.IamFloatGroup Then
                 Set pppp = BoxGroupVar(safegroup.Link)
-                
+          
                 v = 0
                 Else
                 bstack.MoveNameDot safegroup.lasthere + "." + safegroup.GroupName
@@ -3784,12 +3795,18 @@ If v >= 0 Then w$ = pppp.CodeName + CStr(v) Else w$ = pppp.CodeName + "_" + CStr
             If safegroup.lasthere$ = here$ Then
                 w$ = safegroup.LastOpen
             Else
-                w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+                 If safegroup.lasthere$ = vbNullString Then
+        w$ = safegroup.LastOpen
+        Else
+        w$ = safegroup.lasthere$ + "." + safegroup.LastOpen
+        End If
             End If
             GoTo cont2020
         Else
-                'safegroup.LastOpen = w$
-                'safegroup.lasthere$ = here$
+        If safegroup.Link.IamFloatGroup Then
+                safegroup.LastOpen = vbNullString
+                safegroup.lasthere$ = vbNullString
+                End If
         End If
         Else
 '                safegroup.LastOpen = w$
@@ -22592,8 +22609,8 @@ If Len(nm$) > 5 And False Then
                 If useglobalname Then
                     n$ = nm$
                     Else
-                    n$ = here$ & "." & nm$
-                    'n$ = here$ & "." & bstack.GroupName & nm$
+                    'n$ = here$ & "." & nm$
+                    n$ = here$ & "." & bstack.GroupName & nm$
                     End If
                 End If
 
@@ -22605,8 +22622,8 @@ Else
 If here$ = vbNullString Then
 n$ = nm$
 Else
-n$ = here$ & "." & nm$
-'n$ = here$ & "." & bstack.GroupName & nm$
+'n$ = here$ & "." & nm$
+n$ = here$ & "." & bstack.GroupName & nm$
 End If
 End If
 End If
@@ -24631,8 +24648,15 @@ If TypeOf var(h&) Is Constant Then
     Err.Clear
     End If
 Else
+If TypeOf var(h&) Is Group Then
+If var(h&).IamApointer Then
+s$ = s$ & "*[" & Typename(var(h&)) & "]"
+Else
 s$ = s$ & "[" & Typename(var(h&)) & "]"
-
+End If
+Else
+s$ = s$ & "[" & Typename(var(h&)) & "]"
+End If
 End If
 End If
 Else
@@ -29383,7 +29407,7 @@ If myobject Is Nothing Then GoTo exithere1
                             If Asc(s$) = 42 Then s$ = Mid$(s$, 2)
                                   If GetVar1(bstack, bstack.GroupName & s$, v) Then ' And here$ = VbNullString
                                   ' this needed for "a<=b"  a copy to a global group
-                                
+                                                ElseIf GetVar1(bstack, ps2push, v) Then
                                                 ElseIf Not GetVar1(bstack, s$, v) Then
                                                         v = globalvar(bstack.GroupName & s$, 0)
                                             End If

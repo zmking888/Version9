@@ -343,9 +343,10 @@ Else
     If AscW(a$) = 46 Then
     dotnum = 1
     While AscW(Mid$(a$, dotnum + 1) + " ") = 46
-    dotnum = dotnum + 1
+     dotnum = dotnum + 1
     Wend
     a$ = Mid$(a$, dotnum + 1)
+    dotnum = dotnum + 1
     GoTo newrun
     End If
     End If
