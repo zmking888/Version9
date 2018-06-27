@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -49026,9 +49026,9 @@ Dim n As Integer
 GetMem2 VarPtr(v), n
 MyIsObject = n = 9
 End Function
-Function MyVal(v As Variant) As Double
+Function MyVal(v As Variant) As Variant
 On Error GoTo there1245
-MyVal = CDbl(v)
+MyVal = v
 Exit Function
 there1245:
 On Error GoTo there1246
