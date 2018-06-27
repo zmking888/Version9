@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 14
+Global Const Revision = 15
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -48490,7 +48490,7 @@ If Left$(ah, 1) = "N" Or InStr(ah, "l") > 0 Then
     End If
         Set bstack.lastobj = Nothing
     Else
-        bb.Value = CDbl(p)
+        bb.Value = p
     End If
     
 ElseIf Left$(ah, 1) = "S" Then
