@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 16
+Global Const Revision = 17
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -9518,24 +9518,37 @@ conthere1:
         If Not bstack.lastpointer Is Nothing Then
         With bstack.lastpointer
         If .lasthere = vbNullString Then
-        Exit Function
-        End If
-        If .GroupName <> "" Then
-        If isstrparam Then
-        r$ = .lasthere + "." + .GroupName + "$"
-        rr& = 3
-        Else
-        r$ = .lasthere + "." + .GroupName
-        rr& = 1
-        End If
-        Else
-        If isstrparam Then
-        r$ = .lasthere + "$"
-        rr& = 3
-        Else
-        r$ = .lasthere
-        rr& = 1
-        End If
+                    If .GroupName <> "" Then
+                If isstrparam Then
+                    r$ = .GroupName + "$"
+                    rr& = 3
+                Else
+                    r$ = .GroupName
+                    rr& = 1
+                End If
+            Else
+            ' why ?
+               Exit Function
+            End If
+
+       Else
+            If .GroupName <> "" Then
+                If isstrparam Then
+                    r$ = .lasthere + "." + .GroupName + "$"
+                    rr& = 3
+                Else
+                    r$ = .lasthere + "." + .GroupName
+                    rr& = 1
+                End If
+            Else
+                If isstrparam Then
+                    r$ = .lasthere + "$"
+                    rr& = 3
+                Else
+                    r$ = .lasthere
+                    rr& = 1
+                End If
+            End If
         End If
         End With
         Set bstack.lastpointer = Nothing
@@ -19915,7 +19928,11 @@ If Len(b$) > 1 Then
             End Select
              GoTo VarOnly
             Else
+            If .lasthere = vbNullString Then
+                w$ = .GroupName + "." + w$
+            Else
                 w$ = .lasthere + "." + .GroupName + "." + w$
+                End If
                 If MaybeIsSymbol2(b$, "=", i) Then
                 If i = 1 Then
                 Mid$(b$, 1, 1) = "_"
@@ -52921,6 +52938,7 @@ Dim w1 As Long, s$, pppp As mArray, w2 As Long, p, nbstack As basetask, myobj As
 
 w1 = Abs(IsLabel(bstack, a$, s$))
 If w1 = 1 Or w1 = 3 Then
+cont11:
 If Not GetVar(bstack, s$, w1) Then GoTo jmp1478
 If Not Typename(var(w1)) = "Group" Then GoTo jmp1478
 If var(w1).IamApointer Then
@@ -53056,7 +53074,26 @@ End If
 
 End If
 jmp1478:
+If s$ = "THIS" Or s$ = "ΑΥΤΟ" Then
+ 
+ If bstack.UseGroupname <> "" Then
+ s$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
+If GetVar(bstack, s$, w1) Then
+s$ = here$
+If (Len(bstack.UseGroupname) - Len(var(w1).GroupName) - 1) > 0 Then
+here$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - Len(var(w1).GroupName) - 1)
+Else
+here$ = "" ' Left$(bstack.Parent.UseGroupname, Len(bstack.Parent.UseGroupname) - 1)
+End If
+MakeGroupPointer bstack, var(w1)
+here$ = s$
+    GetPointer = True
+    Exit Function
+End If
+ End If
+Else
 MyErMacro a$, "Expected a group name", "Περίμενα όνομα ομάδας"
+End If
 End If
 Exit Function
 End Function

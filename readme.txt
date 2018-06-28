@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 16 active-X
+Version 9.3 revision 17 active-X
 
 
 From version 9.0 revision 50:
