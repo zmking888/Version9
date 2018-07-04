@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -17565,11 +17565,12 @@ ContScan:
             If GetForegroundWindow <> Form1.hWND Or Not Targets Then
             If IsExp(bstack, b$, p) Then
             End If
-            RRCOUNTER = 0
+            ' removed from rev 18, ver 9.3
+            ' RRCOUNTER = 0
             MyDoEvents0 di
             If FKey > 0 Then
                 If FK$(FKey) <> "" Then
-                If bstack.IamChild Or bstack.IamAnEvent And FKey = 13 And lastAboutHTitle <> "" Then
+                If bstack.IamChild And bstack.IamAnEvent And FKey = 13 And lastAboutHTitle <> "" Then
                         abt = True
                         FKey = 0
                         vHelp
@@ -48232,12 +48233,12 @@ Function MyScan(basestack As basetask, rest$) As Boolean
 Dim p As Variant, y As Double, s$
 ClearJoyAll
 PollJoypadk
-If Not Targets Then
+If GetForegroundWindow <> Form1.hWND Or Not Targets Then
 If IsExp(basestack, rest$, p) Then
 
 End If
 MyScan = True
-MyDoEvents
+MyDoEvents0 basestack.Owner
 If FKey > 0 Then
 If FK$(FKey) <> "" Then
     s$ = FK$(FKey)
@@ -54400,7 +54401,9 @@ End If
         End If
         End If
         i = MyTrimL(b$)
-        If InStr("/*-+=~^&|<>", Mid$(b$, i, 1)) > 0 Then
+        If i > Len(b$) Then
+        
+        ElseIf InStr("/*-+=~^&|<>", Mid$(b$, i, 1)) > 0 Then
         
                     If InStr("/*-+=~^&|<>!", Mid$(b$, i + 1, 1)) > 0 Then
                         ss$ = Mid$(b$, i, 2)

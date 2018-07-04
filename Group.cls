@@ -34,7 +34,7 @@ Public highpriorityoper As String
 Public leftoper$  ' we have to copy this
 Public HasUnary As Boolean
 Public IamApointer As Boolean, lasthere$
-Public Original As Long
+Public original As Long
 Public isref As Boolean ' One time use
 Public LastOpen As String
 Public Property Get Events() As Object
@@ -196,21 +196,24 @@ Dim JJ As Variant
 If IsObject(bank.item(cursor)) Then
 Set item = bank.item(cursor)
 Else
+
 If mTeam Then
         If cursor = bank.item(1) * 2 + 3 Then
             ' we need common definitions for functions and modules all elements
-                
+                If Not LinkToGroup.IamApointer Then
                 
                 LinkToGroup.PeekItem 1, JJ
                ' If JJ = 0 Then Exit Sub
                 LinkToGroup.PeekItem JJ * 2 + 3, item
                         Exit Sub
+                        End If
             ElseIf cursor = bank.item(1) * 2 + 2 Then
-                    
+                    If Not LinkToGroup.IamApointer Then
                     LinkToGroup.PeekItem 1, JJ
                   '  If JJ = 0 Then Exit Sub
                     LinkToGroup.PeekItem JJ * 2 + 2, item
                           Exit Sub
+                          End If
             End If
 End If
 

@@ -7454,6 +7454,7 @@ End If
 End Function
 Public Sub GarbageFlush()
 Dim objptr, obj As Object, i As Long
+On Error Resume Next
 With GarbageCollector
 If .count > 0 Then
 For i = 0 To .count - 1
