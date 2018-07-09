@@ -5918,7 +5918,7 @@ Public Function ContainsUTF8(ByRef Source() As Byte) As Boolean
 
 End Function
 Function ReadUnicodeOrANSI(FileName As String, Optional ByVal EnsureWinLFs As Boolean, Optional feedback As Long) As String
-Dim i&, FNr&, BLen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte
+Dim i&, FNr&, Blen&, WChars&, BOM As Integer, BTmp As Byte, b() As Byte
 Dim mLof As Long, nobom As Long
 nobom = 1
 ' code from Schmidt, member of vbforums
@@ -5926,18 +5926,18 @@ If FileName = vbNullString Then Exit Function
 On Error Resume Next
 If GetDosPath(FileName) = vbNullString Then MissFile: Exit Function
  On Error GoTo ErrHandler
-  BLen = FileLen(GetDosPath(FileName))
+  Blen = FileLen(GetDosPath(FileName))
 '  If Err.Number = 53 Then missfile: Exit Function
  
-  If BLen = 0 Then Exit Function
+  If Blen = 0 Then Exit Function
   
   FNr = FreeFile
   Open GetDosPath(FileName) For Binary Access Read As FNr
       Get FNr, , BOM
     Select Case BOM
       Case &HFEFF, &HFFFE 'one of the two possible 16 Bit BOMs
-        If BLen >= 3 Then
-          ReDim b(0 To BLen - 3): Get FNr, 3, b 'read the Bytes
+        If Blen >= 3 Then
+          ReDim b(0 To Blen - 3): Get FNr, 3, b 'read the Bytes
 utf16conthere:
           feedback = 0
           If BOM = &HFFFE Then 'big endian, so lets swap the byte-pairs
@@ -5952,16 +5952,16 @@ utf16conthere:
         Get FNr, , BTmp
         If BTmp = &HBF Then 'it's indeed the UTF8-BOM
         feedback = 2
-          If BLen >= 4 Then
-            ReDim b(0 To BLen - 4): Get FNr, 4, b 'read the Bytes
-            WChars = MultiByteToWideChar(65001, 0, b(0), BLen - 3, 0, 0)
+          If Blen >= 4 Then
+            ReDim b(0 To Blen - 4): Get FNr, 4, b 'read the Bytes
+            WChars = MultiByteToWideChar(65001, 0, b(0), Blen - 3, 0, 0)
             ReadUnicodeOrANSI = Space$(WChars)
-            MultiByteToWideChar 65001, 0, b(0), BLen - 3, StrPtr(ReadUnicodeOrANSI), WChars
+            MultiByteToWideChar 65001, 0, b(0), Blen - 3, StrPtr(ReadUnicodeOrANSI), WChars
           End If
         Else 'not an UTF8-BOM, so read the whole Text as ANSI
         feedback = 3
         
-          ReadUnicodeOrANSI = StrConv(Space$(BLen), vbFromUnicode)
+          ReadUnicodeOrANSI = StrConv(Space$(Blen), vbFromUnicode)
           Get FNr, 1, ReadUnicodeOrANSI
         End If
         
@@ -5980,10 +5980,10 @@ utf16conthere:
       If ContainsUTF8(buf()) Then 'maybe is utf-8
       feedback = 2
       nobom = -1
-        ReDim b(0 To BLen - 1): Get FNr, 1, b
-            WChars = MultiByteToWideChar(65001, 0, b(0), BLen, 0, 0)
+        ReDim b(0 To Blen - 1): Get FNr, 1, b
+            WChars = MultiByteToWideChar(65001, 0, b(0), Blen, 0, 0)
             ReadUnicodeOrANSI = Space$(WChars)
-            MultiByteToWideChar 65001, 0, b(0), BLen, StrPtr(ReadUnicodeOrANSI), WChars
+            MultiByteToWideChar 65001, 0, b(0), Blen, StrPtr(ReadUnicodeOrANSI), WChars
         Else
         notok = True
         
@@ -5992,23 +5992,23 @@ utf16conthere:
         Case 1
             nobom = -1
             BOM = &HFEFF
-            ReDim b(0 To BLen - 1): Get FNr, 1, b 'read the Bytes
+            ReDim b(0 To Blen - 1): Get FNr, 1, b 'read the Bytes
             GoTo utf16conthere
         Case 2
             nobom = -1
             BOM = &HFEFF
-            ReDim b(0 To BLen - 1): Get FNr, 1, b 'read the Bytes
+            ReDim b(0 To Blen - 1): Get FNr, 1, b 'read the Bytes
             GoTo utf16conthere
         End Select
         End If
         If notok Then
-        ReDim b(0 To BLen - 1): Get FNr, 1, b
-        If BLen Mod 2 = 1 Then
-        ReadUnicodeOrANSI = StrConv(Space$(BLen), vbFromUnicode)
+        ReDim b(0 To Blen - 1): Get FNr, 1, b
+        If Blen Mod 2 = 1 Then
+        ReadUnicodeOrANSI = StrConv(Space$(Blen), vbFromUnicode)
         Else
-        ReadUnicodeOrANSI = Space$(BLen \ 2)
+        ReadUnicodeOrANSI = Space$(Blen \ 2)
         End If
-         CopyMemory ByVal StrPtr(ReadUnicodeOrANSI), b(0), BLen
+         CopyMemory ByVal StrPtr(ReadUnicodeOrANSI), b(0), Blen
         ReadUnicodeOrANSI = StrConv(ReadUnicodeOrANSI, vbUnicode, cLid)
         End If
     End Select
@@ -9991,6 +9991,27 @@ Else
            IsNumberCheck = True
 End If
 End If
+End Function
+Function utf8encode(a$) As String
+Dim bOut() As Byte, lPos As Long
+If a$ = "" Then Exit Function
+bOut() = Utf16toUtf8(a$)
+lPos = UBound(bOut()) + 1
+If lPos Mod 2 = 1 Then
+    utf8encode = StrConv(String$(lPos, Chr(0)), vbFromUnicode)
+Else
+    utf8encode = String$((lPos + 1) \ 2, Chr(0))
+    End If
+    CopyMemory ByVal StrPtr(utf8encode), bOut(0), LenB(utf8encode)
+End Function
+Function utf8decode(a$) As String
+Dim b() As Byte, Blen As Long, WChars As Long
+Blen = LenB(a$)
+            ReDim b(0 To Blen - 1)
+            CopyMemory b(0), ByVal StrPtr(a$), Blen
+            WChars = MultiByteToWideChar(65001, 0, b(0), (Blen), 0, 0)
+            utf8decode = Space$(WChars)
+            MultiByteToWideChar 65001, 0, b(0), (Blen), StrPtr(utf8decode), WChars
 End Function
 Sub test(a$)
 Dim pos1 As Long
