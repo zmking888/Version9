@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 19
+Global Const Revision = 20
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -36440,7 +36440,7 @@ ElseIf IsLabelSymbolNew(rest$, "ΓΕΓΟΝΟΣ", "EVENT", Lang) Then
             MissPar
         Else
             If Typename(var(i)) <> "mEvent" Then
-                  MyEr "Can't find Event", "Δεν μπορώ να βρω Γεγονός"
+                  MyEr "Can't find Event", "Δεν μπορώ να βρω το Γεγονός"
             Else
                resp = CallEvent(basestack, rest$, Lang, i)
   
@@ -36451,74 +36451,70 @@ ElseIf IsLabelSymbolNew(rest$, "ΓΕΓΟΝΟΣ", "EVENT", Lang) Then
     resp = CallEvent(basestack, rest$, Lang, -1)
     End If
     ElseIf i = 0 Then
-    If ISSTRINGA(rest$, s$) Then
-    If ThisPointer(basestack, i) Then
-    s$ = myUcase(s$)
-     Set op = var(i)
-    Dim a As Group
-    Set a = op
-    Set op = Nothing
-    If Not a.EventFuncPos(s$, ss$, x1) Then
-    ' check parent
-        If basestack.UseGroupname <> "" Then
-            what$ = Mid$(basestack.UseGroupname, 1, Len(basestack.UseGroupname) - 1)
-            
-            If GetVar(basestack, what$, x1) Then
-            what$ = Left$(what$, Len(what$) - Len(var(x1).GroupName))
-            End If
-            Do While GetVar(basestack, what$, x1)
-            If Typename$(var(x1)) <> "Group" Then Exit Do
-                Set a = var(x1)
-                If a.EventFuncPos(s$, ss$, x1) Then
-                    If sbf(x1).goodname = ss$ Then
-                    GoTo contcallhere
+        If ISSTRINGA(rest$, s$) Then
+            If ThisPointer(basestack, i) Then
+                s$ = myUcase(s$)
+                Set op = var(i)
+                Dim a As Group
+                Set a = op
+                Set op = Nothing
+                If Not a.EventFuncPos(s$, ss$, x1) Then
+                    ' check parent
+                    If basestack.UseGroupname <> "" Then
+                        what$ = Mid$(basestack.UseGroupname, 1, Len(basestack.UseGroupname) - 1)
+                        If GetVar(basestack, what$, x1) Then
+                            what$ = Left$(what$, Len(what$) - Len(var(x1).GroupName))
+                        End If
+                        Do While GetVar(basestack, what$, x1)
+                            If Typename$(var(x1)) <> "Group" Then Exit Do
+                            Set a = var(x1)
+                            If a.EventFuncPos(s$, ss$, x1) Then
+                                If sbf(x1).goodname = ss$ Then GoTo contcallhere
+                            End If
+                            what$ = Left$(what$, Len(what$) - Len(var(x1).GroupName))
+                        Loop
                     End If
-                End If
-                what$ = Left$(what$, Len(what$) - Len(var(x1).GroupName))
-              Loop
-        End If
-        Set a = Nothing
+                Set a = Nothing
 ThrowPar:
         ' THROW PARAMETERS HERE
-           Set bs = New basetask
-       Set bs = New basetask
-            Set bs.Owner = basestack.Owner
-            If bs Is Nothing Then Set bs = basestack
-            Set bs.Parent = basestack
-            bs.Look2Parent = True
-            FastSymbol rest$, ","
-            If Not PushParamGeneralV7(bs, rest$) Then
-                Exit Sub
-            End If
-            Set bs = Nothing
-    ElseIf Not sbf(x1).goodname = ss$ Then
-        GoTo ThrowPar
-     Else
+                Set bs = New basetask
+                Set bs = New basetask
+                Set bs.Owner = basestack.Owner
+                If bs Is Nothing Then Set bs = basestack
+                Set bs.Parent = basestack
+                bs.Look2Parent = True
+                FastSymbol rest$, ","
+                If Not PushParamGeneralV7(bs, rest$) Then Exit Sub
+                Set bs = Nothing
+            ElseIf Not sbf(x1).goodname = ss$ Then
+                GoTo ThrowPar
+            Else
 contcallhere:
-            Set bs = New basetask
-            Set bs.Owner = basestack.Owner
-            If bs Is Nothing Then Set bs = basestack
-            bs.UseGroupname = sbf(x1).sbgroup
-            bs.OriginalCode = x1
-            Set bs.Parent = basestack
-            bs.Look2Parent = True
-            FastSymbol rest$, ","
-            If Not PushParamGeneralV7(bs, rest$) Then
+                Set bs = New basetask
+                Set bs.Owner = basestack.Owner
+                If bs Is Nothing Then Set bs = basestack
+                bs.UseGroupname = sbf(x1).sbgroup
+                bs.OriginalCode = x1
+                Set bs.Parent = basestack
+                bs.Look2Parent = True
+                FastSymbol rest$, ","
+                If Not PushParamGeneralV7(bs, rest$) Then
+                    bs.Look2Parent = False
+                    Exit Sub
+                End If
+                bs.strg = False
+                bs.fHere = Left$(ss$, rinstr(ss$, ".") - 1)
+                s$ = here$
+                here$ = bs.fHere
                 bs.Look2Parent = False
+                PushStage basestack, False
+                executeblock i, bs, (sbf(x1).sb), (False), (flag)
+                PopStage basestack
+                here$ = s$
+                Set bs = Nothing
                 Exit Sub
             End If
-
-            bs.strg = False
-            bs.fHere = Left$(ss$, rinstr(ss$, ".") - 1)
-            s$ = here$
-            here$ = bs.fHere
-            bs.Look2Parent = False
-            executeblock i, bs, (sbf(x1).sb), (False), (flag)
-            here$ = s$
-            Set bs = Nothing
-            Exit Sub
-    End If
-    End If
+        End If
     End If
     Else
         MissPar
