@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 20
+Global Const Revision = 21
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -6918,7 +6918,7 @@ End If
 'Select Case v$
 
 
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105
 IsNumber = False
 Exit Function
 fun101: ' "BANK(", "тяап("
@@ -8075,6 +8075,9 @@ fun75: ' "BINARY.NEG(", "дуадийо.амти(", "дуадийо.амтистяожо("
     Exit Function
 fun76: ' "BINARY.OR(", "дуадийо.г("
     IsNumber = IsBinaryOr(bstack, a$, r, SG)
+    Exit Function
+fun105: ' "BINARY.NOT(", "дуадийо.ови("
+    IsNumber = IsBinaryNot(bstack, a$, r, SG)
     Exit Function
 fun77: ' "BINARY.AND(", "дуадийо.йаи("
     IsNumber = IsBinaryAnd(bstack, a$, r, SG)
@@ -14319,7 +14322,7 @@ contstrhere:
             Exit Function
             End If
         Else
-        r$ = StrConv(r$, vbFromUnicode)
+        r$ = StrConv(r$, vbFromUnicode, cLid)
         End If
             If Not FastSymbol(a$, ")") Then IsStr1 = False: Exit Function
     IsStr1 = True
@@ -14372,7 +14375,7 @@ fstr62: ' "CHR$(", "вая$("
                         IsStr1 = False: Exit Function
                 End If
         Else
-        r$ = StrConv(q$, vbUnicode)
+        r$ = StrConv(q$, vbUnicode, cLid)
         End If
     If Not FastSymbol(a$, ")") Then IsStr1 = False: Exit Function
     IsStr1 = True

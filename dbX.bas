@@ -155,6 +155,7 @@ AddDirSep cd
 p$ = Chr(34)
 c$ = ","
 d$ = doriginal$
+If Right$(d$, 2) = "()" Then d$ = Left$(d$, Len(d$) - 1)
 If AscW(d$) < 128 Then
 sql$ = "SELECT * FROM [COMMANDS] WHERE ENGLISH >= '" & UCase(d$) & "'"
 Else
