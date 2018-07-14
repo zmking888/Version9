@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2922,9 +2922,9 @@ End Sub
 Sub scrMove00(Scr As Object, Optional ByVal w As Variant, Optional ByVal h As Variant)
 If TypeOf Scr Is Form Then
 If IsMissing(w) And IsMissing(h) Then
-Scr.Move ScrInfo(Console).Left, ScrInfo(Console).top
+Scr.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
-Scr.Move ScrInfo(Console).Left, ScrInfo(Console).top, w, h
+Scr.Move ScrInfo(Console).Left, ScrInfo(Console).Top, w, h
 End If
 Else
  If IsMissing(w) And IsMissing(h) Then
@@ -3228,7 +3228,7 @@ RetStackSize = bstack.RetStackTotal
         
         End If
         w$ = "THIS"  ' look this other time..
-        ElseIf Len(w$) > 8 Then
+        ElseIf Len(w$) > 5 Then
         If bstack.UseGroupname <> "" Then
         If w$ = "SUPERCLASS" Or w$ = "’–≈— À¡”«" Then
         Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
@@ -3472,7 +3472,7 @@ w$ = myUcase(w$)
         If w$ = "THIS" Or w$ = "¡’‘œ" Then
             w$ = "THIS"
             If bstack.GroupName = vbNullString Then w$ = vbNullString
-        ElseIf Len(w$) > 8 Then
+        ElseIf Len(w$) > 5 Then
         If bstack.UseGroupname <> "" Then
         If w$ = "SUPERCLASS" Or w$ = "’–≈— À¡”«" Then
         Set pppp = New mArray: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
@@ -4096,7 +4096,7 @@ With BoxTarget
 .back = b
 .fore = F
 .Enable = True
-.Pen = prive.mypen
+.pen = prive.mypen
 .Xt = XXT&
 .Yt = YYT&
 .sUAddTwipsTop = prive.uMineLineSpace
@@ -4280,9 +4280,9 @@ helpSizeDialog = 1
 Settings = "time,normal,push"
 With ScrInfo(Console)
 selectorLastX = .Height / 4 + .Left
-selectorLastY = .Width / 4 + .top
+selectorLastY = .Width / 4 + .Top
 AskLastX = .Height / 4 + .Left
-AskLastY = .Width / 4 + .top
+AskLastY = .Width / 4 + .Top
 End With
 sb2used = 0
 ReDim sbf(500) As modfun
@@ -6264,7 +6264,7 @@ With bstack
 If .toprinter Then
     r = 0
 Else
-    r = SG * .Owner.top
+    r = SG * .Owner.Top
     End If
     
     End With
@@ -6278,7 +6278,7 @@ num40: ' "MOTION.XW", " …Õ«”«.◊–", "MOTION.WX", " …Õ«”«.–◊"
     IsNumber = True
     Exit Function
 num41: ' "MOTION.YW", " …Õ«”«.’–", "MOTION.WY", " …Õ«”«.–’"
-    r = SG * Form1.top
+    r = SG * Form1.Top
     
     IsNumber = True
     Exit Function
@@ -6335,10 +6335,10 @@ If .toprinter Then
 r = Form1.PrinterDocument1.CurrentY
 ElseIf .toback Then
 'mouyb = mouy
-r = MOUSEY(Form1.top)
+r = MOUSEY(Form1.Top)
 Else
 'mouyb = mouy - di.top
-r = MOUSEY(Form1.top + bstack.Owner.top)
+r = MOUSEY(Form1.Top + bstack.Owner.Top)
 End If
 End With
        
@@ -6353,7 +6353,7 @@ num47: ' "MOUSEA.X", "ƒ≈… ‘«”¡.◊"
     Exit Function
 num48: ' "MOUSEA.Y", "ƒ≈… ‘«”¡.’"
  
-    r = SG * MOUSEY(Form1.top)
+    r = SG * MOUSEY(Form1.Top)
    
        
     IsNumber = True
@@ -11564,7 +11564,7 @@ rr$ = ac$
  End Function
 Function GrabFrame() As String
 Dim p As New cDIBSection
-p.CreateFromPicture hDCToPicture(GetDC(0), (AVI.Left) / DXP, (AVI.top) / DYP, AVI.Width / DXP, AVI.Height / DYP - DYP)
+p.CreateFromPicture hDCToPicture(GetDC(0), (AVI.Left) / DXP, (AVI.Top) / DYP, AVI.Width / DXP, AVI.Height / DYP - DYP)
 If p.Height > 0 Then
 
 GrabFrame = DIBtoSTR(p)
@@ -24109,7 +24109,7 @@ xl& = .tx + 1
 yl& = .ty
 b = .back
 F = .fore
-prive.mypen = .Pen
+prive.mypen = .pen
 
 Dim dd As Object
 If .layer = 0 Then
@@ -30264,13 +30264,13 @@ where = FindFormSScreen(myform)
         If Not IsExp(bstack, rest$, y) Then procMotionW = False: Exit Function
         Else
         
-        y = myform.top
+        y = myform.Top
     End If
     If FastSymbol(rest$, ";") Then
     x = ((ScrInfo(where).Width - 1) - myform.Width) / 2 + ScrInfo(where).Left
-    y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).top
+    y = ((ScrInfo(where).Height - 1) - myform.Height) / 2 + ScrInfo(where).Top
     If x < ScrInfo(where).Left Then x = ScrInfo(where).Left
-    If y < ScrInfo(where).top Then y = ScrInfo(where).top
+    If y < ScrInfo(where).Top Then y = ScrInfo(where).Top
     End If
     
 myform.Move x, y
@@ -30291,19 +30291,19 @@ If Form1.WindowState = 0 Then
         If Not IsExp(bstack, rest$, y) Then procMotionW = False: Exit Function
         Else
         
-        y = Form1.top
+        y = Form1.Top
     End If
     
     If FastSymbol(rest$, ";") Then
     x = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
+    y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
     End If
 ' LETS MOVE
 
 If IsWine And Form1.Width = ScrInfo(Console).Width Then Form1.Width = ScrInfo(Console).Width - dv15
-If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
 If IsWine Then
-If x = ScrInfo(Console).Left And y = ScrInfo(Console).top Then
+If x = ScrInfo(Console).Left And y = ScrInfo(Console).Top Then
 Form1.Move x, y
 If form5iamloaded Then Form5.RestorePos
 Sleep 10
@@ -30314,10 +30314,10 @@ If form5iamloaded Then Form5.RestorePos
 Console = FindFormSScreen(Form1)
     If FastSymbol(rest$, ";") Then
     x = ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left
-    y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
+    y = ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
     If x < ScrInfo(where).Left Then x = ScrInfo(where).Left
-    If y < ScrInfo(where).top Then y = ScrInfo(where).top
-    If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+    If y < ScrInfo(where).Top Then y = ScrInfo(where).Top
+    If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
     Form1.Move x, y
     End If
 Form1.Up
@@ -30894,9 +30894,9 @@ End If
 If FastSymbol(rest$, ";") And Scr.name = "DIS" Then
 adjustlinespace = False
 If IsWine Then
-    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top, ScrInfo(Console).Width - 1, ScrInfo(Console).Height - 1
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).Width - 1, ScrInfo(Console).Height - 1
 Else
-    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top, ScrInfo(Console).Width, ScrInfo(Console).Height
+    Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).Width, ScrInfo(Console).Height
 End If
     Form1.backcolor = players(-1).Paper
     
@@ -30979,13 +30979,13 @@ ElseIf FastSymbol(rest$, ";") And Scr.name = "DIS" Then
 
 
 
-If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
 If IsWine Then
          Form1.Width = ScrInfo(Console).Width - 1
          Form1.Height = ScrInfo(Console).Height
-         Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top
+         Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 Else
-        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top, ScrInfo(Console).Width, ScrInfo(Console).Height
+        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).Width, ScrInfo(Console).Height
     
 End If
 Form1.backcolor = players(-1).Paper
@@ -31000,9 +31000,9 @@ MyMode Scr
 ElseIf Scr.name = "DIS" Then
 
 w3 = Form1.Left + Scr.Left
-W4 = Form1.top + Scr.top
+W4 = Form1.Top + Scr.Top
 If IsWine And Form1.Width = ScrInfo(Console).Width Then Form1.Width = ScrInfo(Console).Width - dv15
-If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top: W4 = Form1.top + Scr.top
+If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top: W4 = Form1.Top + Scr.Top
 scrMove00 Scr
 If IsWine Then
     If Scr.Width = ScrInfo(Console).Width Then
@@ -31034,7 +31034,7 @@ With players(basketcode)
 .MAXYGRAPH = .My * .Yt
 End With
 With Form1.dSprite(basestack.tolayer)
-.Move .Left, .top, players(basketcode).MAXXGRAPH, players(basketcode).MAXYGRAPH
+.Move .Left, .Top, players(basketcode).MAXXGRAPH, players(basketcode).MAXYGRAPH
 End With
 
 End If
@@ -31169,7 +31169,7 @@ s$ = kk.TextParagraph(1)
                 HelpLastWidth = x
         ElseIf i <> 0 Then
                 Form4.Show , Form1
-                myform Form4, Form4.Left, Form4.top, CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
+                myform Form4, Form4.Left, Form4.Top, CLng(x * Helplastfactor), CLng(y * Helplastfactor), True, Helplastfactor
                 MoveFormToOtherMonitorOnly Form4, True
                 
         End If
@@ -31285,7 +31285,7 @@ ProcMotion = False
 Exit Function
 End If
 Else
-y1 = Scr.top
+y1 = Scr.Top
 End If
 Scr.Move x1, y1
 End If
@@ -31546,7 +31546,7 @@ If IsExp(basestack, rest$, x) Then
                    AVI.Move aviX, aviY
                     MediaPlayer1.sizeLocateMovie 0, 0, Form1.ScaleX(AviSizeX, vbTwips, vbPixels), Form1.ScaleY(AviSizeY, vbTwips, vbPixels) + 1
                     ElseIf UseAviSize Then
-                     AVI.Move AVI.Left, AVI.top, AviSizeX, AviSizeY
+                     AVI.Move AVI.Left, AVI.Top, AviSizeX, AviSizeY
                    MediaPlayer1.sizeLocateMovie 0, 0, Form1.ScaleX(AviSizeX, vbTwips, vbPixels), Form1.ScaleY(AviSizeY, vbTwips, vbPixels) + 1
                     End If
            Else
@@ -32206,7 +32206,8 @@ If Left$(s$, 1) = "S" Then
                 Set Scr = Nothing
                 Exit Function
             End If
-          
+          Dim oldclid As Long
+          oldclid = cLid
             If CFname(s$) <> "" Then
             s$ = CFname(s$)
              frm$ = ReadUnicodeOrANSI(s$, True, x1)
@@ -32260,9 +32261,11 @@ If Left$(s$, 1) = "S" Then
                 Else
                 par = SaveUnicode(s$, frm$, x1)
                 End If
+                
             End If
         End If
         Set Scr = Nothing
+        cLid = oldclid
         Exit Function
     Else
     Set Scr = Nothing
@@ -34422,19 +34425,19 @@ again:
                     
                     If Not Form1.WindowState = 0 Then Form1.WindowState = 0: Form1.Refresh
                     
-                    If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+                    If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
                     If IsWine Then
-                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top
+                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
                         If Form1.Width = ScrInfo(Console).Width Then
                         Form1.Width = ScrInfo(Console).Width - 1
                         Else
                         Form1.Width = ScrInfo(Console).Width
                         End If
                         Form1.Height = ScrInfo(Console).Height
-                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top
+                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
                     
                     Else
-                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top, ScrInfo(Console).Width - 1, ScrInfo(Console).Height - 1
+                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, ScrInfo(Console).Width - 1, ScrInfo(Console).Height - 1
                     End If
                     FrameText Scr, .SZ, CLng(Form1.Width), CLng(Form1.Height), .Paper
                     players(-1).MAXXGRAPH = .MAXXGRAPH
@@ -34462,7 +34465,7 @@ again:
                 Else
                     If x1 = 0 Then x1 = 14000
                     If y1 = 0 Then y1 = 6000
-                    Scr.Move Scr.Left, Scr.top, x1, y1
+                    Scr.Move Scr.Left, Scr.Top, x1, y1
                     FrameText Scr, .SZ, 0, 0, .Paper, True
                             
             End If
@@ -34474,7 +34477,7 @@ again:
                         FrameText Scr, .SZ, x1, y1, .Paper, True
                         Scr.Move (ScrInfo(Console).Width - .MAXXGRAPH) / 2, (ScrInfo(Console).Height - .MAXYGRAPH) / 2
             Else
-                        Scr.Move Scr.Left, Scr.top, x1, y1
+                        Scr.Move Scr.Left, Scr.Top, x1, y1
 
                         FrameText Scr, .SZ, 0, 0, .Paper, True
                         
@@ -34483,7 +34486,7 @@ again:
     Else
         If FastSymbol(rest$, ";") Then 'CENTER
             Form1.WindowState = 0
-            If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+            If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
             
             FrameText Scr, .SZ, x1, y1, .Paper
                     
@@ -34495,10 +34498,10 @@ again:
                         End If
                         Form1.Height = .MAXYGRAPH
                         'Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
-                        Form1.Move ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left, ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).top
+                        Form1.Move ((ScrInfo(Console).Width - 1) - Form1.Width) / 2 + ScrInfo(Console).Left, ((ScrInfo(Console).Height - 1) - Form1.Height) / 2 + ScrInfo(Console).Top
                     Else
             
-            Form1.Move ScrInfo(Console).Left + (ScrInfo(Console).Width - .MAXXGRAPH) / 2, ScrInfo(Console).top + (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
+            Form1.Move ScrInfo(Console).Left + (ScrInfo(Console).Width - .MAXXGRAPH) / 2, ScrInfo(Console).Top + (ScrInfo(Console).Height - .MAXYGRAPH) / 2, .MAXXGRAPH, .MAXYGRAPH
             End If
             Form1.Up
             scrMove00 Scr
@@ -34511,7 +34514,7 @@ again:
              End If
         Else
             Form1.WindowState = 0
-            If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+            If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
             FrameText Scr, .SZ, x1, y1, .Paper
             If IsWine Then
                         If .MAXXGRAPH = ScrInfo(Console).Width Then
@@ -34520,12 +34523,12 @@ again:
                         Form1.Width = .MAXXGRAPH
                         End If
                         Form1.Height = .MAXYGRAPH
-                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top
+                        Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
                                            Else
             
             
             
-            Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top, .MAXXGRAPH, .MAXYGRAPH
+            Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top, .MAXXGRAPH, .MAXYGRAPH
             End If
             players(-1).MAXXGRAPH = .MAXXGRAPH
             players(-1).MAXYGRAPH = .MAXYGRAPH
@@ -37883,7 +37886,7 @@ If IsExp(bstack, rest$, p) Then
                 If it = 0 Then
                     y = 0
                 Else
-                    y = Form1.dSprite(it).top + players(it).y
+                    y = Form1.dSprite(it).Top + players(it).y
                 End If
             End If
         End If
@@ -43387,7 +43390,7 @@ While FastSymbol(rest$, ",")
 If IsLabelSymbolNew(rest$, "÷—¡”«", "TEXT", Lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
 ElseIf IsLabelSymbolNew(rest$, "–≈Õ¡", "PEN", Lang) Then
-If IsExp(bstack, rest$, x) Then q(p).Pen = x
+If IsExp(bstack, rest$, x) Then q(p).pen = x
 ElseIf IsLabelSymbolNew(rest$, "÷œÕ‘œ", "BACK", Lang) Then
 If IsExp(bstack, rest$, x) Then q(p).back = x
 ElseIf IsLabelSymbolNew(rest$, "–À¡…”…œ", "BORDER", Lang) Then
@@ -47473,8 +47476,11 @@ If x1 <> 0 Then
         ProcLoad = False
         Exit Function
     End If
-    
+    Dim oldclid As Long
+    oldclid = cLid
+    cLid = 1032
     ss$ = ReadUnicodeOrANSI(s$, True)
+    cLid = oldclid
     If ss$ <> "" Then
    If par1 Then
         If loadcatalog.ExistKey(Key$) Then

@@ -74,7 +74,7 @@ Private Declare Function CreateSolidBrush Lib "gdi32" (ByVal crColor As Long) As
 
 Public Type RECT
         Left As Long
-        top As Long
+        Top As Long
         Right As Long
         Bottom As Long
 End Type
@@ -1082,7 +1082,7 @@ Public Sub PrintLineControl(mHdc As Long, c As String, r As RECT)
     DrawText mHdc, StrPtr(c), -1, r, 0
 End Sub
 Public Sub CalcRect(mHdc As Long, c As String, r As RECT)
-r.top = 0
+r.Top = 0
 r.Left = 0
 DrawText mHdc, StrPtr(c), -1, r, DT_CALCRECT Or DT_NOPREFIX Or DT_SINGLELINE Or DT_NOCLIP
 End Sub
@@ -1096,12 +1096,12 @@ Public Sub MyPrintNew(ddd As Object, UAddTwipsTop, s$, Optional cr As Boolean = 
 Dim nr As RECT, nl As Long, mytop As Long
 mytop = ddd.CurrentY
 If s$ = vbNullString Then
-nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, " ", nr
 nr.Left = ddd.CurrentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.CurrentY / dv15
-nr.Bottom = nr.top + nr.Bottom
+nr.Top = ddd.CurrentY / dv15
+nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If cr Then
 ddd.CurrentY = (nr.Bottom + 1) * dv15 + UAddTwipsTop ''2
@@ -1110,12 +1110,12 @@ Else
 ddd.CurrentX = nr.Right * dv15
 End If
 Else
-nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, s$, nr
 nr.Left = ddd.CurrentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.CurrentY / dv15
-nr.Bottom = nr.top + nr.Bottom
+nr.Top = ddd.CurrentY / dv15
+nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If Not fake Then
 If nr.Left * dv15 < ddd.Width Then PrintLineControlSingle ddd.hDC, s$, nr
@@ -1136,12 +1136,12 @@ Dim nr As RECT, nl As Long
 With mb
 If s$ = vbNullString Then
 
-nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, " ", nr
 nr.Left = ddd.CurrentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.CurrentY / dv15
-nr.Bottom = nr.top + nr.Bottom
+nr.Top = ddd.CurrentY / dv15
+nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If cr Then
 ddd.CurrentY = (nr.Bottom + 1) * dv15 + .uMineLineSpace
@@ -1150,12 +1150,12 @@ Else
 ddd.CurrentX = nr.Right * dv15
 End If
 Else
-nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, s$, nr
 nr.Left = ddd.CurrentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.CurrentY / dv15
-nr.Bottom = nr.top + nr.Bottom
+nr.Top = ddd.CurrentY / dv15
+nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If Not fake Then
 If nr.Left * dv15 < ddd.Width Then PrintLineControlSingle ddd.hDC, s$, nr
@@ -1182,22 +1182,22 @@ End Sub
 Public Sub MyPrint(ddd As Object, s$)
 Dim nr As RECT, nl As Long
 If s$ = vbNullString Then
-    nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+    nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
     CalcRect ddd.hDC, " ", nr
     nr.Left = ddd.CurrentX / dv15
     nr.Right = nr.Right + nr.Left
-    nr.top = ddd.CurrentY / dv15
-    nr.Bottom = nr.top + nr.Bottom
+    nr.Top = ddd.CurrentY / dv15
+    nr.Bottom = nr.Top + nr.Bottom
     nl = (nr.Bottom + 1) * dv15
     ddd.CurrentY = (nr.Bottom + 1) * dv15
     ddd.CurrentX = 0
 Else
-nr.Left = 0: nr.Right = 0: nr.top = 0: nr.Bottom = 0
+nr.Left = 0: nr.Right = 0: nr.Top = 0: nr.Bottom = 0
 CalcRect ddd.hDC, s$, nr
 nr.Left = ddd.CurrentX / dv15
 nr.Right = nr.Right + nr.Left
-nr.top = ddd.CurrentY / dv15
-nr.Bottom = nr.top + nr.Bottom
+nr.Top = ddd.CurrentY / dv15
+nr.Bottom = nr.Top + nr.Bottom
 nl = (nr.Bottom + 1) * dv15
 If nr.Left * dv15 < ddd.Width Then PrintLineControlSingle ddd.hDC, s$, nr
 ddd.CurrentY = nl
@@ -1240,9 +1240,9 @@ Dim rTop As Long, rBottom As Long
  With nr
  .Left = PX * pixX
  .Right = .Left + pixX
- .top = PY * pixY + mb.uMineLineSpace \ dv15
+ .Top = PY * pixY + mb.uMineLineSpace \ dv15
  
- .Bottom = .top + pixY - mb.uMineLineSpace \ dv15 * 2
+ .Bottom = .Top + pixY - mb.uMineLineSpace \ dv15 * 2
  End With
 rTop = PY * pixY
 rBottom = rTop + pixY - plusone
@@ -1253,7 +1253,7 @@ Do While Len(what) >= .mx - PX And (.mx - PX) > 0
  .Left = PX * pixX
  
  .Right = (PX + Len(p$)) * pixX + 1
- .top = rTop
+ .Top = rTop
  .Bottom = rBottom
  
  End With
@@ -1286,8 +1286,8 @@ If PY >= .My And Not ONELINE Then
 If ddd.name = "PrinterDocument1" Then
 getnextpage
  With nr
- .top = PY * pixY + mb.uMineLineSpace
-  .Bottom = .top + pixY - p2
+ .Top = PY * pixY + mb.uMineLineSpace
+  .Bottom = .Top + pixY - p2
  End With
 PY = 1
 Else
@@ -1304,8 +1304,8 @@ Else
  With nr
  .Left = PX * pixX
  .Right = .Left + pixX
- .top = PY * pixY + mb.uMineLineSpace
- .Bottom = .top + pixY - p2
+ .Top = PY * pixY + mb.uMineLineSpace
+ .Bottom = .Top + pixY - p2
  End With
 rTop = PY * pixY
 rBottom = rTop + pixY - plusone
@@ -1317,7 +1317,7 @@ If LEAVEME Then Exit Sub
      With nr2
  .Left = PX * pixX
  .Right = (PX + Len(what$)) * pixX + 1
- .top = rTop
+ .Top = rTop
  .Bottom = rBottom
  
  End With
@@ -1364,8 +1364,8 @@ With mybasket
     With nr
         .Left = PX * pixX
         .Right = .Left + pixX
-        .top = PY * pixY + mUAddPixelsTop
-         .Bottom = .top + pixY - mUAddPixelsTop * 2
+        .Top = PY * pixY + mUAddPixelsTop
+         .Bottom = .Top + pixY - mUAddPixelsTop * 2
     End With
     
     rTop = PY * pixY
@@ -1385,7 +1385,7 @@ With mybasket
         With nr2
                 .Left = PX * pixX
                  .Right = mybasket.mx * pixX + 1
-                .top = rTop
+                .Top = rTop
                 .Bottom = rBottom
         End With
         If ddd.FontTransparent = False Then FillBack ddd.hDC, nr2, .Paper
@@ -1443,8 +1443,8 @@ With mybasket
         If ddd.name = "PrinterDocument1" Then
         getnextpage
          With nr
-         .top = PY * pixY + mUAddPixelsTop
-          .Bottom = .top + pixY - p2
+         .Top = PY * pixY + mUAddPixelsTop
+          .Bottom = .Top + pixY - p2
          End With
         PY = 1
         Else
@@ -1463,8 +1463,8 @@ With mybasket
             With nr
                .Left = PX * pixX
                .Right = .Left + pixX
-               .top = PY * pixY + mUAddPixelsTop
-               .Bottom = .top + pixY - p2
+               .Top = PY * pixY + mUAddPixelsTop
+               .Bottom = .Top + pixY - p2
             End With
             rTop = PY * pixY
             rBottom = rTop + pixY - plusone
@@ -1484,7 +1484,7 @@ With mybasket
         With nr2
             .Left = PX * pixX
             .Right = (PX + Len(what$)) * pixX + 1
-            .top = rTop
+            .Top = rTop
             .Bottom = rBottom
         End With
         FillBack ddd.hDC, nr2, mybasket.Paper
@@ -2353,7 +2353,7 @@ If Form1.Visible Then
     Set ff = Form1
     End If
     x = ff.Left / DXP
-    y = ff.top / DYP
+    y = ff.Top / DYP
     If useform1 Then Form1.Visible = False
     ff.Hide
     Sleep 50
@@ -2385,11 +2385,11 @@ With mb
 ar.Left = 0
 ar.Bottom = d.Height / dv15
 ar.Right = d.Width / dv15
-ar.top = .mysplit * .Yt / dv15
+ar.Top = .mysplit * .Yt / dv15
 p = .Yt / dv15
-r = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.top), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.top + p), SRCCOPY)
+r = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.Top), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.Top + p), SRCCOPY)
 
- ar.top = ar.Bottom - p
+ ar.Top = ar.Bottom - p
 FillBack d.hDC, ar, .Paper
 .curpos = 0
 .currow = .My - 1
@@ -2403,9 +2403,9 @@ With mb
 ar.Left = 0
 ar.Bottom = d.ScaleY(d.Height, 1, 3)
 ar.Right = d.ScaleX(d.Width, 1, 3)
-ar.top = d.ScaleY(.mysplit * .Yt, 1, 3)
+ar.Top = d.ScaleY(.mysplit * .Yt, 1, 3)
 p = d.ScaleY(.Yt, 1, 3)
-r = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.top + p), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.top), SRCCOPY)
+r = BitBlt(d.hDC, CLng(ar.Left), CLng(ar.Top + p), CLng(ar.Right), CLng(ar.Bottom - p), d.hDC, CLng(ar.Left), CLng(ar.Top), SRCCOPY)
 d.Line (0, .mysplit * .Yt)-(d.ScaleWidth, .mysplit * .Yt + .Yt), .Paper, BF
 .currow = .mysplit
 .curpos = 0
@@ -2979,25 +2979,25 @@ If SzOne < 4 Then SzOne = 4
     If Not Form1.WindowState = 0 Then Form1.WindowState = 0
     Sleep 10
     If Form1.WindowState = 0 Then
-        Form1.Move .Left, .top, .Width - 1, .Height - 1
-        If Form1.top <> .Left Or Form1.Left <> .top Then
+        Form1.Move .Left, .Top, .Width - 1, .Height - 1
+        If Form1.Top <> .Left Or Form1.Left <> .Top Then
             Form1.Cls
-            Form1.Move .Left, .top, .Width - 1, .Height - 1
+            Form1.Move .Left, .Top, .Width - 1, .Height - 1
         End If
     Else
         Sleep 100
         On Error Resume Next
         Form1.WindowState = 0
-        Form1.Move .Left, .top, .Width - 1, .Height - 1
-        If Form1.top <> .top Or Form1.Left <> .Left Then
+        Form1.Move .Left, .Top, .Width - 1, .Height - 1
+        If Form1.Top <> .Top Or Form1.Left <> .Left Then
         Form1.Cls
-        Form1.Move .Left, .top, .Width - 1, .Height - 1
+        Form1.Move .Left, .Top, .Width - 1, .Height - 1
         End If
     End If
 NoBackFormFirstUse = False
 If players(-1).MAXXGRAPH <> 0 Then ClearScrNew Form1, players(-1), 0&
 Form1.DIS.Visible = True
-FrameText d, SzOne, (.Width + .Left - 1 - Form1.Left), (.Height + .top - 1 - Form1.top), PaperOne
+FrameText d, SzOne, (.Width + .Left - 1 - Form1.Left), (.Height + .Top - 1 - Form1.Top), PaperOne
 End With
 Form1.DIS.backcolor = mycolor(PaperOne)
 If lckfrm = 0 Then
@@ -3280,11 +3280,11 @@ If bstack.toback Then
 
 Form1.TEXT1.Move x& * .Xt, y& * .Yt, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 Else
-Form1.TEXT1.Move x& * .Xt + d.Left, y& * .Yt + d.top, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
+Form1.TEXT1.Move x& * .Xt + d.Left, y& * .Yt + d.Top, (x1& - x&) * .Xt + .Xt, (y1& - y&) * .Yt + .Yt
 End If
 End With
 If d.ForeColor = tcol Then
-Form1.TEXT1.glistN.RepaintFromOut d.Image, d.Left, d.top
+Form1.TEXT1.glistN.RepaintFromOut d.Image, d.Left, d.Top
 End If
 
 Set .mDoc = aaa
@@ -3502,10 +3502,10 @@ Else
 End If
 Else
 If maxchar > 0 Then
-.Move x& * prive.Xt + d.Left - ExcludeThisLeft, y& * prive.Yt + d.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
-.glistN.RepaintFromOut d.Image, d.Left, d.top
+.Move x& * prive.Xt + d.Left - ExcludeThisLeft, y& * prive.Yt + d.Top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.glistN.RepaintFromOut d.Image, d.Left, d.Top
 Else
-.Move x& * prive.Xt + d.Left, y& * prive.Yt + d.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
+.Move x& * prive.Xt + d.Left, y& * prive.Yt + d.Top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt
 End If
 End If
 If a$ <> "" Then
@@ -3827,9 +3827,9 @@ End If
 Else
 
 If .BorderStyle = 0 Then
-.Move x& * prive.Xt + d.Left, y& * prive.Yt + d.top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+.Move x& * prive.Xt + d.Left, y& * prive.Yt + d.Top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
 Else
-.Move x& * prive.Xt - dv15 + d.Left, y& * prive.Yt - dv15 + d.top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.Move x& * prive.Xt - dv15 + d.Left, y& * prive.Yt - dv15 + d.Top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 End If
 End If
 .enabled = True
@@ -3889,16 +3889,16 @@ If a$ = vbNullString Then
 
     If .HeadlineHeight <> oldh Then
     If .BorderStyle = 0 Then
-    If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top > ScrY() Then
-    .Move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+    If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .Top > ScrY() Then
+    .Move .Left, .Top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .Top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
     Else
-.Move .Left, .top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
+.Move .Left, .Top, (x1& - x&) * prive.Xt + prive.Xt, (y1& - y&) * prive.Yt + prive.Yt + .HeadlineHeight * dv15
 End If
 Else
-If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top > ScrY() Then
-.Move .Left, .top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+If ((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .Top > ScrY() Then
+.Move .Left, .Top - (((y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15) + .Top - ScrY()), (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 Else
-.Move .Left, .top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
+.Move .Left, .Top, (x1& - x&) * prive.Xt + prive.Xt + 2 * dv15, (y1& - y&) * prive.Yt + prive.Yt + 2 * dv15 + .HeadlineHeight * dv15
 End If
 End If
   
@@ -4201,7 +4201,7 @@ ElseIf myCut Then
 Dim mmxx1, mmyy1
 mmxx1 = .mx * .Xt
 mmyy1 = .My * .Yt
-dd.Move dd.Left, dd.top, mmxx1, mmyy1
+dd.Move dd.Left, dd.Top, mmxx1, mmyy1
 'dd.width = .mx * .Xt
 'dd.Height = .My * .Yt
 End If
@@ -4321,7 +4321,7 @@ If Form1.Visible = False Then
     End If
 Else
     Console = FindFormSScreen(Form1)
-If Form1.top >= VirtualScreenHeight() Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).top
+If Form1.Top >= VirtualScreenHeight() Then Form1.Move ScrInfo(Console).Left, ScrInfo(Console).Top
 End If
 If dq.Visible = False Then dq.Visible = True
 If exWnd = 0 Then Form1.KeyPreview = True
@@ -4360,7 +4360,7 @@ If Not bstack.IamThread Then
  If Not iamactive Then
  If Not Form1.Visible Then
  If Form1.WindowState = 1 Then Form1.WindowState = 0
- If Form1.top > VirtualScreenHeight() - 100 Then Form1.top = ScrInfo(Console).top
+ If Form1.Top > VirtualScreenHeight() - 100 Then Form1.Top = ScrInfo(Console).Top
  Form1.Visible = True
  If Form3.Visible Then Form3.skiptimer = True: Form3.WindowState = 0
  End If
@@ -4825,12 +4825,12 @@ End If
 If Not Form4.Visible Then Form4.Show , Form1: bypassshow = True
 
 If bypassshow Then
-myform Form4, ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+myform Form4, ScrInfo(monitor).Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, ScrInfo(monitor).Height - vH_y * Helplastfactor + ScrInfo(monitor).Top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 Else
 If Screen.Width <= Form4.Left - ScrInfo(monitor).Left Then
-myform Form4, Screen.Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+myform Form4, Screen.Width - vH_x * Helplastfactor + ScrInfo(monitor).Left, Form4.Top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 Else
-myform Form4, Form4.Left, Form4.top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
+myform Form4, Form4.Left, Form4.Top, vH_x * Helplastfactor, vH_y * Helplastfactor, True, Helplastfactor
 End If
 End If
 Form4.moveMe
@@ -6009,7 +6009,13 @@ utf16conthere:
         ReadUnicodeOrANSI = Space$(BLen \ 2)
         End If
          CopyMemory ByVal StrPtr(ReadUnicodeOrANSI), b(0), BLen
+         
+         cLid = FoundLocaleId(Left$(ReadUnicodeOrANSI, 500))
+         
+         
+         
         ReadUnicodeOrANSI = StrConv(ReadUnicodeOrANSI, vbUnicode, cLid)
+        'End If
         End If
     End Select
     

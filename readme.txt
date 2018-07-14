@@ -1,10 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 21 active-X
-
-1. Added Binary.Not() function
-2. Str$("abx") converted to ANSI using Locale
-3. Chr$(A$) converted from ANSI using Locale
+Version 9.3 revision 22 active-X
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
