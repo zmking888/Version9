@@ -338,7 +338,10 @@ Else
     End If
   Else
     a$ = dotcol(dotnum) + "." + a$
-
+If Left$(a$, 1) = "." Then
+a$ = Me.UseGroupname + Mid$(a$, 2)
+GoTo aaa
+End If
     End If
     If AscW(a$) = 46 Then
     dotnum = 1
@@ -351,6 +354,7 @@ Else
     End If
     End If
     End If
+aaa:
     GetDotNew = True
 End Function
 

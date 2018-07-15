@@ -37,6 +37,9 @@ Public IamApointer As Boolean, lasthere$
 Public original As Long
 Public isref As Boolean ' One time use
 Public LastOpen As String
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+    lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
+
 Public Property Get Events() As Object
 Set Events = eventlist
 End Property
@@ -372,3 +375,18 @@ FuncRef = vbNullString
 LocalRef = vbNullString
 VarRef = vbNullString
 End Sub
+Public Property Get RefCount() As Long
+Dim m As Long
+m = GetRefCount(Me)
+If m > 4 Then RefCount = m - 4 Else RefCount = 0
+
+End Property
+Private Function GetRefCount(ByRef vvv) As Long
+    If Not IsObject(vvv) Then Exit Function
+    Dim obj As IUnknown
+    Set obj = vvv
+    If obj Is Nothing Then Exit Function
+    CopyMemory GetRefCount, ByVal (objptr(obj)) + 4, 4
+    GetRefCount = GetRefCount - 2
+    Set obj = Nothing
+End Function
