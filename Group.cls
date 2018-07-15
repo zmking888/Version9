@@ -279,6 +279,9 @@ Else
 ' only when is in an array as Float Group
 End If
 End Property
+Friend Property Get LinkGroup() As Group
+Set LinkGroup = LinkToGroup
+End Property
 Public Property Get Link() As Object
 Set Link = LinkToGroup
 End Property
@@ -375,12 +378,13 @@ FuncRef = vbNullString
 LocalRef = vbNullString
 VarRef = vbNullString
 End Sub
-Public Property Get RefCount() As Long
+Friend Property Get refcount1() As Long
 Dim m As Long
 m = GetRefCount(Me)
-If m > 4 Then RefCount = m - 4 Else RefCount = 0
+If m > 3 Then refcount1 = m - 3 Else refcount1 = 0
 
 End Property
+
 Private Function GetRefCount(ByRef vvv) As Long
     If Not IsObject(vvv) Then Exit Function
     Dim obj As IUnknown

@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 23 active-X
+Version 9.3 revision 24 active-X
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

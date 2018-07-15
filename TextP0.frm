@@ -170,7 +170,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   "http:///"
+      Location        =   ""
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -334,7 +334,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub DIS_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -356,7 +356,7 @@ DestroyCaret
 End If
 End Sub
 
-Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub dSprite_OLEDragOver(index As Integer, data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -387,7 +387,7 @@ Private Sub Form_GotFocus()
 UseEsc = True
 End Sub
 
-Private Sub Form_KeyUp(KeyCode As Integer, Shift As Integer)
+Private Sub Form_KeyUp(KeyCode As Integer, shift As Integer)
 Dim i As Long
  If List1.LeaveonChoose Then Exit Sub
 clickMe = -1
@@ -395,7 +395,7 @@ i = -1
 If KeyCode = vbKeyV Then
 Exit Sub
 End If
-If Shift <> 4 And mynum$ <> "" Then
+If shift <> 4 And mynum$ <> "" Then
 On Error Resume Next
 If Left$(mynum$, 1) = "0" Then
 i = val(mynum$)
@@ -424,7 +424,7 @@ End If
 UseEsc = False
 End Sub
 
-Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, Shift As Integer, x As Single, y As Single, state As Integer)
+Private Sub Form_OLEDragOver(data As DataObject, Effect As Long, Button As Integer, shift As Integer, x As Single, y As Single, state As Integer)
 On Error Resume Next
 If Not TaskMaster Is Nothing Then
   If TaskMaster.QueueCount > 0 Then
@@ -498,9 +498,9 @@ MyPopUp.Up
 
 End Sub
 
-Private Sub gList1_KeyDownAfter(KeyCode As Integer, Shift As Integer)
+Private Sub gList1_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyTab Then
-If Shift = 2 Then
+If shift = 2 Then
 choosenext
 KeyCode = 0
 End If
@@ -946,9 +946,9 @@ If lockme Then TEXT1.SetFocus: Exit Sub
 clickMe2 = -1
 End Sub
 
-Private Sub DIS_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub DIS_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyPause Then
-Form_KeyDown KeyCode, Shift
+Form_KeyDown KeyCode, shift
 End If
 End Sub
 Public Sub GiveASoftBreak(Sorry As Boolean)
@@ -962,7 +962,7 @@ End If
 
 End Sub
 
-Private Sub DIS_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub DIS_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 If Not NoAction Then
 NoAction = True
 Dim sel&
@@ -997,7 +997,7 @@ End Sub
 
 
 
-Private Sub dSprite_MouseDown(index As Integer, Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, x As Single, y As Single)
 Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
@@ -1033,7 +1033,7 @@ End If
 End Sub
 
 
-Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 Dim i As Long
 Form1.Font.charset = GetCharSet(GetCodePage(GetLCIDFromKeyboard))
 
@@ -1047,7 +1047,7 @@ If KeyCode = 13 And trace Then
 If Not STq Then STbyST = True: KeyCode = 0
 
 End If
-clickMe = HighLow(CLng(Shift), CLng(KeyCode))
+clickMe = HighLow(CLng(shift), CLng(KeyCode))
 If clickMe2 = -2 Then clickMe2 = clickMe
 If clickMe = 27 And escok Then
 NOEXECUTION = True
@@ -1082,7 +1082,7 @@ If noentrance Then
 KeyCode = 0
 Exit Sub
 End If
-If Shift = 4 Then
+If shift = 4 Then
 If KeyCode = 18 Then
 If mynum$ = vbNullString Then mynum$ = "0"
 KeyCode = 0
@@ -1113,7 +1113,7 @@ mynum$ = vbNullString
 
 Select Case KeyCode
 Case vbKeyE, vbKeyD
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If pagio$ = "GREEK" Then
 INK$ = INK$ & "”’√√—¡÷« "
@@ -1123,7 +1123,7 @@ End If
 End If
 End If
 Case vbKeyA
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If LASTPROG$ <> "" Then
 If pagio$ = "GREEK" Then
@@ -1135,7 +1135,7 @@ End If
 End If
 End If
 Case vbKeyS
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If pagio$ = "GREEK" Then
 INK$ = "”Ÿ”≈ "
@@ -1145,7 +1145,7 @@ End If
 End If
 End If
 Case vbKeyL
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If pagio$ = "GREEK" Then
 INK$ = "À…”‘¡ "
@@ -1155,7 +1155,7 @@ End If
 End If
 End If
 Case vbKeyF
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If pagio$ = "GREEK" Then
 INK$ = "÷œ—‘Ÿ”≈ "
@@ -1165,7 +1165,7 @@ End If
 End If
 End If
 Case vbKeyP, vbKeyT
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
 If QRY Then
 If pagio$ = "GREEK" Then
 INK$ = "‘’–Ÿ”≈ "
@@ -1175,7 +1175,7 @@ End If
 End If
 End If
 Case vbKeyM
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
  If QRY Then
  If pagio$ = "GREEK" Then
 INK$ = "‘Ã«Ã¡‘¡ "
@@ -1185,7 +1185,7 @@ End If
  End If
 End If
 Case vbKeyU
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
  If QRY Then
  If pagio$ = "GREEK" Then
 INK$ = "—’»Ã…”≈…” " + vbCr
@@ -1195,7 +1195,7 @@ End If
  End If
 End If
 Case vbKeyN
-If ctrl And (Shift And &H2) = 2 Then
+If ctrl And (shift And &H2) = 2 Then
  If QRY Then
  If pagio$ = "GREEK" Then
 INK$ = "‘Ã«Ã¡‘¡ ? " + vbCr
@@ -1205,17 +1205,17 @@ End If
  End If
 End If
 Case vbKeyTab
-    If (Shift And 1) = 1 Then
+    If (shift And 1) = 1 Then
     INK$ = INK$ & Chr$(6)
     KeyCode = 0
-    ElseIf ctrl Or Shift = 2 Or Not (QRY Or GFQRY) Then
+    ElseIf ctrl Or shift = 2 Or Not (QRY Or GFQRY) Then
     ctrl = False
         choosenext
         KeyCode = 0
         
     End If
 Case vbKeyV
-    If ctrl And (Shift And &H2) = 2 Then
+    If ctrl And (shift And &H2) = 2 Then
         Pad$ = GetTextData(CF_UNICODETEXT)
         If Pad$ <> "" Then
           '  For i = 1 To Len(pad$)
@@ -1230,7 +1230,7 @@ Case vbKeyV
     End If
 
 Case vbKeyC, &HFFFE
-If (ctrl And (Shift And &H2) = 2) Or KeyCode = &HFFFE Then
+If (ctrl And (shift And &H2) = 2) Or KeyCode = &HFFFE Then
 If QRY Then
 INK$ = INK$ & "CLS" & Chr$(13)
 Else
@@ -1321,11 +1321,11 @@ NOEXECUTION = True
 End If
 Case vbKeyF1 To vbKeyF12
 If FKey >= 0 Then FKey = KeyCode - vbKeyF1 + 1
-If Abs(FKey) = 1 And ctrl And (Shift And &H2) = 2 Then
+If Abs(FKey) = 1 And ctrl And (shift And &H2) = 2 Then
 If lastAboutHTitle <> "" Then abt = True: vH_title$ = vbNullString
 
 FKey = 0: KeyCode = 0: vHelp
-ElseIf FKey = 1 And (Shift And 1) Then
+ElseIf FKey = 1 And (shift And 1) Then
 FKey = 13
 ElseIf FKey = 4 And ctrl And QRY Then
 interpret DisStack, "END"
@@ -1337,7 +1337,7 @@ ctrl = True
 KeyCode = 0
 Exit Sub
 Case Else
-If ctrl And (Shift And &H2) = 2 And lckfrm = 0 And KeyCode <> 3 And KeyCode <> 16 Then
+If ctrl And (shift And &H2) = 2 And lckfrm = 0 And KeyCode <> 3 And KeyCode <> 16 Then
 If escok Then
 STq = False
 STEXIT = False
@@ -1552,7 +1552,7 @@ End Sub
 
 
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 If NoAction Then Exit Sub
 NoAction = True
 Dim sel&
@@ -1961,7 +1961,7 @@ End Sub
 
 
 
-Private Sub gList1_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, noentrance As Boolean, where As Long
 Dim aa$, a$, JJ As Long, ii As Long, gothere As Long
 If KeyCode = vbKeyEscape Then
@@ -2023,7 +2023,7 @@ End If
 'Exit Sub
 If TEXT1.UsedAsTextBox Then
 Select Case KeyCode
-Case Is = vbKeyTab And (Shift Mod 2 = 1), vbKeyUp
+Case Is = vbKeyTab And (shift Mod 2 = 1), vbKeyUp
 Result = -1
 Case vbKeyReturn, vbKeyTab, vbKeyDown
 Result = 1
@@ -2050,9 +2050,9 @@ With TEXT1
 .Form1mn3Enabled = Clipboard.GetFormat(13) Or Clipboard.GetFormat(1)
 End With
 
-If KeyCode = 13 And Shift = 2 Then
+If KeyCode = 13 And shift = 2 Then
 KeyCode = 0
-Shift = 0
+shift = 0
 UKEY$ = vbNullString
 TEXT1.insertbrackets
 noentrance = False
@@ -2074,7 +2074,7 @@ Case vbKeyControl
 ctrl = True
 KeyCode = 0
 Case vbKeyF1
-If (Shift And 2) = 2 Then
+If (shift And 2) = 2 Then
 If TEXT1.SelText <> "" Then
 helpmeSub
 Else
@@ -2089,22 +2089,22 @@ End If
 
 KeyCode = 0
 Case vbKeyF2
-If Shift <> 0 Then
+If shift <> 0 Then
 If s$ = vbNullString And TEXT1.SelText <> "" Then s$ = TEXT1.SelText
 If pagio$ = "GREEK" Then
 s$ = InputBoxN("¡Ì·ÊﬁÙÁÛÂ ÒÔÚ Ù· ‹Ì˘:", "”ı„„Ò·ˆﬁ  ÂÈÏ›ÌÔı", s$)
 Else
 s$ = InputBoxN("Search to top:", "Text Editor", s$)
 End If
-If s$ <> "" Then Searchup s$, Shift Mod 2 = 1
-Shift = 0
+If s$ <> "" Then Searchup s$, shift Mod 2 = 1
+shift = 0
 ElseIf TEXT1.SelText <> "" Or s$ <> "" Then
 supsub
 End If
 
 KeyCode = 0
 Case vbKeyF3
-If Shift <> 0 Then
+If shift <> 0 Then
 If s$ = vbNullString And TEXT1.SelText <> "" Then s$ = TEXT1.SelText
 If pagio$ = "GREEK" Then
 
@@ -2112,8 +2112,8 @@ s$ = InputBoxN("¡Ì·ÊﬁÙÁÛÂ ÒÔÚ Ù· Í‹Ù˘:", "”ı„„Ò·ˆﬁ  ÂÈÏ›ÌÔı", s$)
 Else
 s$ = InputBoxN("Search to down:", "Text Editor", s$)
 End If
-If s$ <> "" Then SearchDown s$, Shift Mod 2 = 1
-Shift = 0
+If s$ <> "" Then SearchDown s$, shift Mod 2 = 1
+shift = 0
 ElseIf TEXT1.SelText <> "" Or s$ <> "" Then
 
 sdnSub
@@ -2145,7 +2145,7 @@ End If
 End If
 KeyCode = 0
 Case vbKeyF10
-If Shift <> 0 Then
+If shift <> 0 Then
 With TEXT1
 If .UsedAsTextBox Then Exit Sub
 ii = .SelLength
@@ -2173,7 +2173,7 @@ TEXT1.WrapAll
 TEXT1.ManualInform
 KeyCode = 0
 Case vbKeyF12
-If Shift <> 0 Then
+If shift <> 0 Then
 mn5sub
 
 Else
@@ -2204,7 +2204,7 @@ End If
 If TEXT1.SelText <> "" Then
 
     a$ = vbCrLf + TEXT1.SelText & "*"
-    If Shift <> 0 Then  ' ‚„‹ÎÂ
+    If shift <> 0 Then  ' ‚„‹ÎÂ
         a$ = Replace(a$, vbCrLf + String$(6 + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod 6, ChrW(160)), vbCrLf)
         a$ = Replace(a$, vbCrLf + Space$(6 + (Len(TEXT1.CurrentParagraph) - Len(LTrim(TEXT1.CurrentParagraph))) Mod 6), vbCrLf)
         TEXT1.InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -2220,7 +2220,7 @@ If TEXT1.SelText <> "" Then
     End If
   
 Else
-If Shift <> 0 Then
+If shift <> 0 Then
 
     If Mid$(TEXT1.CurrentParagraph, 1, 6) = Space$(6) Or Mid$(TEXT1.CurrentParagraph, 1, 6) = String$(6, ChrW(160)) Then
 
