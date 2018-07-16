@@ -3266,6 +3266,36 @@ l = Len(s): If l = 0 Then Exit Function
   If p2 > p4 Then MyTrim = "" Else MyTrim = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
+Public Function MyTrimB(s$) As String
+Dim i&, l As Long
+Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
+l = LenB(s): If l = 0 Then Exit Function
+
+  p2 = StrPtr(s): l = l - 1
+  p22 = p2
+  p4 = p2 + l
+  For i = p4 To p2 Step -1
+  GetMem1 i, p1
+  Select Case p1
+    Case 32, 160, 10, 13
+    Case Else
+  p4 = i
+   Exit For
+  End Select
+  Next i
+  For i = p2 To p4 Step 1
+  GetMem1 i, p1
+  Select Case p1
+    Case 32, 160, 10, 13
+    Case Else
+     
+     p2 = i
+   Exit For
+  End Select
+  Next i
+  If p2 > p4 Then MyTrimB = "" Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
+ 
+End Function
 Public Function excludespace(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
@@ -3283,7 +3313,7 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
 
 End Function
-Function IsLabelAnew(where$, a$, r$, Lang As Long) As Long
+Function IsLabelAnew(where$, a$, r$, lang As Long) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, gr As Boolean
@@ -3291,7 +3321,7 @@ r$ = vbNullString
 ' NEW FOR REV 156  - WE WANT TO RUN WITH GREEK COMMANDS IN ANY COMPUTER
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p1 As Integer, p4 As Long
-l = Len(a$): If l = 0 Then IsLabelAnew = 0: Lang = 1: Exit Function
+l = Len(a$): If l = 0 Then IsLabelAnew = 0: lang = 1: Exit Function
 
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
@@ -3328,7 +3358,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    Lang = 1
+    lang = 1
     Exit Function
     Case 32, 160
     Case Else
@@ -3358,7 +3388,7 @@ p2 = StrPtr(a$): l = l - 1
         End If
         a$ = Mid$(a$, (i - p2) \ 2)
         IsLabelAnew = 1
-        Lang = -1
+        lang = -1
               
         Exit Function
 
@@ -3478,13 +3508,13 @@ i1233:
     Next i
   If i > p4 Then a$ = vbNullString Else If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
        r$ = myUcase(r$, gr)
-       Lang = 1 + CLng(gr)
+       lang = 1 + CLng(gr)
 
     IsLabelAnew = rr&
 
 
 End Function
-Public Function IsLabelDotSub(where$, a$, rrr$, r$, Lang As Long, Optional p1 As Integer = 0) As Long
+Public Function IsLabelDotSub(where$, a$, rrr$, r$, lang As Long, Optional p1 As Integer = 0) As Long
 ' for left side...no &
 
 Dim rr&, one As Boolean, c$, firstdot$, gr As Boolean
@@ -3492,7 +3522,7 @@ rrr$ = vbNullString
 r$ = vbNullString
 Dim i&, l As Long, p3 As Integer
 Dim p2 As Long, p4 As Long  '', excludesp As Long
-  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: Lang = 1: Exit Function
+  l = Len(a$): If l = 0 Then IsLabelDotSub = 0: lang = 1: Exit Function
 p2 = StrPtr(a$): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3529,7 +3559,7 @@ p2 = StrPtr(a$): l = l - 1
     If i > p2 Then a$ = Mid$(a$, (i - 2 - p2) \ 2)
     End If
     
-    Lang = 1
+    lang = 1
     Exit Function
     Case 0 To 7, 32, 160
     Case Else
@@ -3582,14 +3612,14 @@ p2 = StrPtr(a$): l = l - 1
         a$ = Mid$(a$, (i - p2) \ 2) ' mid$(a$, 2)
         IsLabelDotSub = 1
         
-        Lang = -1
+        lang = -1
       
         Exit Function
     
         ElseIf firstdot$ = vbNullString Then
         IsLabelDotSub = 1
-        Lang = 1 + CLng(gr)
-        If Lang = 1 Then
+        lang = 1 + CLng(gr)
+        If lang = 1 Then
         rrr$ = UCase(r$)
         Else
         rrr$ = myUcase(r$)
@@ -3718,7 +3748,7 @@ i123:
   If (i + 2 - p2) \ 2 > 1 Then a$ = Mid$(a$, (i + 2 - p2) \ 2)
   End If
        rrr$ = firstdot$ + myUcase(r$, gr)
-       Lang = 1 + CLng(gr)
+       lang = 1 + CLng(gr)
     IsLabelDotSub = rr&
    'a$ = LTrim(a$)
 
@@ -3809,8 +3839,8 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "EXIST(", 26, "упаявеи(", 26, "JOYPAD(", 27, "кабг(", 27, "JOYPAD.DIRECTION(", 28, "кабг.йатеухумсг(", 28, "JOYPAD.ANALOG.X(", 29, "кабг.амакоцийо.в(", 29 _
 , "JOYPAD.ANALOG.Y(", 30, "кабг.амакоцийо.у(", 30, "IMAGE.X(", 31, "еийома.в(", 31, "IMAGE.Y(", 32, "еийома.у(", 32, "IMAGE.X.PIXELS(", 33, "еийома.в.сглеиа(", 33 _
 , "IMAGE.Y.PIXELS(", 34, "еийома.у.сглеиа(", 34, "VALID(", 35, "ецйуяо(", 35, "EVAL(", 36, "ейжя(", 36, "ейжяасг(", 36, "POINT(", 37, "сглеио(", 37 _
-, "CTIME(", 38, "упыяа(", 38, "CDATE(", 39, "уплея(", 39, "TIME(", 40, "вяомос(", 40, "DATE(", 41, "глеяа(", 41, "VAL(", 42, "тилг(", 42, "аниа(", 42, "RINSTR(", 43, "хесгдениа(", 43 _
-, "INSTR(", 44, "хесг(", 44, "RECORDS(", 45, "еццяажес(", 45, "GROUP.COUNT(", 46, "олада.сумоко(", 46, "PARAGRAPH(", 47, "паяацяажос(", 47, "PARAGRAPH.INDEX(", 48, "аяихлос.паяацяажоу(", 48 _
+, "CTIME(", 38, "упыяа(", 38, "CDATE(", 39, "уплея(", 39, "TIME(", 40, "вяомос(", 40, "DATE(", 41, "глеяа(", 41, "VAL(", 42, "тилг(", 42, "аниа(", 42, "RINSTR(", 107, "хесгдениа(", 43 _
+, "INSTR(", 106, "хесг(", 44, "RECORDS(", 45, "еццяажес(", 45, "GROUP.COUNT(", 46, "олада.сумоко(", 46, "PARAGRAPH(", 47, "паяацяажос(", 47, "PARAGRAPH.INDEX(", 48, "аяихлос.паяацяажоу(", 48 _
 , "BACKWARD(", 49, "писы(", 49, "FORWARD(", 50, "лпяоста(", 50, "DOC.PAR(", 51, "еццяажоу.пая(", 51, "MAX.DATA(", 52, "лецако.сеияас(", 52, "MIN.DATA(", 53, "лийяо.сеияас(", 53 _
 , "MAX(", 54, "лецако(", 54, "MIN(", 55, "лийяо(", 55, "COMPARE(", 56, "суцйяиме(", 56, "DOC.UNIQUE.WORDS(", 57, "еццяажоу.ломадийес.кенеис(", 57, "DOC.WORDS(", 58, "еццяажоу.кенеис(", 58 _
 , "DOC.LEN(", 59, "еццяажоу.лгйос(", 59, "LEN.DISP(", 60, "лгйос.елж(", 60, "LEN(", 61, "лгйос(", 61, "SQRT(", 62, "яифа(", 62, "FREQUENCY(", 63, "сувмотгта(", 63 _

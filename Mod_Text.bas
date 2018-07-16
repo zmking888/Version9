@@ -79,7 +79,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -583,7 +583,7 @@ Set aa = Nothing
 End Function
 
 
-Function ChangeValuesMem(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ChangeValuesMem(bstack As basetask, rest$, lang As Long) As Boolean
 Dim aa As mHandler, ah As String, p As Variant, s$, addr As Long, PP As Variant, what$, r As Double
 Dim bb1 As MemBlock, w2 As Variant, rs As Single, itissingle As Boolean
 Set aa = bstack.lastobj
@@ -691,17 +691,17 @@ Set bb1 = aa.objref
                                     GoTo there
                                 Else
                             ' here is the part where we copy a string to memblock
-                            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, , , , False) Then
-                                If IsLabelSymbolNew(rest$, "ьгжио", "BYTE", Lang, , , , False) Then
+                            If IsLabelSymbolNew(rest$, "ыс", "AS", lang, , , , False) Then
+                                If IsLabelSymbolNew(rest$, "ьгжио", "BYTE", lang, , , , False) Then
                                     PP = 1
-                                ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", lang, , , , False) Then
                                     PP = 2
-                                ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", lang, , , , False) Then
                                     PP = 4
-                                ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", lang, , , , False) Then
                                     PP = 4
                                     itissingle = True
-                                ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", lang, , , , False) Then
                                     PP = 8
                                 Else
                                     SyntaxError
@@ -759,8 +759,8 @@ Set bb1 = aa.objref
                         If Not IsStrExp(bstack, rest$, s$) Then
                             GoTo there
                         End If
-                        If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, , , , False) Then
-                                If IsLabelSymbolNew(rest$, "цяалла", "STRING", Lang, , , , False) Then
+                        If IsLabelSymbolNew(rest$, "ыс", "AS", lang, , , , False) Then
+                                If IsLabelSymbolNew(rest$, "цяалла", "STRING", lang, , , , False) Then
                                     PP = -4
                                 Else
                                     SyntaxError
@@ -1243,11 +1243,11 @@ With players(GetCode(Scr))
 End With
 End Sub
 
-Function ProcSave(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSave(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, w$, s$, col As Long, prg$, x1 As Long, par As Boolean, i As Long, noUse As Long, lcl As Boolean
 On Error Resume Next
 If lckfrm <> 0 Then MyEr "Save is locked", "г АПОХчЙЕУСГ ЕъМАИ ЙКЕИДЫЛщМГ": rest$ = vbNullString: Exit Function
-lcl = IsLabelSymbolNew(rest$, "топийа", "LOCAL", Lang) Or basestack.IamChild Or basestack.IamAnEvent
+lcl = IsLabelSymbolNew(rest$, "топийа", "LOCAL", lang) Or basestack.IamChild Or basestack.IamAnEvent
 x1 = Abs(IsLabelFileName(basestack, rest, pa$, , s$))
 
 If x1 <> 1 Then
@@ -1274,7 +1274,7 @@ If x1 <> 0 Then
                 s$ = Left$(s$, Len(s$) - 2)
                 
                 If Right$(sbf(col).sb, 2) <> vbCrLf Then sbf(col).sb = sbf(col).sb + vbCrLf
-                If Lang Then
+                If lang Then
                 
                         If Not blockCheck(sbf(col).sb, DialogLang, noUse, "Function " & s$ + "()" + vbCrLf) Then Exit Function
                                 prg$ = s$ & " {" & sbf(col).sb & "}" & vbCrLf + prg$
@@ -1295,7 +1295,7 @@ If x1 <> 0 Then
                 End If
                 Else
                         If Right$(sbf(col).sb, 2) <> vbCrLf Then sbf(col).sb = sbf(col).sb + vbCrLf
-                        If Lang Then
+                        If lang Then
                                 If Not blockCheck(sbf(col).sb, DialogLang, noUse, "Module " & s$ + vbCrLf) Then Exit Function
                                 prg$ = s$ & " {" & sbf(col).sb & "}" & vbCrLf + prg$
                                 If lcl Then
@@ -1346,7 +1346,7 @@ If x1 <> 0 Then
         End If
         s$ = vbNullString
         If CFname(pa$) <> "" Then
-                If Lang = 1 Then
+                If lang = 1 Then
                         If MsgBoxN("Replace " + ExtractNameOnly(pa$), vbOKCancel, MesTitle$) <> vbOK Then
                         MyEr "File not saved -1005", "дЕМ СЧХГЙЕ ТО АЯВЕъО -1005"
                         ProcSave = True
@@ -1383,7 +1383,7 @@ End If
 
 End Function
 
-Function MySwap(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MySwap(bstack As basetask, rest$, lang As Long) As Boolean
 Dim s$, ss$, F As Long, col As Long, x1 As Long, i As Long, pppp As mArray, pppp1 As mArray
     F = Abs(IsLabel(bstack, rest$, s$))
     MySwap = True
@@ -1624,7 +1624,7 @@ Public Sub PopStage(basestack As basetask)
         End With
 End Sub
 
-Function RevisionPrint(basestack As basetask, rest$, xa As Long, Lang As Long) As Boolean
+Function RevisionPrint(basestack As basetask, rest$, xa As Long, lang As Long) As Boolean
 Dim Scr As Object, oldCol As Long, oldFTEXT As Long, oldFTXT As String, oldpen As Long
 Dim par As Boolean, i As Long, F As Long, p As Variant, W4 As Boolean, pn&, s$, dlen As Long
 Dim o As Long, w3 As Long, x1 As Long, y1 As Long, x As Double, ColOffset As Long
@@ -1687,7 +1687,7 @@ If Not IsLabelSYMB3(ss$, s$) Then
                     F = 0
                     
 Else
-Select Case Lang
+Select Case lang
 Case 1
 Select Case UCase(s$)
         Case "BACK"
@@ -1741,7 +1741,7 @@ Select Case myUcase(s$)
         Case Else
         F = 0
         End Select
-        Lang = 0
+        lang = 0
         End Select
         
         If F > 0 And .lastprint Then
@@ -2868,13 +2868,13 @@ If par Or F < 0 Then players(basketcode) = prive
 If myexit(basestack) Then Exit Function
 End With
 End Function
-Private Sub ProcessOperFlat(bstack As basetask, Second As Object, oper$, r As Variant, Lang As Long)
+Private Sub ProcessOperFlat(bstack As basetask, Second As Object, oper$, r As Variant, lang As Long)
 Dim it As Long, ok As Boolean
 
 
 End Sub
 
-Private Sub ProcessOper(bstack As basetask, first As Object, oper$, r As Variant, Lang As Long)
+Private Sub ProcessOper(bstack As basetask, first As Object, oper$, r As Variant, lang As Long)
 Dim where As Long, w$, ok As Boolean
 Dim soroslen As Long, flag As Boolean, backup As Object
 flag = Not first Is Nothing
@@ -2989,7 +2989,7 @@ Dim safegroup As Group
 Dim kolpo As Boolean, bb$, once As Boolean, dd As Variant, subsfc As FastCollection
 Vars = var2used: VName = varhash.count
 subs = sb2used: snames = subHash.count
-Dim MM As mStiva, tempRef As Object
+Dim mm As mStiva, tempRef As Object
 If Prefix = "VAL" Then
 ' we stand as right value...
 If pppp Is Nothing Then Exit Function
@@ -3380,11 +3380,11 @@ conthere145:
         bstack.MoveNameDot myUcase(w$)
     End If
 contheretoo1:
-Set MM = New mStiva
-MM.DataVal CDbl(y1)
+Set mm = New mStiva
+mm.DataVal CDbl(y1)
 If subspoint Then v = -100: subspoint = False
-MM.DataVal CDbl(v)
-MM.DataObj pppp
+mm.DataVal CDbl(v)
+mm.DataObj pppp
 Do While FastSymbol(b$, ",")
 
 
@@ -3448,12 +3448,12 @@ contheretoo:
 cont1010:
                                                 bstack.MoveNameDot myUcase(w$)
                                                 depth = depth + 1
-                                                MM.DataVal CDbl(y1)
+                                                mm.DataVal CDbl(y1)
                                                 If subspoint Then v = -100: subspoint = False
-                                                MM.DataVal CDbl(v)
+                                                mm.DataVal CDbl(v)
                                                 
                                                 
-                                                MM.DataObj pppp
+                                                mm.DataObj pppp
                                     Else
                                                 MissingGroup
                                                 GoTo normalexit
@@ -3532,9 +3532,9 @@ contpointer:
         End If
 conthere3:
 
-MM.DataVal CDbl(0)
-MM.DataVal CDbl(-1)
-MM.DataObj pppp
+mm.DataVal CDbl(0)
+mm.DataVal CDbl(-1)
+mm.DataObj pppp
 
 bstack.MoveNameDot myUcase(w$)
         depth = depth + 1
@@ -3736,10 +3736,10 @@ jump1234:
 breakexit:
 ' maybe is always nothing here, i have to check
         Set bstack.lastobj = Nothing
-        While MM.Total > 0
-        y1 = MM.PopVal
-        v = MM.PopVal
-        Set pppp = MM.PopObj
+        While mm.Total > 0
+        y1 = mm.PopVal
+        v = mm.PopVal
+        Set pppp = mm.PopObj
         If v <> -1 Then
             If v <> -100 Then
             If Not MyIsObject(pppp.item(v)) Then
@@ -3833,7 +3833,7 @@ cont2020:
         If Prefix <> "" Then
         If Prefix = "@READ2" Then
                           
-            Dim Lang As Long, ok As Boolean
+            Dim lang As Long, ok As Boolean
           NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
           SpeedGroup = Abs(ok)
           GoTo CONTlastEtnum
@@ -3956,18 +3956,18 @@ If fr < 0 Or fr > i Then fr = i + 1
 
 If i > 0 Then rinstr = InStrRev(a, b, fr)
 End Function
-Function rinstrTxt(a As String, b As String, Optional ByVal fr As Long) As Long
-' NOT USED....INSTRREV IS THE SAME...WITH VBTEXTCOMPARE
+Function rinstrb(a As String, b As String, Optional ByVal fr As Long) As Long
+'
 Dim i As Long, j As Long
-fr = fr - Len(b) + 1
-If fr < 0 Then fr = Len(a) + 1
+fr = fr - LenB(b) + 1
+If fr < 0 Then fr = LenB(a) + 1
 Do
 j = i
-i = InStr(j + 1, a, b, vbTextCompare)
+i = InStrB(j + 1, a, b)
 
 Loop Until i = 0 Or i > fr
 
-rinstrTxt = j
+rinstrb = j
 End Function
 Sub dset()
 
@@ -4193,7 +4193,7 @@ KillFile strTemp + r$
 Wend
 End Sub
 '' this is from Trick (VbForums)
-Sub Proto1(ByVal addr As Long, basestack As basetask, rest$, Lang As Long, resp As Boolean)
+Sub Proto1(ByVal addr As Long, basestack As basetask, rest$, lang As Long, resp As Boolean)
 End Sub
 
 Sub Main()
@@ -6930,7 +6930,7 @@ End If
 'Select Case v$
 
 
-On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105
+On w1 GoTo fun1, fun2, fun3, fun4, fun5, fun6, fun7, fun8, fun9, fun10, fun11, fun12, fun13, fun14, fun15, fun16, fun17, fun18, fun19, fun20, fun21, fun22, fun23, fun24, fun25, fun26, fun27, fun28, fun29, fun30, fun31, fun32, fun33, fun34, fun35, fun36, fun37, fun38, fun39, fun40, fun41, fun42, fun43, fun44, fun45, fun46, fun47, fun48, fun49, fun50, fun51, fun52, fun53, fun54, fun55, fun56, fun57, fun58, fun59, fun60, fun61, fun62, fun63, fun64, fun65, fun66, fun67, fun68, fun69, fun70, fun71, fun72, fun73, fun74, fun75, fun76, fun77, fun78, fun79, fun80, fun81, fun82, fun83, fun84, fun85, fun86, fun87, fun88, fun89, fun90, fun91, fun92, fun93, fun94, fun95, fun96, fun97, fun98, fun99, fun100, fun101, fun102, fun103, fun104, fun105, fun106, fun107
 IsNumber = False
 Exit Function
 fun101: ' "BANK(", "тяап("
@@ -7993,10 +7993,16 @@ fun42: ' "VAL(", "тилг(", "аниа("
     IsNumber = IsVal(bstack, a$, r, SG, Left$(v$, 1) = "V")
     Exit Function
 fun43: ' "RINSTR(", "хесгдениа("
-    IsNumber = IsRinstr(bstack, a$, r, SG)
+    IsNumber = IsRinstr(bstack, a$, r, SG, 0)
+    Exit Function
+fun107: ' "RINSTR(", "хесгдениа("
+    IsNumber = IsRinstr(bstack, a$, r, SG, 1)
     Exit Function
 fun44: ' "INSTR(", "хесг("
-    IsNumber = IsInstr(bstack, a$, r, SG)
+    IsNumber = IsInstr(bstack, a$, r, SG, 0)
+    Exit Function
+fun106:
+    IsNumber = IsInstr(bstack, a$, r, SG, 1)
     Exit Function
 fun45: ' "RECORDS(", "еццяажес("
     IsNumber = IsRecords(bstack, a$, r, SG)
@@ -9192,7 +9198,7 @@ Else
     End If
 End If
 End Function
-Function ProcLambda(bstack As basetask, rest$, Lang As Long) As Object
+Function ProcLambda(bstack As basetask, rest$, lang As Long) As Object
 ' no named functio- object
 Dim body As New lambda, k As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
 Dim pppp As mArray, pppp2 As mArray, frm$, Find As basetask, Rest1$
@@ -9367,7 +9373,7 @@ ElseIf FastSymbol(rest$, "{") Then
 ' get block
 getfunc:
 If frm$ <> "" Then
-                                If Lang = 1 Then
+                                If lang = 1 Then
                                 frm$ = "Read " + frm$ + vbCrLf
                                 Else
                                 frm$ = "дИэБАСЕ " + frm$ + vbCrLf
@@ -9386,7 +9392,7 @@ GetLine:
 body.code = aheadstatus(rest$, False, pos1)
 If pos1 = 1 Then Exit Function
 If frm$ <> "" Then
-                                If Lang = 1 Then
+                                If lang = 1 Then
                                 frm$ = "Read " + frm$ + vbCrLf
                                 Else
                                 frm$ = "дИэБАСЕ " + frm$ + vbCrLf
@@ -13834,7 +13840,15 @@ fstr40: '"REPLACE$(", "аккацг$("
        If FastSymbol(a$, ",") And IsStrExp(bstackstr, a$, q1$) Then
             If FastSymbol(a$, ",") And IsStrExp(bstackstr, a$, q2$) Then
      IsStr1 = True
+      If FastSymbol(a$, ",") And IsExp(bstackstr, a$, p) Then
+        If FastSymbol(a$, ",") And IsExp(bstackstr, a$, PP) Then
+        r$ = Replace$(q2$, q$, q1$, p, PP)
+        Else
+      r$ = Replace$(q2$, q$, q1$, p)
+      End If
+      Else
     r$ = Replace$(q2$, q$, q1$)    'ReplaceStr(Q$, q1$, Q2$)
+    End If
        End If
        End If
     End If
@@ -13896,14 +13910,14 @@ fstr44: '"STRING$(", "епам$("
         If LenB(q$) > 0 Then
             On Error Resume Next
             If LenB(q$) Mod 2 = 0 Then
-                r$ = String$(p, q$)
-                If Err Then
-                    r$ = Space$(p * Len(q$))
+                dd = Len(q$)
+                    r$ = Space$(p * dd)
+                    
                     While p > 0
                         p = p - 1
                         Mid$(r$, p * dd + 1, dd) = q$
                     Wend
-                End If
+
             Else
                 While p > 0
                 r$ = r$ & q$
@@ -13969,22 +13983,41 @@ fstr44: '"STRING$(", "епам$("
        IsStr1 = False
     Exit Function
 fstr45: ' "MID$(", "лес$("
- 
+    dd = 2 + (AscW(q$) < 128)
     If IsStrExp(bstackstr, a$, q$) Then
     If FastSymbol(a$, ",") And IsExp(bstackstr, a$, p) Then
     p = Abs(p)
     If p = 0 Then
-    MyErMacroStr a$, "Zero pos in mid$ not allowed", "лГДЕМИЙч ХщСГ СТГМ лес$ ДЕМ ЕПИТЯщПЕТАИ)"
-    IsStr1 = False
-    Exit Function
+        MyErMacroStr a$, "Zero pos in mid$ not allowed", "лГДЕМИЙч ХщСГ СТГМ лес$ ДЕМ ЕПИТЯщПЕТАИ)"
+        IsStr1 = False
+        Exit Function
     Else
-    r$ = Mid$(q$, p)
+      If FastSymbol(a$, ",") And IsExp(bstackstr, a$, PP) Then
+        PP = Abs(PP)
+            If IsLabelSymbolNew(a$, "ыс", "AS", dd, , , , False) Then
+            If IsLabelSymbolNew(a$, "ьгжио", "BYTE", dd, , , , False) Then
+                r$ = MidB$(q$, p, PP)
+            Else
+                SyntaxError
+                Exit Function
+            End If
+        Else
+        r$ = Mid$(q$, p, PP)
+        End If
+    Else
+        If IsLabelSymbolNew(a$, "ыс", "AS", dd, , , , False) Then
+            If IsLabelSymbolNew(a$, "ьгжио", "BYTE", dd, , , , False) Then
+            r$ = MidB$(q$, p)
+            Else
+                SyntaxError
+                Exit Function
+            End If
+        Else
+        r$ = Mid$(q$, p)
+        End If
+    End If
     IsStr1 = True
     End If
-    End If
-    If FastSymbol(a$, ",") And IsExp(bstackstr, a$, p) Then
-    p = Abs(p)
-    r$ = Left$(r$, p)
     End If
     If Not FastSymbol(a$, ")") Then IsStr1 = False
     End If
@@ -13992,21 +14025,41 @@ fstr45: ' "MID$(", "лес$("
     Exit Function
     
 fstr46: ' "LEFT$(", "аяис$("
+    dd = 2 + (AscW(q$) < 128)
     If IsStrExp(bstackstr, a$, q$) Then
     If FastSymbol(a$, ",") And IsExp(bstackstr, a$, p) Then
     p = Abs(p)
-    r$ = Left$(q$, p)
-     IsStr1 = True
+    If IsLabelSymbolNew(a$, "ыс", "AS", dd, , , , False) Then
+        If IsLabelSymbolNew(a$, "ьгжио", "BYTE", dd, , , , False) Then
+            r$ = LeftB$(q$, p)
+        Else
+        SyntaxError
+        Exit Function
+        End If
+    Else
+        r$ = Left$(q$, p)
+    End If
+    IsStr1 = True
     End If
     If Not FastSymbol(a$, ")") Then IsStr1 = False
     End If
     Exit Function
 fstr47: ' "RIGHT$(", "дени$("
+    dd = 2 + (AscW(q$) < 128)
     If IsStrExp(bstackstr, a$, q$) Then
     If FastSymbol(a$, ",") And IsExp(bstackstr, a$, p) Then
     p = Abs(p)
-    r$ = Right$(q$, p)
-     IsStr1 = True
+    If IsLabelSymbolNew(a$, "ыс", "AS", dd, , , , False) Then
+        If IsLabelSymbolNew(a$, "ьгжио", "BYTE", dd, , , , False) Then
+           r$ = RightB$(q$, p)
+        Else
+           SyntaxError
+            Exit Function
+        End If
+    Else
+        r$ = Right$(q$, p)
+    End If
+    IsStr1 = True
     End If
     If Not FastSymbol(a$, ")") Then IsStr1 = False
     End If
@@ -14042,8 +14095,18 @@ fstr50: '"JPG$(", "жыто$("
     Exit Function
     End If
 fstr51: '"TRIM$(", "апой$("
+    dd = 2 + (AscW(q$) < 128)
     If IsStrExp(bstackstr, a$, q$) Then
+        If IsLabelSymbolNew(a$, "ыс", "AS", dd, , , , False) Then
+        If IsLabelSymbolNew(a$, "ьгжио", "BYTE", dd, , , , False) Then
+           r$ = MyTrimB$(q$)
+        Else
+           SyntaxError
+            Exit Function
+        End If
+    Else
         r$ = MyTrim$(q$)
+    End If
         If Not FastSymbol(a$, ")") Then IsStr1 = False: Exit Function
         IsStr1 = True
         Exit Function
@@ -15166,7 +15229,7 @@ Set di = bstack.Owner
 Dim prive As basket
 'b$ = Trim$(b$)
 Dim w$, ww#, LLL As Long, sss As Long, v As Long, p As Variant, ss$, sw$, ohere$
-Dim pppp As mArray, i1 As Long, Lang As Long
+Dim pppp As mArray, i1 As Long, lang As Long
 Dim r1 As Long, r2 As Long
 ' uink$ = VbNullString
 di.FontTransparent = True
@@ -15212,11 +15275,11 @@ If NOEXECUTION Then interpret = False: here$ = ohere$: GoTo there1
 
 If NocharsInLine(b$) Then interpret = True: here$ = ohere$: GoTo there1
 If IsSymbol(b$, "@") Then
-i1 = IsLabelAnew("", b$, w$, Lang)  '' NO FORM AA@BBB ALLOWED HERE
+i1 = IsLabelAnew("", b$, w$, lang)  '' NO FORM AA@BBB ALLOWED HERE
 w$ = "@" + w$
 GoTo PROCESSCOMMAND   'IS A COMMAND
 Else
-i1 = IsLabelAnew("", b$, w$, Lang) '' NO FORM AA@BBB ALLOWED HERE
+i1 = IsLabelAnew("", b$, w$, lang) '' NO FORM AA@BBB ALLOWED HERE
 End If
   If trace And (bstack.Process Is Nothing) And Not bypasstrace Then
   If bstack.IamLambda Then
@@ -15857,7 +15920,7 @@ PROCESSCOMMAND:
             b$ = NLtrim(b$)
             SetNextLineNL b$
         Else
-        NeoCall objptr(bstack), b$, Lang, ok
+        NeoCall objptr(bstack), b$, lang, ok
         If Not ok Then
             interpret = 0
             GoTo there1
@@ -15977,7 +16040,7 @@ err123456:
                     If IsSupervisor Then
                     prive = players(GetCode(di))
                     
-                    monitor bstack, prive, Lang
+                    monitor bstack, prive, lang
                     players(GetCode(di)) = prive
                     Else
                     BadCommand
@@ -16007,20 +16070,20 @@ Case "RETURN", "епистяожг"
                                   If ChangeValues(bstack, b$) Then GoTo loopcontinue1
                                   
                            Case 2
-                                    If ChangeValuesMem(bstack, b$, Lang) Then GoTo loopcontinue1
+                                    If ChangeValuesMem(bstack, b$, lang) Then GoTo loopcontinue1
                            Case 3
                                     If ChangeValuesArray(bstack, b$) Then GoTo loopcontinue1
                            End Select
                 End If
             ElseIf IsStrExp(bstack, b$, ss$) Then
-                    append_table bstack, ss$, b$, True, Lang
+                    append_table bstack, ss$, b$, True, lang
                 GoTo loopcontinue1
                  End If
   BadUseofReturn
        interpret = False
        GoTo there1
             Case "CONST", "стахеяг", "стахеяес"
-            ConstNew bstack, b$, w$, True, Lang
+            ConstNew bstack, b$, w$, True, lang
                     If LastErNum = -1 Then
                     interpret = False
                     GoTo there1
@@ -16037,7 +16100,7 @@ Case "RETURN", "епистяожг"
                     If comhash.Find2(w$, i, v) Then
                         If v <> 0 Then
                             If v = 32 Then
-                                If Not Identifier(bstack, w$, b$, True, Lang) Then
+                                If Not Identifier(bstack, w$, b$, True, lang) Then
                                     If NOEXECUTION Then
                                             MyEr "", ""
                                             interpret = False
@@ -16050,7 +16113,7 @@ Case "RETURN", "епистяожг"
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
                               SetNextLineNL b$
-                              ElseIf Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
+                              ElseIf Not ProcModuleEntry(bstack, "", 0, b$, lang) Then
                                     If MOUT And b$ = vbNullString Then
                                     Else
                                         MyErMacro b$, "unknown identifier " & w$, "╒ЦМЫСТО АМАЦМЫЯИСТИЙЭ " & w$
@@ -16073,7 +16136,7 @@ Case "RETURN", "епистяожг"
                     
                     If i <> 0 Then
                      If Not IsBadCodePtr(i) Then
-                        If Not CallByPtr(i, bstack, b$, Lang) Then
+                        If Not CallByPtr(i, bstack, b$, lang) Then
                                If NOEXECUTION Then
                                     MyEr "", ""
                                     interpret = False
@@ -16082,7 +16145,7 @@ Case "RETURN", "епистяожг"
                         End If
                         End If
                     Else
-                            If Not Identifier(bstack, w$, b$, Not comhash.Find(w$, i1), Lang) Then
+                            If Not Identifier(bstack, w$, b$, Not comhash.Find(w$, i1), lang) Then
                             
                                     If NOEXECUTION Then
                                     MyEr "", ""
@@ -16092,7 +16155,7 @@ Case "RETURN", "епистяожг"
                             End If
                     End If
                     
-                    ElseIf Not Identifier(bstack, w$, b$, Not comhash.Find(w$, i1), Lang) Then
+                    ElseIf Not Identifier(bstack, w$, b$, Not comhash.Find(w$, i1), lang) Then
                     
                             If NOEXECUTION Then
                             MyEr "", ""
@@ -16106,7 +16169,7 @@ Case "RETURN", "епистяожг"
                               bstack.callohere = ""
                               b$ = NLtrim(b$)
                               SetNextLineNL b$
-                              ElseIf Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
+                              ElseIf Not ProcModuleEntry(bstack, "", 0, b$, lang) Then
                                           If MOUT And b$ = vbNullString Then
                                 Else
                                     MyErMacro b$, "unknown identifier " & w$, "╒ЦМЫСТО АМАЦМЫЯИСТИЙЭ " & w$
@@ -16876,7 +16939,7 @@ interpret = b$ = vbNullString
 there1:
 bstack.LoadOnly = False
 End Function
-Function StaticNew(bstack As basetask, b$, w$, Lang As Long) As Boolean
+Function StaticNew(bstack As basetask, b$, w$, lang As Long) As Boolean
 Dim p As Variant, ii As Long, ss$, aaa As mHandler
 
 If bstack.StaticCollection Is Nothing Then
@@ -16935,51 +16998,51 @@ Do
                 End If
                
 '                bstack.SetVarobJ w$, aaa
-            ElseIf IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+            ElseIf IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
     
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17024,51 +17087,51 @@ Do
         If Not bstack.ExistVar(w$) Then
             If FastSymbol(b$, "=") Then
             If Not IsExp(bstack, b$, p) Then SyntaxError: Exit Function
-            ElseIf IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+            ElseIf IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
     
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
                         p = 0
                     End If
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17102,7 +17165,7 @@ conthere:
     End Select
  Loop Until Not FastSymbol(b$, ",")
 End Function
-Function ConstNew(bstack As basetask, b$, w$, makeallglobal As Boolean, Lang As Long) As Boolean
+Function ConstNew(bstack As basetask, b$, w$, makeallglobal As Boolean, lang As Long) As Boolean
 Dim p As Variant, ii As Long, ss$, what As Long
     Dim cv As Constant
     Do
@@ -17122,9 +17185,9 @@ Dim p As Variant, ii As Long, ss$, what As Long
         End If
         End If
         p = 0
-    If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+    If IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
     
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17132,7 +17195,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17140,7 +17203,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17148,7 +17211,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17156,7 +17219,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17164,7 +17227,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17172,7 +17235,7 @@ Dim p As Variant, ii As Long, ss$, what As Long
                         Exit Function
                     End If
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then
                     If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     Else
@@ -17266,7 +17329,7 @@ Dim pppp As mArray, bb$, Us$, ec$, i As Long, jump As Boolean, slct As Long, sp 
 If linebyline Then IFCTRL = bstack.IFCTRL: jump = bstack.jump
 Dim w$, LLL As Long, sss As Long, v As Long, p As Variant, ss$, lbl As Boolean, st As Variant, bs As basetask
 Dim y As Double, sX As Double, VarStat As Boolean, NewStat As Boolean
-Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, SBB$, nd&, Lang As Long, kolpo As Boolean, iscom As Boolean
+Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, SBB$, nd&, lang As Long, kolpo As Boolean, iscom As Boolean
 Dim temphere$
 
 If loopthis Then Execute = 2 Else Execute = 1
@@ -17377,8 +17440,8 @@ If jump Or IFCTRL = 2 Then
             While FastOperator(b$, vbCrLf, i, 2)
             Wend
 
-If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
-If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
 End If
 
     
@@ -17394,8 +17457,8 @@ SetNextLine b$
  sss = Len(b$)
 lbl = True
 If jump Or IFCTRL = 2 Then
-If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
-If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
 End If
 
 If sss > 0 Then GoTo again1
@@ -17458,7 +17521,7 @@ Execute = 0
 Exit Function
 End If
 iscom = True
-Select Case IsLabelDotSub(temphere$, b$, w$, ss$, Lang, nchr)
+Select Case IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
 Case 1234, 0
 VarStat = False
 NewStat = False
@@ -17496,7 +17559,7 @@ End If
 again2:
 If MaybeIsSymbol(b$, "@") Then w$ = vbNullString: GoTo parsecommand
 again3:
-x1 = IsLabelDotSub(temphere$, b$, w$, ss$, Lang, nchr)
+x1 = IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
 again4:
 Select Case x1
 Case 1234
@@ -17566,7 +17629,7 @@ ElseIf Not comhash.Find2(w$, i, v) Then
           ElseIf i <> 0 Then
              If Not IsBadCodePtr(i) Then
              On Error GoTo myerr1
-                        If CallByPtr(i, bstack, b$, Lang) Then
+                        If CallByPtr(i, bstack, b$, lang) Then
                             LLL = 0 ' maybe b$ changed inside the call if LLL=len(b$) then we exit from loop
                             GoTo conthere222
                         Else
@@ -17694,7 +17757,7 @@ ContScan:
                 End If
         Case "REFRESH", "амамеысг"
 contRefr:
-        If IsLabelSymbolNew(b$, "дойилг", "TEST", Lang) Then
+        If IsLabelSymbolNew(b$, "дойилг", "TEST", lang) Then
         MyDoEvents1 di
         ElseIf IsExp(bstack, b$, p) Then
                 With Prefresh(GetCode(di))
@@ -17729,31 +17792,31 @@ contRefr:
                 FKey = 0
 Case "статийг", "статийес", "STATIC"
 contStatic:
- StaticNew bstack, b$, w$, Lang
+ StaticNew bstack, b$, w$, lang
 Case "мгла", "THREAD"
 contThread:
 Us$ = vbNullString
-If IsLabelSymbolNewExp(b$, "хесе", "SET", Lang, Us$) Then
+If IsLabelSymbolNewExp(b$, "хесе", "SET", lang, Us$) Then
 If bstack.Process Is Nothing Then GoTo dothesame
-If Not StaticNew(bstack, b$, w$, Lang) Then Execute = 0: Exit Function
-ElseIf IsLabelSymbolNewExp(b$, "ауто", "THIS", Lang, Us$) Then
+If Not StaticNew(bstack, b$, w$, lang) Then Execute = 0: Exit Function
+ElseIf IsLabelSymbolNewExp(b$, "ауто", "THIS", lang, Us$) Then
       If bstack.Process Is Nothing Then
 dothesame:
                 b$ = vbNullString
                 NoThisInThread
                 Execute = 0: Exit Function
                 once = False
-            ElseIf IsLabelSymbolNewExp(b$, "сбгсе", "ERASE", Lang, Us$) Then
+            ElseIf IsLabelSymbolNewExp(b$, "сбгсе", "ERASE", lang, Us$) Then
          Set bstack.Process.Process = Nothing
 
                 b$ = vbNullString ' get lost now
-            ElseIf IsLabelSymbolNewExp(b$, "йяата", "HOLD", Lang, Us$) Then
+            ElseIf IsLabelSymbolNewExp(b$, "йяата", "HOLD", lang, Us$) Then
                 bstack.Process.busy = True
          
-            ElseIf IsLabelSymbolNewExp(b$, "нейима", "RESTART", Lang, Us$) Then
+            ElseIf IsLabelSymbolNewExp(b$, "нейима", "RESTART", lang, Us$) Then
                 bstack.Process.busy = False
                 b$ = vbNullString
-            ElseIf IsLabelSymbolNewExp(b$, "йахе", "INTERVAL", Lang, Us$) Then
+            ElseIf IsLabelSymbolNewExp(b$, "йахе", "INTERVAL", lang, Us$) Then
                                  If IsExp(bstack, b$, p) Then
                                      If p < 2 Then p = 2
                                      
@@ -17776,7 +17839,7 @@ dothesame:
         Execute = Execute(bstack, b$, once, False)
          Exit Do
         End If
-            If Not MyThread(bstack, b$, Lang) Then Execute = 0: Exit Function
+            If Not MyThread(bstack, b$, lang) Then Execute = 0: Exit Function
                If Left$(here$ & "#", 1) = "!" Then here$ = Mid$(here$, 2)
             End If
         Case "LOOP", "йуйкийа"
@@ -17831,7 +17894,7 @@ ContReturn:
                             If ChangeValues(bstack, b$) Then GoTo loopcontinue
                             
                      Case 2
-                              If ChangeValuesMem(bstack, b$, Lang) Then GoTo loopcontinue
+                              If ChangeValuesMem(bstack, b$, lang) Then GoTo loopcontinue
                      Case 3
                               If ChangeValuesArray(bstack, b$) Then GoTo loopcontinue
                      End Select
@@ -17841,7 +17904,7 @@ ContReturn:
        Execute = 0
        Exit Function
        ElseIf IsStrExp(bstack, b$, ss$) Then
-            append_table bstack, ss$, b$, True, Lang
+            append_table bstack, ss$, b$, True, lang
         Else
         If LastErNum <> 0 Then
         
@@ -17873,12 +17936,12 @@ ContReturn:
        Case "END", "текос"
 ContEnd:
     WaitShow = 0
-                If IsLabelSymbolNew(b$, "яоутимас", "SUB", Lang) Then
+                If IsLabelSymbolNew(b$, "яоутимас", "SUB", lang) Then
                 once = False
                 b$ = Chr$(0)
                 Execute = 2
                 Exit Function
-                ElseIf IsLabelSymbolNew(b$, "епикоцгс", "SELECT", Lang) Then
+                ElseIf IsLabelSymbolNew(b$, "епикоцгс", "SELECT", lang) Then
                NoCommandOrBlock
                 Execute = 1
                 Exit Function
@@ -17897,13 +17960,13 @@ ContEnd:
          ''\\"SUB", "яоутима"
 ContExit:
         Us$ = vbNullString
-        If IsLabelSymbolNewExp(b$, "яоутимас", "SUB", Lang, Us$) Then
+        If IsLabelSymbolNewExp(b$, "яоутимас", "SUB", lang, Us$) Then
         WaitShow = 0
                 once = False
                 b$ = Chr$(0)
                 Execute = 2
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(b$, "циа", "FOR", Lang, Us$) Then
+        ElseIf IsLabelSymbolNewExp(b$, "циа", "FOR", lang, Us$) Then
 exitfor:
          once = False
                 
@@ -17930,7 +17993,7 @@ exitfor:
              End If
         
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(b$, "ейтупысгс", "PRINTING", Lang, Us$) Then
+        ElseIf IsLabelSymbolNewExp(b$, "ейтупысгс", "PRINTING", lang, Us$) Then
         If bstack.toprinter Then
                     pnum = 0
                     oprinter.ClearUp
@@ -18073,7 +18136,7 @@ cont10456:
         Exit Function
         End If
 eos:
-        If IsLabelSymbolNew(b$, "еыс", "TO", Lang) Then
+        If IsLabelSymbolNew(b$, "еыс", "TO", lang) Then
         If IsExp(bstack, b$, sp) Then
         If nd& = 4 Then
         sp = MyRound(sp, 0)
@@ -18092,7 +18155,7 @@ eos:
                 st = Sgn(sp - p)
                 End If
                 
-        If IsLabelSymbolNew(b$, "ама", "STEP", Lang) Then
+        If IsLabelSymbolNew(b$, "ама", "STEP", lang) Then
         If VarType(p) = vbSingle Then
             st = CSng(1)
         End If
@@ -18216,7 +18279,7 @@ If x1 = 1 Then
                         If y1 And ss$ = "NEXT" Then
                                     If sX = p Then
 contbasicfor:
-                                            If Lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еп╪лемо " + SBB$
+                                            If lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еп╪лемо " + SBB$
                                             If search2KIND(b$, ss$, x1, True) Then
                                                           b$ = Mid$(b$, x1 + Len(w$))
                                                           bstack.RetStack.drop 2
@@ -18225,7 +18288,7 @@ contbasicfor:
                                                           v = -1
                                               
                                                           GoTo again1
-                                             ElseIf Not Lang Then ss$ = "еполемо " + SBB$
+                                             ElseIf Not lang Then ss$ = "еполемо " + SBB$
                                                     If search2KIND(b$, ss$, x1, True) Then
                                                           b$ = Mid$(b$, x1 + Len(w$))
                                                           bstack.RetStack.drop 2
@@ -18312,7 +18375,7 @@ Do
             If Execute = 2 And ss$ <> "" And Not ok Then
             If y1 And ss$ = "NEXT" Then
             If sX = p Then
-            If Lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еполемо " + SBB$
+            If lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еполемо " + SBB$
             If search2KIND(b$, ss$, x1, True) Then
             b$ = Mid$(b$, x1 + Len(w$))
             bstack.RetStack.drop 2
@@ -18322,7 +18385,7 @@ Do
             v = -1
             '' Set pppp = Nothing
             GoTo again1
-            ElseIf Not Lang Then ss$ = "еп╪лемо " + SBB$
+            ElseIf Not lang Then ss$ = "еп╪лемо " + SBB$
             If search2KIND(b$, ss$, x1, True) Then
             b$ = Mid$(b$, x1 + Len(w$))
             bstack.RetStack.drop 2
@@ -18389,7 +18452,7 @@ Do
             If Execute = 2 And ss$ <> "" And Not ok Then
             If y1 And ss$ = "NEXT" Then
             If sX = p Then
-            If Lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еполемо " + SBB$
+            If lang Then ss$ = "NEXT " + SBB$ Else ss$ = "еполемо " + SBB$
             If search2KIND(b$, ss$, x1, True) Then
             b$ = Mid$(b$, x1 + Len(w$))
             bstack.RetStack.drop 2
@@ -18398,7 +18461,7 @@ Do
             v = -1
             '' Set pppp = Nothing
             GoTo again1
-            ElseIf Not Lang Then ss$ = "еп╪лемо " + SBB$
+            ElseIf Not lang Then ss$ = "еп╪лемо " + SBB$
                         If search2KIND(b$, ss$, x1, True) Then
             b$ = Mid$(b$, x1 + Len(w$))
             bstack.RetStack.drop 2
@@ -18539,7 +18602,7 @@ contNext:
         Case "CALL", "йакесе"
         ' CHECK FOR NUMBER...
 contCall:
-        NeoCall objptr(bstack), b$, Lang, ok
+        NeoCall objptr(bstack), b$, lang, ok
         If Not ok Then
         Execute = 0
         Exit Function
@@ -18548,14 +18611,14 @@ contCall:
         Case "INLINE", "емхесг"
 ContInline:
                If once = True Then Execute = 0: Exit Function
-        If IsLabelSymbolNew(b$, "йыдийа", "CODE", Lang) Then
+        If IsLabelSymbolNew(b$, "йыдийа", "CODE", lang) Then
         If IsLabelDot(here$, b$, sw$) = 1 Then
                 If GetSub(myUcase(sw$, True), nd&) Then
                 
                 WaitShow = Len(b$)
                 bstack.addlen = 0
                 If IsSymbol(b$, ",") Then
-                If Lang = 1 Then
+                If lang = 1 Then
                 b$ = vbCrLf + "Inline code " + b$
                 Else
                 b$ = vbCrLf + "╦МХЕСГ йЧДИЙА " + b$
@@ -18638,7 +18701,7 @@ contBinary:
         If FastSymbol(b$, "{") Then
         ss$ = block(b$)
         If Not FastSymbol(b$, "}", True) Then Exit Do
-            If Not GetRes(bstack, b$, Lang, ss$, var()) Then
+            If Not GetRes(bstack, b$, lang, ss$, var()) Then
                 Execute = 0: Exit Function
             End If
             Execute = 1
@@ -18653,7 +18716,7 @@ contPart:
         ss$ = block(b$)
         x2 = Len(b$)
         If Not FastSymbol(b$, "}", True) Then Exit Do
-        If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+        If IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
           ' search for variable name only
             ok = False
             If Abs(IsLabel(bstack, b$, w$)) = 1 Then
@@ -18723,7 +18786,7 @@ ContRepeat:
                       sss = Len(b$)
                     ec$ = ss$
                  ' FIND UNTIL
-                 If IsLabelSymbolNew(b$, "левяи", "UNTIL", Lang) Then
+                 If IsLabelSymbolNew(b$, "левяи", "UNTIL", lang) Then
                       Execute = 1
                       TraceRestore bstack, y1
                         
@@ -18794,7 +18857,7 @@ ContRepeat:
               End If
                  Else
                  ' play always
-                 If IsLabelSymbolNew(b$, "памта", "ALWAYS", Lang) Then
+                 If IsLabelSymbolNew(b$, "памта", "ALWAYS", lang) Then
                       Do
                  ss$ = ec$
                  
@@ -19123,7 +19186,7 @@ ContElse:
                 sss = Len(b$)
         Case "TRY", "дес"
 ContTry:
-                If IsLabelSymbolNew(b$, "яеула", "STREAM", Lang) Then
+                If IsLabelSymbolNew(b$, "яеула", "STREAM", lang) Then
  'Debug.Print bstack.CallW
  'Debug.Print bstack.fHere
     If bstack.CallW <> "" Then
@@ -19247,8 +19310,8 @@ contElseIf:
             While FastOperator(b$, vbCrLf, i, 2)
             Wend
             
-            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
-            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
             
           
         Else   ' ONLY FOR NOT JUMP
@@ -19315,8 +19378,8 @@ contElseIf:
                                   i = 1
             While FastOperator(b$, vbCrLf, i, 2)
             Wend
-        If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
-        If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+        If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+        If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
         End If
            Case Else
            Execute = 0
@@ -19414,8 +19477,8 @@ End If
                       i = 1
             While FastOperator(b$, vbCrLf, i, 2)
             Wend
-            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
-            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+            If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", lang) Then GoTo contElseIf
+            If IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then GoTo ContElse
             If MaybeIsSymbol(b$, "0123456789") Then
                         GoTo ContGoto
             End If
@@ -19437,16 +19500,16 @@ End If
 contSelect:
         Us$ = vbNullString
         If once = True Then Execute = 0: Exit Function
-        If exeSelect(Execute, once, bstack, b$, v, Lang) Then Exit Function
+        If exeSelect(Execute, once, bstack, b$, v, lang) Then Exit Function
         
          sss = Len(b$)
         Case "апо", "ON"                 '************************************* ON NUMBER GOTO LABELS
 ContOn:
         If IsExp(bstack, b$, p) Then
-        y1 = IsLabelSymbolNew(b$, "пяос", "GOTO", Lang)
+        y1 = IsLabelSymbolNew(b$, "пяос", "GOTO", lang)
         y2 = False
         If Not y1 Then
-        y1 = IsLabelSymbolNew(b$, "диалесоу", "GOSUB", Lang, True)
+        y1 = IsLabelSymbolNew(b$, "диалесоу", "GOSUB", lang, True)
         y2 = True
         End If
             If y1 Then
@@ -19591,7 +19654,7 @@ contHereFromOn:
                 If FastSymbol(b$, ")") Then
                  PushStage bstack, False
                 bstack.RetStack.PushVal Len(b$)
-                If Lang Then
+                If lang Then
                 bstack.RetStack.PushStr "SUB " + w$
                 Else
                 bstack.RetStack.PushStr "яоутима " + w$
@@ -19677,7 +19740,7 @@ contNegLocal:
                     sss = Len(b$)
                     LLL = sss
                 iscom = True
-                    Select Case IsLabelDotSub(temphere$, b$, w$, ss$, Lang, nchr)
+                    Select Case IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
                     Case 1234, 0
                     GoTo errstat
                     Case 1
@@ -19706,15 +19769,15 @@ contNegLocal:
 contNegGlobal:
                 If NewStat Then LocaleAndGlobal: Execute = 0: Exit Function
                 If Not VarStat Then
-                If IsLabelSymbolNew(b$, "олада", "GROUP", Lang) Then
+                If IsLabelSymbolNew(b$, "олада", "GROUP", lang) Then
                     ' group can't used as variable because exist read only variable
                     ' which pop group from stack
-               If Not ProcGroup(1, bstack, b$, Lang) Then Execute = 0: Exit Function
-               ElseIf IsLabelSymbolNew(b$, "цецомос", "EVENT", Lang) Then
+               If Not ProcGroup(1, bstack, b$, lang) Then Execute = 0: Exit Function
+               ElseIf IsLabelSymbolNew(b$, "цецомос", "EVENT", lang) Then
                 If MaybeIsSymbol(b$, "=") Then
                 
                 VarStat = True
-                    If Lang = 0 Then
+                    If lang = 0 Then
                     w$ = "цецомос"
                        Else
                     w$ = "EVENT"
@@ -19722,12 +19785,12 @@ contNegGlobal:
                     sss = Len(b$)
                     GoTo VarOnly
                 End If
-                If Not GlobalEVENT(bstack, b$, Lang) Then Execute = 0: Exit Function
-                ElseIf IsLabelSymbolNew(b$, "йатастасг", "INVENTORY", Lang) Then
+                If Not GlobalEVENT(bstack, b$, lang) Then Execute = 0: Exit Function
+                ElseIf IsLabelSymbolNew(b$, "йатастасг", "INVENTORY", lang) Then
                 If MaybeIsSymbol(b$, "=") Then
                 
                 VarStat = True
-                    If Lang = 0 Then
+                    If lang = 0 Then
                     w$ = "йатастасг"
                        Else
                     w$ = "INVENTORY"
@@ -19735,16 +19798,16 @@ contNegGlobal:
                     sss = Len(b$)
                     GoTo VarOnly
                 End If
-                If IsLabelSymbolNew(b$, "оуяа", "QUEUE", Lang) Then
-                    If Not GlobalHandler(bstack, b$, Lang, 3) Then Execute = 0: Exit Function
+                If IsLabelSymbolNew(b$, "оуяа", "QUEUE", lang) Then
+                    If Not GlobalHandler(bstack, b$, lang, 3) Then Execute = 0: Exit Function
                 Else
-                    If Not GlobalHandler(bstack, b$, Lang, 1) Then Execute = 0: Exit Function
+                    If Not GlobalHandler(bstack, b$, lang, 1) Then Execute = 0: Exit Function
                 End If
-                ElseIf IsLabelSymbolNew(b$, "диаяхяысг", "BUFFER", Lang) Then
+                ElseIf IsLabelSymbolNew(b$, "диаяхяысг", "BUFFER", lang) Then
                            If MaybeIsSymbol(b$, "=") Then
                 
                 VarStat = True
-                    If Lang = 0 Then
+                    If lang = 0 Then
                     w$ = "диаяхяысг"
                        Else
                     w$ = "BUFFER"
@@ -19752,7 +19815,7 @@ contNegGlobal:
                     sss = Len(b$)
                     GoTo VarOnly
                 End If
-                If Not GlobalHandler(bstack, b$, Lang, 2) Then Execute = 0: Exit Function
+                If Not GlobalHandler(bstack, b$, lang, 2) Then Execute = 0: Exit Function
                 Else
                 GoTo CONT12212
                End If
@@ -19766,7 +19829,7 @@ CONT12212:
                 
                     LLL = sss
                 iscom = True
-                    Select Case IsLabelDotSub(temphere$, b$, w$, ss$, Lang, nchr)
+                    Select Case IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
                     Case 1234, 0
                     GoTo errstat
                     Case 1
@@ -19775,7 +19838,7 @@ CONT12212:
                     IsLabel bstack, ss$, w$
                     ElseIf comhash.Find2(w$, i, v) Then
                     If i = 0 And v = 36 Then
-                    ConstNew bstack, b$, w$, True, Lang
+                    ConstNew bstack, b$, w$, True, lang
                     
                     If LastErNum = -1 Then
                     Execute = 0
@@ -19806,7 +19869,7 @@ CONT12212:
                   End If
         Case "CONST", "стахеяг", "стахеяес"
 makeconst:
-        ConstNew bstack, b$, w$, here$ = vbNullString, Lang
+        ConstNew bstack, b$, w$, here$ = vbNullString, lang
          If LastErNum = -1 Then
                     Execute = 0
                     Exit Function
@@ -19821,7 +19884,7 @@ iscom = False
 End If
 VarOnly:
 
-On ExecuteVar(Execute, 1, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 1, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 
 If NoOptimum Then
 If GetSub(w$, v) Then
@@ -19831,7 +19894,7 @@ End If
 parsecommand:
                 'If VarStat Or NewStat Then GoTo errstat
 
-If Not Identifier(bstack, w$, b$, iscom, Lang) Then
+If Not Identifier(bstack, w$, b$, iscom, lang) Then
 
 
 conthere111:
@@ -19845,7 +19908,7 @@ Set bstack.lastpointer = Nothing
 Exit Function
 Else
     If bstack.callx1 > 0 Then
-    If Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
+    If Not ProcModuleEntry(bstack, "", 0, b$, lang) Then
                   If MOUT And b$ = vbNullString Then
         Else
             unknownid b$, w$
@@ -19886,19 +19949,19 @@ lbl = False
 sss = Len(b$)
 Case 3
 contcase3:
-On ExecuteVar(Execute, 3, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 3, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 Case 4
 contcase4:
-On ExecuteVar(Execute, 4, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 4, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 Case 5
 contcase5:
-On ExecuteVar(Execute, 5, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 5, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 Case 6
 contcase6:
-On ExecuteVar(Execute, 6, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 6, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 Case 7
 contcase7:
-On ExecuteVar(Execute, 7, bstack, w$, b$, v, Lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
+On ExecuteVar(Execute, 7, bstack, w$, b$, v, lang, VarStat, NewStat, nchr, ss$, sss, temphere$) GoTo exitdo, autogosub, loopagain, contVarNew, again3, parsecommand, loopcontinue, exitfunc, forpointers, forfloatpointers
 Case Else
 If MaybeIsSymbol(b$, ".") Then
 b$ = NLtrim$(b$)
@@ -19968,7 +20031,7 @@ If Len(b$) > 1 Then
         If Not bstack.lastpointer Is Nothing Then
           '  Mid$(b$, 1, 1) = " "
             nchr = 0
-            x1 = IsLabelDotSub(temphere$, b$, w$, ss$, Lang, nchr)
+            x1 = IsLabelDotSub(temphere$, b$, w$, ss$, lang, nchr)
             With bstack.lastpointer
            If x1 = 0 Then
            
@@ -21009,7 +21072,7 @@ RepPara = True
             End If
         End If
 End Function
-Function IdPara(basestack As basetask, rest$, Lang As Long) As Boolean
+Function IdPara(basestack As basetask, rest$, lang As Long) As Boolean
 Dim x1 As Long, y1 As Long, i As Long, it As Long, vvl As Variant
 Dim x As Double, y As Double, s$, what$, w3 As Long, W4 As Long
 Dim xa As Long, ya As Long
@@ -21017,7 +21080,7 @@ Dim pppp As mArray
 
 
 IdPara = True
-If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
         If Not IsExp(basestack, rest$, y) Then
             MissNumExpr
             IdPara = False
@@ -21283,44 +21346,44 @@ If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
 End If
 
 End Function
-Function IdentifierGroup(basestack As basetask, what$, rest$, Lang As Long) As Boolean
+Function IdentifierGroup(basestack As basetask, what$, rest$, lang As Long) As Boolean
     IdentifierGroup = True
     Select Case what$
     Case "&"
-       IdentifierGroup = MyFunction(2, basestack, rest$, Lang)
+       IdentifierGroup = MyFunction(2, basestack, rest$, lang)
         Exit Function
     Case "FUNCTION", "сумаятгсг"
-        IdentifierGroup = MyFunction(0, basestack, rest$, Lang, True)
+        IdentifierGroup = MyFunction(0, basestack, rest$, lang, True)
         Exit Function
     Case "MODULE", "тлгла"
-        IdentifierGroup = MyModule(basestack, rest$, Lang, True)
+        IdentifierGroup = MyModule(basestack, rest$, lang, True)
         Exit Function
     Case "SUPERCLASS", "упеяйкасг"
-        IdentifierGroup = ProcClass(basestack, rest$, Lang, True)
+        IdentifierGroup = ProcClass(basestack, rest$, lang, True)
     Exit Function
     Case "GROUP", "олада"
-      IdentifierGroup = ProcGroup(0, basestack, rest$, Lang)
+      IdentifierGroup = ProcGroup(0, basestack, rest$, lang)
       Exit Function
     Case "CLASS", "йкасг"
-        IdentifierGroup = ProcClass(basestack, rest$, Lang, False)
+        IdentifierGroup = ProcClass(basestack, rest$, lang, False)
     Exit Function
     Case "DIM", "пимайас", "пимайес"
-        IdentifierGroup = MyDim(basestack, rest$, Lang)
+        IdentifierGroup = MyDim(basestack, rest$, lang)
         Exit Function
     Case "йатастасг", "INVENTORY"
-        IdentifierGroup = ProcInventory(basestack, rest$, Lang)
+        IdentifierGroup = ProcInventory(basestack, rest$, lang)
         Exit Function
     Case "диаяхяысг", "BUFFER"
-        IdentifierGroup = ProcBuffer(basestack, rest$, Lang)
+        IdentifierGroup = ProcBuffer(basestack, rest$, lang)
         Exit Function
     Case "EVENT", "цецомос"
-     IdentifierGroup = myEvent(basestack, rest$, Lang)
+     IdentifierGroup = myEvent(basestack, rest$, lang)
      Exit Function
     Case "DOCUMENT", "еццяажо"
-      IdentifierGroup = MyDocument(basestack, rest$, Lang)
+      IdentifierGroup = MyDocument(basestack, rest$, lang)
     End Select
 End Function
-Function Identifier(basestack As basetask, what$, rest$, Optional nocom As Boolean = False, Optional Lang As Long = 1) As Boolean
+Function Identifier(basestack As basetask, what$, rest$, Optional nocom As Boolean = False, Optional lang As Long = 1) As Boolean
 Dim x1 As Long, y1 As Long, it As Long, ohere$, s$, par As Boolean, p As Variant
 If Not TaskMaster Is Nothing Then
 If TaskMaster.PlayMusic Then
@@ -21338,7 +21401,7 @@ If what$ = vbNullString Then
      
     If Not Identifier Then Exit Function
     what$ = myUcase(what$)
-    Lang = codeW(what$)
+    lang = codeW(what$)
 Else
     Identifier = True
     x1 = Len(rest$)
@@ -21350,59 +21413,59 @@ Else
 End If
 Select Case what$
 Case "&"
-   Identifier = MyFunction(2, basestack, rest$, Lang)
+   Identifier = MyFunction(2, basestack, rest$, lang)
     Exit Function
 Case "амакутгс", "PROFILER"  ' no Neo...
 Identifier = True
 prof.MARKONE
 Exit Function
 Case "FUNCTION", "сумаятгсг"
-    Identifier = MyFunction(0, basestack, rest$, Lang)
+    Identifier = MyFunction(0, basestack, rest$, lang)
     Exit Function
 Case "MODULE", "тлгла"
-    Identifier = MyModule(basestack, rest$, Lang)
+    Identifier = MyModule(basestack, rest$, lang)
     Exit Function
 Case "SUPERCLASS", "упеяйкасг"
-    Identifier = ProcClass(basestack, rest$, Lang, True)
+    Identifier = ProcClass(basestack, rest$, lang, True)
 Exit Function
 Case "EVENT", "цецомос"
- Identifier = myEvent(basestack, rest$, Lang)
+ Identifier = myEvent(basestack, rest$, lang)
  Exit Function
 Case "GROUP", "олада"
-  Identifier = ProcGroup(0, basestack, rest$, Lang)
+  Identifier = ProcGroup(0, basestack, rest$, lang)
   Exit Function
 Case "CLASS", "йкасг"
-    Identifier = ProcClass(basestack, rest$, Lang, False)
+    Identifier = ProcClass(basestack, rest$, lang, False)
 Exit Function
 Case "DIM", "пимайас", "пимайес"
-    Identifier = MyDim(basestack, rest$, Lang)
+    Identifier = MyDim(basestack, rest$, lang)
     Exit Function
 Case "йатастасг", "INVENTORY"
-    Identifier = ProcInventory(basestack, rest$, Lang)
+    Identifier = ProcInventory(basestack, rest$, lang)
     Exit Function
 Case "диаяхяысг", "BUFFER"
-    Identifier = ProcBuffer(basestack, rest$, Lang)
+    Identifier = ProcBuffer(basestack, rest$, lang)
     Exit Function
 Case "WAIT", "амаломг"  '' copy to NeoWait
 Identifier = MyDelay(basestack, rest$)
 Exit Function
 Case "REPORT", "амажояа"
-Identifier = MyReport(basestack, rest$, Lang)
+Identifier = MyReport(basestack, rest$, lang)
 Exit Function
 Case "LET", "стг", "стгм", "сто"  'ok
-Identifier = MyLet(basestack, rest$, Lang)
+Identifier = MyLet(basestack, rest$, lang)
 Exit Function
 Case "COMMIT", "амехесе"
-Identifier = MyRead(3, basestack, rest$, Lang)
+Identifier = MyRead(3, basestack, rest$, lang)
 Exit Function
 Case "ICON", "еийомидио"
 Identifier = MyIcon(basestack, rest$)
 Exit Function
 Case "TITLE", "титкос"
-Identifier = ProcTitle(basestack, rest$, Lang)
+Identifier = ProcTitle(basestack, rest$, lang)
 Exit Function
 Case "ESCAPE", "диажуцг"
-Identifier = MyEscape(rest$, Lang)
+Identifier = MyEscape(rest$, lang)
 Case "HIDE", "сбгсе"
 newHide basestack
 Exit Function
@@ -21410,13 +21473,13 @@ Case "SHOW", "амаье"
 newshow basestack
 Exit Function
 Case "WRITE", "цяаье"
-Identifier = MyWrite(basestack, rest$, Lang)
+Identifier = MyWrite(basestack, rest$, lang)
 Exit Function
 Case "TEXT", "йеилемо", "HTML"  'ok
 Identifier = ProcText(basestack, what$ = "HTML", rest$)
 Exit Function
 Case "STRUCTURE", "долг"  ' ok
-Identifier = myStructure(basestack, rest$, Lang)
+Identifier = myStructure(basestack, rest$, lang)
 Exit Function
 Case "басг", "BASE"   'ok
 ' меа басг
@@ -21427,7 +21490,7 @@ NewTable basestack, rest$
 ' меос пимайас стгм басг
 Exit Function
 Case "ейтекесг", "EXECUTE"   'ok
- If IsLabelSymbolNew(rest$, "йыдийа", "CODE", Lang) Then
+ If IsLabelSymbolNew(rest$, "йыдийа", "CODE", lang) Then
 Identifier = ExecCode(basestack, rest$)
  Else
     CommExecAndTimeOut basestack, rest$
@@ -21435,10 +21498,10 @@ Identifier = ExecCode(basestack, rest$)
 End If
 ' меа киста
 Case "амайтгсг", "RETRIEVE"  'ok
-getrow basestack, rest$, , , Lang
+getrow basestack, rest$, , , lang
 Exit Function
 Case "амафгтгсг", "SEARCH"  'ok
-getrow basestack, rest$, , "", Lang
+getrow basestack, rest$, , "", lang
 Exit Function
 Case "пяосхгйг", "APPEND"  'ok
 ' басг,пимайас,стоивеиа
@@ -21454,7 +21517,7 @@ Exit Function
 Case "епистяожг", "RETURN"  ' no need here
 ' басг,"SELECT пимайас",стоивеиа
 If IsStrExp(basestack, rest$, s$) Then
-append_table basestack, s$, rest$, True, Lang
+append_table basestack, s$, rest$, True, lang
 End If
 Exit Function
 Case "сулпиесг", "COMPRESS"  'ok
@@ -21467,13 +21530,13 @@ Case "PRINTER", "ейтупытгс"  ' ok
 Identifier = ProcPrinter(basestack, rest$)
 Exit Function
 Case "MOTION", "йимгсг"
-Identifier = ProcMotion(basestack, rest$, Lang)
+Identifier = ProcMotion(basestack, rest$, lang)
 Exit Function
 Case "PAGE", "секида" 'ok
-ProcPage basestack, rest$, Lang
+ProcPage basestack, rest$, lang
 Exit Function
 Case "PRINTING", "ейтупысг"
- Identifier = ProcPrinting(basestack, rest$, Lang)
+ Identifier = ProcPrinting(basestack, rest$, lang)
  Exit Function
 Case "FORMLABEL", "етийета.жоялас"
 Identifier = ProcLabel(basestack, rest$)
@@ -21483,7 +21546,7 @@ Case "LEGEND", "епицяажг"
 Identifier = ProcLegend(basestack, rest$)
 Exit Function
 Case "MEDIA", "MOVIE", "таимиа", "MUSIC", "лоусийг"  ' ЛЭМО щМА ЙАИ ЛПОЯЕъ МА ПЕЯИЛщМЕИ ч МА ТО ДИЧНЕИ ЦИА эККО
-Identifier = ProcMedia(basestack, rest$, Lang)
+Identifier = ProcMedia(basestack, rest$, lang)
 Exit Function
 Case "PUT", "дысе"
 Identifier = MyPut(basestack, rest$)
@@ -21493,50 +21556,50 @@ Kform = True
 Identifier = MakeForm(basestack, rest$)
 Exit Function
 Case "SUBDIR", "упойатакоцос"
-    Identifier = ProcSubDir(basestack, rest$, Lang)
+    Identifier = ProcSubDir(basestack, rest$, lang)
 Exit Function
 Case "DIR", "йатакоцос"
-    Identifier = ProcDir(basestack, rest$, Lang)
+    Identifier = ProcDir(basestack, rest$, lang)
 Exit Function
 Case "START", "аявг"
     
     Identifier = newStart(basestack, rest$)
     Exit Function
 Case "REMOVE", "диацяажг"
-    Identifier = ProcRemove(basestack, rest$, Lang)
+    Identifier = ProcRemove(basestack, rest$, lang)
 Exit Function
 Case "DEF", "йаме"
-    Identifier = ProcDef(basestack, rest$, Lang)
+    Identifier = ProcDef(basestack, rest$, lang)
     Exit Function
 Case "LOAD", "жоятысе" '
-Identifier = ProcLoad(basestack, rest$, Lang)
+Identifier = ProcLoad(basestack, rest$, lang)
 Exit Function
 Case "SAVE", "сысе"
-Identifier = ProcSave(basestack, rest$, Lang)
+Identifier = ProcSave(basestack, rest$, lang)
 Exit Function
 Case "OVERWRITE", "йатавыягсг"
 Identifier = RepPara(basestack, rest$)
 Exit Function
 Case "INSERT", "паяелбокг"
-Identifier = IdPara(basestack, rest$, Lang)
+Identifier = IdPara(basestack, rest$, lang)
 Exit Function
 Case "LONG", "лайяус"
-Identifier = MyLong(basestack, rest$, Lang)
+Identifier = MyLong(basestack, rest$, lang)
 Exit Function
 Case "DOCUMENT", "еццяажо"
-Identifier = MyDocument(basestack, rest$, Lang)
+Identifier = MyDocument(basestack, rest$, lang)
 Exit Function
 Case "STOCK", "стой"
-Identifier = StockValues(basestack, rest$, Lang)
+Identifier = StockValues(basestack, rest$, lang)
 Exit Function
 Case "LINK", "емысе"
-Identifier = MyLink(basestack, rest$, Lang)
+Identifier = MyLink(basestack, rest$, lang)
 Exit Function
 Case "REFER", "апедысе"
-Identifier = MyRead(2, basestack, rest$, Lang)
+Identifier = MyRead(2, basestack, rest$, lang)
 Exit Function
 Case "READ", "диабасе"
-Identifier = MyRead(1, basestack, rest$, Lang)
+Identifier = MyRead(1, basestack, rest$, lang)
 Exit Function
 Case "DOUBLE", "дипка"
 SetDouble basestack.Owner
@@ -21545,16 +21608,16 @@ Case "NORMAL", "йамомийа"
 SetNormal basestack.Owner
 Exit Function
 Case "ERROR", "кахос"
-Identifier = MyError(basestack, rest$, Lang)
+Identifier = MyError(basestack, rest$, lang)
 Exit Function
 Case "SET", "хесе"
     Identifier = interpret(basestack, GetNextLine(rest$))
     Exit Function
 Case "NEW", "мео"
-    Identifier = MyNew(basestack, rest$, Lang)
+    Identifier = MyNew(basestack, rest$, lang)
     Exit Function
 Case "EDIT", "суццяажг", "с"
-    Identifier = ProcEdit(basestack, rest$, Lang)
+    Identifier = ProcEdit(basestack, rest$, lang)
     Exit Function
 Case "SCAN", "саяысе"
     Identifier = MyScan(basestack, rest$)
@@ -21566,13 +21629,13 @@ Case "охомг", "CLS"
     Identifier = ProcCls(basestack, rest$)
     Exit Function
 Case "HEX", "дейаен"
-    Identifier = RevisionPrint(basestack, rest$, 1, Lang)
+    Identifier = RevisionPrint(basestack, rest$, 1, lang)
     Exit Function
 Case "PRINT", "тупысе", "?"
-    Identifier = RevisionPrint(basestack, rest$, 0, Lang)
+    Identifier = RevisionPrint(basestack, rest$, 0, lang)
     Exit Function
 Case "BACK", "BACKGROUND", "пеяихыяио"
-    ProcBackGround basestack, rest$, Lang, Identifier
+    ProcBackGround basestack, rest$, lang, Identifier
     Exit Function
 Case "PUSH", "баке"
     par = MyPush(basestack, rest$)
@@ -21581,10 +21644,10 @@ Case "DATA", "сеияа"
     par = MyData(basestack, rest$)
     Exit Function
 Case "SWAP", "аккане"
-    Identifier = MySwap(basestack, rest$, Lang)
+    Identifier = MySwap(basestack, rest$, lang)
     Exit Function
 Case "CLOSE", "йкеисе"
-    Identifier = MyClose(basestack, rest$, Lang)
+    Identifier = MyClose(basestack, rest$, lang)
     Exit Function
 Case "SEEK", "летахесг"
     Identifier = MySeek(basestack, rest$)
@@ -21608,7 +21671,7 @@ Case "WORDS", "кенеис"
     Identifier = ProcWords(basestack, rest$)
     Exit Function
 Case "SORT", "танимолгсг"
-    Identifier = ProcSort(basestack, rest$, Lang)
+    Identifier = ProcSort(basestack, rest$, lang)
     Exit Function
 Case "OVER", "памы"  'амтицяажеи тгм йояужг
     Identifier = ProcOver(basestack, rest$)
@@ -21620,13 +21683,13 @@ Case "SHIFT", "жеяе"  'летайимеи стгм йояужг
     Identifier = ProcShift(basestack, rest$)
     Exit Function
 Case "DROP", "пета"
-    Identifier = ProcDrop(basestack, rest$, Lang)
+    Identifier = ProcDrop(basestack, rest$, lang)
     Exit Function
 Case "SCREEN.PIXELS", "амакусг.охомгс"
     Identifier = ProcScreenRes(basestack, rest$)
     Exit Function
 Case "SOUNDREC", "гвоцяажгсг"
-    Identifier = ProcSoundRec(basestack, rest$, Lang)
+    Identifier = ProcSoundRec(basestack, rest$, lang)
     Exit Function
 Case "KEYBOARD", "пкгйтяокоцио"
     Identifier = ProcKeyboard(basestack, rest$)
@@ -21641,7 +21704,7 @@ Case "GET", "паяе"
     Identifier = ProcGet(basestack, rest$)
     Exit Function
 Case "мгла", "THREAD"
-    Identifier = MyThread(basestack, rest$, Lang)
+    Identifier = MyThread(basestack, rest$, lang)
     Exit Function
 Case "HOLD", "йяатгсе"
     Identifier = ProcHold(basestack)
@@ -21650,16 +21713,16 @@ Case "RELEASE", "ажгсе"
     Identifier = ProcRelease(basestack)
     Exit Function
 Case "USE", "вягсг"
-    Identifier = ProcUSE(basestack, rest$, Lang)
+    Identifier = ProcUSE(basestack, rest$, lang)
     Exit Function
 Case "OPEN.FILE", "амоицла.аявеиоу"
-    Identifier = ProcOpenFile(basestack, rest$, Lang)
+    Identifier = ProcOpenFile(basestack, rest$, lang)
     Exit Function
 Case "OPEN.IMAGE", "амоицла.еийомас"
-    Identifier = ProcOpenImage(basestack, rest$, Lang)
+    Identifier = ProcOpenImage(basestack, rest$, lang)
     Exit Function
 Case "FLUSH", "адеиасе"
-    Identifier = ProcFlush(basestack, rest$, Lang)
+    Identifier = ProcFlush(basestack, rest$, lang)
     Exit Function
 Case "PROPERTIES", "идиотгтес"  ''for printer
     Identifier = ProcPropeties(basestack, rest$)
@@ -21678,13 +21741,13 @@ Case "WINDOW", "паяахуяо"
     ProcWindow basestack, rest$, basestack.Owner, Identifier
     Exit Function
 Case "FIELD", "педио"
-    Identifier = ProcField(basestack, rest$, Lang)
+    Identifier = ProcField(basestack, rest$, lang)
     Exit Function
 Case "TEST", "дойилг"
     Identifier = procTestMe(basestack, rest$, what$)
     Exit Function
 Case "MOUSE.ICON", "деийтг.лояжг"
-    i3MouseIcon basestack, rest$, Lang
+    i3MouseIcon basestack, rest$, lang
     Exit Function
 Case "MOTION.W", "йимгсг.п"
     Identifier = procMotionW(basestack, rest$)
@@ -21693,13 +21756,13 @@ Case "CLIPBOARD", "пяовеияо"
     Identifier = MyClipboard(basestack, rest$)
     Exit Function
 Case "богхеиа", "HELP"
-    Identifier = MyHelp(basestack, rest$, Lang)
+    Identifier = MyHelp(basestack, rest$, lang)
     Exit Function
 Case "CLEAR", "йахаяо"
     Identifier = MyClear(basestack, rest$)
     Exit Function
 Case "DECLARE", "ояисе"  'OBJECT
-    Identifier = MyDeclare(basestack, rest$, Lang)
+    Identifier = MyDeclare(basestack, rest$, lang)
     Exit Function
 Case "REM", "сгл"
     NeoRem 0, rest$, 0, Identifier
@@ -21708,19 +21771,19 @@ Case "VOLUME", "емтасг"
     Identifier = MyVol(basestack, rest$)
     Exit Function
 Case "ABOUT", "пеяи"
-    ProcAbout basestack, rest$, Lang
+    ProcAbout basestack, rest$, lang
     Exit Function
 Case "SMOOTH", "олака"
-        If IsLabelSymbolNew(rest$, "ови", "OFF", Lang) Then
+        If IsLabelSymbolNew(rest$, "ови", "OFF", lang) Then
         GDILines = False
-        ElseIf IsLabelSymbolNew(rest$, "маи", "ON", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "маи", "ON", lang) Then
         GDILines = True
         End If
     Exit Function
 Case "OPTIMIZATION", "бектистопоигсг"  '' not a
-        If IsLabelSymbolNew(rest$, "ови", "OFF", Lang) Then
+        If IsLabelSymbolNew(rest$, "ови", "OFF", lang) Then
         NoOptimum = True
-        ElseIf IsLabelSymbolNew(rest$, "маи", "ON", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "маи", "ON", lang) Then
         NoOptimum = False
         End If
     Exit Function
@@ -21737,19 +21800,19 @@ Case "GRADIENT", "жомто"
     Identifier = ProcGradient(basestack, rest$)
     Exit Function
 Case "CHOOSE.OBJECT", "епекене.амтийеилемо", "епикене.амтийеилемо"
-    ProcChooseObj basestack, rest$, Lang
+    ProcChooseObj basestack, rest$, lang
     Exit Function
 Case "CHOOSE.FONT", "епекене.цяаллатосеияа", "епикене.цяаллатосеияа"
-    ProcChooseFont basestack, Lang
+    ProcChooseFont basestack, lang
     Exit Function
 Case "INPUT", "еисацыцг"   ' ok
-    Identifier = MyInput(basestack, rest$, Lang)
+    Identifier = MyInput(basestack, rest$, lang)
     Exit Function
 Case "мглата", "THREADS"
-    procthreads basestack.Owner, basestack, rest$, Lang
+    procthreads basestack.Owner, basestack, rest$, lang
     Exit Function
 Case "ояио.амадяолгс", "RECURSION.LIMIT"
-    Identifier = ProcRecursionLimit(basestack, rest$, Lang)
+    Identifier = ProcRecursionLimit(basestack, rest$, lang)
     Exit Function
 Case "LOCALE", "топийо"
     Identifier = ProcSalata(3, basestack, rest$)
@@ -21761,22 +21824,22 @@ Case "CHARSET", "ваяайтгяес"
     Identifier = ProcSalata(1, basestack, rest$)
     Exit Function
 Case "STEP", "бгла"
-    Identifier = ProcStep(basestack, rest$, Lang)
+    Identifier = ProcStep(basestack, rest$, lang)
     Exit Function
 Case "MOVE", "хесг"
     Identifier = ProcMove(basestack, rest$)
     Exit Function
 Case "покуцымо", "POLYGON"
-    Identifier = ProcPoly(basestack, rest$, Lang)
+    Identifier = ProcPoly(basestack, rest$, lang)
     Exit Function
 Case "CIRCLE", "йуйкос"
-    Identifier = ProcCircle(basestack, rest$, Lang)
+    Identifier = ProcCircle(basestack, rest$, lang)
     Exit Function
 Case "PLAYER", "паийтгс"
-    Identifier = ProcPlayer(basestack, rest$, Lang)
+    Identifier = ProcPlayer(basestack, rest$, lang)
     Exit Function
 Case "IMAGE", "еийома"
-    Identifier = ProcImage(basestack, rest$, Lang)
+    Identifier = ProcImage(basestack, rest$, lang)
     Exit Function
 Case "SPRITE", "диажамо", "диажамеиа"
     ' ok NeoSprite exist
@@ -21788,7 +21851,7 @@ Case "SPRITE", "диажамо", "диажамеиа"
     If LastErNum1 <> 0 Then Identifier = False
     Exit Function
 Case "COPY", "амтецяаье", "амтицяаье"
-    Identifier = MyCopy(basestack, rest$, Lang)
+    Identifier = MyCopy(basestack, rest$, lang)
     Exit Function
 Case "паине", "PLAY"
     Identifier = MyPlayScore(basestack, rest$)
@@ -21797,7 +21860,7 @@ Case "SCORE", "жымг"
     Identifier = MyScore(basestack, rest$)
     Exit Function
 Case "TARGETS", "стовои"
-    Identifier = ProcTargets(basestack, rest$, Lang)
+    Identifier = ProcTargets(basestack, rest$, lang)
     Exit Function
 Case "LATIN", "катимийа"
     LATIN basestack '****************************************************************
@@ -21806,31 +21869,31 @@ Case "GREEK", "еккгмийа"
     GREEK basestack
     Exit Function
 Case "MODULES", "тлглата"
-    Identifier = MyModules(basestack, rest$, Lang)
+    Identifier = MyModules(basestack, rest$, lang)
     Exit Function
 Case "FILES", "аявеиа"
-    Identifier = ProcFiles(basestack, rest$, Lang)
+    Identifier = ProcFiles(basestack, rest$, lang)
     Exit Function
 Case "CAT", "йатакоцои", "йат"
-    Identifier = ProcCat(basestack, rest$, Lang)
+    Identifier = ProcCat(basestack, rest$, lang)
     Exit Function
 Case "DRAWINGS", "сведиа"
-    Identifier = MyDrawings(basestack, rest$, Lang)
+    Identifier = MyDrawings(basestack, rest$, lang)
     Exit Function
 Case "BITMAPS", "еийомес"
-    Identifier = MyBitmaps(basestack, rest$, Lang)
+    Identifier = MyBitmaps(basestack, rest$, lang)
     Exit Function
 Case "MOVIES", "таимиес"
-    Identifier = MyMovies(basestack, rest$, Lang)
+    Identifier = MyMovies(basestack, rest$, lang)
     Exit Function
 Case "SOUNDS", "гвои"
-    Identifier = MySounds(basestack, rest$, Lang)
+    Identifier = MySounds(basestack, rest$, lang)
     Exit Function
 Case "WRITER", "суццяажеас"
-    Identifier = ProcWriter(basestack, rest$, Lang)
+    Identifier = ProcWriter(basestack, rest$, lang)
     Exit Function
 Case "LIST", "киста"
-    Identifier = ProcList(basestack, rest$, Lang)
+    Identifier = ProcList(basestack, rest$, lang)
     Exit Function
 Case "FRAME", "пкаисио" ' BOX X1,Y1,COL,BOX
     Identifier = MyFrame(basestack, rest$)
@@ -21839,7 +21902,7 @@ Case "MARK", "сглади"
     Identifier = MyMark(basestack, rest$)
     Exit Function
 Case "LINE", "цяаллг"
-    Identifier = MyLineInput(basestack, rest$, Lang)
+    Identifier = MyLineInput(basestack, rest$, lang)
     Exit Function
 Case "CURSOR", "дяолеас" ' CURSOR X,Y
     Identifier = MyCursor(basestack, rest$)
@@ -21848,34 +21911,34 @@ Case "FILL", "баье"
     Identifier = ProcFill(basestack, rest$)
     Exit Function
 Case "FLOODFILL", "целисе"
-    Identifier = ProcFLOODFILL(basestack, rest$, Lang)
+    Identifier = ProcFLOODFILL(basestack, rest$, lang)
     Exit Function
 Case "ваяане", "DRAW"   ' LINE X1,Y1,COL
-    Identifier = ProcDraw(basestack, rest$, Lang)
+    Identifier = ProcDraw(basestack, rest$, lang)
     Exit Function
 Case "WIDTH", "павос"
     Identifier = ProcDrawWidth(basestack, rest$)
     Exit Function
 Case "йалпукг", "CURVE"
-    Identifier = ProcCurve(basestack, rest$, Lang)
+    Identifier = ProcCurve(basestack, rest$, lang)
     Exit Function
 Case "PATH", "COLOR", "вяыла", "ивмос"
-    Identifier = ProcPath(basestack, rest$, Lang)
+    Identifier = ProcPath(basestack, rest$, lang)
     Exit Function
 Case "DESKTOP", "епижамеиа"
-    Identifier = ProcDesktop(basestack, rest$, Lang)
+    Identifier = ProcDesktop(basestack, rest$, lang)
     Exit Function
 Case "CHOOSE.COLOR", "епекене.вяыла", "епикене.вяыла"
-    Identifier = ProcChooseColor(basestack, rest$, Lang)
+    Identifier = ProcChooseColor(basestack, rest$, lang)
     Exit Function
 Case "SAVE.AS", "апохгйеусг.ыс"
-    Identifier = ProcSaveAs(basestack, rest$, Lang)
+    Identifier = ProcSaveAs(basestack, rest$, lang)
     Exit Function
 Case "аккацг", "CHANGE"
-    Identifier = ProcCHANGE(basestack, rest$, Lang)
+    Identifier = ProcCHANGE(basestack, rest$, lang)
     Exit Function
 Case "STACK", "сыяос"
-    Identifier = ProcStack(basestack, rest$, Lang)
+    Identifier = ProcStack(basestack, rest$, lang)
     Exit Function
 Case "ейдосг", "VERSION"
     Identifier = ProcVersion(basestack)
@@ -21884,28 +21947,28 @@ Case "FONT", "цяаллатосеияа"
     Identifier = ProcFont(basestack, rest$)
     Exit Function
 Case "SCROLL", "йукисг"
-    Identifier = ProcSrcoll(basestack, rest$, Lang)
+    Identifier = ProcSrcoll(basestack, rest$, lang)
     Exit Function
 Case "EDIT.DOC", "диояхысе"
-    Identifier = ProcEditDoc(basestack, rest$, Lang)
+    Identifier = ProcEditDoc(basestack, rest$, lang)
     Exit Function
 Case "ITALIC", "пкациа"   '.......................
     Identifier = ProcItalic(basestack, rest$)
     Exit Function
 Case "йкеиди", "FKEY"
-    Identifier = ProcFKey(basestack, rest$, Lang)
+    Identifier = ProcFKey(basestack, rest$, lang)
     Exit Function
 Case "OPEN", "амоине"
-    Identifier = ProcOpen(basestack, rest$, Lang)
+    Identifier = ProcOpen(basestack, rest$, lang)
     Exit Function
 Case "NAME", "омола"
-    Identifier = ProcName(basestack, rest$, Lang)
+    Identifier = ProcName(basestack, rest$, lang)
     Exit Function
 Case "WITH", "ле"
-    Identifier = MyWith(basestack, rest$, Lang)
+    Identifier = MyWith(basestack, rest$, lang)
     Exit Function
 Case "METHOD", "леходос"
-    Identifier = MyMethod(basestack, rest$, Lang)
+    Identifier = MyMethod(basestack, rest$, lang)
     Exit Function
 Case "TUNE", "лекыдиа"
     Identifier = ProcTune(basestack, rest$)
@@ -21914,37 +21977,37 @@ Case "гвос", "SOUND"
     Identifier = ProcSound(basestack, rest$)
     Exit Function
 Case "DB.USER", "басг.вягстгс"
-    Identifier = ProcDBUSER(basestack, rest$, Lang)
+    Identifier = ProcDBUSER(basestack, rest$, lang)
     Exit Function
 Case "DB.PROVIDER", "басг.паяовос"
-    Identifier = ProcDBprovider(basestack, rest$, Lang)
+    Identifier = ProcDBprovider(basestack, rest$, lang)
     Exit Function
 Case "TONE", "томос"
     Identifier = ProcTone(basestack, rest$)
     Exit Function
 Case "VIEW", "деине"
-    Identifier = ProcView(basestack, rest$, Lang)
+    Identifier = ProcView(basestack, rest$, lang)
     Exit Function
 Case "CHOOSE.ORGAN", "епекене.ояцамо", "епикене.ояцамо"
-    Identifier = ProcChooseOrgan(basestack, rest$, Lang)
+    Identifier = ProcChooseOrgan(basestack, rest$, lang)
     Exit Function
 Case "BROWSER", "амакоцио"
-    Identifier = ProcBrowser(basestack, rest$, Lang)
+    Identifier = ProcBrowser(basestack, rest$, lang)
     Exit Function
 Case "лпип", "BEEP"
     Identifier = ProcBeep(basestack, rest$)
     Exit Function
 Case "MENU", "епикоцг"
-    Identifier = MyMenu(0, basestack, rest$, Lang)
+    Identifier = MyMenu(0, basestack, rest$, lang)
     Exit Function
 Case "THREAD.PLAN", "сведио.мглатым"
-    Identifier = ProcThreadPlan(basestack, rest$, Lang)
+    Identifier = ProcThreadPlan(basestack, rest$, lang)
     Exit Function
 Case "яухлисеис", "SETTINGS"
-    Identifier = ProcSettings(basestack, rest$, Lang)
+    Identifier = ProcSettings(basestack, rest$, lang)
     Exit Function
 Case "PROTOTYPE", "пяытотупо"
-    Identifier = ProcProto(basestack, rest$, Lang)
+    Identifier = ProcProto(basestack, rest$, lang)
     Exit Function
 Case Else
     x1 = Len(rest$)
@@ -22272,7 +22335,7 @@ Next
 End With
 
 
-Dim MM As Long
+Dim mm As Long
 Dim als As Long
 Dim subname$
 If FList <> "" Then
@@ -22280,9 +22343,9 @@ subname$ = Replace(Replace(FList, Chr$(3), name$), Chr$(2), name$)
 s() = Split(subname$, Chr$(1))
 For i = LBound(s$()) + 1 To UBound(s$())
 If s(i) <> "" Then
-MM = val(Split(s(i))(1))
+mm = val(Split(s(i))(1))
 als = AllocSub()
-sbf(als) = sbf(MM)
+sbf(als) = sbf(mm)
  subHash.ItemCreator CStr(Split(s(i))(0)), als, True
  
  ''sbf(als).sbgroup = name$
@@ -24552,7 +24615,7 @@ Function ReplaceStr(sStr As String, dStr As String, fromStr As String) As String
   ReplaceStr = Replace$(fromStr, sStr, dStr)  ' changed
 End Function
 
-Sub mylist(bstack As basetask, Optional tofile As Long = -1, Optional Lang As Long)
+Sub mylist(bstack As basetask, Optional tofile As Long = -1, Optional lang As Long)
 Dim Scr As Object, prive As Long
 Set Scr = bstack.Owner
 prive = GetCode(Scr)
@@ -24868,7 +24931,7 @@ End If
 End If
 Next st1
 If s$ <> "" Then
-If Lang = 1 Then
+If lang = 1 Then
 
 s$ = " Static Variables: " + s$
 Else
@@ -24889,7 +24952,7 @@ End If
 End If
 End If
 If GarbageCollector.count > 0 Then
-If Lang = 1 Then
+If lang = 1 Then
 s$ = s$ + "Objects for destroy:" + Str$(GarbageCollector.count)
 Else
 s$ = s$ + "аМТИЙЕъЛЕМА ЦИА ЙАТАСТЯОЖч:" + Str$(GarbageCollector.count)
@@ -26197,7 +26260,7 @@ End If
 var(vvv).edittag = vbNullString
 End Sub
 
-Function ExecuteGroupStruct(bstack As basetask, ohere$, vvv As Long, rest$, Lang As Long, Optional glob As Boolean = False) As Long
+Function ExecuteGroupStruct(bstack As basetask, ohere$, vvv As Long, rest$, lang As Long, Optional glob As Boolean = False) As Long
 Dim w$, w1$, p As Variant, v As Long, s$, ss$, b$, i As Long, lcl As Boolean, j As Long, nm$, x1 As Long, y1 As Long, frm$, skip As Boolean
 Dim uni As Boolean, prv As Boolean, stripstack1 As New basetask, hlp As String, vl As String, NoRec As Boolean, final As Boolean
 Dim highpriority As Boolean, ThisGroup As Group, RightAssociative As Boolean, removebypass As Boolean
@@ -26255,14 +26318,14 @@ i = IsLabelA("", rest$, w$)
 If i = 1 Or i = 3 Then
 If i = 1 Then
     hlp = "[" + w$ + "]"
-    If Lang = 1 Then
+    If lang = 1 Then
         vl = "value"
     Else
         vl = "АНъА"
     End If
 Else
     hlp = "[" + Left$(w$, Len(w$) - 1) + "]$"
-    If Lang = 1 Then
+    If lang = 1 Then
         vl = "value$"
     Else
         vl = "АНъА$"
@@ -26460,7 +26523,7 @@ ExecuteGroupStruct = 0
 Exit Function
 End If
 Case "SET", "хесе"
-final = IsLabelSymbolNew(rest$, "текийо", "FINAL", Lang)
+final = IsLabelSymbolNew(rest$, "текийо", "FINAL", lang)
 If FastSymbol(rest$, "(") Then
 If varhash.Find(here$ + "." + Left$(ThisGroup.GroupName, Len(ThisGroup.GroupName) - 1) + "(", i) Then
 MyEr "Array with same name", "пъМАЙАР ЛЕ ъДИО ЭМОЛА"
@@ -26486,7 +26549,7 @@ ThisGroup.HasSet = True
 w$ = "&"
 GoTo funcoperator
 Case "VALUE", "аниа"
-final = IsLabelSymbolNew(rest$, "текийг", "FINAL", Lang)
+final = IsLabelSymbolNew(rest$, "текийг", "FINAL", lang)
 If final Then
 If FastSymbol(rest$, "(") Then GoTo contthere1
 GoTo contthere22
@@ -26544,18 +26607,18 @@ If prv Then
     Exit Function
 End If
 
-final = IsLabelSymbolNew(rest$, "текийос", "FINAL", Lang)
+final = IsLabelSymbolNew(rest$, "текийос", "FINAL", lang)
 x1 = 1
 If Not ISSTRINGA(rest$, F$) Then
-If IsLabelSymbolNew(rest$, "уьгкос", "HIGH", Lang) Then
+If IsLabelSymbolNew(rest$, "уьгкос", "HIGH", lang) Then
 highpriority = True
 If Not ISSTRINGA(rest$, F$) Then GoTo error0001
 If Len(F$) > 2 Or Len(F$) = 0 Or Not MaybeIsSymbol(F$, "/*-+=~^&|<>") Then GoTo error0001
-ElseIf IsLabelSymbolNew(rest$, "дениос", "RIGHT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "дениос", "RIGHT", lang) Then
 RightAssociative = True
 If Not ISSTRINGA(rest$, F$) Then GoTo error0001
 If Len(F$) > 2 Or Len(F$) = 0 Or Not MaybeIsSymbol(F$, "/*-+=~^&|<>") Then GoTo error0001
-ElseIf IsLabelSymbolNew(rest$, "ломадиаиос", "UNARY", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ломадиаиос", "UNARY", lang) Then
     F$ = "-:"
     ThisGroup.HasUnary = True
 ElseIf Not ISSTRINGA(rest$, F$) Then
@@ -26608,14 +26671,14 @@ Case "CLASS", "йкасг"
 If IsOperator(rest$, ":") Then
 NoRec = True
 GoTo there100
-ElseIf IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", lang) Then
 MyEr "GLOBAL can't used in a CLASS", "г ЙКэСГ СТГМ ОЛэДА ДЕМ ЛПОЯЕъ МА ЕъМАИ ЦЕМИЙч"
 ExecuteGroupStruct = False
 Exit Function
 End If
 x1 = IsLabelA("", rest$, w$)
  If x1 = 1 Or x1 = 3 Then
-                     If IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
+                     If IsLabelSymbolNew(rest$, "тупос", "TYPE", lang) Then
                      MyEr "Use here a Group not a Class", "вЯГСИЛОПОъГСЕ ЛИА оЛэДА ЙАИ ЭВИ ЛИА йКэСГ"
                     ExecuteGroupStruct = False
                     Exit Function
@@ -26625,7 +26688,7 @@ x1 = IsLabelA("", rest$, w$)
                 Else
                 F$ = w$
                 End If
-        If Lang = 1 Then
+        If lang = 1 Then
                If FastSymbol(rest$, "{") Then
             ss$ = block(rest$)
             
@@ -26676,7 +26739,7 @@ x1 = IsLabelA("", rest$, w$)
          End If
              F$ = F$ + w$ + nm$ + vbCrLf
         Loop
-            If IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
+            If IsLabelSymbolNew(rest$, "тупос", "TYPE", lang) Then
                  MyEr "Use here a Group not a Class", "вЯГСИЛОПОъГСЕ ЛИА оЛэДА ЙАИ ЭВИ ЛИА йКэСГ"
                 ExecuteGroupStruct = False
             Exit Function
@@ -26693,12 +26756,12 @@ x1 = IsLabelA("", rest$, w$)
 Case "REM", "сгл"
 SetNextLine rest$: GoTo there100
 Case "FUNCTION", "сумаятгсг"
-If IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", Lang) Then
+If IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", lang) Then
 MyEr "GLOBAL can't used in a Group", "г СУМэЯТГСГ СТГМ ОЛэДА ДЕМ ЛПОЯЕъ МА ЕъМАИ ЦЕМИЙч"
 ExecuteGroupStruct = False
 Exit Function
 End If
-final = IsLabelSymbolNew(rest$, "текийг", "FINAL", Lang)
+final = IsLabelSymbolNew(rest$, "текийг", "FINAL", lang)
 classcontclass:
 x1 = Abs(IsLabelF(rest$, F$))
     If prv Then F$ = ChrW(&HFFBF) + F$
@@ -26725,7 +26788,7 @@ If x1 <> 0 Then
                          
                          If Not sbf(i).locked Then
                           If frm$ <> "" Then
-                            If Lang = 1 Then
+                            If lang = 1 Then
                                 sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
                             Else
                                 sbf(i).sb = "диабасе " + frm$ + vbCrLf + ss$
@@ -26743,7 +26806,7 @@ If x1 <> 0 Then
              End If
  
    If here$ <> "" Then
-             If Lang = 1 Then
+             If lang = 1 Then
                 rest$ = "GLOBAL " + Chr(34) + here$ + "." + bstack.GroupName + F$ + Chr(34) + " { " + ss$ + "} " + rest$
             Else
                   rest$ = "цемийг " + Chr(34) + here$ + "." + bstack.GroupName + F$ + Chr(34) + " { " + ss$ + "} " + rest$
@@ -26823,7 +26886,7 @@ If x1 <> 0 Then
   End If
   If here$ = vbNullString Then
   If w$ = vbNullString Then
-  If Lang = 1 Then
+  If lang = 1 Then
     rest$ = "NEW " + F$ & " " & rest$
     w$ = "FUNCTION"
     Else
@@ -26831,7 +26894,7 @@ If x1 <> 0 Then
      w$ = "сумаятгсг"
     End If
   Else
-  If Lang = 1 Then
+  If lang = 1 Then
     rest$ = "NEW " + bstack.GroupName + F$ & " " & rest$
     
     Else
@@ -26841,7 +26904,7 @@ If x1 <> 0 Then
   Else
   rest$ = F$ & " " & rest$
     If w$ = vbNullString Then
-      If Lang = 1 Then
+      If lang = 1 Then
     w$ = "FUNCTION"
     Else
      w$ = "сумаятгсг"
@@ -26850,7 +26913,7 @@ If x1 <> 0 Then
   End If
   
 BYPASS3:
-ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, Lang))
+ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, lang))
 
   If GetSub(bstack.GroupName + F$ + "()", i) Then
    If sbf(i).locked Then final = True
@@ -26890,12 +26953,12 @@ Else
      
 
 Case "MODULE", "тлгла"
-If IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", Lang) Then
+If IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", lang) Then
 MyEr "GLOBAL can't used in a Group", "г СУМэЯТГСГ СТГМ ОЛэДА ДЕМ ЛПОЯЕъ МА ЕъМАИ ЦЕМИЙч"
 ExecuteGroupStruct = False
 Exit Function
 End If
-final = IsLabelSymbolNew(rest$, "текийо", "FINAL", Lang)
+final = IsLabelSymbolNew(rest$, "текийо", "FINAL", lang)
 x1 = Abs(IsLabelF(rest$, F$))
     If prv Then F$ = ChrW(&HFFBF) + F$
 If x1 <> 0 Then
@@ -26922,7 +26985,7 @@ If x1 <> 0 Then
                           If sbf(bstack.IndexSub).locked Then
                           Else
                           If frm$ <> "" Then
-                            If Lang = 1 Then
+                            If lang = 1 Then
                                 sbf(i).sb = "READ " + frm$ + vbCrLf + ss$
                             Else
                                 sbf(i).sb = "диабасе " + frm$ + vbCrLf + ss$
@@ -26939,7 +27002,7 @@ If x1 <> 0 Then
  
    If here$ <> "" Then
 v = 123
-             If Lang = 1 Then
+             If lang = 1 Then
                 rest$ = "GLOBAL " + Chr(34) + here$ + "." + bstack.GroupName + F$ + Chr(34) + " {'11001EDIT " + CStr(bstack.OriginalCode) + ", 3" + vbCrLf + ss$ + "} " + rest$
                   Else
                   rest$ = "цемийо " + Chr(34) + here$ + "." + bstack.GroupName + F$ + Chr(34) + " {'11001EDIT " + CStr(bstack.OriginalCode) + ", 3" + vbCrLf + ss$ + "} " + rest$
@@ -27060,14 +27123,14 @@ Else
   rest$ = F$ & " " & rest$
   End If
   If glob Then
-  If Lang = 1 Then
+  If lang = 1 Then
   rest$ = "NEW " + rest$
   Else
   rest$ = "мео " + rest$
   End If
   End If
 BYPASS4:
- ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, Lang))
+ ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, lang))
   If GetSub(bstack.GroupName + F$, i) Then
   If sbf(i).locked Then final = True
   If final Then sbf(i).locked = True
@@ -27139,7 +27202,7 @@ If w$ = "GROUP" Or w$ = "олада" Then
      End If
      If prv Then w$ = ChrW(&HFFBF) + w$
       If x1 = 1 Then
-                         If IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
+                         If IsLabelSymbolNew(rest$, "тупос", "TYPE", lang) Then
                                             If IsStrExp(bstack, rest$, ss$) Then
                                             frm$ = bstack.GroupName
                                             prepareGroup bstack, w$, y1, glob, hlp <> ""
@@ -27147,7 +27210,7 @@ If w$ = "GROUP" Or w$ = "олада" Then
                                             LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
                                             
                                             bstack.priveflag = prv
-                                             ExecuteGroupStruct = Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, ss$, Lang, glob))
+                                             ExecuteGroupStruct = Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, ss$, lang, glob))
                                             bstack.priveflag = False
                                                 OvarnameLen = varhash.count + 1 'Len(VarName$) + 1   'we record ...
                                           
@@ -27162,7 +27225,7 @@ If w$ = "GROUP" Or w$ = "олада" Then
                                           prepareGroup bstack, w$, y1, glob, hlp <> ""
                                         LogGroup bstack, vvv, ohere$, OvarnameLen, lcl, NoRec, uni
                                         
-                                        If Not Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, rest$, Lang, glob)) = 0 Then
+                                        If Not Abs(ExecuteGroupStruct(bstack, bstack.GroupName & w$, y1, rest$, lang, glob)) = 0 Then
                                             ExecuteGroupStruct = FastSymbol(rest$, "}")
                                         End If
                                             OvarnameLen = varhash.count + 1  'we record ...
@@ -27198,7 +27261,7 @@ End Select
 
 
 End If
-  ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, Lang))
+  ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, lang))
   bstack.priveflag = False
   bstack.uniflag = False
   bstack.finalFlag = False
@@ -27249,27 +27312,27 @@ w$ = ohere$ & "." & w$
 Select Case v
 Case 1
     p = 0#
-    If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+    If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
     skip = True
-               If IsLabelSymbolNew(rest$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(rest$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", lang, , , , False) Then
                             If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", lang, , , , False) Then
                         If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(rest$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(rest$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(rest$, "коцистийо", "CURRENCY", lang, , , , False) Then
                 If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CCur(p)
             Else
@@ -29795,18 +29858,18 @@ Wend
 GetFunctionList = F$
 End Function
 
-Sub MakeMyTitle(s$, Lang As Long)
+Sub MakeMyTitle(s$, lang As Long)
      If InStr(s$, "(") > 0 Then
             If shortlang Then
-            If Lang Then Form1.TEXT1.Title = "F. " + s$ + " F12 " Else Form1.TEXT1.Title = "с. " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "F. " + s$ + " F12 " Else Form1.TEXT1.Title = "с. " + s$ + " "
             Else
-            If Lang Then Form1.TEXT1.Title = "Function " + s$ + " F12 " Else Form1.TEXT1.Title = "сУМэЯТГСГ " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "Function " + s$ + " F12 " Else Form1.TEXT1.Title = "сУМэЯТГСГ " + s$ + " "
             End If
             Else
             If shortlang Then
-            If Lang Then Form1.TEXT1.Title = "M. " + s$ + " F12 " Else Form1.TEXT1.Title = "т. " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "M. " + s$ + " F12 " Else Form1.TEXT1.Title = "т. " + s$ + " "
             Else
-            If Lang Then Form1.TEXT1.Title = "Module " + s$ + " F12 " Else Form1.TEXT1.Title = "тЛчЛА " + s$ + " "
+            If lang Then Form1.TEXT1.Title = "Module " + s$ + " F12 " Else Form1.TEXT1.Title = "тЛчЛА " + s$ + " "
             End If
             End If
 End Sub
@@ -29817,7 +29880,7 @@ Else
 SBcode = sbf(i).sb
 End If
 End Function
-Function GlobalHandler(basestack As basetask, rest$, Lang As Long, typeHandler As Long) As Boolean
+Function GlobalHandler(basestack As basetask, rest$, lang As Long, typeHandler As Long) As Boolean
 Dim x1 As Long, ss$, i As Long, s$, what$, par As Boolean
 Do
 x1 = Abs(IsLabel(basestack, rest$, what$))
@@ -29865,7 +29928,7 @@ End If
 
 
 End Function
-Function GlobalEVENT(basestack As basetask, rest$, Lang As Long) As Boolean
+Function GlobalEVENT(basestack As basetask, rest$, lang As Long) As Boolean
 Dim x1 As Long, ss$, i As Long, s$, what$
 
 x1 = Abs(IsLabel(basestack, rest$, what$))
@@ -29875,7 +29938,7 @@ here$ = vbNullString
 i = globalvar(basestack.GroupName & what$, s$, , True)
 MakeitObjectEvent var(i)
 here$ = ss$
-GlobalEVENT = ProcEvent(basestack, rest$, Lang, i)
+GlobalEVENT = ProcEvent(basestack, rest$, lang, i)
  
 
 
@@ -30031,7 +30094,7 @@ Dim ss() As String, w2 As Long
     End If
     End If
 End Function
-Sub i3MouseIcon(basestack As basetask, rest$, Lang As Long)
+Sub i3MouseIcon(basestack As basetask, rest$, lang As Long)
 On Error Resume Next
 Dim Scr As Object, s$, x As Double, aPic As StdPicture
 Set Scr = basestack.Owner
@@ -30041,7 +30104,7 @@ oxiforforms
 ElseIf basestack.toprinter Then
     oxiforPrinter
 Else
-        If IsLabelSymbolNew(rest$, "йяуье", "HIDE", Lang) Then
+        If IsLabelSymbolNew(rest$, "йяуье", "HIDE", lang) Then
                 If FastSymbol(rest$, "!") Or OperatingSystem > System_Windows_7 Then
                 MouseShow False
                 ElseIf basestack.tolayer > 0 Or basestack.toback Then
@@ -30054,7 +30117,7 @@ Else
                                         Scr.mousepointer = 99
                             End If
                 End If
-        ElseIf IsLabelSymbolNew(rest$, "деине", "SHOW", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "деине", "SHOW", lang) Then
                 If FastSymbol(rest$, "!") Or OperatingSystem > System_Windows_7 Then
                 MouseShow True
                 ElseIf basestack.tolayer > 0 Or basestack.toback Then
@@ -30545,12 +30608,12 @@ End If
 Exit Function
 
 End Function
-Function ProcPrinting(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcPrinting(basestack As basetask, rest$, lang As Long) As Boolean
 Dim xp As Printer, Scr As Object
 Set Scr = basestack.Owner
   ProcPrinting = True
  If ThereIsAPrinter = False Then Exit Function
-If IsLabelSymbolNew(rest$, "маи", "ON", Lang) And pname <> "" And Not basestack.toprinter Then
+If IsLabelSymbolNew(rest$, "маи", "ON", lang) And pname <> "" And Not basestack.toprinter Then
                             basestack.toprinter = True
                             For Each xp In Printers
                             If xp.DeviceName = pname And xp.port = port Then Set Printer = xp
@@ -30572,12 +30635,12 @@ If IsLabelSymbolNew(rest$, "маи", "ON", Lang) And pname <> "" And Not basestack.
                             LCTbasket Form1.PrinterDocument1, players(-2), 0, 0
                             Printer.CurrentX = 0
                             Printer.CurrentY = 0
-ElseIf IsLabelSymbolNew(rest$, "ови", "OFF", Lang) And basestack.toprinter Then
+ElseIf IsLabelSymbolNew(rest$, "ови", "OFF", lang) And basestack.toprinter Then
                     getenddoc
                     Set Scr = Form1.DIS
                     basestack.toprinter = False
                     SetNormal Scr
-ElseIf IsLabelSymbolNew(rest$, "диейоье", "BREAK", Lang) And basestack.toprinter Then
+ElseIf IsLabelSymbolNew(rest$, "диейоье", "BREAK", lang) And basestack.toprinter Then
                     pnum = 0
                     oprinter.ClearUp
                     Form1.PrinterDocument1.Picture = LoadPicture("")
@@ -31084,12 +31147,12 @@ SetText Scr
 
 
 End Function
-Function ProcAbout(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcAbout(basestack As basetask, rest$, lang As Long) As Boolean
 
 Dim par As Boolean, s$, ss$, x As Double, y As Double, i As Long
 Dim kk As New Document
 Dim UAddPixelsTop As Long  ' just not used
-If IsLabelSymbolNewExp(rest$, "деине", "SHOW", Lang, ss$) Then
+If IsLabelSymbolNewExp(rest$, "деине", "SHOW", lang, ss$) Then
 If lastAboutHTitle <> "" Then abt = True: vH_title$ = vbNullString
 If IsStrExp(basestack, rest$, ss$) Then
     feedback$ = ss$
@@ -31138,7 +31201,7 @@ End If
 End If
 End If
 '*******
-ElseIf IsLabelSymbolNew(rest$, "йакесе", "CALL", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йакесе", "CALL", lang) Then
 mHelp = True
 abt = True
 If IsStrExp(basestack, rest$, ss$) Then
@@ -31150,7 +31213,7 @@ Else
 If IsStrExp(basestack, rest$, s$) Then
 mHelp = True
 If s$ = vbNullString Then
-If Lang = 0 Then
+If lang = 0 Then
 lastAboutHTitle = "бОчХЕИА еЖАЯЛОЦчР"
 LastAboutText = vbNullString
 Else
@@ -31251,26 +31314,26 @@ End If
 End If
 Exit Function
 End Function
-Sub procthreads(Scr As Object, bstack As basetask, rest$, Lang As Long)
+Sub procthreads(Scr As Object, bstack As basetask, rest$, lang As Long)
 If TaskMaster Is Nothing Then Exit Sub
 If TaskMaster.QueueCount >= 0 Then
 
-If IsLabelSymbolNew(rest$, "сбгсе", "ERASE", Lang) Then
+If IsLabelSymbolNew(rest$, "сбгсе", "ERASE", lang) Then
 TaskMaster.Dispose
 bstack.ThrowThreads
 Exit Sub
 End If
-If Lang = 0 Then
+If lang = 0 Then
         PlainBaSket Scr, players(GetCode(Scr)), "NHMATA се епенеяцасиа:" & CStr(TaskMaster.QueueCount)
         Else
         PlainBaSket Scr, players(GetCode(Scr)), "THREADS PROCESSING:" & CStr(TaskMaster.QueueCount)
         End If
-        If bstack.ThreadsStr(Lang) <> "" Then
+        If bstack.ThreadsStr(lang) <> "" Then
         crNew bstack, players(GetCode(Scr))
-        PlainBaSket Scr, players(GetCode(Scr)), bstack.ThreadsStr(Lang)
+        PlainBaSket Scr, players(GetCode(Scr)), bstack.ThreadsStr(lang)
         End If
 Else
-        If Lang = 0 Then
+        If lang = 0 Then
         PlainBaSket Scr, players(GetCode(Scr)), "типота се епенеяцасиа"
         Else
         PlainBaSket Scr, players(GetCode(Scr)), "NOTHING PROCESSING"
@@ -31281,7 +31344,7 @@ crNew bstack, players(GetCode(Scr))
 MyDoEvents1 Scr
 Set Scr = Nothing
 End Sub
-Function ProcPage(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcPage(basestack As basetask, rest$, lang As Long) As Boolean
 ProcPage = True
 Dim Scr As Object, x As Double
 Set Scr = basestack.Owner
@@ -31298,11 +31361,11 @@ End If
 Set Scr = Nothing
 End Function
 
-Function ProcMotion(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcMotion(basestack As basetask, rest$, lang As Long) As Boolean
 Dim Scr As Object, x1 As Long, y1 As Long, p As Variant
 Set Scr = basestack.Owner
 ProcMotion = True
-If Lang = 1 And IsLabelSymbolLatin(rest$, "CENTER") Then
+If lang = 1 And IsLabelSymbolLatin(rest$, "CENTER") Then
 ProcMotion = ProcMode(basestack, Str$(players(GetCode(Scr)).SZ) & "," & Str$(Scr.Width) & "," & Str$(Scr.Height))
 ElseIf IsLabelSymbol(rest$, "йемтяо") Then
 ProcMotion = ProcMode(basestack, Str$(players(GetCode(Scr)).SZ) & "," & Str$(Scr.Width) & "," & Str$(Scr.Height))
@@ -31408,13 +31471,13 @@ Else
 End If
 Set Scr = Nothing
 End Function
-Function ProcMedia(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcMedia(basestack As basetask, rest$, lang As Long) As Boolean
 Dim Scr As Object
 Dim s$, ss$, x As Double, y As Double
 Set Scr = basestack.Owner
 On Error Resume Next
 ProcMedia = True
-If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then
+If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", lang) Then
             If AVIUP Then
                   AVI.GETLOST
                   MyDoEvents
@@ -31454,7 +31517,7 @@ If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then
             
     ElseIf AVIUP Then
     ss$ = vbNullString
-        If IsLabelSymbolNewExp(rest$, "деине", "SHOW", Lang, ss$) Then
+        If IsLabelSymbolNewExp(rest$, "деине", "SHOW", lang, ss$) Then
             'If Not AVIRUN Then MediaPlayer1.playMovie: MediaPlayer1.pauseMovie
             If Scr.name = "GuiM2000" Then
             If Scr.Visible Then
@@ -31479,17 +31542,17 @@ If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then
                 ProcMedia = True
                 Exit Function
        End If
-        ElseIf IsLabelSymbolNewExp(rest$, "йяуье", "HIDE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "йяуье", "HIDE", lang, ss$) Then
                 AVI.Hide
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "йяатгсе", "PAUSE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "йяатгсе", "PAUSE", lang, ss$) Then
                 If MediaPlayer1.isMoviePlaying Then MediaPlayer1.pauseMovie
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "паине", "PLAY", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "паине", "PLAY", lang, ss$) Then
         
                 If Not AVIRUN Then
                 AVI.Timer1.Interval = MediaPlayer1.getLengthInMS - MediaPlayer1.getPositionInMS
@@ -31500,7 +31563,7 @@ If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then
                 Set Scr = Nothing
                 ProcMedia = True
                 Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "нейима", "RESTART", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "нейима", "RESTART", lang, ss$) Then
                     If Not MediaPlayer1.isMoviePlaying Then
                     
                          MediaPlayer1.playMovie
@@ -31513,7 +31576,7 @@ If IsLabelSymbolNew(rest$, "жоятысе", "LOAD", Lang) Then
                     Set Scr = Nothing
                     ProcMedia = True
                     Exit Function
-        ElseIf IsLabelSymbolNewExp(rest$, "сто", "TO", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "сто", "TO", lang, ss$) Then
                     If IsExp(basestack, rest$, x) Then
                         If MediaPlayer1.getLengthInMS > 0 Then MediaPlayer1.setPositionTo x
                         
@@ -31695,7 +31758,7 @@ Set Scr = Form1.DIS 'bstack.Owner
 prive = GetCode(Scr)
 wwPlain bstack, players(prive), ss$, Scr.Width, 1000, True, , 3
 End Sub
-Function ProcCat(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcCat(bstack As basetask, rest$, lang As Long) As Boolean
 Dim aDir As New recDir, ss$, s$, pa$, frm$, par As Boolean, i As Long, col As Long
 aDir.IncludedFolders = True
 aDir.Nofiles = True
@@ -31706,7 +31769,7 @@ ProcCat = True
 s$ = vbNullString
 pa$ = vbNullString
 
-par = Lang = 1
+par = lang = 1
 i = FastSymbol(rest$, "+")
 If FastSymbol(rest$, "*") Then
 ss$ = "*"
@@ -31754,11 +31817,11 @@ Loop
 If i = False Then RepPlain bstack, bstack.Owner, pa$ + ss$
 
 End Function
-Function ProcImage(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcImage(bstack As basetask, rest$, lang As Long) As Boolean
 Dim photo As cDIBSection, pppp As mArray, s$, x1 As Long, y1 As Long, w$, it As Long, p As Variant, part As Boolean, border As Long, titl$
 Dim aPic As StdPicture, s1$, usecolorback As Boolean, ihavepic As Boolean, mem As MemBlock
 ProcImage = True
-part = IsLabelSymbolNew(rest$, "пкаисио", "FRAME", Lang)
+part = IsLabelSymbolNew(rest$, "пкаисио", "FRAME", lang)
 If IsStrExp(bstack, rest$, s$) Then
     ihavepic = Left$(s$, 4) = "cDIB" And Len(s$) > 12
     GoTo cont1
@@ -31830,7 +31893,7 @@ cont1:
         Else
            ThumbImage bstack.Owner, x1, y1, s$, border, dv15, titl$
         End If
-    ElseIf IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
         If CFname(s$) <> "" Or ihavepic Or Not aPic Is Nothing Then
             Select Case Abs(IsLabel(bstack, rest$, w$))
             Case 3
@@ -31954,7 +32017,7 @@ cont1:
             ProcImage = False
             Exit Function
         End If
-    ElseIf IsLabelSymbolNew(rest$, "енацыцг", "EXPORT", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "енацыцг", "EXPORT", lang) Then
         If IsStrExp(bstack, rest$, w$) Then
             If Not CanKillFile(w$) Then FilePathNotForUser:  Exit Function
             Set photo = New cDIBSection
@@ -32019,18 +32082,18 @@ Else
 End If
 End If
 End Function
-Function ProcField(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcField(bstack As basetask, rest$, lang As Long) As Boolean
 Dim prive As Long, pppp As mArray, s$, it As Long, x As Double, y As Double, p As Variant
 Dim i As Long, x1 As Long, y1 As Long, what$, par As Boolean
 If Typename(bstack.Owner) Like "Gui*" Then oxiforforms: Exit Function
 ProcField = True
  prive = GetCode(bstack.Owner)
   With players(prive)
-        If IsLabelSymbolNew(rest$, "мео", "NEW", Lang) Then
+        If IsLabelSymbolNew(rest$, "мео", "NEW", lang) Then
             If IsExp(bstack, rest$, p) Then Result = p Else Result = 0
             Exit Function
         End If
-        If IsLabelSymbolNew(rest$, "сумхгла", "PASSWORD", Lang) Then i = True
+        If IsLabelSymbolNew(rest$, "сумхгла", "PASSWORD", lang) Then i = True
     
         If Not IsExp(bstack, rest$, x) Then x = .curpos
         If Not FastSymbol(rest$, ",") Then Exit Function
@@ -32039,7 +32102,7 @@ ProcField = True
         If Not IsExp(bstack, rest$, p) Then Exit Function
         p = MyRound(p)
         End If
-        If Not IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then Exit Function
+        If Not IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then Exit Function
         Select Case Abs(IsLabel(bstack, rest$, what$))
         Case 3
             par = False
@@ -32078,7 +32141,7 @@ ProcField = True
         Exit Function
 End With
 End Function
-Function ProcFiles(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcFiles(bstack As basetask, rest$, lang As Long) As Boolean
 Dim aDir As New recDir, ss$, pa$, s$, par As Boolean, stac1 As String, frm$, i As Long
 Dim addext As Boolean, addpath As Boolean, p As Variant
 ProcFiles = True
@@ -32090,7 +32153,7 @@ aDir.SortType = Abs(FastSymbol(rest$, "!")) + Abs(FastSymbol(rest$, "!"))
 s$ = vbNullString
 pa$ = vbNullString
 
-par = Lang = 1
+par = lang = 1
 i = FastSymbol(rest$, "+")
 If FastSymbol(rest$, "*") Then
 ss$ = "*"
@@ -32194,7 +32257,7 @@ RepPlain bstack, bstack.Owner, pa$ + ss$
 End If
 End Function
 
-Function ProcEdit(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcEdit(basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$, x1 As Long, y1 As Long, o As Long, frm$, i As Long, par As Boolean, p As Variant
 Dim Scr As Object, ss$
 ProcEdit = True
@@ -32250,7 +32313,7 @@ If Left$(s$, 1) = "S" Then
              End If
              Next i
              If i > Len(frm$) Then
-             If Lang = 1 Then
+             If lang = 1 Then
              MsgBoxN "not text found", 0
              Else
              MsgBoxN "ДЕМ БЯчЙА ЙЕъЛЕМО", 0
@@ -32329,7 +32392,7 @@ jump1:
             Set Scr = Nothing
             Exit Function
             End If
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
             y1 = Abs(IsLabel(basestack, rest$, frm$))
               If y1 <> 0 Then
            '' frm$ = myUcase(frm$)
@@ -32355,7 +32418,7 @@ jump1:
                 sbf(x1).sbc = i
             End If
             If sbf(x1).sbc = 0 Then sbf(x1).sbc = -1
-        MakeMyTitle s$, Lang
+        MakeMyTitle s$, lang
         Set sbf(x1).subs = Nothing
         With players(GetCode(basestack.Owner))
             ScreenEdit basestack, sbf(x1).sb, 0, .mysplit, .mx - 1, .My - 1, sbf(x1).sbc
@@ -32375,7 +32438,7 @@ jump1:
             End If
             i = -1
           
-           MakeMyTitle s$, Lang
+           MakeMyTitle s$, lang
            With players(GetCode(basestack.Owner))
             ScreenEdit basestack, frm$, 0, .mysplit, .mx - 1, .My - 1, i
             End With
@@ -32408,7 +32471,7 @@ jump1:
     End If
 
 End Function
-Function ProcModuleEntry(basestack As basetask, ohere$, x1 As Long, rest$, Optional Lang As Long = -1, Optional thisIsEvent As Boolean = False) As Boolean
+Function ProcModuleEntry(basestack As basetask, ohere$, x1 As Long, rest$, Optional lang As Long = -1, Optional thisIsEvent As Boolean = False) As Boolean
 On Error GoTo there22
   If LastErNum = -1 Then GoTo there22
 Dim frm$, bs As basetask, i As Long, pa$, p As Variant, loopthis As Boolean
@@ -32454,7 +32517,7 @@ i = 1
         End If
        .StaticInUse$ = here$
        End With
-If Lang <> -1 Then
+If lang <> -1 Then
     If IsSymbol(rest$, ";") Then
         Dim what$, WHAT1$
 Do
@@ -32463,20 +32526,20 @@ Do
  
             
         
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
                 If IsLabel(basestack, rest$, WHAT1$) <> 1 Then GoTo myerror1
             Else
             WHAT1$ = what$
             End If
                     If subHash.Find(ohere$ & "." & WHAT1$, i) Then
-                        MyModule bs, what$ + " {}", Lang
+                        MyModule bs, what$ + " {}", lang
                         sbf(bs.IndexSub).locked = True
                         sbf(bs.IndexSub).sb = sbf(i).sb
                         sbf(bs.IndexSub).sbc = sbf(i).sbc
                         sbf(bs.IndexSub).sbgroup = sbf(i).sbgroup
                          
                     ElseIf subHash.Find(WHAT1$, i) Then
-                        MyModule bs, what$ + " {}", Lang
+                        MyModule bs, what$ + " {}", lang
                         sbf(bs.IndexSub).locked = True
                         sbf(bs.IndexSub).sb = sbf(i).sb
                         sbf(bs.IndexSub).sbc = sbf(i).sbc
@@ -32797,10 +32860,10 @@ Set ParentStack.lastobj = Nothing
         If Not ParentStack.lastobj Is Nothing Then
         
          If TypeOf ParentStack.lastobj Is mStiva Then
-            Dim MM As mStiva
-            Set MM = ParentStack.lastobj
-            ps.MergeBottom MM
-            Set MM = Nothing
+            Dim mm As mStiva
+            Set mm = ParentStack.lastobj
+            ps.MergeBottom mm
+            Set mm = Nothing
         ElseIf Not ParentStack.lastpointer Is Nothing Then
                 ps.DataObj ParentStack.lastobj
                 Set ParentStack.lastpointer = Nothing
@@ -32893,10 +32956,10 @@ Dim ps As mStiva, p As Variant, s$, ok As Long
                 ElseIf IsExp(basestack, rest$, p) Then
         If Not basestack.lastobj Is Nothing Then
         If TypeOf basestack.lastobj Is mStiva Then
-            Dim MM As mStiva
-            Set MM = basestack.lastobj
-            ps.MergeBottom MM
-            Set MM = Nothing
+            Dim mm As mStiva
+            Set mm = basestack.lastobj
+            ps.MergeBottom mm
+            Set mm = Nothing
         ElseIf Not basestack.lastpointer Is Nothing Then
             ps.DataObj basestack.lastobj
             Set basestack.lastpointer = Nothing
@@ -33620,7 +33683,7 @@ subsub02:
         
 executeblock = False
 End Function
-Function StockValues(bstack As basetask, b$, Lang As Long) As Boolean
+Function StockValues(bstack As basetask, b$, lang As Long) As Boolean
 ' Stock  A[$|%| ]() in  A,B$,C(3)   copy values to stock array...and
 
 ' Stock  A[$|%| ]() out  A,B$,C(3),...  copy values to variables and make empty space in stock
@@ -33634,7 +33697,7 @@ If Abs(IsLabel(bstack, b$, what$)) > 4 Then
 If Not pppp.Arr Then MyEr "Need an Array", "вЯЕИэФОЛАИ щМА ПъМАЙА": Exit Function
                 If NeoGetArrayItem(pppp, bstack, what$, v, b$) Then
 againhere:
-                            If IsLabelSymbolNew(b$, "апо", "IN", Lang) Then
+                            If IsLabelSymbolNew(b$, "апо", "IN", lang) Then
                             
                                 If what$ = vbNullString Then Exit Function   ' no for no named array
                                 Set soros = bstack.soros
@@ -33674,7 +33737,7 @@ againhere:
                                                     StockValues = True
                                                     Exit Function
                                     End If
-                            ElseIf IsLabelSymbolNew(b$, "се", "OUT", Lang) Then
+                            ElseIf IsLabelSymbolNew(b$, "се", "OUT", lang) Then
                                                   
                                                                      Do
                                                                         If MyIsObject(pppp.item(v)) Then
@@ -33805,7 +33868,7 @@ againhere:
                                                                           End If
                                                                         Loop Until Not FastSymbol(b$, ",")
                                                   
-                                                    ElseIf IsLabelSymbolNew(b$, "циа", "KEEP", Lang) Then
+                                                    ElseIf IsLabelSymbolNew(b$, "циа", "KEEP", lang) Then
                                                     
                                                     If IsExp(bstack, b$, p) Then
                                                             If p <> MyRound(p) Or p < 0 Then
@@ -33940,7 +34003,7 @@ againhere:
                                                    End If
 
                                                     
-                                                    ElseIf IsLabelSymbolNew(b$, "хесе", "SWEEP", Lang) Then
+                                                    ElseIf IsLabelSymbolNew(b$, "хесе", "SWEEP", lang) Then
                                                     If what$ = vbNullString Then Exit Function   ' no for no named array
                                                             If IsExp(bstack, b$, p) Then
                                                                             If p <> MyRound(p) Or p < 0 Then
@@ -34258,13 +34321,13 @@ End Sub
 Sub TraceRestore(b As basetask, v As Long)
          b.addlen = v
 End Sub
-Sub ProcBackGround(bstack As basetask, rest$, Lang As Long, afier As Boolean)
+Sub ProcBackGround(bstack As basetask, rest$, lang As Long, afier As Boolean)
 Dim s$, p As Variant, i As Long, x1 As Long, x As Double, y As Double, F As Long, y1 As Long, sX As Double, ss$, pa$, it As Long
 Dim Scr As Object, frm$, w3 As Long, ya As Long, AddTwipsTopL As Long
 Set Scr = bstack.Owner
 afier = True
 Dim prive As basket
-If IsLabelSymbolNew(rest$, "лоусийг", "MUSIC", Lang) Then
+If IsLabelSymbolNew(rest$, "лоусийг", "MUSIC", lang) Then
 If IsStrExp(bstack, rest$, s$) Then
  'OPEN OR REPLACE
  If s$ <> "" Then
@@ -34835,7 +34898,7 @@ Else
     Set ProcEventVarSet = var(i)
 End If
 End Function
-Function ProcEvent(bstack As basetask, rest$, Lang As Long, i As Long) As Boolean
+Function ProcEvent(bstack As basetask, rest$, lang As Long, i As Long) As Boolean
 'look for { }, or hold
 Dim aa As mEvent, s$, lastname$, dd As Long, pm As Long, pf As Long
 ProcEvent = True
@@ -34855,8 +34918,8 @@ rd$ = vbNullString
 While ss$ <> ""
 If FastSymbol(ss$, vbCrLf) Then
 ss$ = NLtrim(ss$)
-ElseIf IsLabelSymbolNew(ss$, "диабасе", "READ", Lang) Then
-If Lang = 1 Then
+ElseIf IsLabelSymbolNew(ss$, "диабасе", "READ", lang) Then
+If lang = 1 Then
 If rd$ = vbNullString Then rd$ = "READ "
 Else
 If rd$ = vbNullString Then rd$ = "диабасе "
@@ -34885,7 +34948,7 @@ dd = 1
       End If
    Loop Until Not FastSymbol(ss$, ",")
 
-ElseIf IsLabelSymbolNew(ss$, "сумаятгсг", "FUNCTION", Lang) Then
+ElseIf IsLabelSymbolNew(ss$, "сумаятгсг", "FUNCTION", lang) Then
 '' check only for blocks
 pf = pf + 1
 If FastSymbol(ss$, "{") Then
@@ -34895,7 +34958,7 @@ aa.GenItemCreator LTrim(Str(pf * 123)), s$
 While ss$ <> ""
 If FastSymbol(ss$, vbCrLf, , 2) Then
     ss$ = NLtrim(ss$)
-ElseIf IsLabelSymbolNew(ss$, "сумаятгсг", "FUNCTION", Lang) Then
+ElseIf IsLabelSymbolNew(ss$, "сумаятгсг", "FUNCTION", lang) Then
         If FastSymbol(ss$, "{") Then
             s$ = "{" + rd$ + vbCrLf + block(ss$) + "}"
             If Not FastSymbol(ss$, "}") Then ProcEvent = False: Exit Function
@@ -34924,17 +34987,17 @@ Set aa = Nothing
 If Not FastSymbol(rest$, "}") Then ProcEvent = False: Exit Function
 ' do something
 ' find Read command and some Functions
-ElseIf IsLabelSymbolNew(rest$, "ажгсе", "RELEASE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ажгсе", "RELEASE", lang) Then
     Set aa = ProcEventVarSet(bstack, i)
     aa.enabled = True
-ElseIf IsLabelSymbolNew(rest$, "йяатгсе", "HOLD", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йяатгсе", "HOLD", lang) Then
     Set aa = ProcEventVarSet(bstack, i)
     aa.enabled = False
-ElseIf IsLabelSymbolNew(rest$, "йахаяо", "CLEAR", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йахаяо", "CLEAR", lang) Then
     Set aa = ProcEventVarSet(bstack, i)
     aa.enabled = False
     aa.BypassInit 10
-ElseIf IsLabelSymbolNew(rest$, "мео", "NEW", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "мео", "NEW", lang) Then
     Set aa = ProcEventVarSet(bstack, i)
     Do
         dd = 1
@@ -34961,7 +35024,7 @@ ElseIf IsLabelSymbolNew(rest$, "мео", "NEW", Lang) Then
         End If
     Loop Until Not FastSymbol(rest$, ",")
     Set aa = Nothing
-ElseIf IsLabelSymbolNew(rest$, "пета", "DROP", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "пета", "DROP", lang) Then
     Set aa = ProcEventVarSet(bstack, i)
     Do
         dd = 1
@@ -35006,7 +35069,7 @@ alfa.NoHere = aa.NoHere
 Set bstack.lastobj = alfa
 Set aa = Nothing
 End Sub
-Function CallEvent(bstack As basetask, rest$, Lang As Long, ByVal i As Long) As Boolean
+Function CallEvent(bstack As basetask, rest$, lang As Long, ByVal i As Long) As Boolean
 If i > -1 Then
 If Typename(var(i)) <> "mEvent" Then
 Exit Function
@@ -35323,7 +35386,7 @@ extreme = extr
 escok = olescok
 End Function
 
-Function ExpandGui(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, oName As String)
+Function ExpandGui(bstack As basetask, what$, rest$, ifier As Boolean, lang As Long, oName As String)
 Dim pppp As mArray, aVar As Variant, h$
 '' add new GuiItems but not visible
 what$ = Left$(what$, Len(what$) - 1)
@@ -35449,40 +35512,40 @@ ifier = True
 End If
 End If
 End Function
-Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, Lang As Long, i As Long, Optional ar As Long = 0, Optional oName As String = vbNullString, Optional glob As Long = 0)
+Function DeclareGUI(bstack As basetask, what$, rest$, ifier As Boolean, lang As Long, i As Long, Optional ar As Long = 0, Optional oName As String = vbNullString, Optional glob As Long = 0)
 DeclareGUI = True
 Dim w$, x1 As Long, y1 As Long, s$, useold As Boolean, bp As Long
-Dim alfa As GuiM2000, MM As CallBack2
+Dim alfa As GuiM2000, mm As CallBack2
 Dim aVar As Variant, p As Variant
 Dim pppp As mArray, mmmm As mEvent
 ' for these events no use of noHere property because no copyevent/upgrade happens
 '         see .upgrade in UnFloatGroupReWriteVars and UnFloatGroup
 
- If IsLabelSymbolNew(rest$, "ежаялоцг", "APPLICATION", Lang) Then
- If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ If IsLabelSymbolNew(rest$, "ежаялоцг", "APPLICATION", lang) Then
+ If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
      Set var(i) = Form1
  Else
-    Set MM = New CallBack2
+    Set mm = New CallBack2
  
-                     With MM
+                     With mm
                      .NoPublic bstack, ""
                      
                     End With
 
-                     Set var(i) = MM
-                     Set MM = Nothing
+                     Set var(i) = mm
+                     Set mm = Nothing
     End If
                         Exit Function
-ElseIf IsLabelSymbolNew(rest$, "тлгла", "MODULE", Lang) Then
-         Set MM = New CallBack2
-                     With MM
+ElseIf IsLabelSymbolNew(rest$, "тлгла", "MODULE", lang) Then
+         Set mm = New CallBack2
+                     With mm
                      .NoPublic bstack, here$
                     End With
-                     Set var(i) = MM
-                     Set MM = Nothing
+                     Set var(i) = mm
+                     Set mm = Nothing
                      Exit Function
-ElseIf IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
-                  If IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
+                  If IsLabelSymbolNew(rest$, "цецомос", "EVENT", lang) Then
                   
                              x1 = Abs(IsLabel(bstack, rest$, w$))
                              If x1 <> 1 Then
@@ -35576,8 +35639,8 @@ contEvArray:
                     End If
                     End If
          
- ElseIf IsLabelSymbolNew(rest$, "пкгйтяо", "BUTTON", Lang) Then
-        If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "пкгйтяо", "BUTTON", lang) Then
+        If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35617,8 +35680,8 @@ contEvArray:
                 End If
             End If
         End If
-ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
-        If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", lang) Then
+        If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35658,8 +35721,8 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                 End If
             End If
         End If
- ElseIf IsLabelSymbolNew(rest$, "епикоцг", "CHECKBOX", Lang) Then
-         If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "епикоцг", "CHECKBOX", lang) Then
+         If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35699,8 +35762,8 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                 End If
             End If
         End If
- ElseIf IsLabelSymbolNew(rest$, "йеилемо", "EDITBOX", Lang) Then
-          If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "йеилемо", "EDITBOX", lang) Then
+          If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35750,8 +35813,8 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                 End If
             End If
         End If
- ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", Lang) Then
- If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "киста", "LISTBOX", lang) Then
+ If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35801,8 +35864,8 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                 End If
             End If
         End If
- ElseIf IsLabelSymbolNew(rest$, "киста.еисацыцгс", "COMBOBOX", Lang) Then
-    If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+ ElseIf IsLabelSymbolNew(rest$, "киста.еисацыцгс", "COMBOBOX", lang) Then
+    If IsLabelSymbolNew(rest$, "жояла", "FORM", lang) Then
             If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
             Else
@@ -35840,28 +35903,28 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
                 End If
             End If
         End If
-    ElseIf IsLabelSymbolNew(rest$, "пкгяожояиес", "INFORMATION", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "пкгяожояиес", "INFORMATION", lang) Then
     Set var(i) = OsInfo
-    ElseIf IsLabelSymbolNew(rest$, "лахглатийа", "MATH", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "лахглатийа", "MATH", lang) Then
     Set var(i) = New Math
     End If
 End Function
 
-Sub ProcMethodArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, Lang As Long, ifier0 As Boolean)
+Sub ProcMethodArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, lang As Long, ifier0 As Boolean)
 Dim VR(1)
 Set VR(0) = pppp.item(index)
 On Error Resume Next
-ProcMethod bstack, VR(), 0, co$, rest$, Lang, ifier0
+ProcMethod bstack, VR(), 0, co$, rest$, lang, ifier0
  ifier0 = (Err = 0) And ifier0
           Err.Clear
 End Sub
-Sub ProcPropertyArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, Lang As Long, ifier0 As Boolean)
+Sub ProcPropertyArray(bstack As basetask, pppp As mArray, index As Long, co$, rest$, lang As Long, ifier0 As Boolean)
         Dim VR(1)
         If VarType(pppp.item(index)) <> vbEmpty Then
         
         Set VR(0) = pppp.item(index)
         On Error Resume Next
-          ProcProperty bstack, VR(), 0, co$, rest$, Lang, True
+          ProcProperty bstack, VR(), 0, co$, rest$, lang, True
   ifier0 = Err = 0
           Err.Clear
           Else
@@ -35872,18 +35935,18 @@ Private Function ProcPtr(ByVal nAddress As Long) As Long
     ProcPtr = nAddress
 End Function
 
-Function CallByPtr(nSubAddress As Long, basestack As basetask, rest$, Lang As Long) As Boolean
+Function CallByPtr(nSubAddress As Long, basestack As basetask, rest$, lang As Long) As Boolean
 Dim resp As Boolean
 If TaskMaster.PlayMusic Then
                     TaskMaster.OnlyMusic = True
                         TaskMaster.TimerTick
                         TaskMaster.OnlyMusic = False
 End If
-CallWindowProc nSubAddress, VarPtr(basestack), VarPtr(rest$), VarPtr(Lang), VarPtr(resp)
+CallWindowProc nSubAddress, VarPtr(basestack), VarPtr(rest$), VarPtr(lang), VarPtr(resp)
 CallByPtr = resp
 End Function
 
-Sub NeoWait(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+Sub NeoWait(basestackLP As Long, rest$, lang As Long, resp As Boolean)
 Dim basestack As basetask, p As Variant
 Set basestack = ObjFromPtr(basestackLP)
 If IsExp(basestack, rest$, p) Then
@@ -35967,15 +36030,15 @@ End If
         End If
 End Sub
 
-Sub NeoCall0(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+Sub NeoCall0(basestackLP As Long, rest$, lang As Long, resp As Boolean)
 Dim basestack As basetask, i As Long, p As Variant, par As Boolean, F As Long, b$
 Dim flag As Boolean, it As Long, what$, s$, x1 As Long, ss$, bs As basetask, vvl As Variant, x As Double
 Set basestack = ObjFromPtr(basestackLP)
 resp = True
 If FastSymbol(rest$, "!") Then basestack.nokillvars = True
 par = False: F = 0
-If IsLabelSymbolNew(rest$, "йемг", "VOID", Lang) Then par = True
-If IsLabelSymbolNew(rest$, "енытеяийг", "EXTERN", Lang) Then
+If IsLabelSymbolNew(rest$, "йемг", "VOID", lang) Then par = True
+If IsLabelSymbolNew(rest$, "енытеяийг", "EXTERN", lang) Then
 ' NOW WE HAVE TO GET THE NUMBER
 basestack.nokillvars = False
 If IsExp(basestack, rest$, p) Then
@@ -36030,7 +36093,7 @@ End If
 Else
 'WRONG...
 End If
-ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", lang) Then
     i = Abs(IsLabel(basestack, rest$, what$))
     If i = 1 Then
         If Not GetVar(basestack, basestack.GroupName & what$, i) Then
@@ -36039,13 +36102,13 @@ ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
             If Typename(var(i)) <> "mEvent" Then
                   MyEr "Can't find Event", "дЕМ ЛПОЯЧ МА БЯЫ цЕЦОМЭР"
             Else
-               resp = CallEvent(basestack, rest$, Lang, i)
+               resp = CallEvent(basestack, rest$, lang, i)
   
             End If
         End If
     ElseIf i = 5 Then
     If GetEventFromArray(basestack, rest$, what$) Then
-    resp = CallEvent(basestack, rest$, Lang, -1)
+    resp = CallEvent(basestack, rest$, lang, -1)
     End If
     Else
         MissPar
@@ -36054,8 +36117,8 @@ ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
 
     Exit Sub
 Else
-flag = IsLabelSymbolNew(rest$, "топийа", "LOCAL", Lang)
-If IsLabelSymbolNew(rest$, "сумаятгсг", "FUNCTION", Lang) Then F = 3
+flag = IsLabelSymbolNew(rest$, "топийа", "LOCAL", lang)
+If IsLabelSymbolNew(rest$, "сумаятгсг", "FUNCTION", lang) Then F = 3
 
 reenter1:
 
@@ -36365,12 +36428,12 @@ Set basestack = Nothing
 End Sub
 
 
-Sub NeoCall(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+Sub NeoCall(basestackLP As Long, rest$, lang As Long, resp As Boolean)
 Dim basestack As basetask, i As Long, p As Variant, par As Boolean, F As Long, op As Object, op1 As Object
 Dim flag As Boolean, it As Long, what$, s$, x1 As Long, ss$, bs As basetask, vvl As Variant, x As Double
 Set basestack = ObjFromPtr(basestackLP)
 
- If IsLabelSymbolNew(rest$, "текестг", "OPERATOR", Lang) Then
+ If IsLabelSymbolNew(rest$, "текестг", "OPERATOR", lang) Then
 
     If ISSTRINGA(rest$, s$) Then
 contoper:
@@ -36406,7 +36469,7 @@ contoper:
             OnlyInAGroup
             Exit Sub
         End If
-    ElseIf IsLabelSymbolNew(rest$, "ломадиаио", "UNARY", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "ломадиаио", "UNARY", lang) Then
         s$ = "-:": GoTo contoper
     Else
         SyntaxError
@@ -36420,8 +36483,8 @@ resp = True
 If FastSymbol(rest$, "!") Then basestack.nokillvars = True
 par = False: F = 0
 
-If IsLabelSymbolNew(rest$, "йемг", "VOID", Lang) Then par = True
-If IsLabelSymbolNew(rest$, "енытеяийг", "EXTERN", Lang) Then
+If IsLabelSymbolNew(rest$, "йемг", "VOID", lang) Then par = True
+If IsLabelSymbolNew(rest$, "енытеяийг", "EXTERN", lang) Then
 basestack.nokillvars = False
 If IsExp(basestack, rest$, p) Then
 i = CLng(p)
@@ -36475,7 +36538,7 @@ End If
 Else
 'WRONG...
 End If
-ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", lang) Then
     i = Abs(IsLabel(basestack, rest$, what$))
     
     If i = 1 Then
@@ -36485,13 +36548,13 @@ ElseIf IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
             If Typename(var(i)) <> "mEvent" Then
                   MyEr "Can't find Event", "дЕМ ЛПОЯЧ МА БЯЫ ТО цЕЦОМЭР"
             Else
-               resp = CallEvent(basestack, rest$, Lang, i)
+               resp = CallEvent(basestack, rest$, lang, i)
   
             End If
         End If
     ElseIf i = 5 Then
     If GetEventFromArray(basestack, rest$, what$) Then
-    resp = CallEvent(basestack, rest$, Lang, -1)
+    resp = CallEvent(basestack, rest$, lang, -1)
     End If
     ElseIf i = 0 Then
         If ISSTRINGA(rest$, s$) Then
@@ -36566,8 +36629,8 @@ contcallhere:
 
     Exit Sub
 Else
-flag = IsLabelSymbolNew(rest$, "топийа", "LOCAL", Lang)
-If IsLabelSymbolNew(rest$, "сумаятгсг", "FUNCTION", Lang) Then F = 3
+flag = IsLabelSymbolNew(rest$, "топийа", "LOCAL", lang)
+If IsLabelSymbolNew(rest$, "сумаятгсг", "FUNCTION", lang) Then F = 3
 
 reenter1:
 
@@ -37040,16 +37103,16 @@ End If
 
 End Sub
 
-Function myStructure(basestack As basetask, rest$, Lang As Long) As Boolean
+Function myStructure(basestack As basetask, rest$, lang As Long) As Boolean
 Dim base As String
 If IsStrExp(basestack, rest$, base) Then
-    TABLENAMES base, basestack, rest$, Lang
+    TABLENAMES base, basestack, rest$, lang
     myStructure = True
 Else
-    myStructure = makestruct(basestack, rest$, Lang)
+    myStructure = makestruct(basestack, rest$, lang)
 End If
 End Function
-Function makestruct(basestack As basetask, rest$, Lang As Long) As Boolean
+Function makestruct(basestack As basetask, rest$, lang As Long) As Boolean
 Dim what$, offset As Long, offset1 As Long, offsetlist As FastCollection, i As Long, s$, b$, p As Variant, w2 As Long
 
 ' struct is an inventory of offsets
@@ -37067,7 +37130,7 @@ If basestack.priveflag Then what$ = ChrW(&HFFBF) + what$
 Set offsetlist = var(i).objref
 ' so now we have the inventory
 If FastSymbol(rest$, "{") Then
-    If StructPage(basestack, rest$, Lang, 0, offset, offsetlist, "") Then
+    If StructPage(basestack, rest$, lang, 0, offset, offsetlist, "") Then
     If offsetlist Is Nothing Then Exit Function
     offsetlist.StructLen = offset
     var(i).ReadOnly = True
@@ -37084,7 +37147,7 @@ Else
 Between = (a >= b And a <= c) And Not a = exclude
 End If
 End Function
-Function StructPage(basestack As basetask, rest$, Lang As Long, ByVal offset, ByRef offset2, offsetlist As FastCollection, ByVal lasthead$) As Boolean
+Function StructPage(basestack As basetask, rest$, lang As Long, ByVal offset, ByRef offset2, offsetlist As FastCollection, ByVal lasthead$) As Boolean
 Dim what$, offset1 As Long, i As Long, s$, b$, p As Variant, w2 As Long, maxoffset As Long, probeoffset As Long
 Dim itissingle As Boolean
     b$ = NLtrim$(block(rest$))
@@ -37109,7 +37172,7 @@ again1:
     ElseIf FastSymbol(b$, "{") Then
     ' IS A NEW PAGE
     probeoffset = 0
-    If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$) Then
+    If StructPage(basestack, b$, lang, offset, probeoffset, offsetlist, lasthead$) Then
         If probeoffset > maxoffset Then maxoffset = probeoffset
         ' leave offset as is
     GoTo again
@@ -37119,7 +37182,7 @@ again1:
     ElseIf Between(Abs(IsLabelOnly(b$, what$)), 1, 3, 2) Then
     Do
     '' check type, or by default use 2
-    If IsLabelSymbolNew(what$, "долг", "STRUCTURE", Lang, , , , False) Then
+    If IsLabelSymbolNew(what$, "долг", "STRUCTURE", lang, , , , False) Then
     If Abs(IsLabelOnly(b$, what$)) = 1 Then
     If FastSymbol(b$, "{") Then
         probeoffset = 0
@@ -37130,7 +37193,7 @@ again1:
         Exit Function
         End If
 
-        If StructPage(basestack, b$, Lang, offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
+        If StructPage(basestack, b$, lang, offset, probeoffset, offsetlist, lasthead$ + what$ + ".") Then
             If probeoffset > maxoffset Then maxoffset = probeoffset
             ' leave offset as is
     
@@ -37152,20 +37215,20 @@ again1:
         Exit Function
     End If
 
-    ElseIf IsLabelSymbolNew(b$, "ыс", "AS", Lang, , , , False) Then
+    ElseIf IsLabelSymbolNew(b$, "ыс", "AS", lang, , , , False) Then
     itissingle = False
-                            If IsLabelSymbolNew(b$, "ьгжио", "BYTE", Lang, , , , False) Then
+                            If IsLabelSymbolNew(b$, "ьгжио", "BYTE", lang, , , , False) Then
                                      offset1 = 1
-                                ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                                      offset1 = 2
-                                ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                                      offset1 = 4
-                                ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                                      offset1 = 4
                                      itissingle = True
-                                ElseIf IsLabelSymbolNew(b$, "цяалла", "STRING", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(b$, "цяалла", "STRING", lang, , , , False) Then
                                      offset1 = -4
-                                ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+                                ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                                      offset1 = 8
                                 Else
                                 If IsLabelOnly(b$, s$) Then
@@ -37251,7 +37314,7 @@ comehere:
 
 End Function
 
-Function MyLet(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyLet(bstack As basetask, rest$, lang As Long) As Boolean
 Dim what$, ss$, i As Long, x1 As Long, flag As Boolean
 MyLet = True
 Do
@@ -37304,14 +37367,14 @@ End If
 End If
 Loop Until Not FastSymbol(rest$, ",")
 End Function
-Function MyThread(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyThread(bstack As basetask, rest$, lang As Long) As Boolean
 Dim frm$, ss$, what$, i As Long, p As Variant, x As Double, par As Boolean, bs As basetask
 MyThread = True
      If FastSymbol(rest$, "{") Then
         frm$ = NLtrim$(block(rest$))
         If FastSymbol(rest$, "}") Then
                 par = False
-                If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+                If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
                 Else
                     MyEr "can't find clause AS variable_name", "ДЕМ ЛПОЯЧ МА БЯЧ ТО ЛщЯОР ыс ОМОЛА_ЛЕТАБКГТчР"
                    
@@ -37337,9 +37400,9 @@ MyThread = True
                         
                         Set bs = Nothing
                         ss$ = vbNullString
-                        If IsLabelSymbolNewExp(rest$, "йахе", "INTERVAL", Lang, ss$) Then
+                        If IsLabelSymbolNewExp(rest$, "йахе", "INTERVAL", lang, ss$) Then
                         GoTo chekInterval
-                        ElseIf IsLabelSymbolNewExp(rest$, "ейтекесг", "EXECUTE", Lang, ss$) Then
+                        ElseIf IsLabelSymbolNewExp(rest$, "ейтекесг", "EXECUTE", lang, ss$) Then
                         TaskMaster.Message CLng(p), 4, , rest$
                         End If
                 Case Else
@@ -37352,17 +37415,17 @@ MyThread = True
         End If
 ElseIf IsExp(bstack, rest$, p) Then
 ss$ = vbNullString
-    If IsLabelSymbolNewExp(rest$, "сбгсе", "ERASE", Lang, ss$) Then
+    If IsLabelSymbolNewExp(rest$, "сбгсе", "ERASE", lang, ss$) Then
        If Not bstack.ThrowOne(CLng(p)) Then
        TaskMaster.ThrowOne (CLng(p))
        End If
-    ElseIf IsLabelSymbolNewExp(rest$, "йяата", "HOLD", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "йяата", "HOLD", lang, ss$) Then
         TaskMaster.Message CLng(p), 0
-    ElseIf IsLabelSymbolNewExp(rest$, "ейтекесг", "EXECUTE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "ейтекесг", "EXECUTE", lang, ss$) Then
      TaskMaster.Message CLng(p), 4, , rest$
-    ElseIf IsLabelSymbolNewExp(rest$, "нейима", "RESTART", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "нейима", "RESTART", lang, ss$) Then
         TaskMaster.Message CLng(p), 2
-    ElseIf IsLabelSymbolNewExp(rest$, "йахе", "INTERVAL", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "йахе", "INTERVAL", lang, ss$) Then
 chekInterval:
         If IsExp(bstack, rest$, x) Then
             If x < 2 Then x = 2
@@ -37395,7 +37458,7 @@ players(GetCode(bstack.Owner)).bold = Abs(p <> 0)
 bstack.Owner.Font.bold = Abs(p <> 0)
 
 End Sub
-Sub ProcChooseFont(bstack As basetask, Lang As Long)
+Sub ProcChooseFont(bstack As basetask, lang As Long)
 If Form4.Visible Then
 Form4.Visible = False
     If Form1.TEXT1.Visible Then
@@ -37404,7 +37467,7 @@ Form4.Visible = False
         Form1.SetFocus
     End If
 End If
-DialogSetupLang Lang
+DialogSetupLang lang
 With bstack.Owner
     ReturnFontName = .Font.name
     ReturnBold = .Font.bold
@@ -37562,14 +37625,14 @@ If it <> 1 Then
 End If
 Set Scr = Nothing
 End Function
-Function ProcCurve(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcCurve(bstack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, F As Long
 Dim Scr As Object
 
 Set Scr = bstack.Owner
 ProcCurve = True
 With players(GetCode(Scr))
-If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", Lang) Then par = True
+If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", lang) Then par = True
 F = 32
 ReDim PLG(F)
 x1 = 1
@@ -37632,7 +37695,7 @@ MyDoEvents1 Scr
 
 End Function
 
-Function ProcPoly(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcPoly(bstack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, F As Long
 Dim col As Long, Scr As Object
 ProcPoly = True
@@ -37642,7 +37705,7 @@ If IsExp(bstack, rest$, p) Then
 col = p
 End If
 If Not FastSymbol(rest$, ",") Then SyntaxError: ProcPoly = False: Exit Function
-If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", Lang) Then par = True
+If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", lang) Then par = True
 Scr.fillstyle = vbSolid
 Scr.FillColor = mycolor(col)
 F = 32
@@ -37704,12 +37767,12 @@ End With
 MyDoEvents1 Scr
 Set Scr = Nothing
 End Function
-Function ProcCircle(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcCircle(bstack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant
 Dim col As Long, Scr As Object, isarc As Boolean
 ProcCircle = True
 par = False
-If IsLabelSymbolNew(rest$, "целисла", "FILL", Lang) Then
+If IsLabelSymbolNew(rest$, "целисла", "FILL", lang) Then
 If IsExp(bstack, rest$, p) Then x = p
 If Not FastSymbol(rest$, ",") Then MissNumExpr: ProcCircle = False: Exit Function
 par = True
@@ -37797,7 +37860,7 @@ MyDoEvents1 Scr
 Set Scr = Nothing
 
 End Function
-Function ProcDraw(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDraw(bstack As basetask, rest$, lang As Long) As Boolean
 Dim col As Long, x1 As Long, sX As Double, sY As Double, F As Long, y1 As Long
 Dim p As Variant, Scr As Object
 
@@ -37807,7 +37870,7 @@ With players(GetCode(bstack.Owner))
 x1 = 0
 y1 = 1
 col = .mypen
-If IsLabelSymbolNew(rest$, "еыс", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "еыс", "TO", lang) Then
 If IsExp(bstack, rest$, p) Then x1 = p Else x1 = .XGRAPH
 If FastSymbol(rest$, ",") Then
 If IsExp(bstack, rest$, p) Then y1 = p Else y1 = .YGRAPH
@@ -37835,7 +37898,7 @@ End If
 MyDoEvents1 Scr
 Set Scr = Nothing
 Exit Function
-ElseIf IsLabelSymbolNew(rest$, "цымиа", "ANGLE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "цымиа", "ANGLE", lang) Then
 If IsExp(bstack, rest$, p) Then sX = p Else ProcDraw = False: Exit Function
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then sY = p Else ProcDraw = False: Exit Function
 sX = sX / PI2
@@ -37866,11 +37929,11 @@ Set Scr = Nothing
 End With
 
 End Function
-Function ProcStep(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcStep(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, sY As Double, sX As Double
 ProcStep = True
 With players(GetCode(bstack.Owner))
-If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", Lang) Then
+If IsLabelSymbolNew(rest$, "цымиа", "ANGLE", lang) Then
 If IsExp(bstack, rest$, p) Then sX = p Else ProcStep = False: MissNumExpr: Exit Function
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then sY = p Else ProcStep = False: MissNumExpr: Exit Function
 sX = sX / PI2
@@ -37897,7 +37960,7 @@ If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then .YGRAPH = p Else 
 End If
 End With
 End Function
-Function ProcPlayer(bstack As basetask, rest$, Lang As Long)
+Function ProcPlayer(bstack As basetask, rest$, lang As Long)
 Dim par As Boolean, sX As Double, sY As Double, x As Double, y As Double, x1 As Integer, p As Variant, it As Long
 Dim col As Long, Scr As Object, what$, i As Long, s$, pppp As mArray, frm$, sxy As Double
 If IsExp(bstack, rest$, p) Then
@@ -37932,7 +37995,7 @@ If IsExp(bstack, rest$, p) Then
                 End If
             End If
         End If
-        If IsLabelSymbolNew(rest$, "ле", "USE", Lang) Then ' no need for coma
+        If IsLabelSymbolNew(rest$, "ле", "USE", lang) Then ' no need for coma
             Select Case Abs(IsLabel(bstack, rest$, what$))
             Case 3
                 If GetVar(bstack, what$, i) Then s$ = var(i)
@@ -37988,7 +38051,7 @@ If IsExp(bstack, rest$, p) Then
                         Else
                 
                         End If
-                   If IsLabelSymbolNew(rest$, "лецехос", "SIZE", Lang) Then
+                   If IsLabelSymbolNew(rest$, "лецехос", "SIZE", lang) Then
               If Not IsExp(bstack, rest$, sY) Then ProcPlayer = False: MissNumExpr: Exit Function
               Else
               sY = 1
@@ -38001,7 +38064,7 @@ If IsExp(bstack, rest$, p) Then
          PosSprite CLng(p), x - players(it).x, y - players(it).y
         End If
         Else ' without x, y
-            If IsLabelSymbolNew(rest$, "ле", "USE", Lang) Then
+            If IsLabelSymbolNew(rest$, "ле", "USE", lang) Then
         Select Case Abs(IsLabel(bstack, rest$, what$))
         Case 3
             If GetVar(bstack, what$, i) Then s$ = var(i)
@@ -38048,7 +38111,7 @@ If IsExp(bstack, rest$, p) Then
             Else
     
             End If
-            If IsLabelSymbolNew(rest$, "лецехос", "SIZE", Lang) Then          ' SIZE WITHOUT COMMA
+            If IsLabelSymbolNew(rest$, "лецехос", "SIZE", lang) Then          ' SIZE WITHOUT COMMA
                 If Not IsExp(bstack, rest$, sY) Then ProcPlayer = False: MissNumExpr: Exit Function
             Else
                 sY = 1
@@ -38057,11 +38120,11 @@ If IsExp(bstack, rest$, p) Then
             it = GetNewSpriteObj(CLng(p), s$, col, CLng(sX), CSng(sY), CSng(sxy), frm$)
             ' no USE no X, Y or X,Y USE ..
             ' only command
-        ElseIf IsLabelSymbolNew(rest$, "деине", "SHOW", Lang) Then     ' SHOW
+        ElseIf IsLabelSymbolNew(rest$, "деине", "SHOW", lang) Then     ' SHOW
             SrpiteHideShow p, (True)
-        ElseIf IsLabelSymbolNew(rest$, "йяуье", "HIDE", Lang) Then        ' HIDE
+        ElseIf IsLabelSymbolNew(rest$, "йяуье", "HIDE", lang) Then        ' HIDE
             SrpiteHideShow p, (False)
-        ElseIf IsLabelSymbolNew(rest$, "аккане", "SWAP", Lang) Then       ' SWAP
+        ElseIf IsLabelSymbolNew(rest$, "аккане", "SWAP", lang) Then       ' SWAP
             If IsExp(bstack, rest$, x) Then
                 SpriteControl CLng(p), CLng(x)
                 Dim bb As basket, bl As Long, BR As Long
@@ -38080,7 +38143,7 @@ End If
 ProcPlayer = True
 Exit Function
 End Function
-Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyRead(jump As Long, bstack As basetask, rest$, lang As Long) As Boolean
 Dim ps As mStiva, bs As basetask, F As Long, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, what$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
 Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean
@@ -39147,7 +39210,7 @@ contstrhere:
          If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 2, F) Then
                     If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then SyntaxError: Exit Function
         
-            If Not ProcGroup(100, bstack, what$, Lang) Then
+            If Not ProcGroup(100, bstack, what$, lang) Then
                 MyRead = False
                 Set bstack.lastobj = Nothing
                 Exit Function
@@ -39156,7 +39219,7 @@ contstrhere:
                 MyRead = True
            
         Else
-                 If Not ProcGroup(100, bstack, what$, Lang) Then
+                 If Not ProcGroup(100, bstack, what$, lang) Then
                 MyRead = False
                 Set bstack.lastobj = Nothing
                 Exit Function
@@ -39771,14 +39834,14 @@ ElseIf y1 = 5 Or y1 = 7 Then
   If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
                 If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
                         If Typename(pppp.item(it)) = "Group" Then
-                            Dim MM As Variant
-                            Set MM = pppp.item(it)
+                            Dim mm As Variant
+                            Set mm = pppp.item(it)
                             Set pppp.item(it) = Nothing
                             EmptyVariantArrayItem pppp, it
                             If m_bInIDE Then
-                                CallClear bstack, what$, MM
+                                CallClear bstack, what$, mm
                             Else
-                                CallClear bstack, what$, MM, -1
+                                CallClear bstack, what$, mm, -1
                             End If
 
                          ElseIf Typename(pppp.item(it)) = "lambda" Then
@@ -39884,7 +39947,7 @@ End If
 If Not MyClear Then Exit Do
 Loop Until Not FastSymbol(rest$, ",")
 End Function
-Function MyDeclare(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyDeclare(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, i As Long, s$, pa$
 Dim x1 As Long, y1 As Long, par As Boolean, ss$, w$, what$, y3 As Boolean
 Dim declobj As Object, ML As Long
@@ -39893,8 +39956,8 @@ Dim pppp As mArray
 Dim ii As Long, ev As ComShinkEvent
 MyDeclare = True
 ML = -1
-y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", Lang)
-y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", Lang)
+y1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", lang)
+y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", lang)
 x1 = Abs(innerIsLabel(bstack, rest$, what$, , True, True))
 
 w$ = myUcase$(what$)
@@ -39925,7 +39988,7 @@ gohere:
             End If
             ss$ = vbNullString
 
-               If IsLabelSymbolNewExp(rest$, "типота", "NOTHING", Lang, ss$) Then
+               If IsLabelSymbolNewExp(rest$, "типота", "NOTHING", lang, ss$) Then
                    If ML >= 0 Then
 goNothing:
               If neoGetArray(bstack, w$, pppp) Then
@@ -39962,7 +40025,7 @@ goNothing:
                    End If
                    Exit Function
                
-               ElseIf IsLabelSymbolNewExp(rest$, "мео", "NEW", Lang, ss$) Then
+               ElseIf IsLabelSymbolNewExp(rest$, "мео", "NEW", lang, ss$) Then
                Set var(i) = Nothing
                GoTo THEREnew
                Else
@@ -39976,7 +40039,7 @@ goNothing:
          End If
          ss$ = vbNullString
          
-         If IsLabelSymbolNewExp(rest$, "апо", "LIB", Lang, ss$) Then
+         If IsLabelSymbolNewExp(rest$, "апо", "LIB", lang, ss$) Then
          
               par = Fast2Label(rest$, "C", 1, "", 0, 1)
               
@@ -39997,7 +40060,7 @@ goNothing:
                 s$ = vbNullString
                 SpaceForVar i
                 Set declobj = New stdCallFunction
-                If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+                If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
                 If Not IsExp(bstack, rest$, p) Then
                 BadObjectDecl
                 MyDeclare = False
@@ -40007,7 +40070,7 @@ goNothing:
             declobj.RetType = CLng(p)
                 End If
                 End If
-                declobj.CallThis pa$, ss$, Lang
+                declobj.CallThis pa$, ss$, lang
                 If par Then declobj.CallType = 1
             
                 Set var(i) = declobj
@@ -40034,7 +40097,7 @@ goNothing:
                  Set declobj = Nothing
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNewExp(rest$, "ле", "USE", Lang, ss$) Then
+        ElseIf IsLabelSymbolNewExp(rest$, "ле", "USE", lang, ss$) Then
                 If y3 <> 0 Then
                 SyntaxError
                 Exit Function
@@ -40069,7 +40132,7 @@ goNothing:
          Else
          
          GlobalArr bstack, w$ + "(", LTrim(Str(ML)) + ")", i, y1
-        If DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, i, ML, w$, y1) Then
+        If DeclareGUI(bstack, what$, rest$, MyDeclare, lang, i, ML, w$, y1) Then
         Exit Function
         End If
         End If
@@ -40193,7 +40256,7 @@ MyDeclare = False
         ElseIf y3 Then
         SyntaxError
         Exit Function
-        ElseIf DeclareGUI(bstack, what$, rest$, MyDeclare, Lang, i) Then
+        ElseIf DeclareGUI(bstack, what$, rest$, MyDeclare, lang, i) Then
          
          
         End If
@@ -40208,9 +40271,9 @@ MyDeclare = False
 If FastSymbol(rest$, ")") Then
  'w$ = Left$(w$, Len(w$) - 1)
 'w$ = w$ + ")"
- If IsLabelSymbolNewExp(rest$, "типота", "NOTHING", Lang, ss$) Then GoTo goNothing
- If IsLabelSymbolNewExp(rest$, "памы", "OVER", Lang, ss$) Then
-    ExpandGui bstack, what$, rest$, MyDeclare, Lang, w$
+ If IsLabelSymbolNewExp(rest$, "типота", "NOTHING", lang, ss$) Then GoTo goNothing
+ If IsLabelSymbolNewExp(rest$, "памы", "OVER", lang, ss$) Then
+    ExpandGui bstack, what$, rest$, MyDeclare, lang, w$
     '' not yet
 '' ElseIf IsLabelSymbolNewExp(rest$, "упо", "UNDER", lang, ss$) Then
   ''  ReduceGui bstack, what$, rest$, ifier, lang, w$
@@ -40241,7 +40304,7 @@ End If
     
 
 End Function
-Function MyWith(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyWith(bstack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, ss$, s$, pppp As mArray, pa$, x1 As Long
 MyWith = True
 x1 = Abs(IsLabel(bstack, rest$, s$))
@@ -40253,7 +40316,7 @@ If x1 = 1 Or x1 = 3 Then
                     If IsStrExp(bstack, rest$, ss$) Then
                     On Error Resume Next
 
-                      ProcProperty bstack, var(), i, ss$, rest$, Lang
+                      ProcProperty bstack, var(), i, ss$, rest$, lang
                       If Err.Number > 0 Then
                       MyEr "Property " + ss$ + " problem", "пЯЭБКГЛА ЛЕ ИДИЭТГТА " + ss$
                       Err.Clear
@@ -40285,7 +40348,7 @@ ElseIf x1 = 5 Or x1 = 6 Then
                     If TypeOf pppp.item(i) Is GuiM2000 Then
                       If UCase(ss$) = "VISIBLE" Then ss$ = "TrueVisible"
                       End If
-                  ProcPropertyArray bstack, pppp, i, ss$, rest$, Lang, MyWith
+                  ProcPropertyArray bstack, pppp, i, ss$, rest$, lang, MyWith
                   If LastErNum1 = -1 Then
                   Exit Do
                   End If
@@ -40314,7 +40377,7 @@ Else
 MissingObj
 End If
 End Function
-Function MyMethod(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyMethod(bstack As basetask, rest$, lang As Long) As Boolean
 
 Dim i As Long, s$, pppp As mArray, pa$, ok As Boolean
 i = Abs(IsLabel(bstack, rest$, s$))
@@ -40329,7 +40392,7 @@ If i = 1 Or i = 3 Then
                 IsSymbol3 rest$, ","
                 If IsStrExp(bstack, rest$, pa$) Then
            ''     IsSymbol3 rest$, ","
-              ProcMethod bstack, var(), i, pa$, rest$, Lang, ok
+              ProcMethod bstack, var(), i, pa$, rest$, lang, ok
           MyMethod = (Err = 0) And ok
           Err.Clear
                 End If
@@ -40361,7 +40424,7 @@ again11:
     End If
              IsSymbol3 rest$, ","
             If IsStrExp(bstack, rest$, pa$) Then
-                ProcMethodArray bstack, pppp, i, pa$, rest$, Lang, MyMethod
+                ProcMethodArray bstack, pppp, i, pa$, rest$, lang, MyMethod
               End If
      End If
   Else
@@ -40385,7 +40448,7 @@ Dim pppp As mArray, x1 As Long
     End If
  End If
 End Function
-Function myEvent(basestack As basetask, rest$, Lang As Long)
+Function myEvent(basestack As basetask, rest$, lang As Long)
 Dim x1 As Long, what$, i As Long, s$
 myEvent = True
  x1 = Abs(IsLabel(basestack, rest$, what$))
@@ -40396,7 +40459,7 @@ myEvent = True
   If Not NeoGetArrayItem(pppp, basestack, what$, x1, rest$, True) Then Exit Function
     If MyIsObject(pppp.item(x1)) Then
     Set basestack.lastobj = pppp.item(x1)
-    myEvent = ProcEvent(basestack, rest$, Lang, -1)
+    myEvent = ProcEvent(basestack, rest$, lang, -1)
     Exit Function
     Else
     MyEr "Not an Event object", "╪ВИ щМА АМТИЙЕъЛЕМО цЕЦОМЭР"
@@ -40416,9 +40479,9 @@ myEvent = True
    i = globalvar(basestack.GroupName & what$, s$)
    MakeitObjectEvent var(i)
  End If
- myEvent = ProcEvent(basestack, rest$, Lang, i)
+ myEvent = ProcEvent(basestack, rest$, lang, i)
 End Function
-Function MyReport(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyReport(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, prive As Long, x As Double, y As Double, y1 As Long, x1 As Long, it As Long
 Dim s$, i As Long, pa$, sX As Double
 MyReport = False
@@ -40444,10 +40507,10 @@ End If
 If FastSymbol(rest$, ",") Then
 If Not IsExp(bstack, rest$, y) Then: Exit Function
 y1 = y - 1
-If IsLabelSymbolNew(rest$, "цяаллг", "LINE", Lang) Then
+If IsLabelSymbolNew(rest$, "цяаллг", "LINE", lang) Then
         If Not IsExp(bstack, rest$, sX) Then: Exit Function
         x1 = sX - 1
-If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
           wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1, , , True
   rest$ = "@READ " + rest$
   If Not executeblock(i, bstack, rest$, True, False) Then
@@ -40457,7 +40520,7 @@ If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
         wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), x1
       End If
 Else
-If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
   wwPlain bstack, players(prive), s$, CLng(x), y1, , , CLng(p), , it, , True
   rest$ = "@READ " + rest$
   If Not executeblock(i, bstack, rest$, True, False) Then
@@ -40483,10 +40546,10 @@ If LastErNum <> 0 Then LastErNum = 0:: Exit Function      'ifier=true
 End If
 
 End Function
-Function MyInput(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyInput(bstack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, p As Variant, PP As Variant, s$, ss$, what$, F As Long, x1 As Long, y As Double, x As Double
 Dim frm$, par As Boolean, pppp As mArray, prive As Long, it As Long, w$, mystack As mStiva
-If IsLabelSymbolNew(rest$, "ле", "WITH", Lang) Then
+If IsLabelSymbolNew(rest$, "ле", "WITH", lang) Then
     If IsStrExp(bstack, rest$, s$) Then
         inpcsvsep$ = Left$(s$, 1)
         If FastSymbol(rest$, ",") Then If IsStrExp(bstack, rest$, s$) Then inpcsvDec$ = Left$(s$, 1): MyInput = True
@@ -40502,7 +40565,7 @@ If inpcsvDec$ = vbNullString Then inpcsvDec$ = "."
 
 MyInput = True
 With players(GetCode(bstack.Owner))
-If IsLabelSymbolNew(rest$, "текос", "END", Lang) Then
+If IsLabelSymbolNew(rest$, "текос", "END", lang) Then
 
 If Not NOEDIT Then
 
@@ -40654,7 +40717,7 @@ If FastSymbol(rest$, "!") Then
                      If Not FastSymbol(rest$, ",") Then
                              y = 0
                              x1 = 50
-                             If IsLabelSymbolNew(rest$, "лгйос", "LEN", Lang, , , , False) Then
+                             If IsLabelSymbolNew(rest$, "лгйос", "LEN", lang, , , , False) Then
                                      If FastSymbol(rest$, "=") Then
                                              If IsExp(bstack, rest$, p) Then
                                                      x1 = Abs(MyRound(p))
@@ -40776,7 +40839,7 @@ If y < 1 And x1 = 0 Then y = 1
                     If Not FastSymbol(rest$, ",") Then
                         y = 0
                         x1 = 50
-                        If IsLabelSymbolNew(rest$, "лгйос", "LEN", Lang, , , , False) Then
+                        If IsLabelSymbolNew(rest$, "лгйос", "LEN", lang, , , , False) Then
                                 If FastSymbol(rest$, "=") Then
                                         If IsExp(bstack, rest$, p) Then
                                             x1 = Abs(MyRound(p))
@@ -41261,7 +41324,7 @@ Do
                 End With
 
 End Function
-Function MyModules(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyModules(bstack As basetask, rest$, lang As Long) As Boolean
 Dim frm$, s$, pa$, ss$, mDir As recDir
 
 MyModules = True
@@ -41289,7 +41352,7 @@ Loop
 
 If pa$ <> "" Then
 If here$ <> "" Then If FastSymbol(rest$, "?") Then GoTo ponly
-If Lang Then
+If lang Then
 
 pa$ = "In Memory: " & pa$ & vbCrLf & "        Use REMOVE to remove the right most, EDIT module_name to edit"
 Else
@@ -41308,7 +41371,7 @@ frm$ = ExtractNameOnly(mDir.Dir2$(mcd, "GSB", False))
 
 If frm$ <> "" Then
 If pa$ <> "" Then pa$ = pa$ & vbCrLf
-If Lang Then
+If lang Then
 pa$ = pa$ & "On Disk: "
 Else
 pa$ = pa$ & "сТОМ дъСЙО: "
@@ -41326,7 +41389,7 @@ Set mDir = Nothing
 pa$ = pa$ & ss$
 If ss$ <> "" Then
 If here$ = vbNullString Then
-If Lang Then
+If lang Then
 pa$ = pa$ & vbCrLf + ReplaceStr$("'", Chr(34), "        Use LOAD 'module_name' to load, EDIT 'module_name.gsb' to edit on disk")
 If IsSupervisor Then pa$ = pa$ & ", WIN DIR$ for folders tasks"
 Else
@@ -41426,7 +41489,7 @@ Else
 MyPlayScore = False
 End If
 End Function
-Function MyCopy(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyCopy(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, Scr As Object, photo As cDIBSection, s$, it As Long, what$
 MyCopy = True
 Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, pppp As mArray, y22 As Single
@@ -41434,7 +41497,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, pppp As mArray, y22 As Singl
              If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
                 Set photo = New cDIBSection
                 If cDib(s$, photo) Then
-                If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+                If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
                 If IsStrExp(bstack, rest$, s$) Then
                        photo.SaveDib s$
                        Set photo = Nothing
@@ -41463,7 +41526,7 @@ Else
 If IsExp(bstack, rest$, p) Then x1 = p
 If FastSymbol(rest$, ",") Then If IsExp(bstack, rest$, p) Then y1 = p
 
-If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
 Select Case Abs(IsLabel(bstack, rest$, s$))
 Case 3
     If GetVar(bstack, s$, it) Then
@@ -41526,7 +41589,7 @@ Case 6
     End If
 
 End Select
-ElseIf IsLabelSymbolNew(rest$, "ле", "USE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "ле", "USE", lang) Then
 
 If IsStrExp(bstack, rest$, s$) Then
  Set photo = New cDIBSection
@@ -41549,7 +41612,7 @@ Set Scr = Nothing
 Else
  MyCopy = False: MissNumExpr: Exit Function
 End If
-ElseIf IsLabelSymbolNew(rest$, "епамы", "TOP", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "епамы", "TOP", lang) Then
 
 If IsStrExp(bstack, rest$, s$) Then
  Set photo = New cDIBSection
@@ -41584,7 +41647,7 @@ End If
 MyDoEvents1 bstack.Owner
 
 End Function
-Function MyDrawings(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyDrawings(bstack As basetask, rest$, lang As Long) As Boolean
 MyDrawings = True
 Dim mDir As recDir, s$, ss$, frm$
 Set mDir = New recDir
@@ -41602,7 +41665,7 @@ s$ = mDir.Dir2
 If s$ <> "" Then frm$ = ExtractNameOnly(s$) Else frm$ = vbNullString
 Loop
 
-If Lang Then
+If lang Then
 ss$ = "Drawings: " & ss$
 Else
 ss$ = "сВщДИА: " & ss$
@@ -41610,7 +41673,7 @@ End If
 Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
 End Function
-Function MySounds(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MySounds(bstack As basetask, rest$, lang As Long) As Boolean
 MySounds = True
 Dim mDir As recDir, s$, ss$, frm$
 Set mDir = New recDir
@@ -41627,7 +41690,7 @@ If ss$ <> "" Then ss$ = ss$ & ", " & s$ Else ss$ = s$
 s$ = mDir.Dir2
 If s$ <> "" Then frm$ = ExtractNameOnly(s$) Else frm$ = vbNullString
 Loop
-If Lang Then
+If lang Then
 ss$ = "Sounds: " & ss$
 Else
 ss$ = "╧ВОИ: " & ss$
@@ -41636,7 +41699,7 @@ Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
 End Function
 
-Function MyMovies(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyMovies(bstack As basetask, rest$, lang As Long) As Boolean
 MyMovies = True
 Dim mDir As recDir, s$, ss$, frm$
 Set mDir = New recDir
@@ -41654,14 +41717,14 @@ s$ = mDir.Dir2
 If s$ <> "" Then frm$ = ExtractNameOnly(s$) Else frm$ = vbNullString
 Loop
 Set mDir = Nothing
-If Lang Then
+If lang Then
 ss$ = "Movies: " & ss$
 Else
 ss$ = "тАИМъЕР: " & ss$
 End If
 RepPlain bstack, bstack.Owner, ss$
 End Function
-Function MyBitmaps(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyBitmaps(bstack As basetask, rest$, lang As Long) As Boolean
 MyBitmaps = True
 Dim mDir As recDir, s$, ss$, frm$
 Set mDir = New recDir
@@ -41678,7 +41741,7 @@ If ss$ <> "" Then ss$ = ss$ & ", " & s$ Else ss$ = s$
 s$ = mDir.Dir2
 If s$ <> "" Then frm$ = ExtractNameOnly(s$) Else frm$ = vbNullString
 Loop
-If Lang Then
+If lang Then
 ss$ = "Bitmaps: " & ss$
 Else
 ss$ = "еИЙЭМЕР: " & ss$
@@ -41686,7 +41749,7 @@ End If
 Set mDir = Nothing
 RepPlain bstack, bstack.Owner, ss$
 End Function
-Function MyFunction(entrypoint As Long, bstack As basetask, rest$, Lang As Long, Optional noskipcommand = False, Optional MakeNew As Boolean) As Boolean
+Function MyFunction(entrypoint As Long, bstack As basetask, rest$, lang As Long, Optional noskipcommand = False, Optional MakeNew As Boolean) As Boolean
 Dim y1 As Long, par As Boolean, what$, s$, ss$, pa$, x1 As Long, i As Long, frm$
 Dim ohere$
 ohere$ = here$
@@ -41696,7 +41759,7 @@ MyFunction = True
                 y1 = True
         ElseIf entrypoint = 2 Then
         ' operators
-        par = IsLabelSymbolNew(rest$, "меа", "NEW", Lang)
+        par = IsLabelSymbolNew(rest$, "меа", "NEW", lang)
         i = InStr(rest$, " ")
         If i = 1 Then
         i = InStr(2, rest$, " ")
@@ -41707,8 +41770,8 @@ MyFunction = True
         rest$ = Mid$(rest$, i + 1)
             GoTo operators
         Else
-                y1 = IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", Lang)
-                par = IsLabelSymbolNew(rest$, "меа", "NEW", Lang)
+                y1 = IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", lang)
+                par = IsLabelSymbolNew(rest$, "меа", "NEW", lang)
         End If
         If y1 <> 0 Then
                 ' FUNCTION GLOBAL "ALFA[212].other" {definition} so we can place [ ] in a definition..
@@ -41801,7 +41864,7 @@ operators:
                                                 End If
                                                 If frm$ <> "" Then
                                                 
-                                                If Lang = 1 Then
+                                                If lang = 1 Then
                                                              s$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf
                                            
                                                 Else
@@ -41825,7 +41888,7 @@ operators:
                                 If FastSymbol(rest$, "{") Then
                                         what$ = block(rest$)
                                             If Len(frm$) <> 0 Then
-                                                    If Lang = 1 Then
+                                                    If lang = 1 Then
                                                         what$ = "Read " + frm$ + vbCrLf + what$
                                                     Else
                                                         what$ = "дИэБАСЕ " + frm$ + vbCrLf + what$
@@ -41872,7 +41935,7 @@ jump1:
                                 
                                             what$ = block(rest$) + " "
                                                 If Len(frm$) <> 0 Then
-                                                    If Lang = 1 Then
+                                                    If lang = 1 Then
                                                         what$ = "Read " + frm$ + vbCrLf + what$
                                                     Else
                                                         what$ = "дИэБАСЕ " + frm$ + vbCrLf + what$
@@ -41917,7 +41980,7 @@ jump1:
                                    '   If bstack.OriginalCode > x1 Then GoTo jumpheretoo
                                    '   End If
                                         If Len(frm$) <> 0 Then
-                                            If Lang = 1 Then
+                                            If lang = 1 Then
                                             rest$ = "Read " + frm$ + vbCrLf + rest$
                                             Else
                                             rest$ = "дИэБАСЕ " + frm$ + vbCrLf + rest$
@@ -41996,7 +42059,7 @@ jumpheretoo:
                                                         End If
                                                 End If
                                                 If frm$ <> "" Then
-                                                        If Lang = 1 Then
+                                                        If lang = 1 Then
         
                                                         s$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf
                    
@@ -42022,7 +42085,7 @@ jumpheretoo:
         End If
 
 End Function
-Function ProcDBprovider(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDBprovider(bstack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, s$, ss$
 ProcDBprovider = True
 If IsStrExp(bstack, rest$, pa$) Then
@@ -42084,7 +42147,7 @@ End If
 JetPostfix = JetPostfixUser
 JetPrefix = JetPrefixUser
 End Function
-Function ProcDBUSER(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDBUSER(bstack As basetask, rest$, lang As Long) As Boolean
 Dim s$
 ProcDBUSER = -True
     If IsStrExp(bstack, rest$, s$) Then
@@ -42104,7 +42167,7 @@ ProcDBUSER = -True
     End If
 
 End Function
-Function ProcChooseOrgan(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcChooseOrgan(bstack As basetask, rest$, lang As Long) As Boolean
 Dim F As Long, i As Long, s$
 If Form4.Visible Then
 Form4.Visible = False
@@ -42121,9 +42184,9 @@ s$ = ORGAN(i)
 Form1.List1.additemFast s$
 'If TextWidth(bstack.Owner, s$) > f Then f = TextWidth(bstack.Owner, s$)
 Next i
-ProcChooseOrgan = MyMenu(1, bstack, rest$, Lang)
+ProcChooseOrgan = MyMenu(1, bstack, rest$, lang)
 End Function
-Function ProcChooseObj(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcChooseObj(bstack As basetask, rest$, lang As Long) As Boolean
 Dim F As Long, i As Long, s$, p As Variant
     Dim iSectCount As Long, iSect As Long, sSections() As String
     Dim iVerCount As Long, iVer As Long, sVersions() As String
@@ -42145,7 +42208,7 @@ End If
                 Form1.List1.additemFast ObjectCatalog.KeyToString
                 
             Next i
-        ProcChooseObj = MyMenu(2, bstack, rest$, Lang)
+        ProcChooseObj = MyMenu(2, bstack, rest$, lang)
     Else
       
        Set ObjectCatalog = New FastCollection
@@ -42205,7 +42268,7 @@ End If
                 
             Next i
             
-            ProcChooseObj = MyMenu(2, bstack, rest$, Lang)
+            ProcChooseObj = MyMenu(2, bstack, rest$, lang)
         
         Else
             OutOfLimit
@@ -42214,7 +42277,7 @@ End If
     End If
 End Function
 
-Function ProcBrowser(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcBrowser(bstack As basetask, rest$, lang As Long) As Boolean
 Dim s$, w$, x As Double
 ProcBrowser = True
 If Not IsStrExp(bstack, rest$, s$) Then
@@ -42264,12 +42327,12 @@ End If
 ProcTask2 bstack
 End Function
 
-Function ProcView(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcView(bstack As basetask, rest$, lang As Long) As Boolean
 If bstack.toprinter Then oxiforPrinter: Exit Function
 If Typename(bstack.Owner) Like "Gui*" Then oxiforforms: Exit Function
-GetNames bstack, rest$, Form1.List1, Lang
+GetNames bstack, rest$, Form1.List1, lang
 mywait bstack, CDbl(100)
-If Not FastSymbol(rest$, ";") Then ProcView = MyMenu(2, bstack, rest$, Lang) Else ProcView = True
+If Not FastSymbol(rest$, ";") Then ProcView = MyMenu(2, bstack, rest$, lang) Else ProcView = True
 End Function
 
 Function ProcTone(bstack As basetask, rest$) As Boolean
@@ -42288,7 +42351,7 @@ Beeper 1000, 100
 End If
 ProcTone = True
 End Function
-Function ProcProto(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcProto(bstack As basetask, rest$, lang As Long) As Boolean
 ProcProto = True
 Dim s$, w$, v As Long
 If FastSymbol(rest$, "{") Then
@@ -42299,7 +42362,7 @@ ProcProto = False
 Exit Function
 End If
 If FastSymbol(rest$, "}", True) Then
-    If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+    If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
         If IsLabelOnly(rest$, w$) = 3 Then
             v = globalvar(w$, v, , True)
             var(v) = s$
@@ -42317,11 +42380,11 @@ If FastSymbol(rest$, "}", True) Then
     ProcProto = False
 End If
 End Function
-Function ProcBuffer(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcBuffer(bstack As basetask, rest$, lang As Long) As Boolean
 ProcBuffer = True
 Dim s$, what$, i As Long, p As Variant, PP As Long, par As Long, what2$, Runnable As Boolean, itissingle As Boolean
-If IsLabelSymbolNew(rest$, "йыдийа", "CODE", Lang) Then Runnable = True
-If IsLabelSymbolNew(rest$, "йемг", "CLEAR", Lang) Then par = &H8
+If IsLabelSymbolNew(rest$, "йыдийа", "CODE", lang) Then Runnable = True
+If IsLabelSymbolNew(rest$, "йемг", "CLEAR", lang) Then par = &H8
 
      Do While Abs(IsLabel(bstack, rest$, what$)) = 1
      If bstack.priveflag Then what$ = ChrW(&HFFBF) + what$
@@ -42337,20 +42400,20 @@ If IsLabelSymbolNew(rest$, "йемг", "CLEAR", Lang) Then par = &H8
                     ' GET TYPE OF  BUFFER
                     ' Char (1 byte) String (2 bytes)  Long (4 Bytes)
                     PP = 1
-                    If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
-                        If IsLabelSymbolNew(rest$, "ьгжио", "BYTE", Lang, , , , False) Then
+                    If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
+                        If IsLabelSymbolNew(rest$, "ьгжио", "BYTE", lang, , , , False) Then
                             PP = 1
-                        ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+                        ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", lang, , , , False) Then
                             PP = 2
-                        ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", Lang, , , , False) Then
+                        ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", lang, , , , False) Then
                             PP = 4
-                        ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", Lang, , , , False) Then
+                        ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", lang, , , , False) Then
                             itissingle = True
                             PP = 4
-                        ElseIf IsLabelSymbolNew(rest$, "цяалла", "STRING", Lang, , , , False) Then
+                        ElseIf IsLabelSymbolNew(rest$, "цяалла", "STRING", lang, , , , False) Then
                             
                             PP = -4
-                        ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", Lang, , , , False) Then
+                        ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", lang, , , , False) Then
                             PP = 8
                         ElseIf Abs(IsLabel(bstack, rest$, what2$)) = 1 Then
                         If IsExp(bstack, what2$, p) Then
@@ -42413,10 +42476,10 @@ comehere:
      Loop
 
 End Function
-Function ProcInventory(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcInventory(bstack As basetask, rest$, lang As Long) As Boolean
 ProcInventory = True
 Dim s$, what$, i As Long, p As Variant, Queue As Boolean, serr As Boolean
-    Queue = IsLabelSymbolNew(rest$, "оуяа", "QUEUE", Lang)
+    Queue = IsLabelSymbolNew(rest$, "оуяа", "QUEUE", lang)
      Do While Abs(IsLabel(bstack, rest$, what$)) = 1
      serr = False
 conthere:
@@ -42485,9 +42548,9 @@ If serr Then SyntaxError: ProcInventory = False
 End Function
 
 
-Function ProcSettings(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSettings(bstack As basetask, rest$, lang As Long) As Boolean
 Dim it As Long
-TweakLang = Lang
+TweakLang = lang
 With bstack.Owner
     it = .FontItalic
     .FontItalic = 0
@@ -42508,15 +42571,15 @@ With bstack.Owner
 End With
 ProcSettings = True
 End Function
-Function ProcThreadPlan(bstack As basetask, rest$, Lang As Long) As Boolean
-If IsLabelSymbolNew(rest$, "таутовяомо", "CONCURRENT", Lang) Then
+Function ProcThreadPlan(bstack As basetask, rest$, lang As Long) As Boolean
+If IsLabelSymbolNew(rest$, "таутовяомо", "CONCURRENT", lang) Then
 If TaskMaster.QueueCount <> 0 Then
 If Not Interrupted Then MyEr "Threads exist, can't change thread plan", "уПэЯВОУМ МчЛАТА, ДЕМ ЛПОЯЕъР МА АККэНЕИР СВщДИО"
 Else
 Interrupted = True
 End If
 
-ElseIf IsLabelSymbolNew(rest$, "диадовийо", "SEQUENTIAL", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "диадовийо", "SEQUENTIAL", lang) Then
 If TaskMaster.QueueCount <> 0 Then
 If Interrupted Then MyEr "Threads exist, can't change thread plan", "уПэЯВОУМ МчЛАТА, ДЕМ ЛПОЯЕъР МА АККэНЕИР СВщДИО"
 Else
@@ -42558,7 +42621,7 @@ PlayTune (s$)
 End If
 ProcTune = True
 End Function
-Function ProcName(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcName(bstack As basetask, rest$, lang As Long) As Boolean
 Dim s$, w$, x1 As Long, y1 As Long, ss$
 ProcName = True
 
@@ -42566,7 +42629,7 @@ x1 = Abs(IsLabelFileName(bstack, rest$, s$, , w$))
 
 If x1 = 1 Then
 s$ = w$
- If Not IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then ProcName = False: Exit Function
+ If Not IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then ProcName = False: Exit Function
 
  y1 = Abs(IsLabelFileName(bstack, rest$, ss$, , w$))
 
@@ -42586,7 +42649,7 @@ Else
 rest$ = s$ + rest$
 End If
 If IsStrExp(bstack, rest$, s$) Then
- If Not IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then ProcName = False: Exit Function
+ If Not IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then ProcName = False: Exit Function
 If IsStrExp(bstack, rest$, ss$) Then
 On Error Resume Next
 RenameFile s$, ss$
@@ -42600,7 +42663,7 @@ ProcName = False
 Exit Function
 End If
 End Function
-Function ProcOpen(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcOpen(bstack As basetask, rest$, lang As Long) As Boolean
 Dim s$, what$, it As Long, p As Variant, x1 As Long, i As Long, skip As Boolean, excl As Boolean
 If IsStrExp(bstack, rest$, s$) Then
     If s$ <> "" Then
@@ -42609,21 +42672,21 @@ If IsStrExp(bstack, rest$, s$) Then
         skip = True
         i = -2
     End If
-    If IsLabelSymbolNew(rest$, "циа", "FOR", Lang, True) Then
+    If IsLabelSymbolNew(rest$, "циа", "FOR", lang, True) Then
         If skip Then
-            If Not IsLabelSymbolNew(rest$, "еуяиа", "WIDE", Lang) Then
-                IsLabelSymbolNew rest$, "еуяеиа", "WCHAR", Lang
+            If Not IsLabelSymbolNew(rest$, "еуяиа", "WIDE", lang) Then
+                IsLabelSymbolNew rest$, "еуяеиа", "WCHAR", lang
             End If
         Else
             i = FreeFile
-            uni(i) = IsLabelSymbolNew(rest$, "еуяиа", "WIDE", Lang)
+            uni(i) = IsLabelSymbolNew(rest$, "еуяиа", "WIDE", lang)
             'SPELLING CORRECTION FOR GREEK WORD..
-            If Not uni(i) Then uni(i) = IsLabelSymbolNew(rest$, "еуяеиа", "WCHAR", Lang)
+            If Not uni(i) Then uni(i) = IsLabelSymbolNew(rest$, "еуяеиа", "WCHAR", lang)
             End If
-        If IsLabelSymbolNew(rest$, "еисацыцг", "INPUT", Lang) Then
-            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", Lang)
+        If IsLabelSymbolNew(rest$, "еисацыцг", "INPUT", lang) Then
+            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", lang)
             If skip Then BadFilename: Exit Function
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, True) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang, True) Then
             IsSymbol rest$, "#"
             
             
@@ -42648,10 +42711,10 @@ If IsStrExp(bstack, rest$, s$) Then
                         End If
                 End If
                 End If
-        ElseIf IsLabelSymbolNew(rest$, "сулпкгяысг", "APPEND", Lang) Then
-            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", Lang)
+        ElseIf IsLabelSymbolNew(rest$, "сулпкгяысг", "APPEND", lang) Then
+            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", lang)
             If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, True) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang, True) Then
                 IsSymbol rest$, "#"
                 If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                     If GetVar(bstack, what$, it) Then
@@ -42681,10 +42744,10 @@ If IsStrExp(bstack, rest$, s$) Then
             Else
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNew(rest$, "енацыцг", "OUTPUT", Lang) Then
-            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", Lang)
+        ElseIf IsLabelSymbolNew(rest$, "енацыцг", "OUTPUT", lang) Then
+            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", lang)
             If Not skip Then If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, True) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang, True) Then
                 IsSymbol rest$, "#"
                 If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                     If GetVar(bstack, what$, it) Then
@@ -42712,11 +42775,11 @@ If IsStrExp(bstack, rest$, s$) Then
             Else
                 Exit Function
             End If
-        ElseIf IsLabelSymbolNew(rest$, "педиа", "RANDOM", Lang) Then
-            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", Lang)
+        ElseIf IsLabelSymbolNew(rest$, "педиа", "RANDOM", lang) Then
+            excl = IsLabelSymbolNew(rest$, "апойкеистийа", "EXCLUSIVE", lang)
             If skip Then BadFilename: Exit Function
             If Not CanKillFile(s$) Then FilePathNotForUser:  Exit Function
-            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang, True) Then
+            If IsLabelSymbolNew(rest$, "ыс", "AS", lang, True) Then
                 IsSymbol rest$, "#"
                 If Abs(IsLabel(bstack, rest$, what$)) = 1 Then
                     If GetVar(bstack, what$, it) Then
@@ -42724,7 +42787,7 @@ If IsStrExp(bstack, rest$, s$) Then
                      Else
                         globalvar what$, i
                     End If
-                    If IsLabelSymbolNew(rest$, "лгйос", "LEN", Lang, , , , False) Then
+                    If IsLabelSymbolNew(rest$, "лгйос", "LEN", lang, , , , False) Then
                         If FastSymbol(rest$, "=", True) Then
                             If IsExp(bstack, rest$, p) Then
                                 p = Abs(p)
@@ -42773,8 +42836,8 @@ Else
 End If
 
 End Function
-Function ProcTargets(bstack As basetask, rest$, Lang As Long) As Boolean
-If Lang = 1 Then
+Function ProcTargets(bstack As basetask, rest$, lang As Long) As Boolean
+If lang = 1 Then
 If IsLabelSymbolLatin(rest$, "NEW") Then
 If Targets Then
 Targets = False
@@ -42791,10 +42854,10 @@ End If
 End If
 ProcTargets = True
 End Function
-Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcWriter(basestack As basetask, rest$, lang As Long) As Boolean
 Dim prive As Long
 prive = GetCode(basestack.Owner)
-If Lang = 1 Then
+If lang = 1 Then
 PlainBaSket basestack.Owner, players(prive), "George Karras (C), Preveza, Greece 1999-2017"
 Else
 PlainBaSket basestack.Owner, players(prive), "цИЧЯЦОР йАЯЯэР (C), пЯщБЕФА, еККэДА 1999-2017"
@@ -42802,19 +42865,19 @@ End If
 crNew basestack, players(prive)
 ProcWriter = True
 End Function
-Function ProcList(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcList(basestack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, again$, Clsid() As GUID, LNames() As String, clsNumber As Long, i As Long, probe$, what$
 Dim usemodule As Boolean, where As Long, page$
-If IsLabelSymbolNew(rest$, "вягстым", "USERS", Lang) Then
+If IsLabelSymbolNew(rest$, "вягстым", "USERS", lang) Then
 ProcUsers basestack
 ProcList = True
 Exit Function
 End If
 
 If FastSymbol(rest$, "!") Then
-mylist basestack, -2, Lang   ' proportional
-ElseIf IsLabelSymbolNew(rest$, "COM", "COM", Lang) Then
-If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+mylist basestack, -2, lang   ' proportional
+ElseIf IsLabelSymbolNew(rest$, "COM", "COM", lang) Then
+If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
 If here$ <> "" Then
     MyEr "Only in command line interpreter", "лЭМО СТОМ ЛЕТАЖЯАСТч ЦЯАЛЛчР"
     Exit Function
@@ -42826,7 +42889,7 @@ If IsLabelOnly(rest$, what$) = 0 Then
 End If
 what$ = myUcase(what$, True)
 If Not subHash.Find(what$, where) Then
-If Lang = 1 Then
+If lang = 1 Then
 where = ModuleSub(what$, "\\ End for Automatic list" + vbCrLf)
 Else
 where = ModuleSub(what$, "\\ тщКОР аУТЭЛАТГР КъСТА" + vbCrLf)
@@ -42841,21 +42904,21 @@ End If
 '' List Lib ?
 If ObjectCatalog.count <> 0 Then again$ = "!"
 ' use Choose.object + to make it again
-If ProcChooseObj(basestack, again$, Lang) Then
+If ProcChooseObj(basestack, again$, lang) Then
 ' list1 is a glist control
 If Form1.List1.ListIndex = -1 Then ProcList = True: Exit Function
     If Form1.List1.listcount > 0 Then
                 ObjectCatalog.index = Form1.List1.ListIndex
         If Not usemodule Then
                 basestack.soros.PushStr ObjectCatalog.Value
-                ProcList = MyReport(basestack, "letter$", Lang)
+                ProcList = MyReport(basestack, "letter$", lang)
         End If
         On Error GoTo there
         If GetAllCoclasses(ObjectCatalog.Value, Clsid(), LNames(), clsNumber) Then
-        If Not usemodule Then If clsNumber > 0 Then ProcList = MyReport(basestack, "{CoClasses - Objects}", Lang)
+        If Not usemodule Then If clsNumber > 0 Then ProcList = MyReport(basestack, "{CoClasses - Objects}", lang)
         For i = 0 To clsNumber - 1
         If usemodule Then
-            If Lang = 1 Then
+            If lang = 1 Then
                 page$ = page$ + "Declare "
             Else
                 page$ = page$ + "╪ЯИСЕ "
@@ -42870,7 +42933,7 @@ If Form1.List1.ListIndex = -1 Then ProcList = True: Exit Function
         basestack.soros.PushStr probe$
         End If
         
-        ProcList = MyReport(basestack, "quote$(letter$)+{, }+quote$(letter$)", Lang)
+        ProcList = MyReport(basestack, "quote$(letter$)+{, }+quote$(letter$)", lang)
         End If
         Next i
          If usemodule Then
@@ -42887,10 +42950,10 @@ ProcList = True
 End If
 Exit Function
 ElseIf IsExp(basestack, rest$, p) Then
-mylist basestack, CLng(p), Lang
+mylist basestack, CLng(p), lang
 
 Else
-mylist basestack, , Lang
+mylist basestack, , lang
 
   
 
@@ -42903,9 +42966,9 @@ there:
 MyEr Err.Description, Err.Description
 Err.Clear
 End Function
-Function ProcFKey(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcFKey(bstack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, p As Variant, s$, prive
-If IsLabelSymbolNew(rest$, "йахаяо", "CLEAR", Lang) Then
+If IsLabelSymbolNew(rest$, "йахаяо", "CLEAR", lang) Then
     For i = 1 To 13: FK$(i) = vbNullString: Next i
 ElseIf IsExp(bstack, rest$, p) Then
 
@@ -42933,7 +42996,7 @@ Else
     s$ = vbNullString: prive = GetCode(bstack.Owner)
     For i = 1 To 13
         If FK$(i) <> "" Then
-            s$ = s$ + placeme$("йкеиди", "FKEY", Lang) + Right$(" " & Str$(i), 3) & " [" & FK$(i) & "]" ' FKEY
+            s$ = s$ + placeme$("йкеиди", "FKEY", lang) + Right$(" " & Str$(i), 3) & " [" & FK$(i) & "]" ' FKEY
             If i = 13 Then s$ = s$ + " SHIFT + F1" Else s$ = s$ + " F" & CStr(i)
             s$ = s$ + vbCrLf
         End If
@@ -42954,7 +43017,7 @@ players(GetCode(bstack.Owner)).italics = Abs(p <> 0)
 bstack.Owner.Font.Italic = (p <> 0)
 ProcItalic = True
 End Function
-Function ProcEditDoc(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcEditDoc(bstack As basetask, rest$, lang As Long) As Boolean
 Dim prive As Long, s$, sX As Double, i As Long, DUM As Boolean, frm$
 Dim x1 As Long, y1 As Long, p As Variant, col As Long
 Dim pppp As mArray
@@ -42962,7 +43025,7 @@ If Typename(bstack.Owner) Like "Gui*" Then oxiforforms: Exit Function
 prive = GetCode(bstack.Owner)
 With players(prive)
 
-                Form1.EditTextWord = Not IsLabelSymbolNew(rest$, "йыдийа", "CODE", Lang)
+                Form1.EditTextWord = Not IsLabelSymbolNew(rest$, "йыдийа", "CODE", lang)
                 DUM = False
                     y1 = Abs(IsLabel(bstack, rest$, s$))
                      
@@ -43072,7 +43135,7 @@ PlainBaSket bstack.Owner, players(prive), CStr(App.Major) & "." & CStr((App.Mino
 crNew bstack, players(prive)
 ProcVersion = True
 End Function
-Function ProcSrcoll(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSrcoll(bstack As basetask, rest$, lang As Long) As Boolean
 Dim prive As Long, p As Variant, DUM As Boolean
 ProcSrcoll = True
 If bstack.toprinter Then
@@ -43080,9 +43143,9 @@ MyEr "No scrolling for printer document", "╪ВИ ЙЩКИСГ ЦИА ТО щЦЦЯАЖО ЕЙТЩПЫСГР"
 ProcSrcoll = False
 Else
 prive = GetCode(bstack.Owner)
-If IsLabelSymbolNew(rest$, "йаты", "DOWN", Lang) Then
+If IsLabelSymbolNew(rest$, "йаты", "DOWN", lang) Then
     ScrollDownNew bstack.Owner, players(prive)
-ElseIf IsLabelSymbolNew(rest$, "выяисла", "SPLIT", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "выяисла", "SPLIT", lang) Then
 If IsExp(bstack, rest$, p) Then
 ''SetText bstack.Owner
 With players(prive)
@@ -43094,7 +43157,7 @@ ProcSrcoll = False
 SyntaxError
 End If
 Else
- DUM = IsLabelSymbolNew(rest$, "амы", "UP", Lang)
+ DUM = IsLabelSymbolNew(rest$, "амы", "UP", lang)
 ScrollUpNew bstack.Owner, players(prive)
 
 
@@ -43125,11 +43188,11 @@ Dim prive As Long, x1 As Long, s$
         GetXYb bstack.Owner, players(prive), players(prive).curpos, players(prive).currow
  ProcFont = True
 End Function
-Function ProcStack(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcStack(bstack As basetask, rest$, lang As Long) As Boolean
 Dim ss$, frm$, ps As mStiva, it As Long, x As Variant, x0 As Double, s$, once As Boolean, prive As Boolean
 Dim x1 As Long, pa$, what$, i As Long, pppp As mArray, F As Long, myobject As Object
 ProcStack = True
-   If IsLabelSymbolNew(rest$, "меос", "NEW", Lang) Then
+   If IsLabelSymbolNew(rest$, "меос", "NEW", lang) Then
    If FastSymbol(rest$, "{") Then
 ss$ = "{" & block(rest$) & "}"
 frm$ = rest$
@@ -43392,7 +43455,7 @@ End If
         s$ = s$ & Chr(34) + ss$ & Chr(34)
         End If
     Case ">"
-    If Lang = 1 Then
+    If lang = 1 Then
     ss$ = "[Optional]"
     Else
     ss$ = "[пЯОАИЯЕТИЙЭ]"
@@ -43447,7 +43510,7 @@ End If
 End If
 
 End Function
-Function ProcCHANGE(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcCHANGE(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, x As Double, w$
 If IsExp(bstack, rest$, p) Then
 p = CLng(p)
@@ -43455,15 +43518,15 @@ If p >= 0 And p < UBound(q()) Then
      
               '
 While FastSymbol(rest$, ",")
-If IsLabelSymbolNew(rest$, "жяасг", "TEXT", Lang) Then
+If IsLabelSymbolNew(rest$, "жяасг", "TEXT", lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Tag = w$
-ElseIf IsLabelSymbolNew(rest$, "пема", "PEN", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "пема", "PEN", lang) Then
 If IsExp(bstack, rest$, x) Then q(p).pen = x
-ElseIf IsLabelSymbolNew(rest$, "жомто", "BACK", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "жомто", "BACK", lang) Then
 If IsExp(bstack, rest$, x) Then q(p).back = x
-ElseIf IsLabelSymbolNew(rest$, "пкаисио", "BORDER", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "пкаисио", "BORDER", lang) Then
 If IsExp(bstack, rest$, x) Then q(p).fore = x
-ElseIf IsLabelSymbolNew(rest$, "одгциа", "COMMAND", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "одгциа", "COMMAND", lang) Then
 If IsStrExp(bstack, rest$, w$) Then q(p).Comm = w$
 End If
 
@@ -43474,7 +43537,7 @@ ProcCHANGE = True
 End If
 
 End Function
-Function ProcSaveAs(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSaveAs(bstack As basetask, rest$, lang As Long) As Boolean
 Dim Scr As Object, frm$, pa$, s$, ss$, w$
 If IsSelectorInUse Then
 SelectorInUse
@@ -43483,7 +43546,7 @@ End If
 olamazi
 
 frm$ = mcd
-DialogSetupLang Lang
+DialogSetupLang lang
 
 IsStrExp bstack, rest$, s$
 If FastSymbol(rest$, ",") Then If IsStrExp(bstack, rest$, pa$) Then frm$ = pa$
@@ -43510,7 +43573,7 @@ End If
 Set Scr = Nothing
 ProcSaveAs = True
 End Function
-Function ProcChooseColor(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcChooseColor(bstack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, i As Long, it As Long, Scr As Object
 olamazi
 With players(GetCode(bstack.Owner))
@@ -43532,7 +43595,7 @@ Else
     Set Scr = Nothing
     End If
 End If
-DialogSetupLang Lang
+DialogSetupLang lang
 If OpenColor(bstack, Scr, i) Then
 bstack.soros.PushVal CDbl(-i)
 Else
@@ -43543,11 +43606,11 @@ Set Scr = Nothing
 End With
 ProcChooseColor = True
 End Function
-Function ProcDesktop(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDesktop(bstack As basetask, rest$, lang As Long) As Boolean
 Dim work1 As Boolean, oldleft As Long, oldtop As Long
 Dim photo As cDIBSection, s$, p As Variant, x As Double, aPic As StdPicture
 olamazi
-If IsLabelSymbolNew(rest$, "еийома", "IMAGE", Lang) Then
+If IsLabelSymbolNew(rest$, "еийома", "IMAGE", lang) Then
 If IsStrExp(bstack, rest$, s$) Then
 ' FILL WIDTH  IMAGE
  If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
@@ -43603,14 +43666,14 @@ If IsStrExp(bstack, rest$, s$) Then
         End If
  Set photo = Nothing
 End If
-ElseIf IsLabelSymbolNew(rest$, "йяуье", "HIDE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йяуье", "HIDE", lang) Then
 If Not form5iamloaded Then
 '
 End If
 Form5.backcolor = &H0 ' ALWAYS BLACK
 Form5.Cls
 SetTrans Form5, CByte(255), mycolor(0), True
-ElseIf IsLabelSymbolNew(rest$, "йахаяг", "CLEAR", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йахаяг", "CLEAR", lang) Then
 If form5iamloaded Then
 Form5.RestoreSizePos
 Form5.backcolor = &H0 ' ALWAYS BLACK
@@ -43657,12 +43720,12 @@ End If
 
 ProcDesktop = True
 End Function
-Function ProcPath(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcPath(bstack As basetask, rest$, lang As Long) As Boolean
 Dim F As Boolean, p As Variant, col As Long, it As Long, ss$, x As Double, par As Boolean, frm$, prive As Long
 Dim oldGDIlines As Boolean, region As Boolean, oldpathcolor As Long, oldpathfillstyle As Integer
 ProcPath = True
 prive = GetCode(bstack.Owner)
-F = IsLabelSymbolNew(rest$, "памы", "OVER", Lang)
+F = IsLabelSymbolNew(rest$, "памы", "OVER", lang)
 If FastSymbol(rest$, "!") Then par = True
 
 If IsExp(bstack, rest$, p) Then
@@ -43777,11 +43840,11 @@ ProcPath = False
 End If
 
 End Function
-Function ProcFLOODFILL(bstack As basetask, rest$, Lang As Long) As Boolean
+Function ProcFLOODFILL(bstack As basetask, rest$, lang As Long) As Boolean
 Dim x1 As Long, y1 As Long, col As Long, p As Variant, par As Boolean
 
 With players(GetCode(bstack.Owner))
-par = IsLabelSymbolNew(rest$, "вяыла", "COLOR", Lang)
+par = IsLabelSymbolNew(rest$, "вяыла", "COLOR", lang)
 x1 = .XGRAPH
 y1 = .YGRAPH
 col = .mypen
@@ -43921,10 +43984,10 @@ End If
 End With
 LCTbasketCur bstack.Owner, players(prive)
 End Function
-Function MyLineInput(bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyLineInput(bstack As basetask, rest$, lang As Long) As Boolean
 Dim F As Long, p As Variant, what$, it As Long, s$, i As Long, prive As Long, frm$
 Dim pppp As mArray
-If IsLabelSymbolNew(rest$, "еисацыцгс", "INPUT", Lang) Then
+If IsLabelSymbolNew(rest$, "еисацыцгс", "INPUT", lang) Then
 If FastSymbol(rest$, "#") Then
 
     If Not IsExp(bstack, rest$, p) Then Exit Function
@@ -44100,7 +44163,7 @@ MyDoEvents1 bstack.Owner
 
 
 End Function
-Function MyMenu(entrypoint As Long, bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyMenu(entrypoint As Long, bstack As basetask, rest$, lang As Long) As Boolean
 Dim prive As Long, p As Variant, par As Boolean, x1 As Long, y1 As Long, col As Long
 Dim frm$, it As Long, s$, F As Long
 MyMenu = True
@@ -44112,7 +44175,7 @@ Exit Function
 End If
 If Typename(bstack.Owner) Like "Gui*" Then oxiforforms: Exit Function
 prive = GetCode(bstack.Owner)
-            If IsLabelSymbolNew(rest$, "деине", "SHOW", Lang) Then
+            If IsLabelSymbolNew(rest$, "деине", "SHOW", lang) Then
                 If Form1.List1.Visible Then
                         If IsStrExp(bstack, rest$, s$) Then
                             p = Form1.List1.Find(s$)
@@ -44123,7 +44186,7 @@ prive = GetCode(bstack.Owner)
                             MyMenu = False
                         End If
                         If p <> -1 Then
-                            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
+                            If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
                                 If IsStrExp(bstack, rest$, s$) Then
                                     Form1.List1.list(CLng(p)) = s$
                                 Else
@@ -44144,7 +44207,7 @@ prive = GetCode(bstack.Owner)
                                MyMenu = False
                             End If
                             If p <> -1 Then
-                                If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
+                                If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then  ' CHANGE MENU ITEM IN AN OPEN MENU
                                 ' IN A THREAD OR IN A @ VARIANT
                                     If IsStrExp(bstack, rest$, s$) Then
                                         Form1.List1.list(CLng(p)) = s$
@@ -44160,9 +44223,9 @@ prive = GetCode(bstack.Owner)
                 End If
                 GoTo ekei
         End If
-    ElseIf IsLabelSymbolNew(rest$, "пкаисио", "FRAME", Lang) Then
-            Form1.List1.BorderStyle = 1 - Abs(IsLabelSymbolNew(rest$, "ови", "OFF", Lang))
-    ElseIf IsLabelSymbolNew(rest$, "баье", "FILL", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "пкаисио", "FRAME", lang) Then
+            Form1.List1.BorderStyle = 1 - Abs(IsLabelSymbolNew(rest$, "ови", "OFF", lang))
+    ElseIf IsLabelSymbolNew(rest$, "баье", "FILL", lang) Then
         If IsExp(bstack, rest$, p) Then
         Form1.List1.CapColor = mycolor(p)
         LEVCOLMENU = 1
@@ -44190,14 +44253,14 @@ prive = GetCode(bstack.Owner)
         MissNumExpr
                     MyMenu = False
         End If
-        ElseIf IsLabelSymbolNew(rest$, "титкос", "TITLE", Lang) Then
+        ElseIf IsLabelSymbolNew(rest$, "титкос", "TITLE", lang) Then
         If Not IsStrExp(bstack, rest$, s$) Then Exit Function
         If Right$(s$, 2) = vbCrLf Then s$ = Left$(s$, Len(s$) - 2)
         Form1.List1.enabled = Form1.List1.Visible
     
         Form1.List1.HeadLine = s$
-        Form1.List1.FloatList = Not IsLabelSymbolNew(rest$, "йяатгсе", "HOLD", Lang)
-        ElseIf IsLabelSymbolNew(rest$, "епикене", "SELECT", Lang) Then
+        Form1.List1.FloatList = Not IsLabelSymbolNew(rest$, "йяатгсе", "HOLD", lang)
+        ElseIf IsLabelSymbolNew(rest$, "епикене", "SELECT", lang) Then
         '' If Form1.List1.LeaveonChoose Then
 
          Form1.List1.PressSoft
@@ -44346,7 +44409,7 @@ Else
 End If
 ProcScreenRes = True
 End Function
-Function ProcDrop(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDrop(basestack As basetask, rest$, lang As Long) As Boolean
 Dim x As Double
 ProcDrop = True
 If Not IsExp(basestack, rest$, x) Then
@@ -44362,7 +44425,7 @@ If TypeOf basestack.lastobj Is mHandler Then
     If TypeOf basestack.lastobj.objref Is FastCollection Then
         Dim tmp As FastCollection
         Set tmp = basestack.lastobj.objref
-        If IsLabelSymbolNew(rest$, "еыс", "TO", Lang) Then
+        If IsLabelSymbolNew(rest$, "еыс", "TO", lang) Then
             If IsExp(basestack, rest$, x) Then
                 tmp.drop x + 1
                 ProcDrop = True
@@ -44525,13 +44588,13 @@ If Not IsExp(basestack, rest$, x) Then x = 1
     End If
 
 End Function
-Function ProcSort(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSort(basestack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, s$, sX As Double, sY As Double, pppp As mArray
 Dim x1 As Long, y1 As Long, p As Variant, ML As Long, desc As Boolean, numb As Boolean, useclid As Boolean
 ProcSort = False
-desc = IsLabelSymbolNew(rest$, "жхимоуса", "DESCENDING", Lang)
+desc = IsLabelSymbolNew(rest$, "жхимоуса", "DESCENDING", lang)
 If Not desc Then
-    useclid = IsLabelSymbolNew(rest$, "ауноуса", "ASCENDING", Lang)
+    useclid = IsLabelSymbolNew(rest$, "ауноуса", "ASCENDING", lang)
 Else
     useclid = True
 End If
@@ -44544,10 +44607,10 @@ End If
                         Exit Function
                         End If
                             If var(i).t1 = 1 Then
-                            If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
-                                numb = IsLabelSymbolNew(rest$, "аяихлос", "NUMBER", Lang, , , , False)
+                            If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
+                                numb = IsLabelSymbolNew(rest$, "аяихлос", "NUMBER", lang, , , , False)
                                 If Not numb Then
-                                If Not IsLabelSymbolNew(rest$, "йеилемо", "TEXT", Lang, , , , False) Then
+                                If Not IsLabelSymbolNew(rest$, "йеилемо", "TEXT", lang, , , , False) Then
                                 MyEr "Expected Text or Number", "пЕЯъЛЕМА йЕъЛЕМО ч аЯИХЛЭР"
                                 ProcSort = False
                                 Exit Function
@@ -45043,16 +45106,16 @@ Dim s$
   End If
 ProcPropeties = True
 End Function
-Function ProcFlush(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcFlush(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pppp As mArray, what$, it As Long, y1 As Long
-If IsLabelSymbolNew(rest$, "кахос", "ERROR", Lang) Then
+If IsLabelSymbolNew(rest$, "кахос", "ERROR", lang) Then
          NOEXECUTION = False
          NERR = False
            LastErNum1 = 0
          LastErNum = 0
             LastErName = vbNullString
             LastErNameGR = vbNullString
-ElseIf IsLabelSymbolNew(rest$, "сйоупидиа", "GARBAGE", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "сйоупидиа", "GARBAGE", lang) Then
     GarbageFlush2
 Else
 Do
@@ -45094,7 +45157,7 @@ Do
 End If
 ProcFlush = True
 End Function
-Function ProcOpenImage(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcOpenImage(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, Scr As Object, x1 As Long
 Dim aaa() As String
 If IsSelectorInUse Then
@@ -45104,7 +45167,7 @@ End If
 olamazi
  
 frm$ = mcd
-DialogSetupLang Lang
+DialogSetupLang lang
 
 IsStrExp basestack, rest$, s$
 If FastSymbol(rest$, ",") Then If IsStrExp(basestack, rest$, pa$) Then frm$ = pa$
@@ -45160,7 +45223,7 @@ Else
 Set Scr = Nothing
 ProcOpenImage = True
 End Function
-Function ProcOpenFile(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcOpenFile(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, ss$, frm$, s$, w$, Scr As Object, x1 As Long, p As Variant, par As Boolean, F As Boolean
 Dim aaa() As String, DUM As Boolean
 If IsSelectorInUse Then
@@ -45169,7 +45232,7 @@ Exit Function
 End If
 olamazi
 frm$ = mcd
-DialogSetupLang Lang
+DialogSetupLang lang
 
 IsStrExp basestack, rest$, s$
 If FastSymbol(rest$, ",") Then If IsStrExp(basestack, rest$, pa$) Then frm$ = pa$
@@ -45245,7 +45308,7 @@ End If
 Set Scr = Nothing
 ProcOpenFile = True
 End Function
-Function ProcUSE(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcUSE(basestack As basetask, rest$, lang As Long) As Boolean
 Dim ss$, ML As Long, x As Double, pa$, s$, stac1$, p As Variant, frm$, i As Long, w$, pppp As mArray
 Dim it As Long, what$
 If IsStrExp(basestack, rest$, ss$) Then   'gsb
@@ -45293,7 +45356,7 @@ If ML <> 1 Then
     End If
 End If
 
-If Not IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+If Not IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
 
 w$ = "S" & CStr(Int(Rnd(12) * 100000))
 
@@ -45345,7 +45408,7 @@ Case 6
    If Left$(w$, 1) <> "S" Then
 
 p = GetTaskId + 10000 ' starts from 10000
-If Not IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
+If Not IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
 's$ = validpipename(ss$)
 
 If frm$ <> "" Then
@@ -45748,10 +45811,10 @@ Else
 End If
 ProcKeyboard = True
 End Function
-Function ProcSoundRec(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSoundRec(basestack As basetask, rest$, lang As Long) As Boolean
 ' not tested yet...
 Dim s$, p As Variant, ss$, x As Double, y As Double
-    If IsLabelSymbolNew(rest$, "меа", "NEW", Lang) Then
+    If IsLabelSymbolNew(rest$, "меа", "NEW", lang) Then
     Set sRec = New RecordMci
     sRec.Rec_Initialize
     If IsStrExp(basestack, rest$, s$) Then
@@ -45778,16 +45841,16 @@ Dim s$, p As Variant, ss$, x As Double, y As Double
     End If
     ElseIf Not (sRec Is Nothing) Then
     ss$ = vbNullString
-    If IsLabelSymbolNewExp(rest$, "еисацыцг", "INSERT", Lang, ss$) Then
+    If IsLabelSymbolNewExp(rest$, "еисацыцг", "INSERT", lang, ss$) Then
         sRec.Capture True
-    ElseIf IsLabelSymbolNewExp(rest$, "аккацг", "OVERWRITE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "аккацг", "OVERWRITE", lang, ss$) Then
         sRec.ReCapture
-    ElseIf IsLabelSymbolNewExp(rest$, "апойопг", "DELETE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "апойопг", "DELETE", lang, ss$) Then
             If IsExp(basestack, rest$, x) Then
             Else
                 x = 0
             End If
-            If IsLabelSymbolNew(rest$, "еыс", "TO", Lang) Then
+            If IsLabelSymbolNew(rest$, "еыс", "TO", lang) Then
                 If Not IsExp(basestack, rest$, y) Then
                     y = sRec.getLengthInMS
                 End If
@@ -45795,11 +45858,11 @@ Dim s$, p As Variant, ss$, x As Double, y As Double
                 y = sRec.getLengthInMS
             End If
             sRec.CutRecordMs x, y
-    ElseIf IsLabelSymbolNewExp(rest$, "STOP", "диайопг", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "STOP", "диайопг", lang, ss$) Then
         sRec.recStop
-    ElseIf IsLabelSymbolNewExp(rest$, "дойилг", "TEST", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "дойилг", "TEST", lang, ss$) Then
         sRec.recPlay
-    ElseIf IsLabelSymbolNewExp(rest$, "хесг", "POS", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "хесг", "POS", lang, ss$) Then
         If sRec.isRecPlaying Then
             If IsExp(basestack, rest$, x) Then
             sRec.recPlayFromMs x
@@ -45814,13 +45877,13 @@ Dim s$, p As Variant, ss$, x As Double, y As Double
             sRec.oneMCI "seek capture to 0"
             End If
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "сысе", "SAVE", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "сысе", "SAVE", lang, ss$) Then
         If IsStrExp(basestack, rest$, s$) Then
             sRec.SaveAs s$
         Else
             sRec.Save
         End If
-    ElseIf IsLabelSymbolNewExp(rest$, "йкеисе", "END", Lang, ss$) Then
+    ElseIf IsLabelSymbolNewExp(rest$, "йкеисе", "END", lang, ss$) Then
         Set sRec = Nothing
     End If
     Else
@@ -45912,7 +45975,7 @@ If entrypoint = 1 Then DUM = True
                 MissPar
     End If
 End Function
-Function ProcRecursionLimit(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcRecursionLimit(basestack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, prive As Long
 ProcRecursionLimit = True
 If IsExp(basestack, rest$, p) Then
@@ -45925,14 +45988,14 @@ If IsExp(basestack, rest$, p) Then funcdeep = Abs(MyRound(p)) ' obsolate
 Else
 prive = GetCode(basestack.Owner)
     If deep = 0 Then
-            If Lang = 1 Then
+            If lang = 1 Then
             PlainBaSket basestack.Owner, players(prive), "NO RECURSION LIMIT FOR SUBRUTINES"
             Else
             PlainBaSket basestack.Owner, players(prive), "выяис ояио амадяолгс стис яоутимес"
             End If
             
     Else
-    If Lang = 1 Then
+    If lang = 1 Then
         PlainBaSket basestack.Owner, players(prive), "RECURSION LIMIT FOR SUBRUTINES " + CStr(deep)
          crNew basestack, players(prive)
          If m_bInIDE Then
@@ -46007,15 +46070,15 @@ Locale:
     If s$ = "" Then DefBooleanString = ";T\r\u\e;F\a\l\s\e" Else DefBooleanString = s$
     End If
 End Function
-Function ProcGroup(entrypoint As Long, basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcGroup(entrypoint As Long, basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$, x1 As Long, y1 As Long, what$, flag As Boolean, ss$, i As Long, par As Boolean
 Dim p As Variant, HasStrName As Boolean, strName$
 ProcGroup = True
 
 If entrypoint = 1 Then flag = True
 Dim y3 As Long
-y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", Lang)
-If IsLabelSymbolNew(rest$, "ауто", "THIS", Lang) Then
+y3 = IsLabelSymbolNew(rest$, "лецецомота", "WITHEVENTS", lang)
+If IsLabelSymbolNew(rest$, "ауто", "THIS", lang) Then
     If basestack.UseGroupname <> "" Then
         MyEr "Not in a Group Definition: Remove Group This { }", "╪ВИ СЕ ОЯИСЛЭ ОЛэДАР: аЖАъЯЕСЕ ТГМ оЛэДА аУТЭ {} "
         Exit Function
@@ -46040,12 +46103,12 @@ what$ = Left$(what$, Len(what$) - 1)
 x1 = 1
 End If
 If x1 = 1 Then
-    If IsLabelSymbolNew(rest$, "тупос", "TYPE", Lang) Then
+    If IsLabelSymbolNew(rest$, "тупос", "TYPE", lang) Then
         If IsStrExp(basestack, rest$, ss$) Then
             s$ = basestack.GroupName
             prepareGroup basestack, what$, y1, flag, HasStrName
             var(y1).IamGlobal = flag
-            ProcGroup = ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, ss$, Lang) <> 0
+            ProcGroup = ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, ss$, lang) <> 0
             basestack.GroupName = s$
         End If
         
@@ -46062,7 +46125,7 @@ If x1 = 1 Then
                 
                 If flag Then ss$ = here$: here$ = vbNullString
                 
-                If ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, rest$, Lang, flag) = 0 Then
+                If ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, rest$, lang, flag) = 0 Then
                     If flag Then here$ = ss$
                     var(y1).edittag = "'11001EDIT " + here$ + ", " + CStr(Len(rest$))
                 End If
@@ -46084,7 +46147,7 @@ If x1 = 1 Then
                     
                     prepareGroup basestack, what$, y1, flag, HasStrName
                     var(y1).IamGlobal = flag
-                    If ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, ss$, Lang, flag) = 0 Then
+                    If ExecuteGroupStruct(basestack, basestack.GroupName & what$, y1, ss$, lang, flag) = 0 Then
                        rest$ = ss$ + rest$
                     Else
                         ProcGroup = FastSymbol(rest$, "}")
@@ -46212,12 +46275,12 @@ With EventObj
     .Done = False
 End With
 End Sub
-Function MyModule(basestack As basetask, rest$, Lang As Long, Optional noskipcommand = False, Optional MakeNew As Boolean) As Boolean
+Function MyModule(basestack As basetask, rest$, lang As Long, Optional noskipcommand = False, Optional MakeNew As Boolean) As Boolean
 Dim s$, pa$, ss$, x1 As Long, par As Boolean, what$, ohere$, i As Long, X3 As Long, frm$
 ohere$ = here$
 MyModule = True
-x1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", Lang)
-        par = IsLabelSymbolNew(rest$, "мео", "NEW", Lang)
+x1 = IsLabelSymbolNew(rest$, "цемийо", "GLOBAL", lang)
+        par = IsLabelSymbolNew(rest$, "мео", "NEW", lang)
 If x1 <> 0 Then
         If MaybeIsSymbol(rest$, Chr(34)) Then
                 ISSTRINGA rest$, what$
@@ -46276,7 +46339,7 @@ BYPASS1:
                         End If
                 End If
                             If frm$ <> "" Then
-                                If Lang = 1 Then
+                                If lang = 1 Then
                                 s$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf
                                 Else
                                 s$ = s$ + vbCrLf + "дИэБАСЕ " + frm$ + vbCrLf
@@ -46358,7 +46421,7 @@ JUMP0:
                                 If Right$(what$, 2) <> vbCrLf Then what$ = what$ + vbCrLf
                                 s$ = "'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i - 2)
                                   If frm$ <> "" Then
-                                If Lang = 1 Then
+                                If lang = 1 Then
                                 what$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf + what$
                                 Else
                                 what$ = s$ + vbCrLf + "дИэБАСЕ " + frm$ + vbCrLf + what$
@@ -46427,7 +46490,7 @@ jumpheretoo:
                                         End If
                                 End If
                                 If frm$ <> "" Then
-                                If Lang = 1 Then
+                                If lang = 1 Then
                                 s$ = s$ + vbCrLf + "Read " + frm$ + vbCrLf
                                 Else
                                 s$ = s$ + vbCrLf + "дИэБАСЕ " + frm$ + vbCrLf
@@ -46469,9 +46532,9 @@ Else
         End If
 End If
 End Function
-Function MyEscape(rest$, Lang As Long) As Boolean
+Function MyEscape(rest$, lang As Long) As Boolean
 MyEscape = True
-If Lang = 1 Then
+If lang = 1 Then
 If IsLabelSymbolLatin(rest$, "ON") Then
 escok = True
 ElseIf IsLabelSymbolLatin(rest$, "OFF") Then
@@ -46545,7 +46608,7 @@ On Error Resume Next
     Set Form1.Icon = aPic
     MyIcon = ok
 End Function
-Function ProcTitle(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcTitle(basestack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, s$
 If IsStrExp(basestack, rest$, s$) Then
     
@@ -46648,9 +46711,9 @@ Else
 End If
 ProcTitle = True
 End Function
-Function MyWrite(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyWrite(basestack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, s$, it As Long, par As Boolean, i As Long, skip As Boolean
-If IsLabelSymbolNew(rest$, "ле", "WITH", Lang) Then
+If IsLabelSymbolNew(rest$, "ле", "WITH", lang) Then
     If IsStrExp(basestack, rest$, s$) Then
         csvsep$ = Left$(s$, 1)
         If FastSymbol(rest$, ",") Then If IsStrExp(basestack, rest$, s$) Then csvDec$ = Left$(s$, 1): MyWrite = True
@@ -46662,7 +46725,7 @@ If IsLabelSymbolNew(rest$, "ле", "WITH", Lang) Then
 End If
 MyWrite = True
 If csvsep$ = vbNullString Then csvsep$ = ","
-If IsLabelSymbolNew(rest$, "дейаен", "HEX", Lang) Then it = 1
+If IsLabelSymbolNew(rest$, "дейаен", "HEX", lang) Then it = 1
 If FastSymbol(rest$, "#") Then
 
     MyWrite = False
@@ -46931,7 +46994,7 @@ ex123:
 Set myobject = Nothing
 Set basestack.lastobj = Nothing
 End Function
-Function ProcSubDir(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcSubDir(basestack As basetask, rest$, lang As Long) As Boolean
 Dim x1 As Long, ss$, w$
 
 x1 = Abs(IsLabelFileName(basestack, rest$, ss$, , w$))
@@ -46956,9 +47019,9 @@ MissDir
 End If
 
 End Function
-Function ProcDir(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDir(basestack As basetask, rest$, lang As Long) As Boolean
 Dim pa$, w$, par As Boolean, s$, ss$, i As Long, p As Variant, what$, x1 As Long
-If IsLabelSymbolNew(rest$, "вягстг", "USER", Lang) Then
+If IsLabelSymbolNew(rest$, "вягстг", "USER", lang) Then
 If IsSupervisor Then
 dset
 Else
@@ -46966,12 +47029,12 @@ Else
     End If
     ProcDir = True
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "йуяио", "MASTER", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "йуяио", "MASTER", lang) Then
 
     userfiles = GetSpecialfolder(CLng(26)) & "\M2000\"
     ProcDir = True
     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "упокоцистг", "COMPUTER", Lang) Then
+ElseIf IsLabelSymbolNew(rest$, "упокоцистг", "COMPUTER", lang) Then
  If IsSupervisor Then pa$ = "#" Else BadCommand: ProcDir = False: Exit Function
 Else
     pa$ = vbNullString
@@ -46991,7 +47054,7 @@ ProcDir = True
     End If
     If pa$ = vbNullString Then If FastSymbol(rest$, ",") Then p = CBool(IsStrExp(basestack, rest$, pa$))
     olamazi
-    DialogSetupLang Lang
+    DialogSetupLang lang
     par = False
     If w$ <> "" Then
     
@@ -47035,7 +47098,7 @@ s$ = vbNullString
             If s$ <> "" Then
             AddDirSep s$
                 ''If Right(s$, 1) <> "\" Then s$ = s$ & "\"
-                If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+                If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
                       Select Case Abs(IsLabel(basestack, rest$, what$))
                         Case 3
                         ProcDir = True
@@ -47083,7 +47146,7 @@ If x1 <> 0 Then
 AddDirSep ss$
     If isdir(ss$) Then
         If Right(ss$, 1) <> "\" Then ss$ = ss$ & "\"
-        If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+        If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
                 Select Case Abs(IsLabel(basestack, rest$, what$))
                 Case 3
                 ProcDir = True
@@ -47106,20 +47169,20 @@ AddDirSep ss$
             If par = True Then
             'GOTO FILES
             If UserPath = "." Then
-            If Lang Then
+            If lang Then
             ss$ = Chr(34) & "Dir User: " & Tcase(Originalusername) & Chr(34)
                 Else
             ss$ = Chr(34) & "йАТэКОЦОР вЯчСТГ: " & Tcase(Originalusername) & Chr(34)
             End If
             Else
             If IsSupervisor Then
-            If Lang Then
+            If lang Then
             ss$ = Chr(34) & "Dir: " & UserPath2 & Chr(34)
                 Else
             ss$ = Chr(34) & "йАТэКОЦОР: " & UserPath2 & Chr(34)
             End If
             Else
-            If Lang Then
+            If lang Then
             ss$ = Chr(34) & "Dir User: " & Tcase(Originalusername) & ": " & mylcasefILE(UserPath2) & Chr(34)
                 Else
             ss$ = Chr(34) & "йАТэКОЦОР вЯчСТГ: " & Tcase(Originalusername) & ": " & mylcasefILE(UserPath2) & Chr(34)
@@ -47127,23 +47190,23 @@ AddDirSep ss$
             End If
             End If
           
-            par = MyReport(basestack, ss$, Lang)
-            par = ProcFiles(basestack, rest$, Lang)
-            par = ProcCat(basestack, "", Lang)
+            par = MyReport(basestack, ss$, lang)
+            par = ProcFiles(basestack, rest$, lang)
+            par = ProcCat(basestack, "", lang)
             End If
             Else
             
          mcd = ss$
             ProcDir = True
             If par Then
-            If Lang Then
+            If lang Then
             ss$ = "{Read Only Folder: " & mcd & "}"
             Else
             ss$ = "{йАТэКОЦОР ЛЭМО ЦИА АМэЦМЫСГ: " & mcd & "}"
             End If
-            par = MyReport(basestack, ss$, Lang)
-            par = ProcFiles(basestack, rest$, Lang)
-            par = ProcCat(basestack, "", Lang) Or par
+            par = MyReport(basestack, ss$, lang)
+            par = ProcFiles(basestack, rest$, lang)
+            par = ProcCat(basestack, "", lang) Or par
             
             End If
             End If
@@ -47160,10 +47223,10 @@ End If
 
 End Function
 
-Function ProcRemove(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcRemove(basestack As basetask, rest$, lang As Long) As Boolean
 Dim ss$
 ProcRemove = True
-If IsLabelSymbolNew(rest$, "адеиас", "LICENCE", Lang) Then
+If IsLabelSymbolNew(rest$, "адеиас", "LICENCE", lang) Then
 If IsStrExp(basestack, rest$, ss$) Then
 Licenses.Remove ss$
 Else
@@ -47194,7 +47257,7 @@ End If
 End If
 End If
 End Function
-Function ProcClass(basestack As basetask, rest$, Lang As Long, super As Boolean) As Boolean
+Function ProcClass(basestack As basetask, rest$, lang As Long, super As Boolean) As Boolean
 Dim i As Long, ss$, y1 As Long, what$, w$, ohere$, w2$, subs As Long, snames As Long, s$
 If super Then
     subs = sb2used: snames = subHash.count:
@@ -47204,7 +47267,7 @@ If super Then
 End If
 ohere$ = here$
 ProcClass = True
-y1 = IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", Lang)
+y1 = IsLabelSymbolNew(rest$, "цемийг", "GLOBAL", lang)
 Select Case IsLabelA("", rest$, w$)
 Case 1
             If FastSymbol(rest$, "{") Then
@@ -47212,7 +47275,7 @@ Case 1
             ss$ = block(rest$)
               i = Len(rest$)
               If here$ = vbNullString Or basestack.LoadOnly Then
-                If Lang = 1 Then
+                If lang = 1 Then
                 s$ = vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")"
                        rest$ = w$ + "{" + vbCrLf + "group " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                   Else
@@ -47220,7 +47283,7 @@ Case 1
                         rest$ = w$ + "{" + vbCrLf + "ОЛэДА " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                   End If
               Else
-              If Lang = 1 Then
+              If lang = 1 Then
               s$ = vbCrLf + "if module(" + w$ + "." + w$ + ") then call! " + w$ + "." + w$ + vbCrLf + "=group(" + w$ + ")"
                      rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                 Else
@@ -47228,7 +47291,7 @@ Case 1
                       rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ОЛэДА " + w$ + "  {" + ss$ + "}" + vbCrLf + s$ + rest$
                 End If
                 End If
-                ProcClass = MyFunction(1, basestack, rest$, Lang)
+                ProcClass = MyFunction(1, basestack, rest$, lang)
          Else
                 If Not GetVar(basestack, basestack.GroupName & what$, i) Then
                         i = globalvar(basestack.GroupName & what$, CLng(0))
@@ -47245,7 +47308,7 @@ w2$ = Left$(w$, Len(w$) - 1)
                 
                 i = Len(rest$)
                 If here$ = vbNullString Or basestack.LoadOnly Then
-                If Lang = 1 Then
+                If lang = 1 Then
                s$ = "if module(" + w2$ + "." + w2$ + ") then call! " + w2$ + "." + w2$ + vbCrLf + "=group$(" + w2$ + ")"
                         rest$ = w$ + "{" + vbCrLf + "group " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                Else
@@ -47253,7 +47316,7 @@ w2$ = Left$(w$, Len(w$) - 1)
                       rest$ = w$ + "{" + vbCrLf + "ОЛэДА " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                 End If
                 Else
-               If Lang = 1 Then
+               If lang = 1 Then
                s$ = "if module(" + w2$ + "." + w2$ + ") then call! " + w2$ + "." + w2$ + vbCrLf + "=group$(" + w2$ + ")"
                         rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "group " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                Else
@@ -47261,7 +47324,7 @@ w2$ = Left$(w$, Len(w$) - 1)
                       rest$ = w$ + "{'11001EDIT " & GetModuleName(basestack, ohere$) & ",-" & CStr(i) + "' " + CStr(Len(s$) + 2) + vbCrLf + "ОЛэДА " + w$ + "  {" + ss$ & "}" + vbCrLf + s$ + rest$
                 End If
                 End If
-                ProcClass = MyFunction(1, basestack, rest$, Lang)
+                ProcClass = MyFunction(1, basestack, rest$, lang)
          Else
                 If Not GetVar(basestack, basestack.GroupName & what$, i) Then
                         i = globalvar(basestack.GroupName & what$, CLng(0))
@@ -47300,16 +47363,16 @@ If TypeOf basestack.lastobj Is Group Then
 Set SuperGroup = basestack.lastobj
 Set basestack.lastobj = Nothing
 
-Dim MM As Variant
+Dim mm As Variant
 
 If y1 Then
-        i = globalvar(w$, MM, , True)
+        i = globalvar(w$, mm, , True)
         Set var(i) = New Group
         
         Set var(i).SuperClassList = SuperGroup
         var(i).IamSuperClass = True
 Else
-        i = globalvar(w$, MM)
+        i = globalvar(w$, mm)
          Set var(i) = New Group
         Set var(i).SuperClassList = SuperGroup
         var(i).IamSuperClass = True
@@ -47325,7 +47388,7 @@ End If
 End If
 
 End Function
-Function ProcDef(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcDef(basestack As basetask, rest$, lang As Long) As Boolean
 Dim i As Long, what$, y1 As Long, ss$, s$, p, ps$
 ProcDef = True
 y1 = IsLabel(basestack, rest$, what$)
@@ -47355,27 +47418,27 @@ ElseIf y1 > 0 Then
 'MyEr "Need name for function with parenthesis", "хщКЫ ЭМОЛА СУМэЯТГСГР ЛЕ ПАЯЕМХщСЕИР"
 If here$ = "" Or basestack.IamThread Then MyEr "Def make Variables only in Modules and Functions", "г йэМЕ ЖТИэВМЕИ ЛЕТАБКГТщР ЛЭМО СЕ тЛчЛАТА ЙАИ сУМАЯТчСЕИР": ProcDef = False: Exit Function
 Dim that As Variant, oldthat As Variant, ByPass As Boolean, lcl As Boolean, notdef As Boolean, notdefone As Boolean
-lcl = IsLabelSymbolNew(what$, "топийа", "LOCAL", Lang)
+lcl = IsLabelSymbolNew(what$, "топийа", "LOCAL", lang)
 If lcl Then y1 = IsLabel(basestack, rest$, what$)
 If y1 < 5 Then
     If y1 = 3 Then
         that = vbNullString
         GoTo jumpnow
-    ElseIf IsLabelSymbolNew(what$, "аяихло", "DECIMAL", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "аяихло", "DECIMAL", lang) Then
     that = CDec(0)
-    ElseIf IsLabelSymbolNew(what$, "дипко", "DOUBLE", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "дипко", "DOUBLE", lang) Then
     that = CDbl(0)
-    ElseIf IsLabelSymbolNew(what$, "апко", "SINGLE", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "апко", "SINGLE", lang) Then
     that = CSng(0)
-    ElseIf IsLabelSymbolNew(what$, "коцийо", "BOOLEAN", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "коцийо", "BOOLEAN", lang) Then
     that = CBool(0)
-    ElseIf IsLabelSymbolNew(what$, "лайяу", "LONG", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "лайяу", "LONG", lang) Then
     that = CLng(0)
-    ElseIf IsLabelSymbolNew(what$, "айеяаио", "INTEGER", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "айеяаио", "INTEGER", lang) Then
     that = CInt(0)
-    ElseIf IsLabelSymbolNew(what$, "коцистийо", "CURRENCY", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "коцистийо", "CURRENCY", lang) Then
     that = CCur(0)
-    ElseIf IsLabelSymbolNew(what$, "цяалла", "STRING", Lang) Then
+    ElseIf IsLabelSymbolNew(what$, "цяалла", "STRING", lang) Then
     that = vbNullString
     Else
     ByPass = True
@@ -47392,22 +47455,22 @@ jumpnow:
     
     If ByPass Then
         notdef = True
-        If IsLabelSymbolNew(rest$, "ыс", "AS", Lang) Then
-        If IsLabelSymbolNew(rest$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+        If IsLabelSymbolNew(rest$, "ыс", "AS", lang) Then
+        If IsLabelSymbolNew(rest$, "аяихлос", "DECIMAL", lang, , , , False) Then
         that = CDec(0)
-        ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "дипкос", "DOUBLE", lang, , , , False) Then
         that = CDbl(0)
-        ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "апкос", "SINGLE", lang, , , , False) Then
         that = CSng(0)
-        ElseIf IsLabelSymbolNew(rest$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "коцийос", "BOOLEAN", lang, , , , False) Then
         that = CBool(0)
-        ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "лайяус", "LONG", lang, , , , False) Then
         that = CLng(0)
-        ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "айеяаиос", "INTEGER", lang, , , , False) Then
         that = CInt(0)
-        ElseIf IsLabelSymbolNew(rest$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "коцистийо", "CURRENCY", lang, , , , False) Then
         that = CCur(0)
-        ElseIf IsLabelSymbolNew(rest$, "цяалла", "STRING", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(rest$, "цяалла", "STRING", lang, , , , False) Then
         that = vbNullString
        Else
        
@@ -47462,11 +47525,11 @@ Exit Function
 End If
 
 End Function
-Function ProcLoad(basestack As basetask, rest$, Lang As Long) As Boolean
+Function ProcLoad(basestack As basetask, rest$, lang As Long) As Boolean
 Dim x1 As Long, s$, w$, ss$, par As Boolean, vvl As Variant, Key$, par1 As Boolean, NoRun As Boolean
-par1 = Not IsLabelSymbolNew(rest$, "мео", "NEW", Lang)
-If par1 Then par1 = Not IsLabelSymbolNew(rest$, "меа", "NEW", Lang)  ' PLURAL FOR GREEK
-NoRun = IsLabelSymbolNew(rest$, "тлглата", "MODULES", Lang)
+par1 = Not IsLabelSymbolNew(rest$, "мео", "NEW", lang)
+If par1 Then par1 = Not IsLabelSymbolNew(rest$, "меа", "NEW", lang)  ' PLURAL FOR GREEK
+NoRun = IsLabelSymbolNew(rest$, "тлглата", "MODULES", lang)
 ProcLoad = True
 Do
 x1 = Abs(IsLabelFileName(basestack, rest$, s$, , w$))
@@ -47624,7 +47687,7 @@ basestack.NoRun = False
 
 
 End Function
-Function MyDocument(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyDocument(basestack As basetask, rest$, lang As Long) As Boolean
 Dim ss$, s$, what$, x1 As Long, i As Long, it As Long, pppp As mArray
 MyDocument = True
 ss$ = vbNullString
@@ -47719,7 +47782,7 @@ End Function
 Function CheckTwoVal(a, b, c)
 CheckTwoVal = a = b Or a = c
 End Function
-Function MyLong(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyLong(basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$, what$, i As Long, p As Variant
 MyLong = True
 
@@ -47783,7 +47846,7 @@ there12:
      If Not FastSymbol(rest$, ",") Then Exit Do
      Loop
 End Function
-Function MyLink(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyLink(basestack As basetask, rest$, lang As Long) As Boolean
 MyLink = True
 Dim myobject As mStiva, ohere$, s$, ss$, x1 As Long, it As Long, Rest1$
 ohere$ = here$
@@ -47791,7 +47854,7 @@ Set myobject = basestack.soros
 Set basestack.Sorosref = New mStiva
 s$ = vbNullString
 Do
-    If IsLabelSymbolNew(rest$, "исвмг", "WEAK", Lang) Then
+    If IsLabelSymbolNew(rest$, "исвмг", "WEAK", lang) Then
         If IsStrExp(basestack, rest$, ss$) Then
             If GetSub(ss$, x1) Then
                 basestack.soros.DataStr "{" + sbf(x1).sb + "}": x1 = 1: GoTo contlink2
@@ -47802,7 +47865,7 @@ Do
         MissStringExpr
         MyLink = False
         Exit Function
-    ElseIf IsLabelSymbolNew(rest$, "цомийо", "PARENT", Lang) Then
+    ElseIf IsLabelSymbolNew(rest$, "цомийо", "PARENT", lang) Then
     
         If basestack.UseGroupname <> "" Then
             ss$ = Mid$(basestack.UseGroupname, 1, Len(basestack.UseGroupname) - 1)
@@ -47944,17 +48007,17 @@ contlink2:
 basestack.NoError = False
 If basestack.soros.Total = 0 Then
     MyEr "Nothing to link", "тъПОТА ЦИА МА ЕМЧСЫ"
-ElseIf IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
-    MyLink = MyRead(2, basestack, rest$, Lang)
-ElseIf IsLabelSymbolNew(rest$, "стг", "TO", Lang, True) Then
-    MyLink = MyRead(2, basestack, rest$, Lang)
+ElseIf IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
+    MyLink = MyRead(2, basestack, rest$, lang)
+ElseIf IsLabelSymbolNew(rest$, "стг", "TO", lang, True) Then
+    MyLink = MyRead(2, basestack, rest$, lang)
 End If
 exitlink:
 Set basestack.Sorosref = myobject
 Set myobject = Nothing
 End Function
 
-Function MyError(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyError(basestack As basetask, rest$, lang As Long) As Boolean
 Dim p As Variant, x1 As Long, s$, ss$, what$
 x1 = LastErNum
 If IsExp(basestack, rest$, p) Then
@@ -48002,16 +48065,16 @@ MyError = False
 End Function
 
 
-Function MyDim(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyDim(basestack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, pppp As mArray, it As Long
 Dim p As Variant, w$, s$, x As Variant, i As Long, F As Long, Reverse As Boolean, ss$, uselocalbase As Boolean, usethisbase As Long
 Dim oldbase As Long, common As Boolean, Rest1$
 MyDim = True
-Reverse = IsLabelSymbolNew(rest$, "OLE", "OLE", Lang)
-par = IsLabelSymbolNew(rest$, "мео", "NEW", Lang)
-common = IsLabelSymbolNew(rest$, "йоимос", "COMMON", Lang)
-If Not common Then common = IsLabelSymbolNew(rest$, "йоимои", "COMMON", Lang)
-uselocalbase = IsLabelSymbolNew(rest$, "басг", "BASE", Lang)
+Reverse = IsLabelSymbolNew(rest$, "OLE", "OLE", lang)
+par = IsLabelSymbolNew(rest$, "мео", "NEW", lang)
+common = IsLabelSymbolNew(rest$, "йоимос", "COMMON", lang)
+If Not common Then common = IsLabelSymbolNew(rest$, "йоимои", "COMMON", lang)
+uselocalbase = IsLabelSymbolNew(rest$, "басг", "BASE", lang)
 If uselocalbase Then
 If FastSymbol(rest$, "1") Then
     oldbase = ArrBase
@@ -48021,7 +48084,7 @@ ElseIf FastSymbol(rest$, "0") Then
     ArrBase = 0
 End If
 If Not par Then
-If IsLabelSymbolNew(rest$, "сто", "TO", Lang) Then
+If IsLabelSymbolNew(rest$, "сто", "TO", lang) Then
 Do
 usethisbase = ArrBase
 
@@ -48373,7 +48436,7 @@ ArrBase = oldbase
 End If
 Set basestack.lastpointer = Nothing
 End Function
-Function MyNew(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyNew(basestack As basetask, rest$, lang As Long) As Boolean
 MyNew = True
 If (basestack.Process Is Nothing) And (basestack.Parent Is Nothing) Then
 Set basestack.StaticCollection = Nothing 'New FastCollection
@@ -48391,7 +48454,7 @@ Set strfunid = New idHash
 NumberId numid, funid
 StringId strid, strfunid
 NoOptimum = False
-If Lang = 0 Then
+If lang = 0 Then
 sHelp "л2000 [богхеиа]", "цЯэЬЕ текос ЦИА МА БЦЕИР АПЭ ТО ПЯЭЦЯАЛЛА" & vbCrLf & "дЕР ТА ока (ЙэМЕ ЙКИЙ СТО ока)" & vbCrLf & "George Karras 2016", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 Else
 sHelp "л2000 [HELP]", "Write END for exit from this program" & vbCrLf & "See ALL commands  (click on ALL)" & vbCrLf & "George Karras 2016", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
@@ -48497,10 +48560,10 @@ End If
 End If
 
 End Function
-Function MyClose(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyClose(basestack As basetask, rest$, lang As Long) As Boolean
 Dim par As Boolean, p As Variant, ss$
 MyClose = True
-If Not IsLabelSymbolNew(rest$, "басг", "BASE", Lang) Then
+If Not IsLabelSymbolNew(rest$, "басг", "BASE", lang) Then
     par = False
     Do
         IsSymbol3 rest$, "#" ' optional
@@ -48550,7 +48613,7 @@ If IsExp(basestack, rest$, p) Then
 End If
 MyVol = True
 End Function
-Function MyHelp(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyHelp(basestack As basetask, rest$, lang As Long) As Boolean
 Dim s$
 If Not basestack.IamChild Or Not mHelp Or Not basestack.IamAnEvent Then
 mHelp = False
@@ -48560,9 +48623,9 @@ If Abs(IsLabel(basestack, rest$, s$)) > 0 Then
     vH_title$ = vbNullString
     fHelp basestack, s$, AscW(s$ + Mid$(" с", Abs(pagio$ = "GREEK") + 1)) < 128
 ElseIf Not ISSTRINGA(rest$, s$) Then
-    nhelp basestack, Lang <> 1
+    nhelp basestack, lang <> 1
 Else
-    fHelp basestack, s$, Lang = 1
+    fHelp basestack, s$, lang = 1
 End If
 End If
 MyHelp = True
@@ -48834,7 +48897,7 @@ Sub refreshGui()
 End Sub
 Function ExecCode(basestack As basetask, rest$) As Boolean ' experimental
 ' ver .001
-Dim p As Variant, MM As MemBlock, w2 As Long
+Dim p As Variant, mm As MemBlock, w2 As Long
     If IsExp(basestack, rest$, p) Then
         If Not basestack.lastobj Is Nothing Then
           If Not TypeOf basestack.lastobj Is mHandler Then
@@ -48850,33 +48913,33 @@ Dim p As Variant, MM As MemBlock, w2 As Long
                        Exit Function
                   End If
             End With
-            Set MM = basestack.lastobj.objref
-            If MM.Status = 0 Then
-            w2 = MM.GetPtr(0)
+            Set mm = basestack.lastobj.objref
+            If mm.Status = 0 Then
+            w2 = mm.GetPtr(0)
             If FastSymbol(rest$, ",") Then
             If Not IsExp(basestack, rest$, p) Then
                 Set basestack.lastobj = Nothing
-                Set MM = Nothing
+                Set mm = Nothing
                 MissPar
                 Exit Function
             End If
-            If p < 0 Or p >= MM.SizeByte Then
+            If p < 0 Or p >= mm.SizeByte Then
                 Set basestack.lastobj = Nothing
-                Set MM = Nothing
+                Set mm = Nothing
                 MyEr "Offset out of buffer", "дИЕЩХУМСГ ЕЙТЭР ДИэЯХЯЫСГР"
                 Exit Function
             End If
 
-            SetUpForExecution w2, MM.SizeByte
+            SetUpForExecution w2, mm.SizeByte
             w2 = cUlng(uintnew(w2) + p)
             End If
             Set basestack.lastobj = Nothing
             Dim what As Long
             what = CallWindowProc(w2, 0&, 0&, 0&, 0&)
             If what <> 0 Then MyEr "Error " & what, "кэХОР " & what
-            ReleaseExecution w2, MM.SizeByte
+            ReleaseExecution w2, mm.SizeByte
             ExecCode = what = 0
-            Set MM = Nothing
+            Set mm = Nothing
             End If
             End If
         
@@ -49106,7 +49169,7 @@ If curparent Is Nothing Then FindPrevOriginal = cur.OriginalCode: Exit Function
 Loop
 FindPrevOriginal = curparent.OriginalCode
 End Function
-Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
+Function iter(bstack As basetask, rest$, lang As Long) As Boolean
 ' each( array or inventory, start: 1 by default, or -1 for end of list,  end: -1 to end (optional), or we can set it)
     Dim pppp As mArray, w1 As Long, s$, num As Long, st As Variant, en As Variant
     
@@ -49118,18 +49181,18 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
             If Not IsSymbol(rest$, ",") Then
             ' READ KEYWORDS
                 st = 1: en = -1
-                If IsLabelSymbolNew(rest$, "аявг", "START", Lang) Then
+                If IsLabelSymbolNew(rest$, "аявг", "START", lang) Then
                     st = 1
-                ElseIf IsLabelSymbolNew(rest$, "текос", "END", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(rest$, "текос", "END", lang, , , , False) Then
                 ElseIf IsExp(bstack, rest$, st) Then
                     st = Int(st)
                 Else
                     st = 1
                 End If
-                If IsLabelSymbolNew(rest$, "еыс", "TO", Lang, , , , False) Then
-                    If IsLabelSymbolNew(rest$, "аявг", "START", Lang, , , , False) Then
+                If IsLabelSymbolNew(rest$, "еыс", "TO", lang, , , , False) Then
+                    If IsLabelSymbolNew(rest$, "аявг", "START", lang, , , , False) Then
                         en = 1
-                    ElseIf IsLabelSymbolNew(rest$, "текос", "END", Lang, , , , False) Then
+                    ElseIf IsLabelSymbolNew(rest$, "текос", "END", lang, , , , False) Then
                         en = -1
                     ElseIf IsExp(bstack, rest$, en) Then
                         en = Int(en)
@@ -49164,20 +49227,20 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
          
        If Not IsSymbol(rest$, ",") Then
                 st = 1: en = -1
-        If IsLabelSymbolNew(rest$, "аявг", "START", Lang, , , , False) Then
+        If IsLabelSymbolNew(rest$, "аявг", "START", lang, , , , False) Then
                     st = 1
-                ElseIf IsLabelSymbolNew(rest$, "текос", "END", Lang, , , , False) Then
+                ElseIf IsLabelSymbolNew(rest$, "текос", "END", lang, , , , False) Then
                     st = -1
                 ElseIf IsExp(bstack, rest$, st) Then
                     st = Int(st)
                 Else
                     st = 1
                 End If
-                If IsLabelSymbolNew(rest$, "еыс", "TO", Lang, , , , False) Then
+                If IsLabelSymbolNew(rest$, "еыс", "TO", lang, , , , False) Then
                 
-                    If IsLabelSymbolNew(rest$, "аявг", "START", Lang, , , , False) Then
+                    If IsLabelSymbolNew(rest$, "аявг", "START", lang, , , , False) Then
                         en = 1
-                    ElseIf IsLabelSymbolNew(rest$, "текос", "END", Lang, , , , False) Then
+                    ElseIf IsLabelSymbolNew(rest$, "текос", "END", lang, , , , False) Then
                         en = -1
                     ElseIf IsExp(bstack, rest$, en) Then
                         en = Int(en)
@@ -49599,14 +49662,14 @@ If tracecounter > 0 Then If Not IsWine Then MyDoEvents1 Form2, True
     End If
 End Function
 
-Private Function exeSelect(ExecuteLong, once, bstack As basetask, b$, v As Long, Lang As Long) As Boolean
+Private Function exeSelect(ExecuteLong, once, bstack As basetask, b$, v As Long, lang As Long) As Boolean
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
 Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
         exeSelect = True
         x1 = 0 ' mode numbers using p, sp and st
                 ' x1=2 using sw$ w$ ss$
 
-            If IsLabelSymbolNew(b$, "ле", "CASE", Lang) Then
+            If IsLabelSymbolNew(b$, "ле", "CASE", lang) Then
             
                         If IsExp(bstack, b$, sp) Then
                         x1 = 1
@@ -49626,7 +49689,7 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                
                             Exit Do
                         End If
-                                If IsLabelSymbolNew(b$, "ле", "CASE", Lang) Then  ' WE HAVE CASE
+                                If IsLabelSymbolNew(b$, "ле", "CASE", lang) Then  ' WE HAVE CASE
                                            If ok Then
                                 ExpectedEndSelect
                                 ExecuteLong = 0
@@ -49643,7 +49706,7 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                                 If IsStrExp(bstack, b$, w$) Then x2 = 2
                                 End If
                                        If x2 > 0 Then 'WE HAVE NUMBER OR STRING
-                                            If IsLabelSymbolNew(b$, "еыс", "TO", Lang) Then   ' range ?
+                                            If IsLabelSymbolNew(b$, "еыс", "TO", lang) Then   ' range ?
                                             y1 = 0
                                                If x1 = 1 Then
                                                     If IsExp(bstack, b$, st) Then y1 = 1
@@ -49747,7 +49810,7 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                                                         
                                                             i = 1
                                                             
-                                                            While IsLabelSymbolNew(b$, "ле", "CASE", Lang)
+                                                            While IsLabelSymbolNew(b$, "ле", "CASE", lang)
                                                            SetNextLine b$
                                                          v = Len(b$)
                                                             Wend
@@ -49796,11 +49859,11 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                                                                 End If
                                 ' drop case
                                 
-                                If IsLabelSymbolNew(b$, "ле", "CASE", Lang, , , True) Then
+                                If IsLabelSymbolNew(b$, "ле", "CASE", lang, , , True) Then
          
-                                ElseIf IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang, , , True) Then
+                                ElseIf IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang, , , True) Then
        
-                                ElseIf IsLabelSymbolNew(b$, "текос", "END", Lang, , , True) Then
+                                ElseIf IsLabelSymbolNew(b$, "текос", "END", lang, , , True) Then
                              
                                 Else
                                     v = Len(b$)
@@ -49878,7 +49941,7 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                                     
                                 End If
                                 
-                                ElseIf IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then
+                                ElseIf IsLabelSymbolNew(b$, "аккиыс", "ELSE", lang) Then
                                            If ok Then
                                 ExpectedEndSelect
                                 ExecuteLong = 0
@@ -49959,8 +50022,8 @@ Dim x2 As Long, y2 As Long, p As Variant, w$, DUM As Boolean, i As Long
                                 End If
                                 SetNextLine b$
                                 slct = 0
-                        ElseIf IsLabelSymbolNew(b$, "текос", "END", Lang) Then
-                            If IsLabelSymbolNew(b$, "епикоцгс", "SELECT", Lang) Then
+                        ElseIf IsLabelSymbolNew(b$, "текос", "END", lang) Then
+                            If IsLabelSymbolNew(b$, "епикоцгс", "SELECT", lang) Then
                                 slct = 0
                                 Exit Do
                             Else
@@ -50257,10 +50320,10 @@ GETarrayFROMstr.t1 = 3
 Set GETarrayFROMstr.objref = pppp
 
 End Function
-Function CheckThis(bstack As basetask, w$, b$, v As Long, Lang As Long, i As Long) As Long
+Function CheckThis(bstack As basetask, w$, b$, v As Long, lang As Long, i As Long) As Long
 
 If Len(w$) > 3 Then
-    If Lang = 1 Then
+    If lang = 1 Then
         If Left$(w$, 1) = "T" Then
         If Left$(w$, 4) = "THIS" Then
             Dim bb$, ss$
@@ -50431,17 +50494,17 @@ GetName = part$
 
 End Function
 Sub FeedArray(pppp As mArray, v As Long, fromthis As Object, Optional convert As Boolean = False)
-Dim MM As mStiva, myobject As Object, p As Variant
-Set MM = fromthis
-Do While Not MM.IsEmpty
+Dim mm As mStiva, myobject As Object, p As Variant
+Set mm = fromthis
+Do While Not mm.IsEmpty
 If v >= pppp.count Then Exit Do
-If MM.PopType = ">" Then
-MM.drop 1
+If mm.PopType = ">" Then
+mm.drop 1
 pppp.item(v) = CLng(0)
 v = v + 1
-ElseIf MM.StackItemTypeIsObject(1) Then
+ElseIf mm.StackItemTypeIsObject(1) Then
         pppp.item(v) = -1
-        Set myobject = MM.PopObj
+        Set myobject = mm.PopObj
             
         If Typename$(myobject) = "Group" Then
               If myobject.IamFloatGroup Then
@@ -50482,24 +50545,24 @@ ElseIf MM.StackItemTypeIsObject(1) Then
         '  mm.drop 1
 Else
 If Typename$(pppp.item(v)) = doc Then
-    If MM.PopType = "S" Then
-        CheckVar pppp.item(v), MM.PopStr
+    If mm.PopType = "S" Then
+        CheckVar pppp.item(v), mm.PopStr
     Else
     ' ERROR
         Set pppp.item(v) = New Document
-        MM.drop 1
+        mm.drop 1
     End If
-ElseIf Not MM.PopType = "S" Then
+ElseIf Not mm.PopType = "S" Then
 If convert Then
-pppp.item(v) = MyRound(MM.StackItem(1), 0)
-MM.drop 1
+pppp.item(v) = MyRound(mm.StackItem(1), 0)
+mm.drop 1
 Else
-pppp.item(v) = MM.StackItem(1)
-MM.drop 1
+pppp.item(v) = mm.StackItem(1)
+mm.drop 1
 End If
 Else
-pppp.item(v) = MM.StackItem(1)
-MM.drop 1
+pppp.item(v) = mm.StackItem(1)
+mm.drop 1
 End If
 
 
@@ -52350,8 +52413,8 @@ Private Function IsDataVal(bstack As basetask, a$, r As Variant, SG As Variant) 
 
 End Function
 Private Function IsVal(bstack As basetask, a$, r As Variant, SG As Variant, Eng As Boolean) As Boolean
-Dim s$, ex$, dd As Long, PP As Variant, Lang As Long
-    If Eng Then Lang = 1
+Dim s$, ex$, dd As Long, PP As Variant, lang As Long
+    If Eng Then lang = 1
    If IsStrExp(bstack, a$, s$) Then
     On Error Resume Next
     If FastSymbol(a$, ",") Then
@@ -52462,34 +52525,34 @@ Dim s$, ex$, dd As Long, PP As Variant, Lang As Long
         IsVal = FastSymbol(a$, ")", True)
     Else
     
-        If IsLabelSymbolNew(a$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+        If IsLabelSymbolNew(a$, "аяихлос", "DECIMAL", lang, , , , False) Then
             On Error GoTo a500
             r = CDec(r)
             If SG < 0 Then r = -r
             IsVal = FastSymbol(a$, ")", True)
-        ElseIf IsLabelSymbolNew(a$, "дипкос", "DOUBLE", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(a$, "дипкос", "DOUBLE", lang, , , , False) Then
             On Error GoTo a300
             r = CDbl(r)
             If SG < 0 Then r = -r
             IsVal = FastSymbol(a$, ")", True)
-        ElseIf IsLabelSymbolNew(a$, "апкос", "SINGLE", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(a$, "апкос", "SINGLE", lang, , , , False) Then
             r = CSng(r)
             If SG < 0 Then r = -r
             IsVal = FastSymbol(a$, ")", True)
-        ElseIf IsLabelSymbolNew(a$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(a$, "коцийос", "BOOLEAN", lang, , , , False) Then
             r = CBool(SG * r)
             IsVal = FastSymbol(a$, ")", True)
-        ElseIf IsLabelSymbolNew(a$, "лайяус", "LONG", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(a$, "лайяус", "LONG", lang, , , , False) Then
             On Error GoTo a100
             r = CLng(r)
             If SG < 0 Then r = -r
             IsVal = FastSymbol(a$, ")", True)
-         ElseIf IsLabelSymbolNew(a$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+         ElseIf IsLabelSymbolNew(a$, "айеяаиос", "INTEGER", lang, , , , False) Then
             On Error GoTo a150
             r = CInt(r)
             If SG < 0 Then r = -r
             IsVal = FastSymbol(a$, ")", True)
-        ElseIf IsLabelSymbolNew(a$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+        ElseIf IsLabelSymbolNew(a$, "коцистийо", "CURRENCY", lang, , , , False) Then
             On Error GoTo a400
             r = CCur(r)
             If SG < 0 Then r = -r
@@ -52572,25 +52635,50 @@ a500:
 Err.Clear
 
 End Function
-Private Function IsRinstr(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
-Dim s$, s1$
+Private Function IsRinstr(bstack As basetask, a$, r As Variant, SG As Variant, lang As Long) As Boolean
+Dim s$, s1$, par As Boolean
     If IsStrExp(bstack, a$, s$) Then
         If FastSymbol(a$, ",") Then
+        
             If IsStrExp(bstack, a$, s1$) Then
                 If FastSymbol(a$, ",") Then
                     If Not IsExp(bstack, a$, r) Then
                         MissParam a$
-                    Exit Function
+                        Exit Function
+                    End If
+                    par = True
                 End If
-                If r < 0 Then r = Len(s$) + r + 1
+           
+             If IsLabelSymbolNew(a$, "ыс", "AS", lang, , , , False) Then
+        If IsLabelSymbolNew(a$, "ьгжио", "BYTE", lang, , , , False) Then
+                 If par Then
+                 If r < 0 Then r = LenB(s$) + r + 1
+                If r < 0 Then r = 1
+                r = LenB(s$) - r + 1
+                If r < 0 Then r = 1
+                If r > LenB(s$) Then r = LenB(s$)
+        Else
+        r = LenB(s$)
+        End If
+           r = SG * rinstrb(s$, s1$, r)
+        Else
+           SyntaxError
+            Exit Function
+        End If
+        Else
+        If par Then
+        If r < 0 Then r = Len(s$) + r + 1
                 If r < 0 Then r = 1
                 r = Len(s$) - r + 1
                 If r < 0 Then r = 1
                 If r > Len(s$) Then r = Len(s$)
-            Else
-                r = Len(s$)
-            End If
-            r = SG * InStrRev(s$, s1$, r)
+        Else
+        r = Len(s$)
+        End If
+     r = SG * InStrRev(s$, s1$, r)
+    End If
+            
+            
             IsRinstr = FastSymbol(a$, ")", True)
     Else
         MissParam a$
@@ -52603,7 +52691,7 @@ Dim s$, s1$
     End If
 
 End Function
-Private Function IsInstr(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Private Function IsInstr(bstack As basetask, a$, r As Variant, SG As Variant, lang As Long) As Boolean
 Dim s$, s1$
     If IsStrExp(bstack, a$, s$) Then
     If FastSymbol(a$, ",") Then
@@ -52617,7 +52705,17 @@ Dim s$, s1$
         Else
         r = 1
         End If
+      If IsLabelSymbolNew(a$, "ыс", "AS", lang, , , , False) Then
+        If IsLabelSymbolNew(a$, "ьгжио", "BYTE", lang, , , , False) Then
+           
+           r = InStrB(r, s$, s1$)
+        Else
+           SyntaxError
+            Exit Function
+        End If
+        Else
     r = InStr(r, s$, s1$)
+    End If
     If SG < 0 Then r = -r
     
     IsInstr = FastSymbol(a$, ")", True)
@@ -53535,7 +53633,7 @@ End Function
 ' if ExecuteVar=6 then GoTo parsecommand (after exit)
 ' if ExecuteVar=7 then GoTo loopcontinue (after exit)
 'if ExecuteVar=8 then  goto exitfunc
-Private Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, w$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$) As Long
+Private Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, w$, b$, v As Long, lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$) As Long
 Dim i As Long, p As Variant, myobject As Object, ok As Boolean, sw$, sp As Variant, usetype As Boolean
 Dim pppp As mArray, lasttype As Boolean
 ' VARSTAT MEANS GLOBAL FOR NEW VARIABLES
@@ -53543,7 +53641,7 @@ Dim pppp As mArray, lasttype As Boolean
 On jumpto GoTo Case1, Case2, Case3, Case4, case5, Case6, Case7
 Exit Function
 Case1:
-    Select Case CheckThis(bstack, w$, b$, v, Lang, i)
+    Select Case CheckThis(bstack, w$, b$, v, lang, i)
     Case 0
     Case 1
     GoTo assignvalue
@@ -53563,27 +53661,27 @@ If VarStat Then
               GoTo jumpiflocal
           Else
               p = CDbl(0)
-              If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+              If IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
   
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                             If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                         If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                 If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CCur(p)
             Else
@@ -53607,27 +53705,27 @@ ElseIf NewStat Then
             GoTo jumpiflocal
         Else
             p = CDbl(0)
-            If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+            If IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
   
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                             If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                         If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                 If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p, True) Then missNumber: Exit Function
                 p = CCur(p)
             Else
@@ -54560,7 +54658,7 @@ If Left$(w$, 1) = "." Then
  ss$ = w$
 IsLabel bstack, ss$, w$
 Else
-Select Case CheckThis(bstack, w$, b$, v, Lang, i)
+Select Case CheckThis(bstack, w$, b$, v, lang, i)
 Case 0
 Case 1
 GoTo assignvaluestr1
@@ -54791,7 +54889,7 @@ cont184575:
             ElseIf Typename$(bstack.lastobj) = "Group" Then
             
             
-            If Not ProcGroup(100 + VarStat, bstack, w$, Lang) Then
+            If Not ProcGroup(100 + VarStat, bstack, w$, lang) Then
             Exec1 = 0: ExecuteVar = 8
             Exit Function
             End If
@@ -54907,7 +55005,7 @@ If Left$(w$, 1) = "." Then
  ss$ = w$
 IsLabel bstack, ss$, w$
 Else
-Select Case CheckThis(bstack, w$, b$, v, Lang, i)
+Select Case CheckThis(bstack, w$, b$, v, lang, i)
 Case 1
 GoTo assignvalue100
 Case -1
@@ -55157,27 +55255,27 @@ again1234567:
 Else
     If VarStat Or NewStat Then
               p = CDbl(0)
-              If IsLabelSymbolNew(b$, "ыс", "AS", Lang) Then
+              If IsLabelSymbolNew(b$, "ыс", "AS", lang) Then
   
-               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", Lang, , , , False) Then
+               If IsLabelSymbolNew(b$, "аяихлос", "DECIMAL", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                     p = CDec(p)
-            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "дипкос", "DOUBLE", lang, , , , False) Then
                             If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CDbl(p)
-            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "апкос", "SINGLE", lang, , , , False) Then
                         If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CSng(p)
-            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцийос", "BOOLEAN", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CBool(p)
-            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "лайяус", "LONG", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CLng(p)
-            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "айеяаиос", "INTEGER", lang, , , , False) Then
                     If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CInt(p)
-            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", Lang, , , , False) Then
+            ElseIf IsLabelSymbolNew(b$, "коцистийо", "CURRENCY", lang, , , , False) Then
                 If FastSymbol(b$, "=") Then If Not IsNumberD2(b$, p) Then missNumber: Exit Function
                 p = CCur(p)
             Else
