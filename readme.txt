@@ -1,6 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 26 active-X
+Version 9.3 revision 27 active-X
+
+From this revisrion: All Chinese characters displayed with Print and Report Statements. Also chr$(7) is a bell if we print it in console, or in paper (using Print only)
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

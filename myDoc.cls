@@ -1224,7 +1224,9 @@ End Property
 
 Property Get Paracolordata(ParaNum As Long) As Variant()
 ' it is valid
+On Error Resume Next
 Paracolordata = para(ParaNum).colordata()
+
 End Property
 Property Get ParagraphOrder(ParaNum As Long) As Long
     ParagraphOrder = 0

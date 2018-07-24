@@ -1220,9 +1220,11 @@ Public Sub PrintLine(dd As Object, c As String, r As RECT)
 DrawText dd.hDC, StrPtr(c), -1, r, DT_CENTER
 End Sub
 Public Sub PrintUnicodeStandardWidthAddXT(dd As Object, c As String, r As RECT)
-''dd.CurrentX = dd.CurrentX + Xt
+'Dim m As Long
+'m = dd.CurrentX + r.Left
 
 DrawText dd.hDC, StrPtr(c), -1, r, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX
+'dd.CurrentX = m
 End Sub
 
 Public Sub PlainOLD(ddd As Object, mb As basket, ByVal what As String, Optional ONELINE As Boolean = False, Optional nocr As Boolean = False, Optional plusone As Long = 2)
@@ -1265,7 +1267,7 @@ Do While Len(what) >= .mx - PX And (.mx - PX) > 0
 If ONELINE And nocr And PX > .mx Then what = vbNullString: Exit For
  c$ = Mid$(p$, r + 1, 1)
 
-If c$ >= " " Then ddd.CurrentX = ddd.CurrentX + .Xt: PrintUnicodeStandardWidthAddXT ddd, c$, nr
+If nounder32(c$) Then ddd.CurrentX = ddd.CurrentX + .Xt: PrintUnicodeStandardWidthAddXT ddd, c$, nr
  With nr
  .Left = .Right
  .Right = .Left + pixX
@@ -1330,7 +1332,7 @@ If what$ <> "" Then
 LCTbasketCur ddd, mb
   For r = 0 To Len(what$) - 1
  c$ = Mid$(what$, r + 1, 1)
- If c$ >= " " Then ddd.CurrentX = ddd.CurrentX + .Xt: PrintUnicodeStandardWidthAddXT ddd, c$, nr
+ If nounder32(c$) Then ddd.CurrentX = ddd.CurrentX + .Xt: PrintUnicodeStandardWidthAddXT ddd, c$, nr
  With nr
  .Left = .Right
  .Right = .Left + pixX
@@ -1399,13 +1401,14 @@ With mybasket
             If ONELINE And nocr And PX > .mx Then what = vbNullString: Exit Do
             c$ = Mid$(WHAT1$, r + 1, 1)
       
-            If c$ >= " " Then
+            If nounder32(c$) Then
             
                If Not skip Then
               If a(r * 2 + 2) = 0 And a(r * 2 + 3) <> 0 And a1(r * 2 + 2) < 8 Then
                           Do
                 p$ = Mid$(WHAT1$, r + 2, 1)
-                If AscW(p$) < 0 Then Mid$(WHAT1$, r + 2, 1) = " ": Exit Do
+                If ideographs(p$) Then Exit Do
+                If Not nounder32(p$) Then Mid$(WHAT1$, r + 2, 1) = " ": Exit Do
                 c$ = c$ + p$
                              r = r + 1
                     If r >= r1 Then Exit Do
@@ -1500,13 +1503,14 @@ realR& = 0
 r1 = Len(what$) - 1
     For r = r To r1
         c$ = Mid$(WHAT1$, r + 1, 1)
-        If c$ >= " " Then
+        If nounder32(c$) Then
        ' skip = True
              If Not skip Then
            If a(r * 2 + 2) = 0 And a(r * 2 + 3) <> 0 And a1(r * 2 + 2) < 8 Then
             Do
                 p$ = Mid$(WHAT1$, r + 2, 1)
-                If AscW(p$) < 0 Then Mid$(WHAT1$, r + 2, 1) = " ": Exit Do
+                If ideographs(p$) Then Exit Do
+                If Not nounder32(p$) Then Mid$(WHAT1$, r + 2, 1) = " ": Exit Do
                 c$ = c$ + p$
                 r = r + 1
                 If r >= r1 Then Exit Do
@@ -1515,6 +1519,9 @@ r1 = Len(what$) - 1
          End If
                
       ddd.CurrentX = ddd.CurrentX + .Xt
+        
+      Else
+        If c$ = Chr$(7) Then Beep
         End If
         PrintUnicodeStandardWidthAddXT ddd, c$, nr
         realR& = realR + 1
@@ -1532,6 +1539,7 @@ r1 = Len(what$) - 1
  .currow = PY
   End With
 End Sub
+
 
 Public Function nTextY(basestack As basetask, ByVal what As String, ByVal Font As String, ByVal Size As Single, Optional ByVal degree As Double = 0#)
 Dim ddd As Object
@@ -1769,12 +1777,13 @@ npy = PY
 ruller& = wi&
 For ttt = 1 To Len(what)
     b$ = Mid$(what, ttt, 1)
-    Select Case AscW(b$)
-    Case Is > 31
+   ' If nounder32(b$) Then
+   If Not b$ = vbCr Then
     If TextWidth(ddd, buf$ & b$) <= (wi& * .Xt) Then
     buf$ = buf$ & b$
     End If
-    Case Is = 13
+    ElseIf b$ = vbCr Then
+    
     If nocr Then Exit For
     MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
     
@@ -1783,8 +1792,7 @@ For ttt = 1 To Len(what)
     Hi& = Hi& - 1
     npy = npy + 1
     LCTbasket ddd, mb, npy, PX
-    Case Else
-    End Select
+    End If
     If Hi& < 0 Then Exit For
 Next ttt
 If Hi& >= 0 And buf$ <> "" Then MyPrintNew ddd, mb.uMineLineSpace, buf$, Not nocr
@@ -1866,8 +1874,8 @@ For ttt = 1 To Len(what)
 If NOEXECUTION Then Exit For
 b$ = Mid$(what, ttt, 1)
 If paragr Then INTD = Len(buf$ & b$) - Len(NLtrim$(buf$ & b$))
-Select Case AscW(b$)
-Case Is > 31
+If b$ = Chr$(0) Then
+ElseIf Not b$ = Chr$(13) Then
 spcc = (Len(buf$ & b$) - Len(ReplaceStr(" ", "", Trim$(buf$ & b$))))
 
 kkl = spcc * OverDispl
@@ -1997,7 +2005,8 @@ kk& = (help1 + help2) < (w2 - kkl)
 If Not nopr Then LCTbasket ddd, mybasket, npy, PX: ddd.CurrentX = ddd.CurrentX + dv2x15
   End If
     End If
-Case Is = 13
+'ElseIf b$ = vbCr Then
+Else
 If nonewline Then Exit For
 paragr = True
  skip = skip - 1
@@ -2082,8 +2091,7 @@ End If
 conthere:
 If Not nopr Then LCTbasket ddd, mybasket, npy, PX: ddd.CurrentX = ddd.CurrentX + dv2x15
 End If
-Case Else
-End Select
+End If
 
 If Hi < 0 Then
 ' Exit For
@@ -7270,6 +7278,7 @@ Dim i As Long, cursor As Long, ch As String
                 Select Case LCase$(ch) 'We'll make this forgiving though lowercase is proper.
                     Case "\", "/": ch = ch
                     Case """":      ch = """"
+                    Case "a":       ch = Chr$(7)
                     Case "n":      ch = vbLf
                     Case "r":      ch = vbCr
                     Case "t":      ch = vbTab
@@ -10045,3 +10054,13 @@ Debug.Print aheadstatus(a$, False, pos1)
 Debug.Print pos1
 Debug.Print Left$(a$, pos1)
 End Sub
+Public Function ideographs(c$) As Boolean
+Dim code As Long
+If c$ = vbNullString Then Exit Function
+code = AscW(c$)  '
+ideographs = (code And &H7FFF) >= &H4E00 Or (-code > 24578) Or (code >= &H3400& And code <= &HEDBF&) Or (code >= -1792 And code <= -1281)
+End Function
+Public Function nounder32(c$) As Boolean
+nounder32 = AscW(c$) > 31 Or AscW(c$) < 0
+End Function
+
