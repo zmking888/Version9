@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 27
+Global Const Revision = 29
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1690,6 +1690,9 @@ If Not IsLabelSYMB3(ss$, s$) Then
 Else
 Select Case Lang
 Case 1
+If Len(s$) > 3 Then
+If InStr("BOUP", UCase(Left$(s$, 1))) > 0 Then
+
 Select Case UCase(s$)
         Case "BACK"
         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
@@ -1707,8 +1710,15 @@ Select Case UCase(s$)
         ''rest$ = s$ + rest$
         F = 0
         End Select
-        
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+End If
 Case 0, 2
+If Len(s$) > 2 Then
+If InStr("÷–’Ã", myUcase(Left$(s$, 1))) > 0 Then
         Select Case myUcase(s$, True)
         Case "÷œÕ‘œ"
         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
@@ -1725,7 +1735,15 @@ Case 0, 2
         Case Else
         F = 0
         End Select
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+End If
 Case -1   '' this is for ?
+If Len(s$) > 2 Then
+If InStr("BOUP÷–’Ã", myUcase(Left$(s$, 1))) > 0 Then
 Select Case myUcase(s$)
         Case "÷œÕ‘œ", "BACK"
         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
@@ -1742,6 +1760,12 @@ Select Case myUcase(s$)
         Case Else
         F = 0
         End Select
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+        End If
         Lang = 0
         End Select
         

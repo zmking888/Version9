@@ -1874,8 +1874,8 @@ For ttt = 1 To Len(what)
 If NOEXECUTION Then Exit For
 b$ = Mid$(what, ttt, 1)
 If paragr Then INTD = Len(buf$ & b$) - Len(NLtrim$(buf$ & b$))
-If b$ = Chr$(0) Then
-ElseIf Not b$ = Chr$(13) Then
+If b$ = Chr$(0) Or b$ = vbLf Then
+ElseIf Not b$ = vbCr Then
 spcc = (Len(buf$ & b$) - Len(ReplaceStr(" ", "", Trim$(buf$ & b$))))
 
 kkl = spcc * OverDispl
