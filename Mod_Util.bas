@@ -9977,7 +9977,15 @@ Else
                 If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = "."
                 r = val(ig$ & DE$)
                 End If
-            Case 38
+           Case 37
+                Mid$(a$, sng, 1) = " "
+                If DE$ <> vbNullString Then Mid$(DE$, 1, 1) = cdecimaldot$
+                r = CInt(ig$)
+                If Err.Number = 6 Then
+                Err.Clear
+                r = val(ig$)
+                End If
+           Case 38
                 Mid$(a$, sng, 1) = " "
                 r = CLng(ig$)
                 If Err.Number = 6 Then

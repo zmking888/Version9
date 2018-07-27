@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 29
+Global Const Revision = 30
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37881,14 +37881,23 @@ If x1 <= 0 Or y < 0.001 Then Exit Function
 If par Then
     Scr.fillstyle = vbSolid
     Scr.FillColor = mycolor(x)
+    If sX = sY Then sY = PI2
     If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
     
         If GDILines And Not .NoGDI Then
-            If .pathgdi > 0 Then
+        If y > 1 Then
+            If .pathfillstyle > 0 Then
                 DrawEllipseGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
             Else
                 DrawEllipseGdi Scr.hDC, mycolor(col), mycolor(x), vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
             End If
+        Else
+            If .pathfillstyle > 0 Then
+                DrawEllipseGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+            Else
+                DrawEllipseGdi Scr.hDC, mycolor(col), mycolor(x), vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
+            End If
+        End If
         Else
             sX = MyMod(sX + Pi * 2, 2 * Pi)
     sY = MyMod(sY + Pi * 2, 2 * Pi)
@@ -37899,10 +37908,21 @@ If par Then
             If sX = 0 Then sX = 0.0001
             If sY = 0 Then sY = PI2
             If GDILines And Not .NoGDI Then
-                If .pathgdi > 0 Then
-                    DrawArcPieGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
-                Else
+            ' revision 30, version 9.3 fixed
+            If y > 1 Then
+            If .pathfillstyle > 0 Then
+                    DrawArcPieGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+               Else
+                 
                     DrawArcPieGdi Scr.hDC, mycolor(col), mycolor(x), vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+                End If
+            Else
+               If .pathfillstyle > 0 Then
+                    DrawArcPieGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+               Else
+                 
+                    DrawArcPieGdi Scr.hDC, mycolor(col), mycolor(x), vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+                End If
                 End If
             Else
     sX = MyMod(sX + Pi * 2, 2 * Pi)
@@ -37916,17 +37936,37 @@ Else
     If GDILines And Not .NoGDI Then
        
         If sX = sY Or Abs(sX - sY) + 0.0001 > PI2 Then
-            If .pathgdi > 0 Then
+        If y > 1 Then
+        If .pathfillstyle > 0 Then
                 DrawEllipseGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
             Else
                 DrawEllipseGdi Scr.hDC, mycolor(col), -1, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
             End If
         Else
-            If .pathgdi > 0 Then
+             If .pathfillstyle > 0 Then
+                DrawEllipseGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3)
+            Else
+                DrawEllipseGdi Scr.hDC, mycolor(col), -1, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3)
+            End If
+            End If
+        Else
+        If y > 1 Then
+             If .pathfillstyle > 0 Then
+           
                 DrawArcPieGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
             Else
+                'fixed
                 DrawArcPieGdi Scr.hDC, mycolor(col), -1, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
             End If
+        Else
+             If .pathfillstyle > 0 Then
+           
+                DrawArcPieGdi Scr.hDC, mycolor(col), .pathcolor, .pathfillstyle, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1 / y, 1, 3), Scr.ScaleY(.YGRAPH - x1, 1, 3), Scr.ScaleX(x1 * 2 / y, 1, 3), Scr.ScaleY(x1 * 2, 1, 3), -sX, -sY
+            Else
+                'fixed
+                DrawArcPieGdi Scr.hDC, mycolor(col), -1, vbSolid, Scr.DrawWidth, Scr.DrawStyle, Scr.ScaleX(.XGRAPH - x1, 1, 3), Scr.ScaleY(.YGRAPH - x1 * y, 1, 3), Scr.ScaleX(x1 * 2, 1, 3), Scr.ScaleY(x1 * 2 * y, 1, 3), -sX, -sY
+            End If
+        End If
         End If
     Else
     sX = MyMod(sX + Pi * 2, 2 * Pi)
@@ -41197,7 +41237,7 @@ Do
                                 Else
                                     If Not IsNumberCheck(s$, PP) Then PP = p
                                 End If
-                        var(i) = MyRound(p)
+                        var(i) = MyRound(PP)
                 Else
                         If i = -1 Then
                         bstack.ReadVar what$, PP
@@ -41233,17 +41273,23 @@ Do
                                 Else
                                     If Not IsNumberCheck(s$, PP) Then PP = p
                                 End If
+                            If Typename(p) <> Typename(PP) Then
+                            Overflow
+                            Else
                         globalvar what$, MyRound(PP)
+                        End If
                         End If
                 End If
                  MyInput = True
     Case 5
+                
                 If neoGetArray(bstack, what$, pppp) Then
                         If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then FKey = 0: Exit Function
                 Else
                 MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
                        FKey = 0:  Exit Function
                 End If
+                If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = CDbl(0)
                 MyInput = True
                 If par Then
                         If uni(F) Then
@@ -41261,7 +41307,8 @@ Do
                         'If Not IsNumber(bstack, s$, p) Then ErrNum: MyInput = False:  FKey = 0: Exit Function
                         If Trim(s$) = "" Then ErrNum: MyInput = False: FKey = 0: Exit Function
                 End If
-                p = pppp.item(it)
+                'p = pppp.item(it)
+                If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = pppp.item(it)
                 p = p - p
                 Select Case Typename(p)
                     Case "Long"
@@ -41284,6 +41331,7 @@ Do
                         
                  MyInput = True
     Case 6
+                
                 If neoGetArray(bstack, what$, pppp) Then
                        If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then FKey = 0: Exit Function
                 Else
@@ -41342,6 +41390,7 @@ Do
                         MyEr "No such array", "Δεν υπάρχει τέτοιος πίνακας"
                         Exit Function
                 End If
+                
                 If par Then
                         If uni(F) Then
                                 getUniRealComma F, s$
@@ -41358,7 +41407,7 @@ Do
                          'If Not IsNumber(bstack, s$, p) Then ErrNum: MyInput = False:  FKey = 0: Exit Function
                         If Trim(s$) = "" Then ErrNum: MyInput = False: FKey = 0: Exit Function
                 End If
-                                p = pppp.item(it)
+                 If FastSymbol(rest$, "=") Then IsNumberCheck rest$, p Else p = pppp.item(it)
                 p = p - p
                 Select Case Typename(p)
                     Case "Long"
@@ -41377,7 +41426,6 @@ Do
                     Else
                         If Not IsNumberCheck(s$, PP) Then PP = p
                     End If
-
                 pppp.item(it) = MyRound(PP)
                 MyInput = True
     End Select
