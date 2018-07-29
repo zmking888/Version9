@@ -1,7 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.3 revision 30 active-X
+Version 9.3 revision 31 active-X
 
+Fixed functions member$() and member.type$()
+Additions in Val() function
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

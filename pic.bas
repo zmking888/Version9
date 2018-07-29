@@ -3035,6 +3035,17 @@ Function ValidNumberOnly(a$, r As Variant, skipdec As Boolean) As Boolean
 r = r - r
 ValidNumberOnly = IsNumberOnly(a$, (1), r, (0), skipdec)
 End Function
+Function ValidNumberOnlyClean(a$, r As Variant, skipdec As Boolean) As Long
+r = r - r
+Dim fr As Long, lr As Long
+fr = 1
+If IsNumberOnly(a$, fr, r, lr, skipdec) Then
+ValidNumberOnlyClean = lr
+Else
+ValidNumberOnlyClean = -1
+End If
+
+End Function
 Private Function IsNumberOnly(a$, fr As Long, r As Variant, lr As Long, skipdecimals As Boolean) As Boolean
 Dim SG As Long, sng As Long, n$, ig$, DE$, sg1 As Long, ex$   ', e$
 ' ti kanei to e$

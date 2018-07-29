@@ -708,7 +708,7 @@ FillBack thisHDC, b, glistN.CapColor
   
  '   PrintItem2 thisHDC, mDoc1.TextLine(i), A
     PrintItem2 thisHDC, mDoc1.TextLine2(i, False, True), a
-    a.top = a.top + onelineheight
+    a.Top = a.Top + onelineheight
   Next i
   RaiseEvent ExposeRect(item, thisrect, thisHDC, skip)
   skip = True
@@ -716,7 +716,7 @@ FillBack thisHDC, b, glistN.CapColor
    
 Else
    a.Left = a.Left + 1
-    a.top = a.top + glistN.addpixels \ 2
+    a.Top = a.Top + glistN.addpixels \ 2
     pastchars = mDoc.TextParagraphLine2(item + 1, what$, ThatPara, showparagraph)
     
         If MarkedTextAny Then
@@ -3543,11 +3543,11 @@ Public Property Let ForeColor(ByVal RHS As OLE_COLOR)
 
 End Property
 
-Public Property Get top() As Long
-top = glistN.TopTwips
+Public Property Get Top() As Long
+Top = glistN.TopTwips
 End Property
 
-Public Property Let top(ByVal RHS As Long)
+Public Property Let Top(ByVal RHS As Long)
 glistN.TopTwips = RHS
 End Property
 Public Property Get Height() As Long
@@ -4258,6 +4258,7 @@ Do While pos <= Len(a$)
   Exit Do
   End Select
   End If
+jumphere:
         word$ = vbNullString
             If part$ <> "" Then
             b$ = b$ & part$
@@ -4286,6 +4287,8 @@ Do While pos <= Len(a$)
         part$ = "S"
         End If
         Case "e", "E", "å", "Å"
+        If word$ = "" Then part$ = "N"
+        
         word$ = word$ + w$
            If part$ = "S" Then
             

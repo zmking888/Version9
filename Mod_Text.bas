@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -13029,7 +13029,7 @@ fstr16: '"MEMBER.TYPE$(", "лекоус.тупос$("
                 q1$ = Split(s$)(1)
                 s$ = Split(s$)(0)
                 If Right$(s$, 1) = "(" Then
-                    If here$ = vbNullString Then
+                    If here$ = vbNullString Or var(w1).IamGlobal Then
                     If varhash.ExistKey(s$) Then
                         If Right$(s$, 3) = "$()" Then
                             r$ = "Array String"
@@ -13098,7 +13098,10 @@ fstr17: ' "MEMBER$(", "лекос$("
                 If FastSymbol(a$, ",") Then
                 If IsExp(bstackstr, a$, p) Then
                 p = Fix(p)
-                If here$ <> "" Then
+                If var(w1).IamGlobal Then
+                Set mS = var(w1).PrepareSoros(var(), Left$(s$, Len(s$) - Len(var(w1).GroupName) + 1))
+                ElseIf here$ <> "" Then
+                
                 Set mS = var(w1).PrepareSoros(var(), here$ + "." + Left$(s$, Len(s$) - Len(var(w1).GroupName) + 1))
                 Else
                 Set mS = var(w1).PrepareSoros(var(), Left$(s$, Len(s$) - Len(var(w1).GroupName) + 1))
@@ -21435,6 +21438,8 @@ Function IdentifierGroup(basestack As basetask, what$, rest$, Lang As Long) As B
      Exit Function
     Case "DOCUMENT", "еццяажо"
       IdentifierGroup = MyDocument(basestack, rest$, Lang)
+    Case "LONG", "лайяус"
+        IdentifierGroup = MyLong(basestack, rest$, Lang)
     End Select
 End Function
 Function Identifier(basestack As basetask, what$, rest$, Optional nocom As Boolean = False, Optional Lang As Long = 1) As Boolean
@@ -27395,7 +27400,7 @@ Case 1
             End If
      
     End If
-
+    
     If glob Then
      v = globalvar(w$, p)
     ElseIf here$ = vbNullString Then
@@ -27415,7 +27420,8 @@ Case 1
     If skip Then
     ' do nothing
     ElseIf FastSymbol(rest$, "=") Then
-        If IsExp(stripstack1, rest$, p) Then
+         If IsExp(stripstack1, rest$, p) Then
+       
             If Not stripstack1.lastobj Is Nothing Then
             If final Then
             NoObjectAssign
@@ -27489,18 +27495,16 @@ againgroup:
                     bstack.CopyStrip stripstack1
                     GoTo continuehere
                 ElseIf Typename$(stripstack1.lastobj) = myArray Then
-                    x1 = globalvar(w$, p)
-                    Set var(x1) = New mHandler
-                    var(x1).t1 = 3
-                    Set var(x1).objref = stripstack1.lastobj
+                    Set var(v) = New mHandler
+                    var(v).t1 = 3
+                    Set var(v).objref = stripstack1.lastobj
                     Set stripstack1.lastobj = Nothing
                 Else
                     Set myobject = stripstack1.lastobj
                     If CheckStackObj(stripstack1, myobject, var()) Then
-                    x1 = globalvar(w$, p)
-                    Set var(x1) = New mHandler
-                    var(x1).t1 = 3
-                    Set var(x1).objref = myobject
+                    Set var(v) = New mHandler
+                    var(v).t1 = 3
+                    Set var(v).objref = myobject
                     Set stripstack1.lastobj = Nothing
                     
                     Else
@@ -52546,23 +52550,23 @@ Dim s$, ex$, dd As Long, PP As Variant, Lang As Long
     On Error Resume Next
     If FastSymbol(a$, ",") Then
       If IsStrExp(bstack, a$, ex$) Then
-      If Len(ex$) = 0 Then
+      If Len(ex$) <> 1 Then
       dd = AscW(NowDec$)
       Else
           dd = AscW(ex$)
           End If
        If InStr(s$, ".") > 0 And dd <> 46 Then
-        s$ = Replace(s$, ".", "*")
+        s$ = Replace(s$, ".", "*", 1, 1)
         End If
-        s$ = Replace(s$, ChrW(dd), ".")
+        s$ = Replace(s$, ChrW(dd), ".", 1, 1)
         dd = 46
     ElseIf IsExp(bstack, a$, PP) Then
         PP = Fix(PP)
         dd = AscW(GetlocaleString2(14, CLng(PP)))
         If InStr(s$, ".") > 0 And dd <> 46 Then
-        s$ = Replace(s$, ".", "*")
+        s$ = Replace(s$, ".", "*", 1, 1)
         End If
-        s$ = Replace(s$, ChrW(dd), ".")
+        s$ = Replace(s$, ChrW(dd), ".", 1, 1)
         dd = 46
     Else
     
@@ -52621,7 +52625,22 @@ Dim s$, ex$, dd As Long, PP As Variant, Lang As Long
     Exit Function
     End If
     On Error GoTo a100
+    If FastSymbol(a$, ",") Then
     
+    Dim mm As mStiva
+   Set mm = New mStiva
+    Dim oldm As mStiva
+    Set oldm = bstack.soros
+    Set bstack.Sorosref = mm
+    mm.PushVal ValidNumberOnlyClean(s$, r, Len(ex$) > 1)
+    FastSymbol a$, "&"
+    If Not MyRead(1, bstack, a$, Lang) Then
+    IsVal = False
+    Set bstack.Sorosref = oldm
+    Exit Function
+    End If
+    Set bstack.Sorosref = oldm
+    End If
     IsVal = FastSymbol(a$, ")", True)
     ElseIf IsExp(bstack, a$, r) Then
     If FastSymbol(a$, "->", False, 2) Then
