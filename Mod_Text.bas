@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 3
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2062,15 +2062,17 @@ takeone:
     
     If counter = myobject.count Or (counter > Counterend And Counterend > -1) Or countDir = 0 Then
         Set myobject = Nothing
-              rest$ = bck$
-             bck$ = vbNullString
+              SwapStrings rest$, bck$
+            '  rest$ = bck$
+            ' bck$ = vbNullString
         GoTo taketwo
     End If
 Else
         If counter < 0 Or (counter < Counterend And Counterend > -1) Then
         Set myobject = Nothing
-              rest$ = bck$
-             bck$ = vbNullString
+            SwapStrings rest$, bck$
+             ' rest$ = bck$
+            ' bck$ = vbNullString
         GoTo taketwo
     End If
     End If
@@ -2108,8 +2110,10 @@ Else
                 Counterend = -1
                 counter = 0
                 countDir = 1
-                bck$ = rest$
-                rest$ = vbNullString
+                bck$ = vbNullString
+                SwapStrings rest$, bck$
+                'bck$ = rest$
+                'rest$ = vbNullString
                 GoTo takeone
                 ElseIf Typename(basestack.lastobj) = "mHandler" Then
                     Set myobject = basestack.lastobj
@@ -2127,8 +2131,9 @@ Else
                             Set myobject = Nothing
                             
                         Else
-                                bck$ = rest$
-                                rest$ = vbNullString
+                                SwapStrings rest$, bck$
+                                'bck$ = rest$
+                                'rest$ = vbNullString
                                 GoTo takeone
                         End If
                         
@@ -2137,20 +2142,23 @@ Else
                     If Not CheckLastHandler(myobject, var()) Then NoProperObject: rest$ = bck$: RevisionPrint = False: Exit Function
                     If Typename(myobject.objref) = "FastCollection" Then
                              Set myobject = myobject.objref
-                        bck$ = rest$
-                        rest$ = vbNullString
+                             SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
                         GoTo takeone
                     ElseIf Typename(myobject.objref) = "mStiva" Then
                         Set myobject = myobject.objref
-                        bck$ = rest$
-                        rest$ = vbNullString
+                        SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
                         GoTo takeone
 
                     ElseIf Typename(myobject.objref) = myArray Then
                         If myobject.objref.Arr Then
                             Set myobject = myobject.objref
-                        bck$ = rest$
-                        rest$ = vbNullString
+                            SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
                         GoTo takeone
                         End If
                     End If
@@ -2189,8 +2197,9 @@ isanumber:
                 Counterend = -1
                 counter = 0
                 countDir = 1
-                bck$ = rest$
-                rest$ = vbNullString
+                SwapStrings rest$, bck$
+                'bck$ = rest$
+                'rest$ = vbNullString
                 GoTo takeone
                 End If
                 
@@ -17373,6 +17382,7 @@ Dim x1 As Long, y1 As Long, x2 As Long, y2 As Long, SBB$, nd&, Lang As Long, kol
 Dim temphere$
 
 If loopthis Then Execute = 2 Else Execute = 1
+
 sss = Len(b$): lbl = True
 
 Do While Len(b$) <> LLL
@@ -17482,6 +17492,7 @@ If jump Or IFCTRL = 2 Then
 
 If IsLabelSymbolNew(b$, "аккиыс.ам", "ELSE.IF", Lang) Then GoTo contElseIf
 If IsLabelSymbolNew(b$, "аккиыс", "ELSE", Lang) Then GoTo ContElse
+If i > 0 Then lbl = True
 End If
 
     
@@ -19239,8 +19250,9 @@ ContElse:
                 End If
                 End If
                    IFCTRL = 0 ' NONEED ANYTHING AND ERROR FOR IF.ELSE AND ELSE
-            
+                            
                 sss = Len(b$)
+                
         Case "TRY", "дес"
 ContTry:
                 If IsLabelSymbolNew(b$, "яеула", "STREAM", Lang) Then
@@ -46642,7 +46654,6 @@ jumpheretoo:
                                 End If
                         End If
                         If Not FastSymbol(rest$, "}") Then MyModule = False
-                        ' CHECK
                         Exit Function
                 Else
                 If basestack.StaticCollection Is Nothing Then ConnectStatic basestack, myUcase(what$)
@@ -56510,4 +56521,11 @@ Set z = z1
                  Set myobject = Nothing
                  End If
 conthere:
+End Sub
+Sub SwapStrings(a$, b$)
+Dim i As Long, j As Long
+GetMem4 VarPtr(a$), i
+GetMem4 VarPtr(b$), j
+PutMem4 VarPtr(a$), j
+PutMem4 VarPtr(b$), i
 End Sub
