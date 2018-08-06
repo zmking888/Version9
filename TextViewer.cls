@@ -1405,6 +1405,7 @@ OLDPOS = Charpos
             End If
             Charpos = BlockEndPos
         End If
+        
         mDoc.ReWritePara BlockStartPara, b$
     Else
         order1 = mDoc.ParagraphOrder(BlockStartPara)

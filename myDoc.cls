@@ -83,7 +83,7 @@ If Not para(docpara).startfrom = 0 Then Err.Raise 50501, , "internal problem in 
 End If
 End Function
 Sub InsertDocPara(ByVal ParaNum As Long, ByVal Previus As Long, ByVal NextPara As Long)
-'ok
+ 'ok
     DocParaNext(ParaNum) = NextPara
     DocParaBack(ParaNum) = Previus
     DocParaNext(Previus) = ParaNum
@@ -372,7 +372,8 @@ If lookthis = 0 Then
 lookthis = para(mNum).startfrom
 mNum1 = mNum
 Do While mNum1 <> 0
-    If para(mNum1).startfrom = lookthis Then ReDim para(mNum1).colordata(1)
+    If para(mNum1).startfrom = lookthis Then ReDim para(mNum1).colordata(1) Else Exit Do
+    
      para(mNum1).startfrom = 0
     mNum1 = DocParaNext(mNum1)
     
@@ -382,7 +383,7 @@ End If
 count = -1
 Else
 
-If lookthis = 0 And False Then
+If lookthis = 0 Then
 lookthis = para(mNum1).startfrom
 mNum1 = DocParaNext(mNum1)
 Do While mNum1 <> 0
@@ -436,8 +437,8 @@ Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = Fa
     para(ParaNum).lines = neolines
     NeoData$ = vbNullString
     Loop Until data$ = vbNullString
-     If ColorEvent And Not skipcolor Then
-            ColorThis (ParaNum)
+    If ColorEvent And Not skipcolor Then
+     ColorThis (ParaNum)
     End If
 End Sub
 Sub AppendParagraphOneLine(myparagraph$)
@@ -832,9 +833,9 @@ Public Sub InsertDoc(ByVal ParaNum As Long, fromPos As Long, norawtext As String
     Dim t_text As String, once As Boolean
     Dim a() As String, t() As String
     Dim b$
-    If para(ParaNum).startfrom = ParaNum Then
-    para(ParaNum).startfrom = 0
-    End If
+   ' If para(ParaNum).startfrom = ParaNum Then
+   ' para(ParaNum).startfrom = 0
+   ' End If
     once = True
       a() = Split(norawtext, vbCrLf)
         norawtext = Join(a(), vbLf)
@@ -880,7 +881,7 @@ Dim i As Long, k As Long, j As Long, ii As Long
     once = False
         b$ = TextParagraph(ParaNum)
         If fromPos = 1 Then
-          ReWritePara ParaNum, t_text, True
+          ReWritePara ParaNum, t_text ', True
           fromPos = Len(t_text) + 1
        
         ElseIf fromPos > Len(b$) Then

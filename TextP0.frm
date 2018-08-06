@@ -216,7 +216,7 @@ Attribute TEXT1.VB_VarHelpID = -1
 Public EditTextWord As Boolean
 ' by default EditTextWord is false, so we look for identifiers not words
 Private Pad$, s$
-Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
+Private LastDocTitle$, para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
 Public ShadowMarks As Boolean
 Private nochange As Boolean
 Private Declare Function lstrlenW Lib "kernel32.dll" (ByVal psString As Long) As Long
@@ -821,7 +821,8 @@ Else
 TEXT1.glistN.dropkey = True
 Do
 If TEXT1.mDoc.FindIdentifier(s$, True, w, l) Then
-If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
+'If w2 > 0 Then TEXT1.mDoc.ColorThis w2: TEXT1.WrapMarkedPara
+If w2 > 0 Then If w2 <> w Then TEXT1.mDoc.WrapAgainBlock w2, w2:    TEXT1.mDoc.ColorThis w2
 w2 = w
 If safety And w = w1 Then
 
@@ -835,6 +836,7 @@ TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
 TEXT1.SelText = neo$
 TEXT1.RemoveUndo neo$
+
 Exit Do
 ElseIf l - addthat < i1 Then
 i1 = i1 + Len(neo$) - Len(s$)
@@ -849,8 +851,10 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 TEXT1.AddUndo ""
+
 TEXT1.SelText = neo$
-TEXT1.RemoveUndo neo$
+TEXT1.RemoveUndo neo
+ 
 l = l + Len(neo$)
 
 Else
@@ -2126,7 +2130,7 @@ Case vbKeyF5
 If TEXT1.SelText <> "" Then rthissub
 KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-MarkSoftButton Para1, PosPara1
+MarkSoftButton para1, PosPara1
 KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2
 MarkSoftButton Para2, PosPara2
@@ -2953,15 +2957,15 @@ End Sub
 Function Mark$()
 If ShadowMarks Then Mark$ = vbNullString: Exit Function
 If TEXT1.Title = vbNullString Then  'reset all para
-Para1 = 0: Para2 = 0: Para3 = 0
+para1 = 0: Para2 = 0: Para3 = 0
 ElseIf LastDocTitle$ <> TEXT1.Title Then
-Para1 = 0: Para2 = 0: Para3 = 0
+para1 = 0: Para2 = 0: Para3 = 0
 LastDocTitle$ = TEXT1.Title
 End If
 Dim s$
-If Para1 <> 0 Then
-If TEXT1.mDoc.InvalidPara(Para1) Then Para1 = 0
-If Para1 = TEXT1.mDoc.MarkParagraphID Then
+If para1 <> 0 Then
+If TEXT1.mDoc.InvalidPara(para1) Then para1 = 0
+If para1 = TEXT1.mDoc.MarkParagraphID Then
 s$ = " [F6] "
 Else
 s$ = " *F6 "
@@ -2993,7 +2997,7 @@ Mark$ = s$
 
 End Function
 Public Sub ResetMarks()
-Para1 = 0: Para2 = 0: Para3 = 0
+para1 = 0: Para2 = 0: Para3 = 0
 
 
 End Sub

@@ -456,13 +456,16 @@ validpipename = a$
 End If
 End Function
 
-Function Included(afile$, simple$) As String
+Function Included(afile$, ByVal simple$) As String
 Dim a As Document
 On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
 st& = 1
-
+Dim word$(), it As Long, max As Long, line$, ok As Boolean
+simple$ = simple$ + "|"
+word$() = Split(simple$, "|")
+max = UBound(word$()) - 1
 If simple$ = vbNullString Then
 Included = ExtractName(afile$)
 Else
@@ -471,16 +474,26 @@ Else
     
     a.lcid = cLid
     a.ReadUnicodeOrANSI afile$, , what
+    
     If InStr(simple$, vbCr) > 0 Then
     'work with any char but using computer locale
-    If InStr(1, a.textDoc, simple$, vbTextCompare) > 0 Then
+    If InStr(1, a.textDoc, word$(0), vbTextCompare) > 0 Then
                 Included = ExtractName(afile$)
     End If
     Else
     ' work in paragraphs..
-    If a.FindStr(simple$, st&, pa&, po&) > 0 Then
-                                                                '   'If InStr(1, A$, simple$, vbTextCompare) > 0 Then
+    Dim ok1 As Boolean
+    If a.FindStr(word$(0), st&, pa&, po&) > 0 Then
+     If max > 0 Then
+     line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
+     For it = 1 To max
+     ok = InStr(1, line$, word$(it), vbTextCompare) > 0
+     If Not ok Then Exit For
+     Next it
+    If ok Then Included = ExtractName(afile$)
+     Else
             Included = ExtractName(afile$)
+           End If
     End If
     End If
     Set a = Nothing

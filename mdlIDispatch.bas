@@ -429,11 +429,15 @@ ReadOneParameter = Err = 0
   ''  If Err.Number <> 0 Then ReadOneParameter = varRet
 Err.Clear
 End Function
-Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR$, ThisIndex As Variant) As Variant
+Public Function ReadOneIndexParameter(pobjTarget As Object, dispid As Long, ERrR$, ThisIndex As Variant, Optional useset As Boolean = False) As Variant
     
     Dim CallType As cbnCallTypes
     
+    If useset Then
+    CallType = VbSet
+    Else
     CallType = VbGet
+    End If
     Dim IDsp        As IDispatch.IDispatchM2000
     Dim riid        As IDispatch.IID
     Dim params      As IDispatch.DISPPARAMS
