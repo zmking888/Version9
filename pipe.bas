@@ -483,6 +483,7 @@ Else
     Else
     ' work in paragraphs..
     Dim ok1 As Boolean
+again:
     If a.FindStr(word$(0), st&, pa&, po&) > 0 Then
      If max > 0 Then
      line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
@@ -490,7 +491,9 @@ Else
      ok = InStr(1, line$, word$(it), vbTextCompare) > 0
      If Not ok Then Exit For
      Next it
-    If ok Then Included = ExtractName(afile$)
+     st& = st& + 1
+    If ok Then Included = ExtractName(afile$) Else GoTo again
+    
      Else
             Included = ExtractName(afile$)
            End If
