@@ -462,7 +462,7 @@ On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
 st& = 1
-Dim word$(), it As Long, max As Long, line$, ok As Boolean
+Dim word$(), it As Long, max As Long, line$, ok As Boolean, min As Long
 simple$ = simple$ + "|"
 word$() = Split(simple$, "|")
 max = UBound(word$()) - 1
@@ -482,16 +482,19 @@ Else
     End If
     Else
     ' work in paragraphs..
-    Dim ok1 As Boolean
+  
 again:
-    If a.FindStr(word$(0), st&, pa&, po&) > 0 Then
+    st& = a.FindStr(word$(0), st&, pa&, po&)
+    If st& > 0 Then
+    
      If max > 0 Then
+     po& = po& + Len(word$(0))
      line$ = a.TextParagraph(a.ParagraphFromOrder(pa&))
      For it = 1 To max
-     ok = InStr(1, line$, word$(it), vbTextCompare) > 0
+     ok = InStr(po&, line$, word$(it), vbTextCompare) > 0
      If Not ok Then Exit For
      Next it
-     st& = st& + 1
+     st& = st& + Len(word$(0))
     If ok Then Included = ExtractName(afile$) Else GoTo again
     
      Else

@@ -47,7 +47,7 @@ Private mtolayer As Long
 Private myRun As Boolean
 Private mprocess As TaskInterface ' reference to current process maybe same to parrent...
 Private mprocessOk As Boolean ' if i have a process class
-Private threadsnames As GarbageClass   ' δουλεύει
+Private threadsnames As ThreadsClass
 Public TaskMain As Boolean
 Public OriginalName$
 Private mGroupName$
@@ -507,7 +507,7 @@ Public Property Get Process() As TaskInterface
 Set Process = mprocess
 End Property
 Private Sub checkialive()
-If threadsnames Is Nothing Then Set threadsnames = New GarbageClass
+If threadsnames Is Nothing Then Set threadsnames = New ThreadsClass
 End Sub
 
 Public Property Set LinkThread(Threadid As Long, a As TaskInterface)

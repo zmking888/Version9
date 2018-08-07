@@ -1346,7 +1346,6 @@ FirstPosPara = b
 FindStrDown = True
 End If
 End Function
-
 Public Function FindStr(s$, ByVal st&, FindParaOrder As Long, FindPosPara As Long) As Long
 Dim mycur As Long, ac&, ac1&, acp&, mlines As Long, wh&, order As Long
 mycur = DocParaNext(0)

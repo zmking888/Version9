@@ -79,8 +79,8 @@ Public UKEY$
 Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, WaitShow As Long
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
-Global Const VerMinor = 3
-Global Const Revision = 34
+Global Const VerMinor = 4
+Global Const Revision = 0
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -164,7 +164,6 @@ Public varhash As New Hash
 Public comhash As New sbHash, numid As New idHash, numidbackup As New idHash, funid As New idHash, funidbackup As New idHash
 Public strid  As New idHash, stridbackup As New idHash, strfunid As New idHash, strfunidbackup As New idHash
 Public cLid As Long 'current id for app id
-Public GarbageCollector As New GarbageClass
 Public lastAboutHTitle As String, LastAboutText As String
 ''
 Public basestack1 As New basetask ' this is the global stack
@@ -2933,7 +2932,7 @@ varhash.ItemCreator w$, where
 UnFloatGroup bstack, w$, where, bstack.lastobj, True
 End If
 var(where).FloatGroupName = w$
-NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + oper$ + "()", ok
+NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + oper$ + "()", ok
 If soroslen < bstack.soros.Total Then
     If soroslen + 1 = bstack.soros.Total And flag Then
     r = bstack.soros.PopVal
@@ -3868,7 +3867,7 @@ cont2020:
         If Prefix = "@READ2" Then
                           
             Dim Lang As Long, ok As Boolean
-          NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
+          NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
           SpeedGroup = Abs(ok)
           GoTo CONTlastEtnum
         ElseIf Prefix = "@READ" Then
@@ -4430,7 +4429,6 @@ Set MediaPlayer1 = Nothing
 Set MediaBack1 = Nothing
 Erase sbf()
 Erase var()
-Set GarbageCollector = Nothing
 s_complete = False
 l_complete = False
 ResetTokenFinal  ' sure for GDI release token
@@ -4446,7 +4444,6 @@ firststr:
             If bstack.lastobj Is Nothing Then
                 pppp.item(x1 - 1) = s$
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set pppp.item(x1 - 1) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -4457,7 +4454,6 @@ firstexp:
             If bstack.lastobj Is Nothing Then
                 pppp.item(x1 - 1) = p
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set pppp.item(x1 - 1) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -4470,7 +4466,6 @@ If IsStrExp(bstack, b$, s$) Then
             If bstack.lastobj Is Nothing Then
                 pppp.item(x1 - 1) = s$
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set pppp.item(x1 - 1) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -4480,7 +4475,6 @@ ElseIf IsExp(bstack, b$, p) Then
             If bstack.lastobj Is Nothing Then
                 pppp.item(x1 - 1) = p
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set pppp.item(x1 - 1) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -15548,7 +15542,7 @@ checkobject:
                                     bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
+                                NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
                             ElseIf bstack.lastobj Is Nothing Then
                                 NeedAGroupInRightExpression
                                 interpret = False
@@ -15642,7 +15636,7 @@ noexpression:
                             If bstack.lastobj Is Nothing Then
                                 MissingObjReturn
                                 interpret = False: GoTo there1
-                            ElseIf Typename(bstack.lastobj) = "mHandler" Then   '' CheckGarbage bstack
+                            ElseIf Typename(bstack.lastobj) = "mHandler" Then
                                 Set myobject = New mHandler
                                 bstack.lastobj.CopyTo myobject
                                 If bstack.lastobj.indirect > -0 Then
@@ -15827,7 +15821,7 @@ somethingelse:
                             Set bstack.lastobj = Nothing
                         End If
                     End If
-                    NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", ok
+                    NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", ok
                     If Not ok Then
                         If LastErNum = 0 Then
                             MisOperatror (ss$)
@@ -15962,7 +15956,7 @@ PROCESSCOMMAND:
             b$ = NLtrim(b$)
             SetNextLineNL b$
         Else
-        NeoCall objptr(bstack), b$, Lang, ok
+        NeoCall ObjPtr(bstack), b$, Lang, ok
         If Not ok Then
             interpret = 0
             GoTo there1
@@ -16292,7 +16286,7 @@ If ss$ <> "" Then
                                 bstack.soros.PushObj bstack.lastobj
                                 Set bstack.lastobj = Nothing
                             End If
-                            NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", ok
+                            NeoCall2 ObjPtr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", ok
                     If Not ok Then
                         If LastErNum = 0 Then
                             MisOperatror (ss$)
@@ -16645,8 +16639,7 @@ If Not IsExp(bstack, b$, p) Then here$ = ohere$: GoTo there1
             End With
      Else
             If Typename(bstack.lastobj) = "mHandler" Then
-                                   CheckGarbage bstack
-                          Set pppp.item(v) = bstack.lastobj
+                               Set pppp.item(v) = bstack.lastobj
      
             Else
                    If Not bstack.lastobj Is Nothing Then
@@ -16705,7 +16698,6 @@ If Not bstack.lastobj Is Nothing Then
         
         
      Else
-        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
         Set pppp.item(v) = bstack.lastobj
     End If
     Set pppp.item(v).LinkRef = myobject
@@ -16819,12 +16811,9 @@ Else
     If bstack.lastobj.Arr Then
         Set pppp.item(v) = CopyArray(bstack.lastobj)
     Else
-        If Typename(bstack.lastobj.GroupRef) = "mHandler" Then CheckGarbage bstack
-        Set pppp.item(v) = bstack.lastobj.GroupRef
+         Set pppp.item(v) = bstack.lastobj.GroupRef
     End If
     Else
-        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-   
         Set pppp.item(v) = bstack.lastobj
         End If
         Set bstack.lastobj = Nothing
@@ -18672,7 +18661,7 @@ contNext:
         Case "CALL", "ΚΑΛΕΣΕ"
         ' CHECK FOR NUMBER...
 contCall:
-        NeoCall objptr(bstack), b$, Lang, ok
+        NeoCall ObjPtr(bstack), b$, Lang, ok
         If Not ok Then
         Execute = 0
         Exit Function
@@ -25024,14 +25013,6 @@ End If
 
 End If
 End If
-If GarbageCollector.count > 0 Then
-If Lang = 1 Then
-s$ = s$ + "Objects for destroy:" + Str$(GarbageCollector.count)
-Else
-s$ = s$ + "Αντικείμενα για καταστροφή:" + Str$(GarbageCollector.count)
-End If
-End If
-
     If tofile < -1 Then
         If Scr.CurrentX <> 0 Then crNew bstack, players(prive)
         If s$ <> "" Then s$ = vbCrLf + s$
@@ -36558,7 +36539,7 @@ contoper:
                     If TypeOf basestack.lastobj Is Group Then
                        basestack.soros.PushObj basestack.lastobj
                        Set basestack.lastobj = Nothing
-                        NeoCall2 objptr(basestack), "." + ChrW(&H1FFF) + s$ + "()", (True)
+                        NeoCall2 ObjPtr(basestack), "." + ChrW(&H1FFF) + s$ + "()", (True)
                   
                         resp = True
                     Else
@@ -36568,7 +36549,7 @@ contoper:
                 MissNumExpr
                 End If
             Else
-               NeoCall2 objptr(basestack), "." + ChrW(&H1FFF) + s$ + "()", (True)
+               NeoCall2 ObjPtr(basestack), "." + ChrW(&H1FFF) + s$ + "()", (True)
                 
                 resp = True
             End If
@@ -39070,7 +39051,7 @@ contpointer:
                         Set m = bstack.soros
                         Set bstack.Sorosref = New mStiva
                         bstack.soros.PushVal p
-                        NeoCall2 objptr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", ok
+                        NeoCall2 ObjPtr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", ok
                         Set bstack.Sorosref = m
                         Set m = Nothing
                     Else
@@ -39299,7 +39280,7 @@ contstrhere:
                         Set m = bstack.soros
                         Set bstack.Sorosref = New mStiva
                         bstack.soros.PushStr s$
-                        NeoCall2 objptr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
+                        NeoCall2 ObjPtr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
                         Set bstack.Sorosref = m
                         Set m = Nothing
                 ElseIf TypeOf var(i) Is Constant Then
@@ -39893,63 +39874,24 @@ ElseIf y1 < 5 And y1 > 0 Then
             ReadOnly
             MyClear = False
             Exit Function
-            End If
-            If var(i).UseIterator Then
+        End If
+        If var(i).UseIterator Then
             ReadOnly
             MyClear = False
             Exit Function
-            End If
-           
-   
-           If var(i).indirect > -1 Then Exit Function
-            If GarbageCollector.Find(objptr(var(i).objref)) Then
-            If Not var(i).objref Is Nothing Then
-             var(i).objref.GarbageJob2
-             End If
-             If GarbageCollector.Find(objptr(var(i).objref)) Then
-             End If
-             ElseIf GarbageCollector.Find(objptr(var(i))) Then
-             Else
-               If Not var(i).objref Is Nothing Then
-             var(i).objref.GarbageJob2
-             Set var(i) = Nothing
-             MakeitObjectInventory var(i)
-             Exit Function
-             End If
-            End If
-            
-             
-       
-              If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue <= 2 Then
-                GarbageCollector.RemoveWithNoFind
-            End If
-            End If
+        End If
 
             Set var(i) = Nothing
-             MakeitObjectInventory var(i)
-       
-       ElseIf var(i).t1 = 2 Then
-       GarbageCollector.Done = False
+            MakeitObjectInventory var(i)
            
-            If GarbageCollector.Find(objptr(var(i).objref)) Then
-            ElseIf GarbageCollector.Find(objptr(var(i))) Then
-            
-            End If
+       ElseIf var(i).t1 = 2 Then
        
- 
-                     If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue <= 2 Then
-                GarbageCollector.RemoveWithNoFind
-            End If
-            End If
         Set var(i) = New mHandler
 
          var(i).t1 = 2
-       Set var(i).objref = New MemBlock
+            Set var(i).objref = New MemBlock
        Else
        If var(i).UseIterator Then
-       ''var(i).index_cursor = var(i).index_start
        Set var(i) = Nothing
        var(i) = CLng(0)
        Else
@@ -41108,7 +41050,7 @@ Do
                                  '   bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 'End If
-                                NeoCall2 objptr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
+                                NeoCall2 ObjPtr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
                                 Set bstack.Sorosref = mystack
                                 Set mystack = Nothing
                             Else
@@ -41207,7 +41149,7 @@ Do
                                     bstack.soros.PushObj bstack.lastobj
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall2 objptr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", MyInput
+                                NeoCall2 ObjPtr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", MyInput
                                 Set bstack.Sorosref = mystack
                                 Set mystack = Nothing
                                 
@@ -41400,7 +41342,7 @@ Do
                                     MyInput = False: Exit Function
                                     End If
                                     bstack.soros.DataStr s$
-                                    NeoCall2 objptr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
+                                    NeoCall2 ObjPtr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", MyInput
                                     Set bstack.Sorosref = mystack
                                     Set mystack = Nothing
                     
@@ -48915,16 +48857,7 @@ If Left$(ah, 1) = "N" Or InStr(ah, "l") > 0 Then
         Set pppp = Nothing
         
     Else
-    If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-    'If Not GarbageCollector.ExistKey(objptr(bstack.lastobj)) Then
-    'GarbageCollector.AddKey objptr(bstack.lastobj), bstack.lastobj
-    'End If
-    'End If
-    
-    
-    
-    
-        Set bb.ValueObj = bstack.lastobj
+      Set bb.ValueObj = bstack.lastobj
     End If
         Set bstack.lastobj = Nothing
     Else
@@ -49301,24 +49234,6 @@ Function MakeATypeLib(v As Variant, Optional usetypelib As Boolean = False) As F
     Set obj = Nothing
 End Function
 
-Sub CheckGarbage(bstack As basetask)
-On Error GoTo nogarbage
-With bstack.lastobj
-     If .indirect = -1 Then
-                                        If .t1 < 2 Then
-                                            If Not GarbageCollector.ExistKey(objptr(.objref)) Then
-                                            GarbageCollector.AddKey objptr(.objref), .objref
-                                            End If
-                                        End If
-                                        ElseIf var(.indirect).objref.t1 < 2 Then
-                                            If Not GarbageCollector.ExistKey(objptr(var(.indirect).objref)) Then
-                                                GarbageCollector.AddKey objptr(var(.indirect).objref), var(.indirect)
-                                            End If
-                                        End If
-                                      
-End With
-nogarbage:
-End Sub
 Function FindPrevOriginal(bstack As basetask) As Long
 Dim curparent As basetask, cur As basetask
 'If bstack.IamThread Then
@@ -54179,7 +54094,7 @@ assigngroup:
                                 End If
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
+                                NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
                                 Set bstack.Sorosref = myobject
                                 Set myobject = Nothing
                             ElseIf bstack.lastobj Is Nothing Then
@@ -54316,7 +54231,7 @@ noexpression1:
                             If bstack.lastobj Is Nothing Then
                                 MissingObjReturn
                                 Exec1 = 0: ExecuteVar = 8: Exit Function
-                            ElseIf Typename(bstack.lastobj) = "mHandler" Then   '' CheckGarbage bstack
+                            ElseIf Typename(bstack.lastobj) = "mHandler" Then
                                 Set myobject = New mHandler
                                 bstack.lastobj.CopyTo myobject
                                 If bstack.lastobj.indirect > -0 Then
@@ -54640,7 +54555,7 @@ comeoper:
                         End If
                     End If
 
-                    NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", ok
+                    NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ss$ + "()", ok
                      Set bstack.Sorosref = myobject
                  Set myobject = Nothing
                     If Not ok Then
@@ -54970,7 +54885,7 @@ assignvaluestr1:
                                     End If
                                     Set bstack.lastobj = Nothing
                                 End If
-                                NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
+                                NeoCall2 ObjPtr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
                             Set bstack.Sorosref = myobject
                                 Set myobject = Nothing
                    Else
@@ -55140,7 +55055,7 @@ again12345:
                             End If
 a325674:
                             
-                            NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", ok
+                            NeoCall2 ObjPtr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + sw$ + "()", ok
                              Set bstack.Sorosref = myobject
                             Set myobject = Nothing
                             If Not ok Then GoTo here1234
@@ -55536,7 +55451,6 @@ If FastSymbol(b$, "=") Then
             If bstack.lastobj Is Nothing Then
                 myobject.item(0) = p
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set myobject.item(0) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -55603,7 +55517,7 @@ If myobject.HasSet Then
                     End If
                     Set bstack.lastobj = Nothing
                 End If
-                NeoCall2 objptr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
+                NeoCall2 ObjPtr(bstack), w$ + "." + ChrW(&H1FFF) + ":=()", ok
                 Set bstack.Sorosref = myobject
                 Set myobject = Nothing
                 ExecuteVar = 7: Exit Function
@@ -55939,9 +55853,7 @@ again12569:
             End With
      Else
             If Typename(bstack.lastobj) = "mHandler" Then
-                                   CheckGarbage bstack
                           Set pppp.item(v) = bstack.lastobj
-     
             Else
                    If Not bstack.lastobj Is Nothing Then
                           If TypeOf bstack.lastobj Is mArray Then
@@ -56040,7 +55952,6 @@ If pppp.UpperMonoLimit > v Then
         
         
      Else
-        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
         Set pppp.item(v) = bstack.lastobj
     End If
    If Not myobject Is Nothing Then
@@ -56126,7 +56037,6 @@ ElseIf FastSymbol(b$, ")") Then
             If bstack.lastobj Is Nothing Then
                 myobject.item(0) = vbNullString
             Else
-                If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                 Set myobject.item(0) = bstack.lastobj
                 Set bstack.lastobj = Nothing
             End If
@@ -56181,7 +56091,7 @@ PushParamGeneral bstack, b$
                                     Set bstack.lastobj = Nothing
                                 End If
                                 
-                                NeoCall2 objptr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
+                                NeoCall2 ObjPtr(bstack), Left$(w$, Len(w$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
                                 Set bstack.Sorosref = myobject
                                 Set myobject = Nothing
                                 ExecuteVar = 7: Exit Function
@@ -56303,12 +56213,10 @@ Else
     If bstack.lastobj.Arr Then
         Set pppp.item(v) = CopyArray(bstack.lastobj)
     Else
-        If Typename(bstack.lastobj.GroupRef) = "mHandler" Then CheckGarbage bstack
         Set pppp.item(v) = bstack.lastobj.GroupRef
     End If
     Else
-        If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
-   
+  
         Set pppp.item(v) = bstack.lastobj
         End If
         Set bstack.lastobj = Nothing
@@ -56544,7 +56452,7 @@ Set z = z1
                 
                 Set myobject = bstack.soros
                 Set bstack.Sorosref = New mStiva
-                    NeoCall2 objptr(bstack), what$ + "." + ChrW(&H1FFF) + "_%()", ok
+                    NeoCall2 ObjPtr(bstack), what$ + "." + ChrW(&H1FFF) + "_%()", ok
                      Set bstack.Sorosref = myobject
                  Set myobject = Nothing
                  End If

@@ -84,7 +84,6 @@ Private Sub Class_Initialize()
     toplim = -1
     mSortstyle = vbTextCompare
     NowDec$ = DefaultDec$
-   ' Debug.Print "create one"
 End Sub
 Public Sub ResetGui()
     MaxSpace = 50
@@ -881,7 +880,7 @@ Private Function GetRefCount(ByRef vvv) As Long
     Dim obj As IUnknown
     Set obj = vvv
     If obj Is Nothing Then Exit Function
-    CopyMemory GetRefCount, ByVal (objptr(obj)) + 4, 4
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
     GetRefCount = GetRefCount - 2
     Set obj = Nothing
 End Function
@@ -964,49 +963,9 @@ Done = False
 End Function
 
 Private Sub Class_Terminate()
-'Debug.Print "erased"
     Erase PriveSpace()
 End Sub
-Public Sub GarbageJob2()
-' use garbagecollector
-Dim i As Long, vvv As Variant
-If GarbageCollector.count > 0 Then
-If toplim > -1 Then
-For i = 0 To toplim
-If MyIsObject(PriveSpace(i).iValue) Then
-Set vvv = PriveSpace(i).iValue
-Set PriveSpace(i).iValue = Nothing
-                 GarbageCollector.Done = False
-           If Typename(vvv) = "mHandler" Then
-            If GarbageCollector.Find(objptr(vvv.objref)) Then
-            ElseIf GarbageCollector.Find(objptr(vvv)) Then
-            
-            End If
-            Else
-            If GarbageCollector.Find(objptr(vvv)) Then
-            End If
-            End If
-      
-       
-              If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue <= 2 Then
-                GarbageCollector.RemoveWithNoFind
-            End If
-            End If
-            Set vvv = Nothing
-End If
-Next i
-End If
-End If
-Erase PriveSpace()
-toplim = -1
-ReduceHash -1
-End Sub
-Public Sub GarbageJob()
-Erase PriveSpace()
-toplim = -1
-ReduceHash -1
-End Sub
+
 Private Sub QuickSortItems(Arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
 Dim Piv As item, tmp As item '<- adjust types here, when switching to something different than Long

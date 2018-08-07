@@ -7367,7 +7367,6 @@ Do
                 If bstack.lastobj Is Nothing Then
                     pppp.item(x1 - 1) = p
                 Else
-                    If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                     Set pppp.item(x1 - 1) = bstack.lastobj
                     Set bstack.lastobj = Nothing
                 End If
@@ -7397,7 +7396,6 @@ Do
                 If bstack.lastobj Is Nothing Then
                     pppp.item(x1 - 1) = ss$
                 Else
-                    If Typename(bstack.lastobj) = "mHandler" Then CheckGarbage bstack
                     Set pppp.item(x1 - 1) = bstack.lastobj
                     Set bstack.lastobj = Nothing
                 End If
@@ -7468,70 +7466,10 @@ MergeOperators = b$
 End If
 End Function
 Public Sub GarbageFlush()
-Dim objptr, obj As Object, i As Long
-On Error Resume Next
-With GarbageCollector
-If .count > 0 Then
-For i = 0 To .count - 1
-.index = i
-Set obj = .ValueObj
-If TypeOf obj Is FastCollection Then
-    obj.GarbageJob
-ElseIf TypeOf obj Is mHandler Then
-If obj.objref Is Nothing Then
-
-ElseIf TypeOf obj.objref Is FastCollection Then
-obj.objref.GarbageJob
-
-End If
-End If
-Next i
-'Set obj = .ValueObj
-GarbageCollector.Done = False
-GarbageCollector.GarbageJob
-End If
-End With
-
+' obsolate
 End Sub
 Public Sub GarbageFlush2()
-Dim objptr, obj As Object, i As Long, tmp As New GarbageClass
-With GarbageCollector
-If .count > 0 Then
-For i = 0 To .count - 1
-.index = i
-Set obj = .ValueObj
-If TypeOf obj Is FastCollection Then
-
-tmp.AddKey .KeyLong
-    obj.GarbageJob
-ElseIf TypeOf obj Is mHandler Then
-If obj.objref Is Nothing Then
-
-ElseIf TypeOf obj.objref Is FastCollection Then
-tmp.AddKey .KeyLong
-obj.objref.GarbageJob
-
-End If
-End If
-Next i
-End If
-End With
-Set obj = Nothing
-If tmp.count > 0 Then
-With tmp
-For i = 0 To .count - 1
-.index = i
-If GarbageCollector.Find(tmp.KeyLong) Then
-    If GarbageCollector.ReferCountValue = 1 Then
-        GarbageCollector.RemoveWithNoFind
-    End If
-End If
-
-Next i
-End With
-End If
-
-
+'obsolate
 End Sub
 Function PointPos(F$) As Long
 Dim er As Long, er2 As Long

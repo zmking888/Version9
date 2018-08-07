@@ -129,7 +129,6 @@ If IsObject(val) Then
 '' maybe here we can copy
 '' check first the type
 If TypeOf val Is mHandler Then
-CheckGarbage val, v()
 If val.indirect > -1 Then
     Set myVar(where).Value = v(val.indirect)
     Exit Sub
@@ -156,28 +155,6 @@ Private Function GetFree() As Long
 End Function
 
 Private Sub Class_Terminate()
-Dim i As Long
-If used > 0 Then
-For i = used - 1 To 0
-If IsObject(myVar(i).Value) Then
-            GarbageCollector.Done = False
-           If Typename(myVar(i).Value) = "mHandler" Then
-            If GarbageCollector.Find(objptr(myVar(i).Value.objref)) Then
-            ElseIf GarbageCollector.Find(objptr(myVar(i).Value)) Then
-            
-            End If
-            End If
-            
-            If GarbageCollector.Done Then
-            If GarbageCollector.ReferCountValue <= 2 Then
-                GarbageCollector.RemoveWithNoFind
-            End If
-            End If
-            Set myVar(i).Value = Nothing
-End If
-Next i
-
-End If
 Erase myVar()
 Set subs = Nothing
 End Sub
@@ -218,19 +195,4 @@ End If
 End If
 Next i
 End If
-End Sub
-Sub CheckGarbage(obj As Variant, var() As Variant)
-With obj
-     If .indirect = -1 Then
-                                        If .t1 <> 2 Then
-                                            If Not GarbageCollector.ExistKey(objptr(.objref)) Then
-                                            GarbageCollector.AddKey objptr(.objref), .objref
-                                            End If
-                                        End If
-                                        ElseIf var(.indirect).objref.t1 <> 2 Then
-                                            If Not GarbageCollector.ExistKey(objptr(var(.indirect).objref)) Then
-                                                GarbageCollector.AddKey objptr(var(.indirect).objref), var(.indirect)
-                                            End If
-                                        End If
-End With
 End Sub

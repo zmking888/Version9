@@ -29,16 +29,6 @@ End Sub
 
 ''Public Par1 As Variant
 Private Sub Class_Terminate()
-If indirect = -1 Then
-If GarbageCollector.Find(objptr(objref)) Then
-        If GarbageCollector.ReferCountValue = 2 Then
-                GarbageCollector.RemoveWithNoFind
-        
-        End If
- Set objref = Nothing
-    Exit Sub
-End If
-End If
 Set objref = Nothing
 End Sub
 Public Sub CopyTo(a As mHandler)

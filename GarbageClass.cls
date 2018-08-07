@@ -12,37 +12,6 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
-' George's FastCollection
-' Only Add, and Find.
-' Key as string may be a hex number (used for enumarates)
-' No same key.
-' We can remove key
-' We can add key (only unique keys)
-' return variant (can be anything)
-'**************
-'* Propertiea:
-'*      Count
-'*'* from 1 to Count we can access all the members of FastCollection
-'*     .Index=1  used for input/output
-'* We can get Key or Value
-'*      .KeyToString
-'*      .Value
-'* We can change Valus
-'*    set .ValueObj = objectX
-'*     .ValueVar
-'**************************
-'* Methods
-'* AddKey "10" [, variant]
-'* ToKey "10"
-'* SwapValues "10", "30"
-'*
-'* .Done ..operation is ok
-'* .Remove 10
-'* .AddKey without parameter add 1 to lastkey
-'* .LastKey
-'* .LastIndex
-'* .Frwd  (for index, exit if not .done)
-'* .Back  (for index, exit if not .done)
 Private mSortstyle As VbCompareMethod
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
@@ -85,6 +54,8 @@ End Sub
 
 
 Public Sub AddKey(RHS, Optional aValue As Variant)
+If RHS = 0 Then Exit Sub
+Debug.Print "Add :" & RHS
     index = -1
     lastkey = CLng(RHS)
     Done = False
@@ -118,6 +89,7 @@ Public Sub ToKey(RHS)
     If Done Then lastkey = CLng(RHS)
 End Sub
 Public Sub RemoveWithNoFind()
+
 Dim k As Long, k1 As Long, vvv As Variant, top1 As Long
 If toplim < 0 Then Exit Sub  ' previus stop
 top1 = toplim
@@ -163,6 +135,7 @@ End If
 End Sub
 Public Sub Remove(RHS)
 Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
+
 If toplim < 0 Then Exit Sub  ' previus stop
 top1 = toplim
 If Find2(RHS, Parndx, ndx) Then
@@ -286,7 +259,8 @@ Private Sub ReHash()
 End Sub
 
 Private Sub ReduceHash(newTop As Long)
-    If newTop <= 5 Then
+
+   If newTop <= 5 Then
             If newTop < 0 Then
                 newTop = -1
                 toplim = -1
@@ -305,6 +279,9 @@ Private Sub ReduceHash(newTop As Long)
                 ReHash
             End If
     Else
+            On Error Resume Next
+            ReDim Preserve PriveSpace(MaxSpace) As item
+            If Err.Number > 0 Then Exit Sub
             If MaxSpace - newTop + 1 > 2 * newTop + 2 Then
             MaxSpace = 2 * (newTop + 1) + 1
             ReDim Preserve PriveSpace(MaxSpace) As item
@@ -326,8 +303,8 @@ Private Function Malloc() As Long
     toplim = toplim + 1
     Malloc = toplim
 End Function
-Property Get Count()
-    Count = toplim + 1
+Property Get count()
+    count = toplim + 1
 End Property
 
 Function IsObj() As Boolean
@@ -337,6 +314,8 @@ IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 Function Find(RHS) As Boolean
+If RHS = 0 Then Exit Function
+Debug.Print "Find :" & RHS, Typename$(RHS)
 If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
 Key = CLng(RHS)
@@ -357,6 +336,7 @@ If k = k1 Then
 ReHash
 k = Hash(HashFunc(Key)) - 1
 If k >= 0 Then
+ParentIndex = -1
 k1 = -2
 Do
     If PriveSpace(k).Key = Key Then Find = True: lastfind = Key: index = k: Done = True: Exit Function
@@ -369,6 +349,7 @@ End If
 End If
 End Function
 Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
+Debug.Print "Find2 :" & RHS
 If toplim = -1 Then Exit Function
 Dim k As Long, Key As Long, k1 As Long
 
@@ -454,7 +435,7 @@ Done = True
 End Sub
 
 Property Get Percent()
-Percent = 100 * Count / hashlen
+Percent = 100 * count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long
@@ -485,10 +466,10 @@ Private Function UINT(ByVal a As Integer) As Long
  End If
  
  End Function
-
-Private Function MyMod(r1, po) As Variant
+Private Function MyMod(r1 As Double, po) As Double
 MyMod = r1 - Fix(r1 / po) * po
 End Function
+
 Private Function uintnew(ByVal a As Currency) As Currency
 If a > 2147483647@ Then a = 2147483647@
 If a < -2147483648@ Then a = -2147483648@
@@ -542,11 +523,11 @@ End If
 End Property
 Public Sub ToStart()
 index = 0
-Done = Count > 0
+Done = count > 0
 End Sub
 Public Sub ToEnd()
-index = Count - 1
-Done = Count > 0
+index = count - 1
+Done = count > 0
 End Sub
 
 Public Sub NextIndex()
@@ -577,11 +558,11 @@ ReduceHash -1
 End Sub
 Private Sub QuickSortItems(Arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-Dim Piv As item, Tmp As item '<- adjust types here, when switching to something different than Long
+Dim Piv As item, tmp As item '<- adjust types here, when switching to something different than Long
   If UB - LB = 1 Then
      M1 = LB
 
-     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = 1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = 1 Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
      Exit Sub
   Else
   ' we have unique names
@@ -597,7 +578,7 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
     Do While StrComp(Arr(M2).Key, Piv.Key, mSortstyle) = 1: M2 = M2 - 1: Loop
 
     If M1 <= M2 Then
-      Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp 'swap
+      tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp 'swap
       M1 = M1 + 1
       M2 = M2 - 1
     End If
@@ -610,11 +591,11 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
 End Sub
 Private Sub QuickSortItemsRev(Arr() As item, ByVal LB As Long, ByVal UB As Long)
 Dim M1 As Long, M2 As Long
-Dim Piv As item, Tmp As item '<- adjust types here, when switching to something different than Long
+Dim Piv As item, tmp As item '<- adjust types here, when switching to something different than Long
   If UB - LB = 1 Then
      M1 = LB
 
-     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = -1 Then Tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = Tmp
+     If StrComp(Arr(M1).Key, Arr(UB).Key, mSortstyle) = -1 Then tmp = Arr(M1): Arr(M1) = Arr(UB): Arr(UB) = tmp
      Exit Sub
   Else
   ' we have unique names
@@ -630,7 +611,7 @@ Dim Piv As item, Tmp As item '<- adjust types here, when switching to something 
     Do While StrComp(Arr(M2).Key, Piv.Key, mSortstyle) = -1: M2 = M2 - 1: Loop
 
     If M1 <= M2 Then
-      Tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = Tmp 'swap
+      tmp = Arr(M1): Arr(M1) = Arr(M2): Arr(M2) = tmp 'swap
       M1 = M1 + 1
       M2 = M2 - 1
     End If
@@ -696,7 +677,7 @@ Loop
 End If
 End If
 Next i
-Debug.Print Count, countme, countinqueues, hashlen, Me.Percent, (countme - countinqueues) / countme * 100
+Debug.Print count, countme, countinqueues, hashlen, Me.Percent, (countme - countinqueues) / countme * 100
 problem = haveproblem
 End Function
 
