@@ -361,12 +361,12 @@ Private Function GetMemberName(obj As Object, ByVal dispid As Long, IID As GUID,
 
     Dim strName     As String
     ' get IDispatch from the object
-    pVTbl = objptr(obj)
+    pVTbl = ObjPtr(obj)
     CpyMem pVTbl, ByVal pVTbl, 4
     CpyMem oDispatch, ByVal pVTbl, Len(oDispatch)
 
     ' get ITypeInfo
-    hRet = CallPointer(oDispatch.GetTypeInfo, objptr(obj), 0, LCID_DEF, VarPtr(pTypeInfo))
+    hRet = CallPointer(oDispatch.GetTypeInfo, ObjPtr(obj), 0, LCID_DEF, VarPtr(pTypeInfo))
     If hRet Then GoTo finalize
 
     ' ITypeInfo VTable
@@ -476,8 +476,8 @@ Public Function Attach(obj As Object) As Boolean
 
     ' IUnknown VTable
     Set oTarget = obj
-    pTarget = objptr(obj)
-    CpyMem pVTblTarget, ByVal pTarget, 4
+    pTarget = ObjPtr(obj)
+    CpyMem pVTblTarget, ByVal pTarget, 4   ' make Vtbl pointer from object pointer
     CpyMem oUnk, ByVal pVTblTarget, Len(oUnk)
 
     ' IID string -> GUID struct
@@ -516,7 +516,7 @@ Public Function Attach(obj As Object) As Boolean
     Set oSink = CreateEventSink(iid_event, Me)
 
     ' advise the event sink
-    hRet = CallPointer(oCP.Advise, pCP, objptr(oSink), VarPtr(dwCookie))
+    hRet = CallPointer(oCP.Advise, pCP, ObjPtr(oSink), VarPtr(dwCookie))
     If hRet Then Exit Function
 
     ' wohoo, done!

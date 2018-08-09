@@ -226,7 +226,7 @@ On Error Resume Next
 Set aa = mstack.item(where)
 StackItemType = aa.Typename
 End Property
-Public Property Get StackItemTypeObjectType(where As Long, v() As Variant) As String
+Public Property Get StackItemTypeObjectType(where As Long) As String
 Dim aa As VarItem, bb As Object
 On Error Resume Next
 
@@ -238,7 +238,7 @@ Case "*"
 Set bb = aa.ObjectRef
 If TypeOf bb Is mHandler Then
 Set bb = bb.objref
-CheckDeepAny bb, v()
+CheckDeepAny bb
 If bb.t1 = 3 Then
 StackItemTypeObjectType = "*[" + Typename(bb) + "]"
 ElseIf bb.t1 = 1 Then

@@ -492,22 +492,47 @@ Else
     Set CDib2Pic = emptypic
 End If
 End Function
-Public Function GetDIBPixel(ssdib$, ByVal x As Long, ByVal y As Long) As Double
+Public Function SetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long, aColor As Long) As Double
+Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
+w = val("&H" & Mid$(ssdib, 5, 4))
+h = val("&H" & Mid$(ssdib, 9, 4))
+If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+If w * h <> 0 Then
+bpl = (LenB(ssdib) - 24) \ h
+w = (w - x - 1) Mod w
+h = (y Mod h) * bpl + w * 3 + 24
+CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
+
+SetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
+CopyMemory ByVal StrPtr(ssdib) + h, aColor, 3
+End If
+End Function
+Public Function GetDIBPixel(ssdib As Variant, ByVal x As Long, ByVal y As Long) As Double
 Dim w As Long, h As Long, bpl As Long, rgb(2) As Byte
 'a = ssdib$
-w = val("&H" & Mid$(ssdib$, 5, 4))
-h = val("&H" & Mid$(ssdib$, 9, 4))
-If Len(ssdib$) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+w = val("&H" & Mid$(ssdib, 5, 4))
+h = val("&H" & Mid$(ssdib, 9, 4))
+If Len(ssdib) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
 If w * h <> 0 Then
-bpl = (Len(ssdib$) - 12) \ h   ' Len(ssdib$) 2 bytes per char
-w = x Mod w
+bpl = (LenB(ssdib) - 24) \ h   ' Len(ssdib$) 2 bytes per char
+w = (w - x - 1) Mod w
+
 h = (y Mod h) * bpl + w * 3 + 24
 
 
-CopyMemory rgb(0), ByVal StrPtr(ssdib$) + h, 3
+CopyMemory rgb(0), ByVal StrPtr(ssdib) + h, 3
 
-GetDIBPixel = -(rgb(0) * 256# * 256# + rgb(1) * 256# + rgb(2))
+GetDIBPixel = -(rgb(2) * 256# * 256# + rgb(1) * 256# + rgb(0))
 End If
+End Function
+Public Function cDIBwidth1(a) As Long
+Dim w As Long, h As Long
+cDIBwidth1 = -1
+
+w = val("&H" & Mid$(a, 5, 4))
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+cDIBwidth1 = w
 End Function
 Public Function cDIBwidth(a) As Long
 Dim w As Long, h As Long
@@ -521,12 +546,19 @@ cDIBwidth = w
 End If
 End If
 End Function
+Public Function cDIBheight1(a) As Long
+Dim w As Long, h As Long
+cDIBheight1 = -1
+w = val("&H" & Mid$(a, 5, 4))
+h = val("&H" & Mid$(a, 9, 4))
+If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function
+cDIBheight1 = h
+End Function
 Public Function cDIBheight(a) As Long
 Dim w As Long, h As Long
 cDIBheight = -1
 If Len(a) >= 12 Then
 If Left$(a, 4) = "cDIB" Then
-
 w = val("&H" & Mid$(a, 5, 4))
 h = val("&H" & Mid$(a, 9, 4))
 If Len(a) * 2 < ((w * 3 + 3) \ 4) * 4 * h - 24 Then Exit Function

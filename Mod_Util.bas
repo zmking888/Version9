@@ -59,6 +59,7 @@ Public Type basket
 
 End Type
 Private stopwatch As Long
+Private Const myArray = "mArray"
 Private Const LOCALE_SYSTEM_DEFAULT As Long = &H800
 Private Const LOCALE_USER_DEFAULT As Long = &H800
 Private Const C3_DIACRITIC As Long = &H2
@@ -78,6 +79,12 @@ Public Type RECT
         Right As Long
         Bottom As Long
 End Type
+Public Const LOCALE_SDECIMAL = &HE&
+Public Const LOCALE_SGROUPING = &H10&
+Public Const LOCALE_STHOUSAND = &HF&
+Public Const LOCALE_SMONDECIMALSEP = &H16&
+Public Const LOCALE_SMONTHOUSANDSEP = &H17&
+Public Const LOCALE_SMONGROUPING = &H18&
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private Const DT_BOTTOM As Long = &H8&
 Private Const DT_CALCRECT As Long = &H400&
@@ -4800,9 +4807,9 @@ End Function
 
 
 Sub ICOPY(d1 As Object, x1 As Long, y1 As Long, w As Long, h As Long)
-Dim sv As Long
+Dim sV As Long
 With players(GetCode(d1))
-sv = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
+sV = BitBlt(d1.hDC, CLng(d1.ScaleX(x1, 1, 3)), CLng(d1.ScaleY(y1, 1, 3)), CLng(d1.ScaleX(w, 1, 3)), CLng(d1.ScaleY(h, 1, 3)), d1.hDC, CLng(d1.ScaleX(.XGRAPH, 1, 3)), CLng(d1.ScaleY(.YGRAPH, 1, 3)), SRCCOPY)
 'sv = UpdateWindow(d1.hwnd)
 End With
 End Sub
@@ -5742,13 +5749,13 @@ Public Sub ResCounter()
 k1 = 0
 End Sub
 
-Public Function CheckStackObj(bstack As basetask, anything As Object, vvv() As Variant, Optional counter As Long) As Boolean
+Public Function CheckStackObj(bstack As basetask, anything As Object, Optional counter As Long) As Boolean
 If TypeOf bstack.lastobj Is mHandler Then
         If bstack.lastobj.t1 <> 3 Then Exit Function
         counter = bstack.lastobj.index_cursor + 1
         Set anything = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If CheckDeepAny(anything, vvv()) Then CheckStackObj = True
+        If CheckDeepAny(anything) Then CheckStackObj = True
 End If
         
 End Function
@@ -6589,7 +6596,7 @@ If Not Screen.ActiveForm Is Nothing Then
     End If
 
 End Sub
-Public Function CheckIsmArray(obj As Object, vv() As Variant) As Boolean
+Public Function CheckIsmArray(obj As Object) As Boolean
 Dim oldobj As Object
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
@@ -6600,7 +6607,7 @@ If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
     If obj.t1 = 3 Then
         If obj.indirect >= 0 And obj.indirect <= var2used Then
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6615,7 +6622,7 @@ If TypeOf obj Is mArray Then If obj.Arr Then CheckIsmArray = True: Set oldobj = 
 End If
 Set obj = oldobj
 End Function
-Public Function CheckIsmArrayOrStackOrCollection(obj As Object, vv() As Variant) As Boolean
+Public Function CheckIsmArrayOrStackOrCollection(obj As Object) As Boolean
 Dim oldobj As Object
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
@@ -6626,7 +6633,7 @@ If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
     If obj.t1 <> 2 Then
         If obj.indirect >= 0 And obj.indirect <= var2used Then
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6643,7 +6650,7 @@ If TypeOf obj Is FastCollection Then CheckIsmArrayOrStackOrCollection = True: Se
 End If
 Set obj = oldobj
 End Function
-Public Function CheckDeepAny(obj As Object, vv() As Variant) As Boolean
+Public Function CheckDeepAny(obj As Object) As Boolean
 Dim oldobj As Object
 If obj Is Nothing Then Exit Function
 Set oldobj = obj
@@ -6654,7 +6661,7 @@ If kk > 20 Then Set obj = oldobj: Exit Function
 If TypeOf obj Is mHandler Then
     If obj.t1 = 3 Then
         If obj.indirect >= 0 And obj.indirect <= var2used Then
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6667,7 +6674,7 @@ End If
 If Not obj Is Nothing Then Set oldobj = Nothing: CheckDeepAny = True: Exit Function
 Set obj = oldobj
 End Function
-Public Function CheckLastHandler(obj As Object, vv() As Variant) As Boolean
+Public Function CheckLastHandler(obj As Object) As Boolean
 Dim oldobj As Object, first As Object
 If obj Is Nothing Then Exit Function
 Set first = obj
@@ -6679,7 +6686,7 @@ If TypeOf obj Is mHandler Then
     'If obj.t1 = 3 Then
         If obj.indirect >= 0 And obj.indirect <= var2used Then
                 Set oldobj = obj
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6695,7 +6702,7 @@ End If
 If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandler = True: Exit Function
 Set obj = first
 End Function
-Public Function CheckLastHandlerVariant(obj, vv() As Variant) As Boolean
+Public Function CheckLastHandlerVariant(obj) As Boolean
 Dim oldobj As Object, first As Object
 If obj Is Nothing Then Exit Function
 Set first = obj
@@ -6708,7 +6715,7 @@ If TypeOf obj Is mHandler Then
     'If obj.t1 = 3 Then
         If obj.indirect >= 0 And obj.indirect <= var2used Then
                 Set oldobj = obj
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6724,7 +6731,7 @@ End If
 If Not oldobj Is Nothing Then Set obj = oldobj: Set oldobj = Nothing: CheckLastHandlerVariant = True: Exit Function
 Set obj = first
 End Function
-Public Function CheckLastHandlerOrIterator(obj As Object, vv() As Variant, lastindex As Long) As Boolean
+Public Function CheckLastHandlerOrIterator(obj As Object, lastindex As Long) As Boolean
 Dim oldobj As Object, first As Object
 If obj Is Nothing Then Exit Function
 Set first = obj
@@ -6736,7 +6743,7 @@ If TypeOf obj Is mHandler Then
         If obj.UseIterator Then lastindex = obj.index_cursor
         If obj.indirect >= 0 And obj.indirect <= var2used Then
                 Set oldobj = obj
-                Set obj = vv(obj.indirect)
+                Set obj = var(obj.indirect)
                 kk = kk + 1
                 GoTo again
         Else
@@ -6810,6 +6817,13 @@ End Sub
 Public Sub MissStringExpr()
 MyEr "Missing string expression", "Λείπει αλφαριθμητική παράσταση"
 End Sub
+Public Sub MissString()
+MyEr "Missing string", "Λείπει αλφαριθμητικό"
+End Sub
+Public Sub MissStringNumber()
+MyEr "Missing string or number", "Λείπει αλφαριθμητικό ή αριθμός"
+End Sub
+
 Public Sub NoCreateFile()
     MyEr "Can't create file", "Δεν μπορώ να φτιάξω αρχείο"
 End Sub
@@ -8763,7 +8777,7 @@ End If
 End If
 End Function
 
-Function GetRes(bstack As basetask, b$, Lang As Long, data$, var()) As Boolean
+Function GetRes(bstack As basetask, b$, Lang As Long, data$) As Boolean
 Dim w$, x1 As Long, label1$, useHandler As mHandler, par As Boolean, pppp As mArray, p As Variant
 If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
             w$ = Funcweak(bstack, b$, x1, label1$)
@@ -10010,3 +10024,1723 @@ Public Function nounder32(c$) As Boolean
 nounder32 = AscW(c$) > 31 Or AscW(c$) < 0
 End Function
 
+Function GetImageX(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim w1 As Long, s$, w2 As Long, pppp As mArray, useHandler As mHandler
+GetImageX = False
+If IsExp(bstack, a$, s$) Then
+      GetImageX = FastSymbol(a$, ")", True)
+        If Not bstack.lastobj Is Nothing Then
+           If TypeOf bstack.lastobj Is mHandler Then
+              Set useHandler = bstack.lastobj
+              Set bstack.lastobj = Nothing
+              If useHandler.t1 = 2 Then
+                  If useHandler.objref.ReadImageSizeX(r) Then
+                  r = SG * bstack.Owner.ScaleX(r, 3, 1)
+                          Set useHandler = Nothing
+                      Exit Function
+                  End If
+              End If
+           End If
+        End If
+            noImageInBuffer a$
+            GetImageX = False
+            r = 0#
+    
+Else
+w1 = Abs(IsLabel(bstack, a$, s$))
+        If w1 = 3 Then
+            If GetVar(bstack, s$, w1) Then
+                If Typename(var(w1)) <> "String" Then MissString: Exit Function
+                If Left$(var(w1), 4) = "cDIB" And Len(var(w1)) > 12 Then
+                    r = cDIBwidth1(var(w1)) * DXP
+                    If SG < 0 Then r = -r
+                    GetImageX = FastSymbol(a$, ")", True)
+                Else
+                    noImage a$
+                    Exit Function
+                End If
+            Else
+                MissFuncParameterStringVarMacro a$
+            End If
+        ElseIf w1 = 6 Then
+            If neoGetArray(bstack, s$, pppp) Then
+                If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                If Not pppp.IsStringItem(w2) Then MissString: Exit Function
+                Dim sV As Variant
+                pppp.SwapItem w2, sV
+          
+                If Left$(sV, 4) = "cDIB" And Len(sV) > 12 Then
+                    r = SG * cDIBwidth1(sV) * DXP
+                    If SG < 0 Then r = -r
+                    pppp.SwapItem w2, sV
+                    GetImageX = FastSymbol(a$, ")", True)
+                Else
+                    pppp.SwapItem w2, sV
+                    noImage a$
+                End If
+    
+        Else
+            MissParam a$
+        End If
+End If
+End If
+    
+ 
+End Function
+Function GetImageY(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim w1 As Long, s$, w2 As Long, pppp As mArray, useHandler As mHandler
+GetImageY = False
+If IsExp(bstack, a$, s$) Then
+      GetImageY = FastSymbol(a$, ")", True)
+        If Not bstack.lastobj Is Nothing Then
+           If TypeOf bstack.lastobj Is mHandler Then
+              Set useHandler = bstack.lastobj
+              Set bstack.lastobj = Nothing
+              If useHandler.t1 = 2 Then
+                  If useHandler.objref.ReadImageSizeY(r) Then
+                  r = SG * bstack.Owner.ScaleY(r, 3, 1)
+                          Set useHandler = Nothing
+                      Exit Function
+                  End If
+              End If
+           End If
+        End If
+            noImageInBuffer a$
+            GetImageY = False
+            r = 0#
+    
+Else
+w1 = Abs(IsLabel(bstack, a$, s$))
+        If w1 = 3 Then
+            If GetVar(bstack, s$, w1) Then
+                If Typename(var(w1)) <> "String" Then MissString: Exit Function
+                If Left$(var(w1), 4) = "cDIB" And Len(var(w1)) > 12 Then
+                    r = cDIBheight1(var(w1)) * DXP
+                    If SG < 0 Then r = -r
+                    GetImageY = FastSymbol(a$, ")", True)
+                Else
+                    noImage a$
+                    Exit Function
+                End If
+            Else
+                MissFuncParameterStringVarMacro a$
+            End If
+        ElseIf w1 = 6 Then
+            If neoGetArray(bstack, s$, pppp) Then
+                If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                If Not pppp.IsStringItem(w2) Then MissString: Exit Function
+                Dim sV As Variant
+                pppp.SwapItem w2, sV
+          
+                If Left$(sV, 4) = "cDIB" And Len(sV) > 12 Then
+                    r = SG * cDIBheight1(sV) * DXP
+                    If SG < 0 Then r = -r
+                    pppp.SwapItem w2, sV
+                    GetImageY = FastSymbol(a$, ")", True)
+                Else
+                    pppp.SwapItem w2, sV
+                    noImage a$
+                End If
+    
+        Else
+            MissParam a$
+        End If
+End If
+End If
+    
+ 
+End Function
+Function GetImageXpixels(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim w1 As Long, s$, w2 As Long, pppp As mArray, useHandler As mHandler
+GetImageXpixels = False
+If IsExp(bstack, a$, s$) Then
+      GetImageXpixels = FastSymbol(a$, ")", True)
+        If Not bstack.lastobj Is Nothing Then
+           If TypeOf bstack.lastobj Is mHandler Then
+              Set useHandler = bstack.lastobj
+              Set bstack.lastobj = Nothing
+              If useHandler.t1 = 2 Then
+                  If useHandler.objref.ReadImageSizeX(r) Then
+                  r = SG * r
+                          Set useHandler = Nothing
+                      Exit Function
+                  End If
+              End If
+           End If
+        End If
+            noImageInBuffer a$
+            GetImageXpixels = False
+            r = 0#
+    
+Else
+w1 = Abs(IsLabel(bstack, a$, s$))
+        If w1 = 3 Then
+            If GetVar(bstack, s$, w1) Then
+                If Typename(var(w1)) <> "String" Then MissString: Exit Function
+                If Left$(var(w1), 4) = "cDIB" And Len(var(w1)) > 12 Then
+                    r = cDIBwidth1(var(w1))
+                    If SG < 0 Then r = -r
+                    GetImageXpixels = FastSymbol(a$, ")", True)
+                Else
+                    noImage a$
+                    Exit Function
+                End If
+            Else
+                MissFuncParameterStringVarMacro a$
+            End If
+        ElseIf w1 = 6 Then
+            If neoGetArray(bstack, s$, pppp) Then
+                If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                If Not pppp.IsStringItem(w2) Then MissString: Exit Function
+                Dim sV As Variant
+                pppp.SwapItem w2, sV
+          
+                If Left$(sV, 4) = "cDIB" And Len(sV) > 12 Then
+                    r = SG * cDIBwidth1(sV)
+                    If SG < 0 Then r = -r
+                    pppp.SwapItem w2, sV
+                    GetImageXpixels = FastSymbol(a$, ")", True)
+                Else
+                    pppp.SwapItem w2, sV
+                    noImage a$
+                End If
+    
+        Else
+            MissParam a$
+        End If
+End If
+End If
+    
+ 
+End Function
+Function GetImageYpixels(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim w1 As Long, s$, w2 As Long, pppp As mArray, useHandler As mHandler
+GetImageYpixels = False
+If IsExp(bstack, a$, s$) Then
+      GetImageYpixels = FastSymbol(a$, ")", True)
+        If Not bstack.lastobj Is Nothing Then
+           If TypeOf bstack.lastobj Is mHandler Then
+              Set useHandler = bstack.lastobj
+              Set bstack.lastobj = Nothing
+              If useHandler.t1 = 2 Then
+                  If useHandler.objref.ReadImageSizeY(r) Then
+                  r = SG * r
+                          Set useHandler = Nothing
+                      Exit Function
+                  End If
+              End If
+           End If
+        End If
+            noImageInBuffer a$
+            GetImageYpixels = False
+            r = 0#
+    
+Else
+w1 = Abs(IsLabel(bstack, a$, s$))
+        If w1 = 3 Then
+            If GetVar(bstack, s$, w1) Then
+                If Typename(var(w1)) <> "String" Then MissString: Exit Function
+                If Left$(var(w1), 4) = "cDIB" And Len(var(w1)) > 12 Then
+                    r = cDIBheight1(var(w1))
+                    If SG < 0 Then r = -r
+                    GetImageYpixels = FastSymbol(a$, ")", True)
+                Else
+                    noImage a$
+                    Exit Function
+                End If
+            Else
+                MissFuncParameterStringVarMacro a$
+            End If
+        ElseIf w1 = 6 Then
+            If neoGetArray(bstack, s$, pppp) Then
+                If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
+                If Not pppp.IsStringItem(w2) Then MissString: Exit Function
+                Dim sV As Variant
+                pppp.SwapItem w2, sV
+          
+                If Left$(sV, 4) = "cDIB" And Len(sV) > 12 Then
+                    r = SG * cDIBheight1(sV)
+                    If SG < 0 Then r = -r
+                    pppp.SwapItem w2, sV
+                    GetImageYpixels = FastSymbol(a$, ")", True)
+                Else
+                    pppp.SwapItem w2, sV
+                    noImage a$
+                End If
+    
+        Else
+            MissParam a$
+        End If
+End If
+End If
+    
+ 
+End Function
+
+Function enthesi(bstack As basetask, rest$) As String
+'first is the string "label {0} other {1}
+Dim counter As Long, pat$, final$, pat1$, pl1 As Long, pl2 As Long, pl3 As Long
+Dim q$, p As Variant, p1 As Integer, pd$
+If IsStrExp(bstack, rest$, final$) Then
+  If FastSymbol(rest$, ",") Then
+    Do
+    pl2 = 1
+        pat$ = "{" + CStr(counter)
+       pat1$ = pat$ + ":"
+        pat$ = pat$ + "}"
+        If IsStrExp(bstack, rest$, q$) Then
+fromboolean:
+            final$ = Replace$(final$, pat$, q$)
+AGAIN0:
+        pl2 = InStr(pl2, final$, pat1$)
+          If pl2 > 0 Then
+           pl1 = InStr(pl2, final$, "}")
+           pl3 = val(Mid$(final$, pl2 + Len(pat1$)) + "}")
+           If pl3 <> 0 Then
+        If pl3 > 0 Then
+            pd$ = Left$(q$ + Space$(pl3), pl3)
+            Else
+            pd$ = Right$(Space$(Abs(pl3)) + q$, Abs(pl3))
+            End If
+      End If
+            final$ = Replace$(final$, Mid$(final$, pl2, pl1 - pl2 + 1), pd$)
+            GoTo AGAIN0
+          End If
+            If Not FastSymbol(rest$, ",") Then Exit Do
+        ElseIf IsExp(bstack, rest$, p) Then
+        If VarType(p) = vbBoolean Then q$ = Format$(p, DefBooleanString): GoTo fromboolean
+again1:
+        pl2 = InStr(pl2, final$, pat1$)
+        If pl2 > 0 Then
+        pl1 = InStr(pl2, final$, "}")
+        If Mid$(final$, pl2 + Len(pat1$), 1) = ":" Then
+        p1 = 0
+        pl3 = val(Mid$(final$, pl2 + Len(pat1$) + 1) + "}")
+        Else
+        p1 = val("0" + Mid$(final$, pl2 + Len(pat1$)))
+        
+        pl3 = val(Mid$(final$, pl2 + Len(pat1$) + Len(Str$(p1))) + "}")
+        If p1 < 0 Then p1 = 13 '22
+        If p1 > 13 Then p1 = 13
+      p = MyRound(p, p1)
+      End If
+      pd$ = LTrim(Str(p))
+      
+      If InStr(pd$, "E") > 0 Or InStr(pd$, "e") > 0 Then '' we can change e to greek ε
+      pd$ = Format$(p, "0." + String$(p1, "0") + "E+####")
+           If Not NoUseDec Then
+                   If OverideDec Then
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                    
+                ElseIf InStr(pd$, NowDec$) > 0 Then
+                pd$ = Replace$(pd$, NowDec$, Chr(2))
+                pd$ = Replace$(pd$, NowThou$, Chr(3))
+                pd$ = Replace$(pd$, Chr(2), ".")
+                pd$ = Replace$(pd$, Chr(3), ",")
+                
+                End If
+            End If
+      ElseIf p1 <> 0 Then
+       pd$ = Format$(p, "0." + String$(p1, "0"))
+               If Not NoUseDec Then
+                If OverideDec Then
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    pd$ = Replace$(pd$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    pd$ = Replace$(pd$, Chr(2), NowDec$)
+                    pd$ = Replace$(pd$, Chr(3), NowThou$)
+                ElseIf InStr(pd$, NowDec$) > 0 Then
+                pd$ = Replace$(pd$, NowDec$, Chr(2))
+                pd$ = Replace$(pd$, NowThou$, Chr(3))
+                pd$ = Replace$(pd$, Chr(2), ".")
+                pd$ = Replace$(pd$, Chr(3), ",")
+                
+                End If
+            End If
+      End If
+   
+      If pl3 <> 0 Then
+        If pl3 > 0 Then
+            pd$ = Left$(pd$ + Space$(pl3), pl3)
+            Else
+            pd$ = Right$(Space$(Abs(pl3)) + pd$, Abs(pl3))
+            End If
+      End If
+            final$ = Replace$(final$, Mid$(final$, pl2, pl1 - pl2 + 1), pd$)
+            GoTo again1
+        Else
+        
+        If NoUseDec Then
+            final$ = Replace$(final$, pat$, CStr(p))
+        Else
+        pd$ = LTrim(Str$(p))
+         If Left$(pd$, 1) = "." Then
+        pd$ = "0" + pd$
+        ElseIf Left$(pd$, 2) = "-." Then pd$ = "-0" + Mid$(pd$, 2)
+        End If
+        If OverideDec Then
+        final$ = Replace$(final$, pat$, Replace(pd$, ".", NowDec$))
+        Else
+        final$ = Replace$(final$, pat$, pd$)
+        End If
+        End If
+        
+        
+            End If
+            If Not FastSymbol(rest$, ",") Then Exit Do
+        Else
+            Exit Do
+        End If
+        counter = counter + 1
+    Loop
+    Else
+    enthesi = EscapeStrToString(final$)
+    Exit Function
+    End If
+End If
+enthesi = final$
+End Function
+
+Public Function GetDeflocaleString(ByVal this As Long) As String
+On Error GoTo 1234
+    Dim Buffer As String, ret&, r&
+    Buffer = String$(514, 0)
+      
+        ret = GetLocaleInfoW(0, this, StrPtr(Buffer), Len(Buffer))
+    GetDeflocaleString = Left$(Buffer, ret - 1)
+    
+1234:
+    
+End Function
+Function RevisionPrint(basestack As basetask, rest$, xa As Long, Lang As Long) As Boolean
+Dim Scr As Object, oldCol As Long, oldFTEXT As Long, oldFTXT As String, oldpen As Long
+Dim par As Boolean, i As Long, F As Long, p As Variant, W4 As Boolean, pn&, s$, dlen As Long
+Dim o As Long, w3 As Long, x1 As Long, y1 As Long, x As Double, ColOffset As Long
+Dim work As Boolean, work2 As Long, skiplast As Boolean, ss$, ls As Long, myobject As Object, counter As Long, Counterend As Long, countDir As Long
+Dim bck$, clearline As Boolean, ihavecoma As Boolean, isboolean As Boolean
+Set Scr = basestack.Owner
+w3 = -1
+Dim basketcode As Long, prive As basket
+basketcode = GetCode(Scr)
+prive = players(basketcode)
+With prive
+If .MAXXGRAPH = 0 Then MyEr "No form to print", "δεν υπάρχει φόρμα για εκτύπωση": Exit Function
+PlaceBasketPrive Scr, prive
+Scr.FontTransparent = True
+On Error GoTo 0
+Dim opn&
+par = True
+If MaybeIsSymbol2(rest$, "#", F) Then
+   If Mid$(rest$, F + 1, 6) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
+   
+   Else
+  Mid$(rest$, 1, F) = Space$(F)
+        If IsExp(basestack, rest$, p, , True) Then
+        If p < 0 Then
+        If p < -1 Then
+        
+                     .lastprint = False
+                     par = False
+        End If
+        F = p
+                     If Not FastSymbol(rest$, ",") Then
+                     s$ = vbNullString
+                     pn& = 2
+                     GoTo isAstring
+                     End If
+        Else
+                     F = CLng(MyMod(p, 512))
+                     If FKIND(F) = FnoUse Or FKIND(F) = Finput Or FKIND(F) = Frandom Then MyEr "Wrong File Handler", "Λάθος Χειριστής Αρχείου": RevisionPrint = False: Exit Function
+                     Dim clearprive As basket
+                     prive = clearprive
+                     .lastprint = False
+                     par = False
+                     If Not FastSymbol(rest$, ",") Then
+                     s$ = vbNullString
+                     pn& = 2
+                     GoTo isAstring
+                     End If
+                     
+                     
+            End If
+             
+       Else
+       MyEr "expected file number", "περίμενα αριθμό αρχείου"
+       End If
+    End If
+Else
+ss$ = Left$(rest$, MyTrimL(rest$) + 5)
+ls = Len(ss$)
+If Not IsLabelSYMB3(ss$, s$) Then
+                    F = 0
+                    
+Else
+Select Case Lang
+Case 1
+If Len(s$) > 3 Then
+If InStr("BOUP", UCase(Left$(s$, 1))) > 0 Then
+
+Select Case UCase(s$)
+        Case "BACK"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 4
+        Case "OVER"
+        F = 1
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Case "UNDER"
+        F = 2
+         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Case "PART"
+        F = 3
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Case Else
+        ''rest$ = s$ + rest$
+        F = 0
+        End Select
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+End If
+Case 0, 2
+If Len(s$) > 2 Then
+If InStr("ΦΠΥΜ", myUcase(Left$(s$, 1))) > 0 Then
+        Select Case myUcase(s$, True)
+        Case "ΦΟΝΤΟ"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 4
+        Case "ΠΑΝΩ"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 1
+        Case "ΥΠΟ"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 2
+        Case "ΜΕΡΟΣ"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 3
+        Case Else
+        F = 0
+        End Select
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+End If
+Case -1   '' this is for ?
+If Len(s$) > 2 Then
+If InStr("BOUPΦΠΥΜ", myUcase(Left$(s$, 1))) > 0 Then
+Select Case myUcase(s$)
+        Case "ΦΟΝΤΟ", "BACK"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 4
+        Case "ΠΑΝΩ", "OVER"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 1
+        Case "ΥΠΟ", "UNDER"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 2
+        Case "ΜΕΡΟΣ", "PART"
+        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        F = 3
+        Case Else
+        F = 0
+        End Select
+        Else
+        F = 0
+        End If
+        Else
+        F = 0
+        End If
+        Lang = 0
+        End Select
+        
+        If F > 0 And .lastprint Then
+        .lastprint = False
+        
+        GetXYb Scr, prive, x1&, y1&
+        If F <> 2 Then If x1& > 0 Or y1& >= .mx Then crNew basestack, prive
+        End If
+If F = 1 Then  ''
+    work = True
+    oldCol = .Column
+    Scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 2 * DYP), .Paper, BF
+    LCTbasket Scr, prive, .currow, 0&
+    .Column = .mx - 1
+    W4 = True
+    oldFTEXT = .FTEXT
+    oldFTXT = .FTXT
+    oldpen = .mypen
+    pn& = 2
+    .FTEXT = 4
+ElseIf F = 2 Then
+    work = True
+    oldCol = .Column
+    Scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - DYP), .mypen, BF
+    crNew basestack, prive
+    LCTbasketCur Scr, prive
+    W4 = True
+    oldFTEXT = .FTEXT
+    oldFTXT = .FTXT
+    oldpen = .mypen
+    .FTEXT = 4
+    pn& = 2
+ElseIf F = 3 Then
+' we print in a line with lost chars, so controling the start of printing
+' we can render text, like from a view port Some columns are hidden because they went out of screen;
+work = True
+oldCol = .Column
+LCTbasket Scr, prive, .currow, 0&
+W4 = True
+oldFTEXT = .FTEXT
+oldFTXT = .FTXT
+.FTEXT = 4
+oldpen = .mypen
+ElseIf F = 4 Then
+    work = True
+    clearline = True
+    ' LCTbasketCur scr, prive
+    If .curpos > 0 Then
+    crNew basestack, prive
+    LCTbasketCur Scr, prive
+    End If
+    Scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
+   ' scr.Line (0&, (.currow) * .Yt + .Yt - DYP)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .mypen, BF
+    LCTbasketCur Scr, prive
+    pn& = 2
+End If
+
+F = 0
+End If
+
+End If
+If W4 Then pn& = 2 Else pn& = 0
+
+s$ = vbNullString
+If par Then
+    If .FTEXT > 3 And .curpos >= .mx And Not W4 Then
+    crNew basestack, prive
+    w3 = 0
+End If
+End If
+If par Then
+If FastSymbol(rest$, ";") Then
+
+            If .lastprint Then
+            .lastprint = False
+            LCTbasketCur Scr, prive
+            crNew basestack, prive
+            End If
+         
+ElseIf .lastprint Then
+If .FTEXT > 3 Then pn& = 7: GoTo newntrance
+
+End If
+End If
+
+
+Do
+
+   If FastSymbol(rest$, "~(", , 2) Then ' means combine
+        ' get the color and then look for @( parameters)
+        w3 = -1
+    If par Then  ' par is false when we print in files, we can't use color;
+   
+                 If IsExp(basestack, rest$, p, , True) Then .mypen = CLng(mycolor(p))
+                 TextColor Scr, .mypen
+                 
+                     If FastSymbol(rest$, ",") Then
+                     
+                                If W4 Or Not work Then
+                                  If prive.lastprint Then
+                                   prive.lastprint = False
+                                   GetXYb Scr, prive, .curpos, .currow
+                                                   If work Then
+                       .curpos = .curpos - ColOffset
+                      If (.curpos Mod (.Column + 1)) <> 0 Then
+                      .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                      End If
+                 If W4 Then LCTbasketCur Scr, prive
+                       End If
+                                  End If
+                               
+                              LCTbasketCur Scr, prive
+                             
+                                Else
+                                 If work Then
+                       .curpos = .curpos - ColOffset
+                      If (.curpos Mod (.Column + 1)) <> 0 Then
+                      .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                      End If
+                 If W4 Then LCTbasketCur Scr, prive
+                       End If
+                               '' LCTbasketCur scr, prive
+                                End If
+                                
+                                
+'                                         GetXYb scr, prive, .curpos, .currow
+                   ''  LCTbasketCur scr, prive
+                x1 = .Column + .curpos + 1
+                y1 = .currow + 1
+                
+                                pn& = 99
+                             GoTo pthere   ' background and border and or images
+            
+            
+                 End If
+                         If Not FastSymbol(rest$, ")") Then RevisionPrint = False: Set Scr = Nothing: Exit Function
+                         pn& = 99
+    End If
+    ElseIf FastSymbol(rest$, "@(", , 2) Then
+    clearline = False
+    w3 = -1
+               'If Not par Then RevisionPrint = False: Set scr = Nothing: Exit Function
+                If IsExp(basestack, rest$, p, , True) Then
+
+                If par Then .curpos = CLng(Fix(p))
+                End If
+                
+                If FastSymbol(rest$, ",") Then
+                If IsExp(basestack, rest$, p, , True) Then
+                If CLng(Fix(p)) >= .My Then
+                If par Then .currow = .My - 1
+                Else
+                If par Then .currow = CLng(Fix(p))
+                End If
+                End If
+                End If
+
+                If FastSymbol(rest$, ",") Then
+                
+                If IsExp(basestack, rest$, p, , True) Then x1 = CLng(Fix(p))
+                Else
+                x1 = 1
+                End If
+                
+                If FastSymbol(rest$, ",") Then
+                If IsExp(basestack, rest$, p, , True) Then y1 = CLng(Fix(p))
+                Else
+                y1 = 1
+                End If
+
+                If FastSymbol(rest$, ",") Then
+             '   On Error Resume Next
+pthere:
+                   
+                If par Then LCTbasketCur Scr, prive
+                If IsStrExp(basestack, rest$, s$) Then
+                p = 0
+                    If FastSymbol(rest$, ",") Then
+                        If IsExp(basestack, rest$, p, , True) Then
+                            If p <> 0 Then p = True
+                        Else
+                        p = True
+                        End If
+                    End If
+             
+                    x1 = Abs(x1 - .curpos)
+                    y1 = Abs(y1 - .currow)
+                    
+                    If par Then BoxImage Scr, prive, x1, y1, s$, 0, (p)
+                    'If P <> 0 Then .currow = y1 + .currow
+                ElseIf IsExp(basestack, rest$, p, , True) Then
+         
+                    If par Then BoxColorNew Scr, prive, x1 - 1, y1 - 1, (p)
+                    If FastSymbol(rest$, ",") Then
+                        If IsExp(basestack, rest$, x, , True) Then
+                            If par Then BoxBigNew Scr, prive, x1 - 1, y1 - 1, (x)
+                            
+                            
+                            
+                        Else
+                            RevisionPrint = False
+                            Set Scr = Nothing
+                            Exit Function
+                        End If
+                    End If
+                Else
+                    RevisionPrint = False
+                    Set Scr = Nothing
+                    Exit Function
+                
+                End If
+
+                End If
+             If par Then LCTbasket Scr, prive, .currow, .curpos
+                
+        If Not FastSymbol(rest$, ")") Then
+        RevisionPrint = False
+        Set Scr = Nothing
+        Exit Function
+        End If
+        work = False
+        pn& = 99
+        ElseIf LastErNum <> 0 Then
+      RevisionPrint = LastErNum = -2
+      Set Scr = Nothing
+    Exit Function
+    
+    ElseIf FastSymbol(rest$, "$(", , 2) Then
+conthere:
+w3 = -1
+        If IsExp(basestack, rest$, p, , True) Then
+        If Not par Then p = 0
+            .FTEXT = Abs(p) Mod 10
+            ' 0 STANDARD LEFT chars before typed beyond the line are directed to the next line
+            ' 1  RIGHT
+            ' 2 CENTER
+            ' 3 LEFT
+            ' 4 LEFT PROP....expand to next .Column......
+            ' 5 RIGHT PROP
+            ' 6 CENTER PROP
+            ' 7 LEFT PROP
+            ' 8 left and right justify
+            ' 9 New in version 8 Left justify(like 7) without word wrap (cut excess)
+        ElseIf IsStrExp(basestack, rest$, s$) Then
+            .FTXT = s$
+        End If
+        
+        
+        If FastSymbol(rest$, ",") Then
+                If IsExp(basestack, rest$, p, , True) Then
+                    If par Then
+                        p = p - 1
+                        If Abs(Int(p Mod (.mx + 1))) < 2 Then
+                            MyEr ".Column minimum width is 4 chars", "Μικρότερο μέγεθος στήλης είναι οι τέσσερις χαρακτήρες"
+                        Else
+                            If W4 Or Not work Then
+                                LCTbasketCur Scr, prive
+                            Else
+                                GetXYb Scr, prive, .curpos, .currow
+                            End If
+                            If W4 Then ColOffset = .curpos    ' now we have columns from offset ColOffset
+                                .Column = Abs(Int(p Mod (.mx + 1)))
+                            End If
+                    End If
+                    
+                Else
+                    RevisionPrint = False
+                    Set Scr = Nothing
+                    Exit Function
+                End If
+         End If
+      
+            If Not FastSymbol(rest$, ")") Then
+            RevisionPrint = False
+            Set Scr = Nothing
+            Exit Function
+            End If
+        
+        
+        If par Then pn& = 99
+        ElseIf LastErNum <> 0 Then
+       RevisionPrint = LastErNum <> -2
+       Set Scr = Nothing
+    Exit Function
+    ElseIf Not myobject Is Nothing Then
+takeone:
+    '' for arrays only
+    If countDir >= 0 Then
+    
+    If counter = myobject.count Or (counter > Counterend And Counterend > -1) Or countDir = 0 Then
+        Set myobject = Nothing
+              SwapStrings rest$, bck$
+            '  rest$ = bck$
+            ' bck$ = vbNullString
+        GoTo taketwo
+    End If
+Else
+        If counter < 0 Or (counter < Counterend And Counterend > -1) Then
+        Set myobject = Nothing
+            SwapStrings rest$, bck$
+             ' rest$ = bck$
+            ' bck$ = vbNullString
+        GoTo taketwo
+    End If
+    End If
+    
+    myobject.index = counter
+    If myobject.IsEmpty Then
+        s$ = " "
+        counter = counter + countDir
+        GoTo isAstring
+    Else
+            If Not IsNumeric(myobject.Value) Then
+                If MyIsObject(myobject.Value) Then
+                    s$ = " "
+                Else
+                    s$ = myobject.Value
+                End If
+
+                
+                counter = counter + countDir
+                GoTo isAstring
+            Else
+                p = myobject.Value
+                counter = counter + countDir
+                GoTo isanumber
+            End If
+    End If
+
+    
+    ElseIf IsExp(basestack, rest$, p) Then
+            If Not basestack.lastobj Is Nothing Then
+                
+                If Typename(basestack.lastobj) = myArray Then
+                Set myobject = basestack.lastobj
+                Set basestack.lastobj = Nothing
+                Counterend = -1
+                counter = 0
+                countDir = 1
+                bck$ = vbNullString
+                SwapStrings rest$, bck$
+                'bck$ = rest$
+                'rest$ = vbNullString
+                GoTo takeone
+                ElseIf Typename(basestack.lastobj) = "mHandler" Then
+                    Set myobject = basestack.lastobj
+                    Set basestack.lastobj = Nothing
+                    With myobject
+                    If myobject.UseIterator Then
+                        counter = myobject.index_start
+                        Counterend = myobject.index_End
+                        If counter <= Counterend Then countDir = 1 Else countDir = -1
+                    Else
+                        Counterend = -1
+                        counter = 0
+                        countDir = 1
+                        If Not CheckIsmArrayOrStackOrCollection(myobject) Then
+                            Set myobject = Nothing
+                            
+                        Else
+                                SwapStrings rest$, bck$
+                                'bck$ = rest$
+                                'rest$ = vbNullString
+                                GoTo takeone
+                        End If
+                        
+                    End If
+                    End With
+                    If Not CheckLastHandler(myobject) Then NoProperObject: rest$ = bck$: RevisionPrint = False: Exit Function
+                    If Typename(myobject.objref) = "FastCollection" Then
+                             Set myobject = myobject.objref
+                             SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
+                        GoTo takeone
+                    ElseIf Typename(myobject.objref) = "mStiva" Then
+                        Set myobject = myobject.objref
+                        SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
+                        GoTo takeone
+
+                    ElseIf Typename(myobject.objref) = myArray Then
+                        If myobject.objref.Arr Then
+                            Set myobject = myobject.objref
+                            SwapStrings rest$, bck$
+                        'bck$ = rest$
+                        'rest$ = vbNullString
+                        GoTo takeone
+                        End If
+                    End If
+                ElseIf TypeOf basestack.lastobj Is VarItem Then
+                    p = basestack.lastobj.ItemVariant
+                End If
+                Set basestack.lastobj = Nothing
+            ElseIf VarType(p) = vbBoolean Then
+            isboolean = True
+            End If
+isanumber:
+        If par Then
+            If .lastprint Then opn& = 5
+
+            pn& = 1
+            If .Column = 1 Then
+            
+            pn& = 6
+            End If
+            Else
+            .lastprint = False
+            pn& = 1
+           End If
+    ElseIf LastErNum <> 0 Then
+            .lastprint = False
+            RevisionPrint = LastErNum = -2
+            Set Scr = Nothing
+            Exit Function
+    ElseIf IsStrExp(basestack, rest$, s$) Then
+    ' special not good for every day...is 255 char in greek codepage
+   '   If InStr(s$, ChrW(&HFFFFF8FB)) > 0 Then s$ = Replace(s$, ChrW(&HFFFFF8FB), ChrW(&H2007))
+     If Not basestack.lastobj Is Nothing Then
+                If Typename(basestack.lastobj) = myArray Then
+                Set myobject = basestack.lastobj
+                Set basestack.lastobj = Nothing
+                Counterend = -1
+                counter = 0
+                countDir = 1
+                SwapStrings rest$, bck$
+                'bck$ = rest$
+                'rest$ = vbNullString
+                GoTo takeone
+                End If
+                
+            End If
+isAstring:
+If par Then
+
+    If .lastprint Then opn& = 5
+            pn& = 2
+            
+      If .Column = 1 Then
+            
+            pn& = 7
+            End If
+            Else
+             .lastprint = False
+            pn& = 2
+            End If
+    ElseIf LastErNum <> 0 Then
+             RevisionPrint = LastErNum = -2
+             Set Scr = Nothing
+                Exit Function
+    Else
+    If pn& <> 0 And pn& < 5 And Not .lastprint Then
+        If par Then
+            If Not W4 Then
+          '' GetXYb scr, prive, .curpos, .currow
+
+If Not (.curpos = 0) Then
+GetXYb Scr, prive, .curpos, .currow
+If pn& = 1 Then
+crNew basestack, prive: skiplast = True
+ElseIf pn& = 2 Then
+
+If Abs(w3) = 1 And .curpos = 0 And Not (.FTEXT = 9 Or .FTEXT = 5 Or .FTEXT = 6) Then
+If .FTEXT = 7 Then
+crNew basestack, prive: skiplast = True
+End If
+Else
+crNew basestack, prive: skiplast = True
+End If
+End If
+End If
+
+
+            End If
+        Else
+        If F < 0 Then
+            crNew basestack, prive
+        ElseIf uni(F) Then
+            putUniString F, vbCrLf
+            Else
+            putANSIString F, vbCrLf
+            'Print #f,
+            End If
+        End If
+    End If
+ 
+        Exit Do
+    End If
+conthere2:
+If .lastprint And opn& > 4 Then .lastprint = False
+    If FastSymbol(rest$, ";") Then
+'' LEAVE W3
+If par Then
+   If opn& = 0 And (Not work) And (Not .lastprint) Then
+
+   LCTbasket Scr, prive, .currow, .curpos
+   End If
+  
+   ' IF  WORK THEN opn&=5
+   opn& = 5
+  End If
+newntrance:
+work = True
+.lastprint = True
+        
+         Do While FastSymbol(rest$, ";")
+         Loop
+    ElseIf Not FastSymbol(rest$, ",") Then
+    
+    pn& = pn& + opn&
+  opn& = 0
+  rest$ = NLtrim$(rest$)
+ If Len(rest$) > 0 Then If Not MaybeIsSymbol(rest$, " : }\'" + vbCr) Then Exit Function
+
+    Else
+If par Then
+ihavecoma = True ' 'rest$ = "," & rest$
+End If
+    End If
+    pn& = pn& + opn&
+    Select Case pn&
+    Case 0
+    Exit Do
+    Case 1
+        If .FTXT = vbNullString Then
+        If xa Then
+        s$ = PACKLNG2$(p)
+        Else
+If NoUseDec Then
+    If isboolean Then
+        If ShowBooleanAsString Then
+            If cLid = 1032 Then
+                s$ = Format$(p, ";\Α\λ\η\θ\έ\ς;\Ψ\ε\υ\δ\έ\ς")
+            ElseIf cLid = 1033 Then
+                s$ = Format$(p, ";\T\r\u\e;\F\a\l\s\e")
+            Else
+                s$ = Format$(p, DefBooleanString)
+            End If
+            isboolean = False
+            GoTo contboolean2
+        Else
+            p = p * 1
+            isboolean = False
+            GoTo contboolean
+        End If
+    Else
+        s$ = CStr(p)
+    End If
+Else
+
+If isboolean Then
+    If ShowBooleanAsString Then
+        If cLid = 1032 Then
+            s$ = Format$(p, ";\Α\λ\η\θ\έ\ς;\Ψ\ε\υ\δ\έ\ς")
+        ElseIf cLid = 1033 Then
+            s$ = Format$(p, ";\T\r\u\e;\F\a\l\s\e")
+        Else
+            s$ = Format$(p, DefBooleanString)
+        End If
+        isboolean = False
+        GoTo contboolean2
+    Else
+        p = p * 1
+        isboolean = False
+        GoTo contboolean
+    End If
+Else
+contboolean:
+On Error Resume Next
+ s$ = LTrim$(Str(p))
+ If Err Then s$ = Typename$(p): Err.Clear
+    If Left$(s$, 1) = "." Then
+    s$ = "0" + s$
+    ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+ End If
+ 
+ If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+ End If
+End If
+contboolean2:
+      If .FTEXT < 4 Then
+            If InStr(s$, ".") > 0 Then
+                 If InStr(s$, ".") <= .Column Then
+                        If RealLen(s$) > .Column + 1 Then
+                                 If .FTEXT > 0 Then s$ = Left$(s$, .Column + 1)
+                        End If
+                End If
+            ElseIf .FTEXT > 0 Then
+                 If RealLen(s$) > .Column + 1 Then s$ = String$(.Column, "?")
+            End If
+          End If
+    End If
+        Else
+        s$ = Format$(p, .FTXT)
+        If Not NoUseDec Then
+            If OverideDec Then
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                s$ = Replace$(s$, Chr(2), NowDec$)
+                s$ = Replace$(s$, Chr(3), NowThou$)
+                
+            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+                ElseIf InStr(s$, NowDec$) > 0 Then
+                s$ = Replace$(s$, NowDec$, Chr(2))
+                s$ = Replace$(s$, NowThou$, Chr(3))
+                s$ = Replace$(s$, Chr(2), ".")
+                s$ = Replace$(s$, Chr(3), ",")
+            
+            End If
+            End If
+        End If
+     If par Then
+        If .Column > 2 Then   ' .Column 3 means 4 chars width
+        If opn& < 5 Then
+    '                    ensure that we are align in .Column  (.Column is based zero...)
+    skiplast = False
+               If .currow >= .My Then
+               If Not W4 Then crNew basestack, prive: skiplast = True
+               End If
+        
+                        If work Then
+                       .curpos = .curpos - ColOffset
+                      If (.curpos Mod (.Column + 1)) <> 0 Then
+                      .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                      End If
+                 If W4 Then LCTbasketCur Scr, prive
+                       End If
+                       work = True
+    End If
+            If .curpos >= .mx Then
+    '' ???
+                    Else
+            If clearline And .curpos = 0 Then Scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
+            Select Case .FTEXT
+            Case 0
+            
+                          
+                       PlainBaSket Scr, prive, Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + s$, W4, W4, , clearline
+                       
+            Case 3
+                        PlainBaSket Scr, prive, Right$(Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + Left$(s$, .Column + 1), .Column + 1), W4, W4, , clearline
+            Case 2
+                        If RealLen(s$) > .Column + 1 Then s$ = "????"
+                        PlainBaSket Scr, prive, Left$(Space$((.Column + 1 - RealLen(s$)) \ 2) + Left$(s$, .Column + 1) & Space$(.Column), .Column + 1), W4, W4, , clearline
+            Case 1
+                        PlainBaSket Scr, prive, Left$(s$ & Space$(.Column), .Column + 1), W4, W4, , clearline
+            Case 5
+                        x1 = .curpos
+                        y1 = .currow
+                        If Not (.mx - 1 <= .curpos And W4 <> 0) Then
+                        LCTbasketCur Scr, prive
+                        Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                        wwPlain basestack, prive, s$, .Column * .Xt + .Xt - (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2, 0, , True, 0, , CBool(W4), True, , True
+                        .currow = y1
+        
+
+                        .curpos = x1 + .Column + 1
+                        
+                        End If
+                     If .curpos >= .mx And Not W4 Then
+                   
+                         .currow = .currow + 1
+                         .curpos = 0
+                         End If
+              If .lastprint Then
+     
+                 If .curpos = 0 Then
+                 If .currow >= .My Then crNew basestack, prive Else LCTbasketCur Scr, prive
+                 End If
+                 
+     Scr.CurrentX = .curpos * .Xt
+                
+                  Scr.CurrentY = .currow * .Yt + .uMineLineSpace
+             
+         
+                   End If
+            Case 4, 7, 8
+                         wwPlain basestack, prive, s$ & vbCrLf, .Column * .Xt + .Xt - (.Xt - TextWidth(Scr, Right$(s$, 1))) \ 2, 0, , , 1, , , pn& < 5, , True
+                        .curpos = .curpos + .Column + 1
+                        If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+
+                        End If
+                        If .lastprint Then
+                            If .curpos = 0 Then
+                                If .currow >= .My Then
+                                crNew basestack, prive
+                                
+                             
+                              
+                                Else
+                                LCTbasketCur Scr, prive
+
+                                End If
+                            End If
+                            If .curpos > 0 Then Scr.CurrentX = .curpos * .Xt - (.Xt - TextWidth(Scr, Right$(s$, 1))) \ 2 Else Scr.CurrentX = .curpos * .Xt
+                            Scr.CurrentY = .currow * .Yt + .uMineLineSpace
+                        End If
+            Case 6
+                            
+                        wwPlain basestack, prive, s$, .Column * .Xt + .Xt, 0, , False, 2, , , pn& < 5, , True
+                        .curpos = .curpos + .Column + 1
+                        If .curpos >= .mx And Not W4 Then
+                            .curpos = 0
+                            .currow = .currow + 1
+                        End If
+                        If .lastprint Then
+                            If .curpos = 0 Then
+                                If .currow >= .My Then crNew basestack, prive Else LCTbasketCur Scr, prive
+                            End If
+                            Scr.CurrentX = .curpos * .Xt
+                            Scr.CurrentY = .currow * .Yt + .uMineLineSpace
+                        End If
+                            
+            Case 9
+                            LCTbasketCur Scr, prive
+                            wPlain Scr, prive, s$, 1000, 0, True
+                             GetXYb Scr, prive, .curpos, .currow
+                           .curpos = .curpos + 1
+                            If (.curpos Mod (.Column + 1)) <> 0 Then
+                     .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                      End If
+                             '     .curpos = .curpos + .Column + 1
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                                                               If .lastprint Then
+     
+                 If .curpos = 0 Then
+                 If .currow >= .My Then crNew basestack, prive Else LCTbasketCur Scr, prive
+                 End If
+                If .curpos > 0 Then Scr.CurrentX = .curpos * .Xt - (.Xt - TextWidth(Scr, Right$(s$, 1))) \ 2 Else Scr.CurrentX = .curpos * .Xt
+                  Scr.CurrentY = .currow * .Yt + .uMineLineSpace
+             
+         
+                   End If
+            End Select
+End If
+            
+            
+            
+        Else
+        ' no way to use this any more...7 rev 20
+        PlainBaSket Scr, prive, s$
+        End If
+ 
+        Else
+          If F < 0 Then
+            PlainBaSket Scr, prive, s$
+        ElseIf uni(F) Then
+            putUniString F, s$
+            Else
+            putANSIString F, s$
+        'Print #f, S$;
+        End If
+        End If
+    Case 2
+    '' for string.....................................................................................................................
+        If .FTXT <> "" Then
+        s$ = Format$(s$, .FTXT)
+        End If
+        If par Then
+        If .Column > 0 Then
+                             x1 = .curpos: y1 = .currow
+                skiplast = False
+                                If .currow >= .My And Not W4 Then
+                                crNew basestack, prive
+                                skiplast = True
+                                End If
+                        If work Then
+                       .curpos = .curpos - ColOffset
+                      If (.curpos Mod (.Column + 1)) <> 0 Then
+                      .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                     
+                      End If
+                      '' LCTbasket scr, prive,   y1, X1
+                       If W4 Then LCTbasketCur Scr, prive
+                       End If
+                       work = True
+          If s$ = vbNullString Then s$ = " "
+          
+                 If .curpos >= .mx Then
+                 y1 = 1
+                    Else
+                               If clearline And .curpos = 0 Then Scr.Line (0&, .currow * .Yt)-((.mx - 1) * .Xt + .Xt * 2, (.currow) * .Yt + .Yt - 1 * DYP), .Paper, BF
+
+            Select Case .FTEXT
+                Case 1
+                           '' GetXY scr, X1, y1
+                          ''  If s$ = VbNullString Then s$ = " "
+                          dlen = RealLen(s$)
+                          PlainBaSket Scr, prive, Left$(s$ & Space$(Len(s$) - dlen + .Column - (dlen - 1) Mod (.Column + 1)), .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
+                Case 2
+                            dlen = RealLen(s$)
+                            If dlen > (.Column + 1 + Len(s$) - dlen) Then s$ = Left$(s$, .Column + 1 + Len(s$) - dlen):  dlen = RealLen(s$)
+                            
+                            PlainBaSket Scr, prive, Left$(Space$((.Column + 1 + Len(s$) - dlen - dlen) \ 2) + s$ & Space$(.Column), .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
+                Case 3
+                            dlen = RealLen(s$)
+                            PlainBaSket Scr, prive, Right$(Space$(.Column + Len(s$) - dlen - (dlen - 1) Mod (.Column + 1)) & s$, .Column + 1 + Len(s$) - dlen), W4, W4, , clearline
+                Case 0
+                           '' If s$ = VbNullString Then s$ = " "
+                        
+                            PlainBaSket Scr, prive, s$ + Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)), W4, W4, , clearline
+                       
+                Case 4
+                            
+                            LCTbasketCur Scr, prive
+                            Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                            
+                            w3 = 0
+                            wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3, True
+                            w3 = w3 \ .Xt + 1
+                            ' go to next .Column...
+                            
+                            .curpos = (.Column + 1) * ((w3 + .Column + 1) \ (.Column + 1))
+                        If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                Case 5
+                           '' GetXY scr, X1, y1
+                            LCTbasketCur Scr, prive
+                            Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                            wwPlain basestack, prive, s$, .Column * .Xt + .Xt - (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2, 0, , True, 3, , , True
+                            .curpos = .curpos + .Column + 1
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                Case 6
+                        ''    LCTbasketCur scr, prive
+                            wwPlain basestack, prive, s$, .Column * .Xt + .Xt, 0, , False, 2, , , True
+                                        .curpos = .curpos + .Column + 1
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                             End If
+                Case 7
+                            
+                            LCTbasketCur Scr, prive
+                    work2 = Scr.CurrentY
+                            
+                            wwPlain basestack, prive, s$ & vbCrLf, .Column * .Xt + .Xt - (.Xt - TextWidth(Scr, Right$(s$, 1))) \ 2, 0, , True, 1, , , True, , True
+                       Scr.CurrentY = work2
+                            .curpos = .curpos + .Column + 1
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                Case 8
+                            LCTbasketCur Scr, prive
+                            Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                            If Not (.mx - 1 <= x1 And W4 <> 0) Then
+                                    wwPlain basestack, prive, s$, .Column * .Xt + .Xt - (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2, 0, , True, 0, , , True
+                            End If
+                            .curpos = .curpos + .Column + 1
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                Case 9
+                            LCTbasketCur Scr, prive
+
+              wPlain Scr, prive, s$, .Column + 1, 0, True
+                GetXYb Scr, prive, .curpos, .currow
+                          .curpos = .curpos + 1
+                            If (.curpos Mod (.Column + 1)) <> 0 Then
+                     .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                      Else
+                       .curpos = .curpos + ColOffset
+                      End If
+                            If .curpos >= .mx And Not W4 Then
+                                .curpos = 0
+                                .currow = .currow + 1
+                            End If
+                End Select
+                End If
+        Else
+            PlainBaSket Scr, prive, s$
+        
+        End If
+        Else
+              If F < 0 Then
+            PlainBaSket Scr, prive, s$
+        ElseIf uni(F) Then
+            putUniString F, s$
+            Else
+            putANSIString F, s$
+        'Print #f, S$;
+        End If
+        End If
+    Case 6
+        If par Then
+                If .FTEXT > 3 Then
+            w3 = 0
+             x1 = .curpos
+             y1 = .currow
+                        If .FTXT <> "" Then
+                                       s$ = Format$(p, .FTXT)
+            If Not NoUseDec Then
+               If OverideDec Then
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                s$ = Replace$(s$, Chr(2), NowDec$)
+                s$ = Replace$(s$, Chr(3), NowThou$)
+                
+            ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+                s$ = Replace$(s$, NowDec$, Chr(2))
+                s$ = Replace$(s$, NowThou$, Chr(3))
+                s$ = Replace$(s$, Chr(2), ".")
+                s$ = Replace$(s$, Chr(3), ",")
+            
+            End If
+            End If
+                               
+                                If .FTEXT > 4 And Not work Then Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                                If Scr.CurrentX < .mx * .Xt Then
+                            
+                                wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3
+                                
+                                End If
+                                
+                        Else
+                                 If xa Then
+                                        s$ = PACKLNG2$(p)
+                                Else
+                                If NoUseDec Then
+                                       s$ = CStr(p)
+                                    Else
+                                     s$ = LTrim$(Str(p))
+                                      If Left$(s$, 1) = "." Then
+                                        s$ = "0" + s$
+                                        ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+                                        End If
+                                     If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+                                    End If
+                                End If
+
+                                If .FTEXT > 4 And Not work Then Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                                      If Scr.CurrentX < 0 Then
+                             
+                                
+                                
+                                End If
+                                wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3
+                                work = True
+                                Scr.CurrentX = w3
+                         
+                                            
+                        End If
+                      '' Then LCTbasket scr, prive, y1, W3 \ .Xt + 1
+                Else
+                        If .FTXT = vbNullString Then
+                      
+                                If xa Then
+                                    PlainBaSket Scr, prive, PACKLNG2$(p)
+                                Else
+                                  If NoUseDec Then
+                                    s$ = CStr(p)
+                                        Else
+                                            s$ = LTrim$(Str(p))
+                                                If Left$(s$, 1) = "." Then
+                                                s$ = "0" + s$
+                                                ElseIf Left$(s$, 2) = "-." Then s$ = "-0" + Mid$(s$, 2)
+                                                End If
+                                            If OverideDec Then s$ = Replace$(s$, ".", NowDec$)
+                                        End If
+                                    PlainBaSket Scr, prive, s$
+                                End If
+                        Else
+                      s$ = Format$(p, .FTXT)
+            If Not NoUseDec Then
+                If OverideDec Then
+                    s$ = Replace$(s$, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                    s$ = Replace$(s$, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                    s$ = Replace$(s$, Chr(2), NowDec$)
+                    s$ = Replace$(s$, Chr(3), NowThou$)
+                ElseIf InStr(s$, NowDec$) > 0 And InStr(.FTXT, ".") > 0 Then
+                    s$ = Replace$(s$, NowDec$, Chr(2))
+                    s$ = Replace$(s$, NowThou$, Chr(3))
+                    s$ = Replace$(s$, Chr(2), ".")
+                    s$ = Replace$(s$, Chr(3), ",")
+                
+                End If
+            End If
+      
+                            PlainBaSket Scr, prive, s$
+                        End If
+                End If
+        Else
+              If F < 0 Then
+            PlainBaSket Scr, prive, s$
+        ElseIf uni(F) Then
+            putUniString F, s$
+            Else
+            putANSIString F, s$
+        ' Print #f, S$;
+        End If
+        End If
+    Case 7
+        If par Then
+        If s$ <> "" Then
+           If .FTEXT > 3 Then
+            w3 = 0
+             x1 = .curpos
+             y1 = .currow
+            If Not work Then LCTbasketCur Scr, prive
+              If .FTXT <> "" Then s$ = Format$(s$, .FTXT)
+                        If .FTEXT > 4 And Not work Then Scr.CurrentX = Scr.CurrentX + (.Xt - TextWidth(Scr, Left$(s$, 1))) \ 2
+                        wwPlain basestack, prive, s$, Scr.Width, 0, , True, 0, , w3
+                        work = True
+                       Scr.CurrentX = w3
+            Else
+                If .FTXT <> "" Then
+                PlainBaSket Scr, prive, Format$(s$, .FTXT), , , , clearline
+                Else
+                PlainBaSket Scr, prive, s$, , , , clearline
+                End If
+                
+            End If
+        Else
+
+          
+        End If
+   
+        Else
+              If F < 0 Then
+            PlainBaSket Scr, prive, s$
+        ElseIf uni(F) Then
+            putUniString F, s$
+            Else
+            putANSIString F, s$
+        ' Print #f, S$;
+        End If
+        End If
+    End Select
+taketwo:
+If ihavecoma Then
+ihavecoma = False
+GoTo cont12344
+    ElseIf FastSymbol(rest$, ",") Then
+cont12344:
+        w3 = 1
+        pn& = 0
+      ''  skiplast = False
+        If opn& > 4 Then
+            Scr.CurrentX = Scr.CurrentX + .Xt - dv15
+            GetXYb Scr, prive, .curpos, .currow
+            If work Then
+                .curpos = .curpos - ColOffset
+                If (.curpos Mod (.Column + 1)) <> 0 Then
+                    .curpos = .curpos + (.Column + 1) - (.curpos Mod (.Column + 1)) + ColOffset
+                Else
+                    .curpos = .curpos + ColOffset
+                End If
+                If W4 Then LCTbasketCur Scr, prive
+            End If
+            work = True
+        Else
+            work = False
+        End If
+        opn& = 0
+        Do While FastSymbol(rest$, ",")
+            If par Then
+            ' ok I want that
+            If .Column > .mx And .FTEXT < 4 Then
+            Else
+                If Not W4 Then
+                    If Not skiplast Then crNew basestack, prive
+                End If
+            End If
+            Else
+                If F < 0 Then
+                    crNew basestack, prive
+                    
+                ElseIf uni(F) Then
+                    putUniString F, vbCrLf
+                Else
+                    putANSIString F, vbCrLf
+            'Print #f,
+                End If
+            End If
+        Loop
+    End If
+If par Or F < 0 Then players(basketcode) = prive
+Loop
+
+If W4 <> 0 And par Then
+        .FTEXT = oldFTEXT
+        .FTXT = oldFTXT
+        .Column = oldCol
+        If .mypen <> oldpen Then .mypen = oldpen: TextColor Scr, oldpen
+        ElseIf par Then
+        If pn& > 4 And opn& = 0 Then
+        
+                 If pn& < 99 Then
+                 If work Then
+                 .lastprint = False
+                 End If
+                 If Not skiplast Then crNew basestack, prive
+                 End If
+        ElseIf .currow >= .My Or (w3 < 0 And pn& = 0) Then
+              crNew basestack, prive
+              LCTbasketCur Scr, prive
+        ElseIf pn& > 4 Then
+       
+        End If
+
+End If
+EXITNOW:
+If basestack.IamThread Then
+' let thread do the refresh
+ElseIf par Then
+    If Not extreme Then
+    PrintRefresh basestack, Scr
+    End If
+End If
+RevisionPrint = True
+If par Or F < 0 Then players(basketcode) = prive
+If myexit(basestack) Then Exit Function
+End With
+End Function
+
+Private Function MyMod(r1, po) As Variant
+MyMod = r1 - Fix(r1 / po) * po
+End Function
+Sub dset()
+
+'USING the temporary path
+    strTemp = String(MAX_FILENAME_LEN, Chr$(0))
+    'Get
+    GetTempPath MAX_FILENAME_LEN, StrPtr(strTemp)
+    strTemp = LONGNAME(mylcasefILE(Left$(strTemp, InStr(strTemp, Chr(0)) - 1)))
+    If strTemp = vbNullString Then
+     strTemp = mylcasefILE(Left$(strTemp, InStr(strTemp, Chr(0)) - 1))
+    End If
+' NOW COPY
+' for mcd
+Dim cd As String, dummy As Long, q$
+
+''cd = App.Path
+''AddDirSep cd
+''mcd = mylcasefILE(cd)
+
+' Return to standrad path...for all users
+userfiles = GetSpecialfolder(CLng(26)) & "\M2000"
+AddDirSep userfiles
+If Not isdir(userfiles) Then
+MkDir userfiles
+End If
+
+mcd = userfiles
+DefaultDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+If NowDec$ <> "" Then
+ElseIf OverideDec Then
+NowDec$ = GetlocaleString(LOCALE_SDECIMAL)
+NowThou$ = GetlocaleString(LOCALE_STHOUSAND)
+Else
+NowDec$ = DefaultDec$
+NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
+End If
+CheckDec
+cdecimaldot$ = GetDeflocaleString(LOCALE_SDECIMAL)
+End Sub
+Public Sub CheckDec()
+OverideDec = False
+NowDec$ = GetDeflocaleString(LOCALE_SDECIMAL)
+NowThou$ = GetDeflocaleString(LOCALE_STHOUSAND)
+If NowDec$ = "." Then
+NoUseDec = False
+Else
+NoUseDec = mNoUseDec
+End If
+End Sub

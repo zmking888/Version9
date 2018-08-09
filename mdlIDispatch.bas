@@ -25,6 +25,7 @@ Enum cbnCallTypes
     VbGet = DISPATCH_PROPERTYGET
     VbSet = DISPATCH_PROPERTYPUTREF
     VbMethod = DISPATCH_METHOD
+    VbNext = DISPID_NEWENUM
 End Enum
 ' Maybe need this http://support2.microsoft.com/kb/2870467/
 'To update oleaut32

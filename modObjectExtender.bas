@@ -22,10 +22,10 @@ Public Type EventSink
     hMem        As Long     ' memory address
 End Type
 ' for DEP
-Private Declare Function VirtualAlloc Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flAllocationType As Long, ByVal flProtect As Long) As Long
-Private Declare Function VirtualFree Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal dwFreeType As Long) As Long
-Private Declare Function VirtualLock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
-Private Declare Function VirtualUnlock Lib "kernel32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
+Private Declare Function VirtualAlloc Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal flAllocationType As Long, ByVal flProtect As Long) As Long
+Private Declare Function VirtualFree Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long, ByVal dwFreeType As Long) As Long
+Private Declare Function VirtualLock Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
+Private Declare Function VirtualUnlock Lib "KERNEL32" (ByVal lpAddress As Long, ByVal dwSize As Long) As Long
 Private Const MEM_DECOMMIT = &H4000
 Private Const MEM_RELEASE = &H8000
 Private Const MEM_COMMIT = &H1000
@@ -48,10 +48,10 @@ Public Declare Function SysReAllocString Lib "oleaut32" ( _
 Public Declare Function VarPtrArray Lib "msvbvm60" Alias "VarPtr" ( _
     PtrDest() As Any) As Long
 
-Public Declare Sub CpyMem Lib "kernel32" Alias "RtlMoveMemory" ( _
+Public Declare Sub CpyMem Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     pDst As Any, pSrc As Any, ByVal dwLen As Long)
 
-Public Declare Sub FillMem Lib "kernel32" Alias "RtlFillMemory" ( _
+Public Declare Sub FillMem Lib "KERNEL32" Alias "RtlFillMemory" ( _
     pDst As Any, ByVal dlen As Long, ByVal Fill As Byte)
 
 Public Declare Function IsEqualGUID Lib "ole32" ( _
@@ -60,13 +60,13 @@ Public Declare Function IsEqualGUID Lib "ole32" ( _
 Public Declare Function CLSIDFromString Lib "ole32" ( _
     ByVal lpsz As Long, GUID As Any) As Long
 
-Public Declare Function GlobalAlloc Lib "kernel32" ( _
+Public Declare Function GlobalAlloc Lib "KERNEL32" ( _
     ByVal uFlags As Long, ByVal dwBytes As Long) As Long
 
-Public Declare Function GlobalFree Lib "kernel32" ( _
+Public Declare Function GlobalFree Lib "KERNEL32" ( _
     ByVal hMem As Long) As Long
 
-Public Declare Function LCID_def1 Lib "kernel32" Alias "GetSystemDefaultLCID" ( _
+Public Declare Function LCID_def1 Lib "KERNEL32" Alias "GetSystemDefaultLCID" ( _
     ) As Long
 
 Private Const E_NOINTERFACE As Long = &H80004002
@@ -166,13 +166,13 @@ Private Function ObjExt_GetTypeInfoCount(this As EventSink, pctinfo As Long) As 
 End Function
 
 ' IDispatch::GetTypeInfo
-Private Function ObjExt_GetTypeInfo(this As EventSink, ByVal iTInfo As Long, ByVal LCID As Long, ppTInfo As Long) As Long
+Private Function ObjExt_GetTypeInfo(this As EventSink, ByVal iTInfo As Long, ByVal lcid As Long, ppTInfo As Long) As Long
     ppTInfo = 0
     ObjExt_GetTypeInfo = E_NOTIMPL
 End Function
 
 ' IDispatch::GetIDsOfNames
-Private Function ObjExt_GetIDsOfNames(this As EventSink, riid As GUID, rgszNames As Long, ByVal cNames As Long, ByVal LCID As Long, rgDispId As Long) As Long
+Private Function ObjExt_GetIDsOfNames(this As EventSink, riid As GUID, rgszNames As Long, ByVal cNames As Long, ByVal lcid As Long, rgDispId As Long) As Long
     ObjExt_GetIDsOfNames = E_NOTIMPL
 End Function
 
@@ -180,7 +180,7 @@ End Function
 Private Function ObjExt_Invoke(this As EventSink, _
          ByVal dispIdMember As Long, _
          riid As GUID, _
-         ByVal LCID As Long, _
+         ByVal lcid As Long, _
          ByVal wFlags As Integer, _
          ByVal pDispParams As Long, _
          ByVal pVarResult As Long, _
@@ -203,7 +203,7 @@ Public Function CreateEventSink(IID As GUID, objext As ComShinkEvent) As Object
     With sink
         .cRef = 1
         .IID = IID
-        .pClass = objptr(objext)
+        .pClass = ObjPtr(objext)
         .pVTable = VarPtr(ObjExt_vtbl(0))
     End With
 
@@ -229,6 +229,11 @@ ObjSetAddRef ResolveObjPtr, Ptr
     'CpyMem oUnk, 0&, 4&
 End Function
 ' ObjSetAddRef ObjectFromPtr, Ptr
+
+Public Function GetEnumarator(uOnk As IUnknown) As Boolean
+GetEnumarator = True
+End Function
+
 
 Public Function CallPointer(ByVal fnc As Long, ParamArray params()) As Long
 Static once As Boolean

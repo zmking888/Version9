@@ -67,6 +67,9 @@ Else
  If IsObject(RETVAR) Then
 Set Value = RETVAR
 Else
+On Error Resume Next
+If TypeOf RETVAR Is IUnknown Then Set Value = RETVAR: Exit Property
+Err.Clear
 Value = RETVAR
 End If
  End If

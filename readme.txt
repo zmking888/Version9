@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 active-X
+Version 9.4 rev 1 active-X
 
-Additional Garbage Collector removed.
+Refactoring for more speed
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

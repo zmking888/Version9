@@ -18,7 +18,7 @@ Dim limit(10) As Long  ' max 9 dimensions
 Dim dtable(10) As Long
 Dim nlimit(10) As Long  ' max 9 dimensions
 
-Dim actualdata() As Variant
+Private actualdata() As Variant
 Dim maxitems As Long
 Dim maxitems1 As Long
 Dim nmaxitems As Long
@@ -685,6 +685,12 @@ End Function
 Public Property Get itemPtr(curitem As Long) As Long
 itemPtr = VarPtr(actualdata(curitem))
 End Property
+Friend Sub SwapItem(curitem As Long, thisvariant)
+SwapVariant actualdata(curitem), thisvariant
+End Sub
+Friend Function IsStringItem(curitem As Long) As Variant
+IsStringItem = Typename(actualdata(curitem)) = "String"
+End Function
 Public Property Get item(curitem As Long) As Variant
 On Error GoTo there1
 If Arr Then

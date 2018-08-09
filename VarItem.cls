@@ -12,20 +12,19 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Private mTypeName As String
 Private mItem As Variant
-Private slot As Integer
-Private IamNull As Boolean
+Private slot As Byte
+Private mTypeName As Byte
+
  Property Let Typename(ByRef RHS As String)
-mTypeName = RHS
+mTypeName = Asc(RHS)
 End Property
 
  Property Get Typename() As String
-Typename = mTypeName
+Typename = Chr(mTypeName)
 End Property
 
  Property Let ItemStr(ByRef RHS As String)
- IamNull = False
  slot = 4
 mItem = CVar(RHS)
 End Property
@@ -34,7 +33,6 @@ End Property
 If slot = 4 Then ItemStr = mItem
 End Property
  Property Let ItemDouble(ByVal RHS As Variant)
- IamNull = False
  slot = 2
 mItem = RHS
 End Property
@@ -44,29 +42,27 @@ If slot = 2 Then ItemDouble = mItem
 End Property
  Property Let ItemVariant(RHS As Variant)
  slot = 2
- IamNull = False
 mItem = RHS
 End Property
  Property Get ItemVariant() As Variant
  If slot = 2 Then ItemVariant = mItem
 End Property
 
-Private Sub Class_Initialize()
-IamNull = True
-End Sub
+'Private Sub Class_Initialize()
+'IamNull = True
+'End Sub
 Property Get NoValue() As Boolean
-NoValue = IamNull
+If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
 End Property
 
 Public Property Set ObjectRef(RHS As Object)
-IamNull = RHS Is Nothing
-slot = 1
+    slot = 1
     Set mItem = RHS
 End Property
 Public Property Get ObjectRef() As Object
 If slot = 1 Then Set ObjectRef = mItem
 End Property
 
-Private Sub Class_Terminate()
-If slot = 1 Then Set mItem = Nothing
-End Sub
+'Private Sub Class_Terminate()
+'If slot = 1 Then Set mItem = Nothing
+'End Sub
