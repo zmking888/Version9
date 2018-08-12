@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 1 active-X
+Version 9.4 rev 2 active-X
 
-Refactoring for more speed
+Fixed 9.4 ev1 bug (can't open wide files - wchars- using Open statement).
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

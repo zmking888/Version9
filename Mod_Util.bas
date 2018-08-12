@@ -10,7 +10,6 @@ Public Enum Ftypes
     Frandom
 End Enum
 Public FLEN(512) As Long, FKIND(512) As Ftypes
-Public uni(512) As Boolean
 Public Type Counters
     k1 As Long
     RRCOUNTER As Long

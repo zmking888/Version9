@@ -48,9 +48,6 @@ End Property
  If slot = 2 Then ItemVariant = mItem
 End Property
 
-'Private Sub Class_Initialize()
-'IamNull = True
-'End Sub
 Property Get NoValue() As Boolean
 If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
 End Property
@@ -63,6 +60,3 @@ Public Property Get ObjectRef() As Object
 If slot = 1 Then Set ObjectRef = mItem
 End Property
 
-'Private Sub Class_Terminate()
-'If slot = 1 Then Set mItem = Nothing
-'End Sub
