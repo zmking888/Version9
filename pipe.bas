@@ -462,11 +462,11 @@ On Error GoTo inc1
 Dim what As Long
 Dim st&, pa&, po&
 st& = 1
-Dim word$(), it As Long, max As Long, line$, ok As Boolean, min As Long
+Dim word$(), it As Long, max As Long, line$, ok As Boolean, Min As Long
 simple$ = simple$ + "|"
 word$() = Split(simple$, "|")
 max = UBound(word$()) - 1
-If simple$ = vbNullString Then
+If Len(simple$) <= 1 Then
 Included = ExtractName(afile$)
 Else
     Sleep 1

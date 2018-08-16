@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 2 active-X
+Version 9.4 rev 4 active-X
 
-Fixed 9.4 ev1 bug (can't open wide files - wchars- using Open statement).
+New for arrays: we can use for each dimension range of values: Dim A(-10 to 10, -4 to 4)
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
