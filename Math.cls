@@ -67,9 +67,11 @@ End Function
 Private Sub PutVector(v As VecType, a As Long)
     CopyMemory a, VarPtr(v), 24
 End Sub
-
+Private Function GetRealType(a As Long) As Double
+    CopyMemory VarPtr(GetRealType), a, 8
+End Function
 Private Function GetQuatType(a As Long) As QuatType
-    CopyMemory VarPtr(GetQuatType), a, 36
+    CopyMemory VarPtr(GetQuatType), a, 32
 End Function
 Private Sub PutQuatType(q As QuatType, a As Long)
     CopyMemory a, VarPtr(q), 32
@@ -501,7 +503,14 @@ Private Function RotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     RotQuat.y = q1.w * q2.y + q1.x * q2.z + q1.y * q2.w - q1.z * q2.x
     RotQuat.z = q1.w * q2.z - q1.x * q2.y + q1.y * q2.x + q1.z * q2.w
 End Function
-
+Private Function MulQuat(q1 As QuatType, q2 As QuatType) As QuatType
+    ' q1 is being rotated by q2 amount.
+    '
+    MulQuat.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z
+    MulQuat.x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y
+    MulQuat.y = q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x
+    MulQuat.z = q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w
+End Function
 Private Function UnRotQuat(q1 As QuatType, q2 As QuatType) As QuatType
     ' q1 is being UNrotated by q2 amount.
     '
@@ -857,6 +866,12 @@ Private Function NegQuat(quat As QuatType) As QuatType
     NegQuat.y = -quat.y
     NegQuat.z = -quat.z
 End Function
+Private Function NegQuatAll(quat As QuatType) As QuatType
+    NegQuatAll.w = -quat.w
+    NegQuatAll.x = -quat.x
+    NegQuatAll.y = -quat.y
+    NegQuatAll.z = -quat.z
+End Function
 Public Sub MakeLineFrom2Vec(a As Long, b As Long, c As Long) ' Pointers VecType, VecType, LineType
     CopyMemory c, a, 24
     CopyMemory c + 24, a, 24
@@ -871,7 +886,7 @@ Private Function MakeVec(x As Double, y As Double, z As Double) As VecType
     MakeVec.y = y
     MakeVec.z = z
 End Function
-Public Sub MakeQuaterion(a As Long, w As Double, x As Double, y As Double, z As Double)
+Public Sub Quaternion(a As Long, w As Double, x As Double, y As Double, z As Double)
     CopyMemory a, VarPtr(w), 8
     CopyMemory a + 8, VarPtr(x), 8
     CopyMemory a + 16, VarPtr(y), 8
@@ -883,23 +898,261 @@ Private Function MakeQuat(w As Double, x As Double, y As Double, z As Double) As
     MakeQuat.y = y
     MakeQuat.z = z
 End Function
-
-
-
+' quad functions
+Public Sub QuatNeg(a As Long, Optional b As Long = 0)
+    Dim q As QuatType
+    q = NegQuatAll(GetQuatType(a))
+    If b = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory b, VarPtr(q), 32
+End Sub
+Public Sub QuatNegMul(n As Long, a As Long, Optional b As Long = 0)
+    Dim q As QuatType, m As Long
+    For m = 1 To n
+    q = NegQuatAll(GetQuatType(a))
+    If b = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory b, VarPtr(q), 32: b = b + 32
+    a = a + 32
+    Next m
+End Sub
+Public Sub QuatMultQuat(a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, q2 As QuatType
+    q = GetQuatType(a)
+    q2 = GetQuatType(b)
+    q = MulQuat(q, q2)
+    If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory c, VarPtr(q), 32
+End Sub
+Public Sub QuatMultQuatMul(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, q2 As QuatType, m As Long
+    If c = 0 Then
+    For m = 1 To n
+        q = GetQuatType(a)
+        q2 = GetQuatType(b)
+        q = MulQuat(q, q2)
+        CopyMemory a, VarPtr(q), 32
+        a = a + 32
+        b = b + 32
+    Next m
+    Else
+    For m = 1 To n
+        q = GetQuatType(a)
+        q2 = GetQuatType(b)
+        q = MulQuat(q, q2)
+        CopyMemory c, VarPtr(q), 32
+        c = c + 32
+        a = a + 32
+        b = b + 32
+    Next m
+    End If
+End Sub
+Public Sub QuatMultByReal(a As Long, r As Double, Optional c As Long = 0)
+    Dim q As QuatType
+    q = GetQuatType(a)
+    q.w = q.w * r
+    q.x = q.x * r
+    q.y = q.y * r
+    q.z = q.z * r
+    If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory c, VarPtr(q), 32
+End Sub
+Public Sub QuatMultReal(a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, r As Double
+    q = GetQuatType(a)
+    r = GetRealType(b)
+    q.w = q.w * r
+    q.x = q.x * r
+    q.y = q.y * r
+    q.z = q.z * r
+    If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory c, VarPtr(q), 32
+End Sub
+Public Sub QuatMultRealMul(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, r As Double, m As Long
+    For m = 1 To n
+    q = GetQuatType(a)
+    r = GetRealType(b)
+    q.w = q.w * r
+    q.x = q.x * r
+    q.y = q.y * r
+    q.z = q.z * r
+    If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
+    a = a + 32
+    b = b + 8
+    Next m
+End Sub
+Public Sub QuatMultRealMulOne(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, r As Double, m As Long
+    r = GetRealType(b)
+    For m = 1 To n
+    q = GetQuatType(a)
+    q.w = q.w * r
+    q.x = q.x * r
+    q.y = q.y * r
+    q.z = q.z * r
+    If c = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory c, VarPtr(q), 32: c = c + 32
+    a = a + 32
+    Next m
+End Sub
+Public Sub QuatAddByReal(a As Long, r As Double, Optional c As Long = 0)
+    Dim q As QuatType
+    If c = 0 Then
+        q = GetQuatType(a)
+        q.w = q.w + r
+        CopyMemory a, VarPtr(q), 8
+    Else
+        q = GetQuatType(a)
+        q.w = q.w + r
+        CopyMemory c, VarPtr(q), 32
+    End If
+End Sub
+Public Sub QuatAddReal(a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType
+    If c = 0 Then
+        q.w = GetRealType(a) + GetRealType(b)
+        CopyMemory a, VarPtr(q), 8
+    Else
+        q = GetQuatType(a)
+        q.w = q.w + GetRealType(b)
+        CopyMemory c, VarPtr(q), 32
+    End If
+End Sub
+Public Sub QuatAddRealMulConst(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, m As Long
+    If c = 0 Then
+        For m = 1 To n
+            q.w = GetRealType(a) + GetRealType(b)
+            CopyMemory a, VarPtr(q), 8
+            a = a + 32
+        Next m
+    Else
+        For m = 1 To n
+            q = GetQuatType(a)
+            q.w = q.w + GetRealType(b)
+            CopyMemory c, VarPtr(q), 32
+            c = c + 32
+            a = a + 32
+        Next m
+    End If
+End Sub
+Public Sub QuatAddRealMulMul(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, m As Long
+    If c = 0 Then
+        For m = 1 To n
+            q.w = GetRealType(a) + GetRealType(b)
+            CopyMemory a, VarPtr(q), 8
+            a = a + 32
+            b = b + 8
+        Next m
+    Else
+        For m = 1 To n
+            q = GetQuatType(a)
+            q.w = q.w + GetRealType(b)
+            CopyMemory c, VarPtr(q), 32
+            c = c + 32
+            a = a + 32
+            b = b + 8
+        Next m
+    End If
+End Sub
+Public Sub QuatAddQuat(a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, q2 As QuatType
+    q = GetQuatType(a)
+    q2 = GetQuatType(b)
+    With q
+        .w = .w + q2.w
+        .x = .x + q2.x
+        .y = .y + q2.y
+        .z = .z + q2.z
+    End With
+    If c = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory c, VarPtr(q), 32
+End Sub
+Public Sub QuatAddQuatMul(n As Long, a As Long, b As Long, Optional c As Long = 0)
+    Dim q As QuatType, q2 As QuatType, m As Long
+    If c = 0 Then
+    For m = 1 To n
+        q = GetQuatType(a)
+        q2 = GetQuatType(b)
+        With q
+            .w = .w + q2.w
+            .x = .x + q2.x
+            .y = .y + q2.y
+            .z = .z + q2.z
+        End With
+        CopyMemory a, VarPtr(q), 32
+        a = a + 32
+        b = b + 32
+    Next m
+    Else
+    For m = 1 To n
+        q = GetQuatType(a)
+        q2 = GetQuatType(b)
+        With q
+            .w = .w + q2.w
+            .x = .x + q2.x
+            .y = .y + q2.y
+            .z = .z + q2.z
+        End With
+        CopyMemory c, VarPtr(q), 32
+        a = a + 32
+        b = b + 32
+        c = c + 32
+    Next m
+    End If
+End Sub
+Public Sub QuatConj(a As Long, Optional b As Long = 0)
+    Dim q As QuatType
+    q = NegQuat(GetQuatType(a))
+    If b = 0 Then CopyMemory a, VarPtr(q), 32: Exit Sub
+    CopyMemory b, VarPtr(q), 32
+End Sub
+Public Sub QuatConjMul(n As Long, a As Long, Optional b As Long = 0)
+    Dim q As QuatType, m As Long
+    For m = 1 To n
+    q = NegQuat(GetQuatType(a))
+    If b = 0 Then CopyMemory a, VarPtr(q), 32 Else CopyMemory b, VarPtr(q), 32: b = b + 32
+    a = a + 32
+    Next m
+End Sub
+Public Function QuatNormRetDouble(a As Long) As Double
+    QuatNormRetDouble = NormQuat(GetQuatType(a))
+End Function
+Public Sub QuatNorm(a As Long, b As Long)
+    Dim z As Double
+    z = NormQuat(GetQuatType(a))
+    CopyMemory b, VarPtr(z), 8
+End Sub
+Public Sub QuatNormMul(n As Long, a As Long, b As Long)
+    Dim z As Double, m As Long
+    For m = 1 To n
+    z = NormQuat(GetQuatType(a))
+    CopyMemory b, VarPtr(z), 8
+    a = a + 32
+    b = b + 8
+    Next m
+End Sub
+Private Function NormQuat(v As QuatType) As Double
+    NormQuat = Sqr(v.w * v.w + v.x * v.x + v.y * v.y + v.z * v.z)
+End Function
 
 ' debug
-Public Function VecString(a As Long) As String
+Public Function QuatString(a As Long, Optional frm$ = "#0.00000") As String
+    Dim q As QuatType
+    q = GetQuatType(a)
+    QuatString = MyFrm(q.w, frm$) & ", " & MyFrm(q.x, frm$) & ", " & MyFrm(q.y, frm$) & ", " & MyFrm(q.z, frm$)
+End Function
+Public Function VecString(a As Long, Optional frm$ = "#0.00000") As String
     Dim v As VecType
     v = GetVector(a)
-    VecString = Format$(v.x, "#0.00000") & ", " & Format$(v.y, "#0.00000") & ", " & Format$(v.z, "#0.00000")
+    VecString = MyFrm(v.x, frm$) & ", " & MyFrm(v.y, frm$) & ", " & MyFrm(v.z, frm$)
 End Function
 ' trig functions
-Public Sub VectorRad2Deg(a As Long, b As Long)
+Public Sub VectorRad2Deg(a As Long, Optional b As Long = 0)
     Dim v As VecType
     v = GetVector(a)
     v.x = Rad2Deg(v.x)
     v.y = Rad2Deg(v.y)
     v.z = Rad2Deg(v.z)
+    If b = 0 Then CopyMemory a, VarPtr(v), 24: Exit Sub
     CopyMemory b, VarPtr(v), 24
 End Sub
 Public Sub VectorRad2DegMult(n As Long, a As Long, b As Long)
@@ -915,12 +1168,13 @@ Public Sub VectorRad2DegMult(n As Long, a As Long, b As Long)
     Next m
 End Sub
 
-Public Sub VectorDeg2Rad(a As Long, b As Long)
+Public Sub VectorDeg2Rad(a As Long, Optional b As Long = 0)
     Dim v As VecType
     CopyMemory VarPtr(v), a, 24
     v.x = Deg2Rad(v.x)
     v.y = Deg2Rad(v.y)
     v.z = Deg2Rad(v.z)
+    If b = 0 Then CopyMemory a, VarPtr(v), 24: Exit Sub
     CopyMemory b, VarPtr(v), 24
 End Sub
 Public Sub VectorDeg2RadMult(n As Long, a As Long, b As Long)
@@ -1011,4 +1265,45 @@ CheckThis = mcheck
 End Property
 Public Property Let CheckThis(RHS As Boolean)
 mcheck = RHS
+End Property
+Private Function MyFrm(w As Double, frm$) As String
+If frm$ = vbNullString Then
+    MyFrm = LTrim(Str$(w))
+            If Left$(MyFrm, 1) = "." Then
+                    MyFrm = "0" + MyFrm
+            ElseIf Left$(MyFrm, 2) = "-." Then
+                    MyFrm = "-0" + Mid$(MyFrm, 2)
+            End If
+Else
+
+        MyFrm = Format$(w, frm$)
+        If Not NoUseDec Then
+            If OverideDec Then
+                MyFrm = Replace$(MyFrm, GetDeflocaleString(LOCALE_SDECIMAL), Chr(2))
+                MyFrm = Replace$(MyFrm, GetDeflocaleString(LOCALE_STHOUSAND), Chr(3))
+                MyFrm = Replace$(MyFrm, Chr(2), NowDec$)
+                MyFrm = Replace$(MyFrm, Chr(3), NowThou$)
+                If Left$(MyFrm, 1) = NowDec$ Then
+                    MyFrm = "0" + MyFrm
+                ElseIf Left$(MyFrm, 2) = "-" + NowDec$ Then
+                    MyFrm = "-0" + Mid$(MyFrm, 2)
+                End If
+            ElseIf InStr(MyFrm, NowDec$) > 0 And InStr(frm$, ".") > 0 Then
+                ElseIf InStr(MyFrm, NowDec$) > 0 Then
+                MyFrm = Replace$(MyFrm, NowDec$, Chr(2))
+                MyFrm = Replace$(MyFrm, NowThou$, Chr(3))
+                MyFrm = Replace$(MyFrm, Chr(2), ".")
+                MyFrm = Replace$(MyFrm, Chr(3), ",")
+                If Left$(MyFrm, 1) = "." Then
+                    MyFrm = "0" + MyFrm
+                ElseIf Left$(MyFrm, 2) = "-." Then
+                    MyFrm = "-0" + Mid$(MyFrm, 2)
+                End If
+            End If
+        End If
+    End If
+End Function
+
+Property Get Version() As Variant
+Version = 1.1
 End Property

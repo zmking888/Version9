@@ -1,8 +1,10 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 4 active-X
+Version 9.4 rev 5 active-X
 
-New for arrays: we can use for each dimension range of values: Dim A(-10 to 10, -4 to 4)
+1. Concurrent Threads issues fixed (when a thread call a module or a function and stop for waiting keyboard, another thread before fix, may call same module./function and overwrite local functions)
+
+2. Quaternions in Math Lib. 
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
