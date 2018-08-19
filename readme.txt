@@ -1,10 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 5 active-X
+Version 9.4 rev 6 active-X
 
-1. Concurrent Threads issues fixed (when a thread call a module or a function and stop for waiting keyboard, another thread before fix, may call same module./function and overwrite local functions)
-
-2. Quaternions in Math Lib. 
+A bug removed about a pointer for group in stack, when make it a copy, in an Over or similar statement.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

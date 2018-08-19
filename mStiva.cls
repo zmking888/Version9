@@ -717,7 +717,9 @@ Sub CopyGroupObj(myobject1 As Object, myobject2 As Object)
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
  Dim mygroup2 As New Group
   Dim myobject As Group
+  
  Set myobject = myobject1
+ If myobject.IamApointer Then Set myobject2 = myobject1: Exit Sub
              With myobject
                 If .IamFloatGroup Then
          
