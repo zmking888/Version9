@@ -48,7 +48,10 @@ For i = 0 To used - 1
     ElseIf Typename(myVar(where).Value) = "Group" Then
     Dim aa As Object
     Set aa = myVar(where).Value
+   
+   
      UnFloatGroup bstack, nm$, myVar(where).there, aa
+   
      Set aa = Nothing
      Else
      
@@ -73,11 +76,13 @@ For i = 0 To used - 1
                         GlobalSub here$ & "." & bstack.GroupName & nm$ + "()", "CALL EXTERN " & Str(there)
                 End If
           ElseIf Typename(myVar(where).Value) = "Group" Then
-          'If glb Then
-          LinkGroup bstack, nm$, v(i)
-          'Else
-          'LinkGroup bstack, here$ & "." & bstack.GroupName & nm$, v(i)
-          'End If
+          If myVar(where).Value.IamApointer Then
+          globalvar nm$, there, True, glb
+
+          Else
+          LinkGroup bstack, nm$, v(there)
+          End If
+
           Else
           globalvar nm$, there, True, glb
           End If
@@ -103,6 +108,7 @@ For i = 0 To used - 1
 ' check if is better with MyIsObject
     If IsObject(v(myVar(i).there)) Then
         If Typename(myVar(i).Value) = "Group" Then
+        
             Set myVar(i).Value = CopyGroupObj(v(myVar(i).there))
             ' why not  Set v(myVar(i).there) = Nothing
         Else

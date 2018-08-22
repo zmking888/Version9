@@ -2281,6 +2281,9 @@ again112:
          addone pos2, 14
     pos2 = k - Len(a$) + 1
     onetime = True
+    If MaybeIsSymbol(a$, ".;+(") Then
+GoTo CheckThis
+End If
     GoTo again112
     ElseIf MaybeIsSymbol(a$, "'") Then
         lastkind = 0
@@ -2427,6 +2430,13 @@ If pos2 > 0 Then
 addone pos2, 14
 Else
 addone 1, 14
+If MaybeIsSymbol(a$, "(") Then
+GoTo CheckThis
+ElseIf MaybeIsSymbol(a$, ",;") Then
+a$ = Mid$(a$, 2)
+
+ GoTo CheckThis
+End If
 End If
         pos2 = k - Len(a$) + 1
         GoTo again

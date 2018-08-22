@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 6 active-X
+Version 9.4 rev 7 active-X
 
-A bug removed about a pointer for group in stack, when make it a copy, in an Over or similar statement.
+A bug removed about a pointer for group ias a closure in a lambda function/
+New form for execute lambda: lambda (x)->{=x**2}(3)  so x get 3 and return 9
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

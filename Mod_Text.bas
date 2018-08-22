@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3554,6 +3554,7 @@ again3:
                       '      bstack.lastobj.lasthere$ = here$
             Else
             If TypeOf bstack.lastobj Is Group Then GoTo again3
+    
             End If
          If MaybeIsSymbol(aa$, "Ii≈Â") Then
              If Fast2Label(aa$, "IS", 2, "≈…Õ¡…", 5, 5) Then
@@ -5267,14 +5268,24 @@ num79: ' "NUMBER", "¡—…»Ãœ”", "‘…Ã«"
 num81: ' "À¡Ãƒ¡"
     Set bstack.lastobj = ProcLambda(bstack, a$, 0)
     r = 0
-    
+   If FastSymbol(a$, "(") Then
+    If Not CallLambdaASAP(bstack, a$, r) Then IsNumber = False: Exit Function
+    If SG < 0 Then r = -r
+    IsNumber = True
+    Else
     IsNumber = Not bstack.lastobj Is Nothing
+    End If
 Exit Function
 num80: ' "LAMBDA"
     Set bstack.lastobj = ProcLambda(bstack, a$, 1)
     r = 0
-    
+    If FastSymbol(a$, "(") Then
+    If Not CallLambdaASAP(bstack, a$, r) Then IsNumber = False: Exit Function
+    If SG < 0 Then r = -r
+    IsNumber = True
+    Else
     IsNumber = Not bstack.lastobj Is Nothing
+    End If
 Exit Function
 num86: ' Case "STACK", "”Ÿ—œ”"
 IsNumber = IsStackObj(v$, bstack, a$, r, SG)
@@ -10610,12 +10621,28 @@ lit30: '    Case "LETTER$", "√—¡ÃÃ¡$"
 lit35: '    Case "À¡Ãƒ¡$"
         Set bstackstr.lastobj = ProcLambda(bstackstr, a$, 0)
         r$ = vbNullString
-        IsStr1 = Not bstackstr.lastobj Is Nothing
+           If FastSymbol(a$, "(") Then
+    If Not CallLambdaASAP(bstackstr, a$, p, True) Then IsStr1 = False: Exit Function
+    r$ = CStr(p)
+    IsStr1 = True
+    Else
+    IsStr1 = Not bstackstr.lastobj Is Nothing
+    End If
+    
     Exit Function
 lit31: ' "LAMBDA$"
         Set bstackstr.lastobj = ProcLambda(bstackstr, a$, 1)
         r$ = vbNullString
-        IsStr1 = Not bstackstr.lastobj Is Nothing
+           If FastSymbol(a$, "(") Then
+        p = vbNullString
+    If Not CallLambdaASAP(bstackstr, a$, p, True) Then IsStr1 = False: Exit Function
+    r$ = CStr(p)
+    IsStr1 = True
+    Else
+    IsStr1 = Not bstackstr.lastobj Is Nothing
+    End If
+    
+    Exit Function
     Exit Function
     
 itisavar:
@@ -49193,6 +49220,7 @@ End Function
 Function GetModuleName(b As basetask, where$) As String
 If SecureNames Then
 If b.OriginalCode < 0 Then
+    If var2used <= -b.OriginalCode Then Exit Function
     GetModuleName = GetName(var(-b.OriginalCode).name)
 Else
     GetModuleName = GetName(sbf(b.OriginalCode).goodname)
@@ -55077,249 +55105,50 @@ GetMem4 VarPtr(b$), j
 PutMem4 VarPtr(a$), j
 PutMem4 VarPtr(b$), i
 End Sub
-Sub testme()
-Dim Src As String
- Src = "#define TOK_FINAL     0" & vbCrLf & _
-            "#define TOK_RPAREN    1" & vbCrLf & _
-            "#define TOK_ADD       2" & vbCrLf & _
-            "#define TOK_MOD       3" & vbCrLf & _
-            "#define TOK_IDIV      4" & vbCrLf & _
-            "#define TOK_MUL       5" & vbCrLf & _
-            "#define TOK_UNARY     6" & vbCrLf & _
-            "#define TOK_POWER     7" & vbCrLf & _
-            "#define TOK_LPAREN    8" & vbCrLf & _
-            "#define TOK_NUM       9" & vbCrLf & _
-            "#define TOK_WHITE     10" & vbCrLf & _
-            "" & vbCrLf & _
-            "int lookup[256];" & vbCrLf & _
-            "" & vbCrLf & _
-            "simple_eval(s, pdbl, wParam, lParam)" & vbCrLf & _
-            "{" & vbCrLf & _
-            "    int i, p, l, ch, prec, prev_pr;" & vbCrLf & _
-            "    int op_stack, op_idx;" & vbCrLf & _
-            "    int val_stack, val_idx;" & vbCrLf
-        Src = Src & _
-            "    int num_size;" & vbCrLf & _
-            "" & vbCrLf & _
-            "    op_idx = op_stack = alloca(4000);" & vbCrLf & _
-            "    val_idx = val_stack = alloca(8000);" & vbCrLf & _
-            "    l = &lookup;" & vbCrLf & _
-            "    if (*(char *)(l + 32) == 0) {" & vbCrLf & _
-            "        p = l;" & vbCrLf & _
-            "        i = 0;" & vbCrLf & _
-            "        while (i < 256) {" & vbCrLf & _
-            "            *(char *)p++ = TOK_WHITE;" & vbCrLf & _
-            "            i++;" & vbCrLf & _
-            "        }" & vbCrLf & _
-            "        *(char *)(l + '(') = TOK_LPAREN;" & vbCrLf & _
-            "        *(char *)(l + ')') = TOK_RPAREN;" & vbCrLf & _
-            "        *(char *)(l + '+') = TOK_ADD;" & vbCrLf & _
-            "        *(char *)(l + '-') = TOK_ADD;" & vbCrLf & _
-            "        *(char *)(l + '*') = TOK_MUL;" & vbCrLf & _
-            "        *(char *)(l + '/') = TOK_MUL;" & vbCrLf & _
-            "        *(char *)(l + '^') = TOK_POWER;" & vbCrLf & _
-            "        *(char *)(l + '\\') = TOK_IDIV;" & vbCrLf & _
-            "        *(char *)(l + '%') = TOK_MOD;" & vbCrLf & _
-            "        *(char *)(l + '.') = TOK_NUM;" & vbCrLf
-        Src = Src & _
-            "        p = l + '0';" & vbCrLf & _
-            "        i = '0';" & vbCrLf & _
-            "        while (i <= '9') {" & vbCrLf & _
-            "            *(char *)p++ = TOK_NUM;" & vbCrLf & _
-            "            i++;" & vbCrLf & _
-            "        }" & vbCrLf & _
-            "    }" & vbCrLf & _
-            "    prev_pr = 0;" & vbCrLf & _
-            "    p = s;" & vbCrLf & _
-            "    while ((ch = *(short *)p)) {" & vbCrLf & _
-            "        if (!(ch >> 8)) {" & vbCrLf & _
-            "            prec = *(char *)(l + ch);" & vbCrLf & _
-            "            if (prec != TOK_WHITE) {" & vbCrLf & _
-            "                if (prec == TOK_NUM) {" & vbCrLf & _
-            "                    val_idx = val_idx + 8;" & vbCrLf & _
-            "                    parse_num(p, val_idx, &num_size);" & vbCrLf & _
-            "                    p = p + ((num_size-1) << 1);" & vbCrLf & _
-            "                } else if (prec == TOK_ADD) {" & vbCrLf & _
-            "                    if (prev_pr >= TOK_ADD && prev_pr < TOK_NUM)" & vbCrLf & _
-            "                        prec = TOK_UNARY;" & vbCrLf
-        Src = Src & _
-            "                }" & vbCrLf & _
-            "                if (prec >= TOK_ADD && prec < TOK_NUM) {" & vbCrLf & _
-            "                    if(prec != TOK_UNARY)" & vbCrLf & _
-            "                        eval_stack(prec, op_stack, &op_idx, val_stack, &val_idx);" & vbCrLf & _
-            "                    op_idx = op_idx + 4;" & vbCrLf & _
-            "                    *(int *)op_idx = (prec << 16) + ch;" & vbCrLf & _
-            "                }" & vbCrLf & _
-            "                prev_pr = prec;" & vbCrLf & _
-            "            }" & vbCrLf & _
-            "        }" & vbCrLf & _
-            "        p++; p++;" & vbCrLf & _
-            "    }" & vbCrLf & _
-            "    eval_stack(TOK_FINAL, op_stack, &op_idx, val_stack, &val_idx);" & vbCrLf & _
-            "    *(int *)pdbl = *(int *)val_idx;" & vbCrLf & _
-            "    *(int *)(pdbl + 4) = *(int *)(val_idx + 4);" & vbCrLf & _
-            "}" & vbCrLf & _
-            "" & vbCrLf
-        Src = Src & _
-            "#define ASM_MOV_EAX_    _asm mov eax," & vbCrLf & _
-            "#define ASM_ADD_EAX_    _asm _emit 0x83 _asm _emit 0xc0 _asm _emit" & vbCrLf & _
-            "#define ASM_SUB_EAX_    _asm _emit 0x83 _asm _emit 0xe8 _asm _emit" & vbCrLf & _
-            "#define ASM_FSTP_EAX    _asm _emit 0xdd _asm _emit 0x18" & vbCrLf & _
-            "#define ASM_FLD_EAX     _asm _emit 0xdd _asm _emit 0x00" & vbCrLf & _
-            "#define ASM_FLD_EAX_    _asm _emit 0xdd _asm _emit 0x40 _asm _emit" & vbCrLf & _
-            "#define ASM_FADD_EAX_   _asm _emit 0xdc _asm _emit 0x40 _asm _emit" & vbCrLf & _
-            "#define ASM_FSUB_EAX_   _asm _emit 0xdc _asm _emit 0x60 _asm _emit" & vbCrLf & _
-            "#define ASM_FMUL_EAX_   _asm _emit 0xdc _asm _emit 0x48 _asm _emit" & vbCrLf & _
-            "#define ASM_FDIV_EAX_   _asm _emit 0xdc _asm _emit 0x70 _asm _emit" & vbCrLf & _
-            "#define ASM_FCHS        _asm _emit 0xd9 _asm _emit 0xe0" & vbCrLf & _
-            "#define ASM_FILD_EAX    _asm _emit 0xdb _asm _emit 0x00" & vbCrLf & _
-            "#define ASM_FISTP_EAX   _asm _emit 0xdb _asm _emit 0x18" & vbCrLf & _
-            "#define ASM_FYL2X       _asm _emit 0xd9 _asm _emit 0xf1" & vbCrLf & _
-            "#define ASM_FLD1        _asm _emit 0xd9 _asm _emit 0xe8" & vbCrLf & _
-            "#define ASM_FLD_ST1     _asm _emit 0xd9 _asm _emit 0xc1" & vbCrLf & _
-            "#define ASM_FPREM       _asm _emit 0xd9 _asm _emit 0xf8" & vbCrLf & _
-            "#define ASM_F2XM1       _asm _emit 0xd9 _asm _emit 0xf0" & vbCrLf & _
-            "#define ASM_FADDP_ST1   _asm _emit 0xde _asm _emit 0xc1" & vbCrLf & _
-            "#define ASM_FSCALE      _asm _emit 0xd9 _asm _emit 0xfd" & vbCrLf
-        Src = Src & _
-            "" & vbCrLf & _
-            "eval_stack(prec, op_stack, pop_idx, val_stack, pval_idx)" & vbCrLf & _
-            "{" & vbCrLf & _
-            "    int op_idx, val_idx, op, t1, pt1, t2, pt2;" & vbCrLf & _
-            "" & vbCrLf & _
-            "    op_idx = *(int *)pop_idx;" & vbCrLf & _
-            "    val_idx = *(int *)pval_idx;" & vbCrLf & _
-            "    while (op_idx > op_stack) {" & vbCrLf & _
-            "        if (*(int *)(op_idx) < (prec << 16))" & vbCrLf & _
-            "            break;" & vbCrLf & _
-            "        val_idx = val_idx - 8;" & vbCrLf & _
-            "        op = *(short *)op_idx;" & vbCrLf & _
-            "        if (op == '+') {" & vbCrLf & _
-            "            if (*(int *)(op_idx) > (TOK_UNARY << 16)) {" & vbCrLf & _
-            "                val_idx = val_idx + 8;" & vbCrLf & _
-            "            } else {" & vbCrLf & _
-            "                /* *(double *)val_idx = *(double *)val_idx + *(double *)(val_idx + 8); */" & vbCrLf & _
-            "                ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "                ASM_FLD_EAX;" & vbCrLf & _
-            "                ASM_FADD_EAX_(8);" & vbCrLf & _
-            "                ASM_FSTP_EAX;" & vbCrLf & _
-            "            }" & vbCrLf
-        Src = Src & _
-            "        } else if (op == '-') {" & vbCrLf & _
-            "            if (*(int *)(op_idx) > (TOK_UNARY << 16)) {" & vbCrLf & _
-            "                val_idx = val_idx + 8;" & vbCrLf & _
-            "                /* *(double *)val_idx = -*(double *)val_idx; */" & vbCrLf & _
-            "                ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "                ASM_FLD_EAX;" & vbCrLf & _
-            "                ASM_FCHS;" & vbCrLf & _
-            "                ASM_FSTP_EAX;" & vbCrLf & _
-            "            } else {" & vbCrLf & _
-            "                /* *(double *)val_idx = *(double *)val_idx - *(double *)(val_idx + 8); */" & vbCrLf & _
-            "                ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "                ASM_FLD_EAX;" & vbCrLf & _
-            "                ASM_FSUB_EAX_(8);" & vbCrLf & _
-            "                ASM_FSTP_EAX;" & vbCrLf & _
-            "            }" & vbCrLf & _
-            "        } else if (op == '*') {" & vbCrLf & _
-            "            /* *(double *)val_idx = *(double *)val_idx * *(double *)(val_idx + 8); */" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf
-        Src = Src & _
-            "            ASM_FMUL_EAX_(8);" & vbCrLf & _
-            "            ASM_FSTP_EAX;" & vbCrLf & _
-            "        } else if (op == '/') {" & vbCrLf & _
-            "            /* *(double *)val_idx = *(double *)val_idx / *(double *)(val_idx + 8); */" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_FDIV_EAX_(8);" & vbCrLf & _
-            "            ASM_FSTP_EAX;" & vbCrLf & _
-            "        } else if (op == '^') {" & vbCrLf & _
-            "            /* *(double *)val_idx = pow(*(double *)val_idx, *(double *)(val_idx + 8)); */" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_ADD_EAX_(8);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_SUB_EAX_(8);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_FYL2X;" & vbCrLf & _
-            "            ASM_FLD1;" & vbCrLf & _
-            "            ASM_FLD_ST1;" & vbCrLf & _
-            "            ASM_FPREM;" & vbCrLf & _
-            "            ASM_F2XM1;" & vbCrLf & _
-            "            ASM_FADDP_ST1;" & vbCrLf & _
-            "            ASM_FSCALE;" & vbCrLf & _
-            "            ASM_FSTP_EAX;" & vbCrLf
-        Src = Src & _
-            "        } else if (op == '\\') {" & vbCrLf & _
-            "            pt1 = &t1;" & vbCrLf & _
-            "            /* *(double *)val_idx = (int)(*(double *)val_idx / *(double *)(val_idx + 8)); */" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_FDIV_EAX_(8);" & vbCrLf & _
-            "            ASM_MOV_EAX_(pt1);" & vbCrLf & _
-            "            ASM_FISTP_EAX;" & vbCrLf & _
-            "            ASM_FILD_EAX;" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FSTP_EAX;" & vbCrLf & _
-            "        } else if (op == '%') {" & vbCrLf & _
-            "            pt1 = &t1;" & vbCrLf & _
-            "            pt2 = &t2;" & vbCrLf & _
-            "            /* *(double *)val_idx = (int)*(double *)val_idx % (int)*(double *)(val_idx + 8); */" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_MOV_EAX_(pt1);" & vbCrLf & _
-            "            ASM_FISTP_EAX;" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_ADD_EAX_(8);" & vbCrLf
-        Src = Src & _
-            "            ASM_FLD_EAX;" & vbCrLf & _
-            "            ASM_MOV_EAX_(pt2);" & vbCrLf & _
-            "            ASM_FISTP_EAX;" & vbCrLf & _
-            "            t1 = t1 % t2;" & vbCrLf & _
-            "            ASM_MOV_EAX_(pt1);" & vbCrLf & _
-            "            ASM_FILD_EAX;" & vbCrLf & _
-            "            ASM_MOV_EAX_(val_idx);" & vbCrLf & _
-            "            ASM_FSTP_EAX;" & vbCrLf & _
-            "        } else if (op == '(') {" & vbCrLf & _
-            "            val_idx = val_idx + 8;" & vbCrLf & _
-            "            if (prec == TOK_RPAREN) {" & vbCrLf & _
-            "                op_idx = op_idx - 4;" & vbCrLf & _
-            "                break;" & vbCrLf & _
-            "            } else if (prec > TOK_RPAREN)" & vbCrLf & _
-            "                break;" & vbCrLf & _
-            "        }" & vbCrLf & _
-            "        op_idx = op_idx - 4;" & vbCrLf & _
-            "    }" & vbCrLf & _
-            "    *(int *)pval_idx = val_idx;" & vbCrLf & _
-            "    *(int *)pop_idx = op_idx;" & vbCrLf & _
-            "}" & vbCrLf & _
-            "" & vbCrLf
-        Src = Src & _
-            "#define PARSE_FLAGS_DEFAULT 0xB14" & vbCrLf & _
-            "#define VTBIT_R8 0x20" & vbCrLf & _
-            "" & vbCrLf & _
-            "parse_num(s, pdbl, psize)" & vbCrLf & _
-            "{" & vbCrLf & _
-            "    int numparse, dig, variant_res;" & vbCrLf & _
-            "" & vbCrLf & _
-            "    numparse = alloca(24);" & vbCrLf & _
-            "    dig = alloca(30);" & vbCrLf & _
-            "    variant_res = alloca(16);" & vbCrLf & _
-            "    *(int *)numparse = 30;" & vbCrLf & _
-            "    *(int *)(numparse + 4) = PARSE_FLAGS_DEFAULT;" & vbCrLf & _
-            "    if (!VarParseNumFromStr(s, 0, 0, numparse, dig)) {" & vbCrLf & _
-            "        if (!VarNumFromParseNum(numparse, dig, VTBIT_R8, variant_res)) {" & vbCrLf & _
-            "            *(int *)pdbl = *(int *)(variant_res + 8);" & vbCrLf & _
-            "            *(int *)(pdbl + 4) = *(int *)(variant_res + 12);" & vbCrLf & _
-            "            *(int *)psize = *(int *)(numparse + 12); /* cchUsed */" & vbCrLf & _
-            "            return;" & vbCrLf & _
-            "        }" & vbCrLf & _
-            "    }" & vbCrLf & _
-            "    *(int *)pdbl = 0;" & vbCrLf & _
-            "    *(int *)(pdbl + 4) = 0;" & vbCrLf & _
-            "    *(int *)psize = 1;" & vbCrLf & _
-            "}"
-             Clipboard.Clear
-              SetTextData CF_UNICODETEXT, Src
-End Sub
 
+Function CallLambdaASAP(bstack As basetask, a$, r, Optional forstring As Boolean = False) As Long
+Dim w2 As Long, w1 As Long, nbstack As basetask
+PushStage bstack, False
+w2 = var2used
+If forstring Then
+w1 = globalvar("A_" + CStr(w2) + "$", 0#)
+ Set var(w1) = bstack.lastobj
+ Set bstack.lastobj = Nothing
+  If here$ = vbNullString Then
+            GlobalSub "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
+        Else
+            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
+    End If
+ Set nbstack = New basetask
+    nbstack.reflimit = varhash.count
+    Set nbstack.Parent = bstack
+    If bstack.IamThread Then Set nbstack.Process = bstack.Process
+    Set nbstack.Owner = bstack.Owner
+    nbstack.OriginalCode = 0
+    nbstack.UseGroupname = ""
+ CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "$()", a$, r)
+
+Else
+w1 = globalvar("A_" + CStr(w2), 0#)
+ Set var(w1) = bstack.lastobj
+ Set bstack.lastobj = Nothing
+  If here$ = vbNullString Then
+            GlobalSub "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
+        Else
+            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
+    End If
+     Set nbstack = New basetask
+    nbstack.reflimit = varhash.count
+    Set nbstack.Parent = bstack
+    If bstack.IamThread Then Set nbstack.Process = bstack.Process
+    Set nbstack.Owner = bstack.Owner
+    nbstack.OriginalCode = 0
+    nbstack.UseGroupname = ""
+ CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", a$, r)
+End If
+
+
+                 
+PopStage bstack
+End Function
 
