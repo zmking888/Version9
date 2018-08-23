@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 7
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2022,7 +2022,7 @@ Do While FastSymbol(b$, ",")
         If Len(Rest1$) = 0 Then
             i = IsLabelDot("", b$, w$)
         Else
-            b$ = Mid$(b$, 129 - Len(Rest1$))
+            b$ = Mid$(b$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
 
@@ -4530,7 +4530,7 @@ Else
     If Len(n$) = 0 Then
         v1& = IsLabelBig(bstack, a$, v$, par, s1$, True, , usebackup)
     Else
-        a$ = Mid$(a$, 129 - Len(n$))
+        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
     End If
 End If
 
@@ -7679,7 +7679,7 @@ If Len(rest$) < 129 Then
         If Len(Rest1$) = 0 Then
             k = IsPureLabel(rest$, n$)
         Else
-            rest$ = Mid$(rest$, 129 - Len(Rest1$))
+            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
 
@@ -7992,15 +7992,24 @@ End Function
 
 
 Function IsLabelBig(bstack As basetask, a$, rrr$, Optional nocommand As Boolean, Optional r$, Optional noconvert As Boolean = False, Optional StrPointer As Boolean, Optional iscommand As Boolean) As Long
-Dim rr&, one As Boolean, c$, dot&, gr As Boolean, skipcase As Boolean, cc As Long, isstrparam As Boolean
+Dim rr&, one As Boolean, c$, dot&, gr As Boolean, skipcase As Boolean, cc As Long, isstrparam As Boolean, ascwc As Integer
 r$ = vbNullString
 If a$ = vbNullString Then IsLabelBig = 0: Exit Function  'ok
 a$ = NLtrim$(a$)
     Do While Len(a$) > 0
      c$ = Left$(a$, 1) 'ANYCHAR HERE
-        If AscW(c$) < 256 Then
-        Select Case AscW(c$)
-        Case 2 To 7
+     ascwc = AscW(c$)
+     If ascwc < 10 And ascwc >= 0 Then
+     Select Case ascwc
+     Case 8 '
+     If Len(r$) > 0 Then Exit Do
+     a$ = Mid$(a$, 2)
+     ' get a name from bstack tempstr
+     nocommand = True
+     a$ = bstack.tmpstr + a$
+     bstack.tmpstr = vbNullString
+         
+    Case 2 To 7
         a$ = Mid$(a$, 2)
         Case 1
         isstrparam = True
@@ -8070,6 +8079,14 @@ conthere1:
         Else
         a$ = Mid$(a$, 2)
         End If
+      Case Else
+        Exit Do
+     End Select
+     
+     
+        ElseIf ascwc < 256 And ascwc > 0 Then
+        Select Case ascwc
+          
         Case 64  '"@"
            If r$ = vbNullString Then
               a$ = Mid$(a$, 2)
@@ -8088,6 +8105,7 @@ conthere1:
         Exit Function
         End If
         a$ = Mid$(a$, 2)
+        
         Case 46 '"."
             
             If one Then
@@ -8145,7 +8163,7 @@ conthere1:
             
             Exit Do
             End If
-Case Is < 0, Is > 64 ' >=A and negative
+        Case Is < 0, Is > 64 ' >=A and negative
             If one Then
             Exit Do
             Else
@@ -8203,17 +8221,17 @@ again1947:
                              c$ = StripThis2(here$)
                              If c$ <> "" Then c$ = c$ & "." & Mid$(r$, 6) Else c$ = here$ & "." & r$
                          End If
-                  '  a$ = Chr(34) + c$ + Chr(34) + a$
+        
                       rrr$ = c$
                         IsLabelBig = -50
                         Exit Function
                   ElseIf varhash.Find(r$, cc) Then
-                      '   a$ = Chr(34) + r$ & Chr(34) + a$
+        
                          rrr$ = r$
                         IsLabelBig = -50
                         Exit Function
                     Else
-                    '' r$ = myUcase(r$, gr)
+        
                     
                     If r$ = "THIS" Or r$ = "ΑΥΤΟ" Then
                     rrr$ = r$
@@ -8234,12 +8252,12 @@ again1947:
                     End If
                 Else
                     If FastSymbol(a$, ")") Then
-                           '' r$ = myUcase(r$, gr)
+        
                             rr& = 0
                             If Left$(r$, 5) = "ΑΥΤΟ." Or Left$(r$, 5) = "THIS." Then
                             If varhash.ExistKey(bstack.UseGroupname & Mid$(r$, 6)) Then
                        
-                                    'a$ = Chr(34) + bstack.UseGroupname & mid$(r$, 6, Len(r$) - 6) + Chr(34) + a$
+        
                                         rrr$ = bstack.UseGroupname & Mid$(r$, 6, Len(r$) - 6)
                                         IsLabelBig = -50
                                         Exit Function
@@ -8382,26 +8400,41 @@ again1947:
     
    End If
    If StrPointer Then
-   If rr& = 3 Then
+   If Abs(rr&) = 3 Then
    cc = LastErNum1
     If IsStr1(bstack, (rrr$), rrr$) Then
         a$ = rrr$ + " " + a$
-        IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$))
+        StrPointer = False
+        IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$)) * Sgn(rr&)
         
     End If
     LastErNum1 = cc
     nocommand = True
     Exit Function
     
-    ElseIf rr& = 6 Then
+    ElseIf Abs(rr&) = 6 Then
         a$ = rrr$ + a$
         cc = LastErNum1
         If IsStr1(bstack, a$, rrr$) Then
         a$ = rrr$ + " " + a$
-        IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$))
-        End If
+        IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$)) * Sgn(rr&)
         LastErNum1 = cc
+        Else
+        LastErNum1 = cc
+        cc = InStr(rrr$, "(")
+        If cc > 0 Then
+        a$ = Mid$(rrr$, cc + 1) + a$
+        rrr$ = Left$(rrr$, cc)
+        IsLabelBig = 4 * Sgn(rr&)
+        Else
+        IsLabelBig = Sgn(rr&)
+        End If
+        
+        End If
+        StrPointer = False
+      
         nocommand = True
+        
         
     Exit Function
     
@@ -8756,7 +8789,7 @@ If Len(a$) < 129 Then IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot): Exi
     If buf$ = vbNullString Then
         IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot)
     Else
-        a$ = Mid$(a$, 129 - Len(buf$))
+        a$ = Mid$(a$, 128 - Len(buf$) + MyTrimLi(buf$, 1))
     End If
 
     
@@ -9384,7 +9417,7 @@ Else
     If Len(n$) = 0 Then
         IsLabelOnly = IsLabelOnlyInner(a$, r$)
     Else
-        a$ = Mid$(a$, 129 - Len(n$))
+        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
     End If
 End If
 End Function
@@ -9638,7 +9671,7 @@ If Len(a$) < 129 Then IsLabelF = IsLabelF1(a$, rrr$): Exit Function
     If buf$ = vbNullString Then
         IsLabelF = IsLabelF1(a$, rrr$)
     Else
-        a$ = Mid$(a$, 129 - Len(buf$))
+        a$ = Mid$(a$, 128 - Len(buf$) + MyTrimLi(buf$, 1))
     End If
 End Function
 
@@ -10141,7 +10174,7 @@ Else
     n$ = Left$(a$, 128)
     w1& = IsLabelBig(bstackstr, n$, q$, par, , , , usebackup)
      If Len(n$) > 0 Then
-        a$ = Mid$(a$, 129 - Len(n$))
+        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
     Else
         w1& = IsLabelBig(bstackstr, a$, q$, par, , , , usebackup)
     End If
@@ -10156,27 +10189,27 @@ Exit Function
 End If
 If w1& = -100 Then
     w1& = 0
-    r$ = "deleteme"
+      r$ = ""
       If bstackstr.GetDotNew(r$, 1) Then
-      If r$ = "THIS.deleteme" Then
+      If r$ = "THIS." Then
       r$ = Left$(bstackstr.UseGroupname, Len(bstackstr.UseGroupname) - 1)
        ElseIf bstackstr.UseGroupname <> "" Then
-           If Len(r$) = 8 Then IsStr1 = False: Exit Function
-           r$ = Left$(r$, Len(r$) - 9)
+           If Len(r$) = 0 Then IsStr1 = False: Exit Function
+           r$ = Left$(r$, Len(r$) - 1)
            If r$ + "." = bstackstr.UseGroupname Then
            ElseIf InStr(r$, ".") = 0 Then
             If here$ <> "" Then r$ = here$ + "." + r$
            End If
            
        Else
-       If Len(r$) = 8 Then
+       If Len(r$) = 1 Then
        Set bs = bstackstr.Parent
        Do While Not (bs Is Nothing)
         If bs.GetDotNew(r$, 1) Then
-                     If Len(r$) = 8 Then
+                     If Len(r$) = 1 Then
                      Set bs = bs.Parent
                      Else
-                     r$ = here$ + "." + Left$(r$, Len(r$) - 9)
+                     r$ = here$ + "." + Left$(r$, Len(r$) - 1)
                      Set bs = Nothing
                      Exit Do
                      End If
@@ -10186,7 +10219,7 @@ Exit Do
         End If
        Loop
        Else
-  r$ = here$ + "." + Left$(r$, Len(r$) - 9)
+  r$ = here$ + "." + Left$(r$, Len(r$) - 1)
   End If
   End If
            IsStr1 = True
@@ -16571,14 +16604,15 @@ x1 = Abs(IsLabelBig(bstack, b$, w$, , SBB$, , True))
 Else
     ss$ = Left$(b$, 128)
     x1 = Abs(IsLabelBig(bstack, ss$, w$, , SBB$, , True))
+  
      If Len(ss$) > 0 Then
-       b$ = Mid$(b$, 129 - Len(ss$))
+       b$ = Mid$(b$, 128 - Len(ss$) + MyTrimLi(ss$, 1))
     Else
         x1 = Abs(IsLabelBig(bstack, b$, w$, , SBB$, , True))
     End If
 End If
           
-               
+againfor948:
         
 nd& = x1
         Select Case x1
@@ -17105,7 +17139,33 @@ startwithgroup:
                GoTo againarraystring
                End If
                     End If
-        
+        Case 6
+          If neoGetArray(bstack, w$, pppp) Then
+
+                            If NeoGetArrayItem(pppp, bstack, w$, v, b$) Then
+                                
+                                    If Typename$(pppp.item(v)) = "Group" Then
+                                        GoTo startwithgroup
+                                    ElseIf pppp.IsStringItem(v) Then
+                                    
+                                        ec$ = pppp.item(v)
+                                        x1 = Abs(IsLabelBig(bstack, ec$, w$, , SBB$, , True))
+                                        If Not ec$ = vbNullString Then b$ = ec$ + b$
+                                        Set pppp = New mArray
+                                        GoTo againfor948
+                                        
+                                    Else
+                                        MissString
+                                        Execute = 0
+                                Exit Function
+                                    End If
+                            Else
+                                    Execute = 0
+                                Exit Function
+                            End If
+            Else
+                NotExistArray
+         End If
         End Select
         If Not ok Then
         Execute = 0
@@ -21563,10 +21623,11 @@ ElseIf cc = 4 Then
     GoTo cont2
     ElseIf nm$ = "THIS" Then
 cont2:
-        n$ = ".DELETEME"
-        If IsLabel(bstack, (n$), n$) < 0 Then
-            If Len(n$) = 8 Then GetVar3 = False: Exit Function
-            nm$ = Left$(n$, Len(n$) - 9)
+
+        n$ = ""
+         If bstack.GetDotNew(n$, 1) Then
+           If Len(n$) = 0 Then GetVar3 = False: Exit Function
+            nm$ = Left$(n$, Len(n$) - 1)
             finalname = nm$
         End If
     End If
@@ -21864,10 +21925,12 @@ ElseIf cc = 4 Then
     GoTo cont2
     ElseIf nm$ = "THIS" Then
 cont2:
-      n$ = ".DELETEME"
-        If IsLabel(bstack, (n$), n$) < 0 Then
-            If Len(n$) = 8 Then getvar2 = False: Exit Function
-        nm$ = Left$(n$, Len(n$) - 9)
+
+       n$ = ""
+
+        If bstack.GetDotNew(n$, 1) Then
+            If Len(n$) = 0 Then getvar2 = False: Exit Function
+           nm$ = Left$(n$, Len(n$) - 1)
         End If
     End If
     If lookglobalonly Then
@@ -21875,13 +21938,12 @@ cont2:
         Else
     n$ = here$ & "." & nm$
 
-   'n$ = here$ & "." & bstack.GroupName & nm$
+
     End If
 Else
     If lookglobalonly Then
         n$ = nm$
     Else
-        'n$ = here$ & "." & bstack.GroupName & nm$
         n$ = here$ + "." + nm$
     End If
 
@@ -27234,8 +27296,11 @@ End Sub
 Sub MakeThisSub(ThatStack As basetask, rest$)
 
 If Left$(rest$, 5) = "THIS." Then
+Dim s$
+If ThatStack.GetDotNew(s$, 1) Then
 
-    If ThatStack.GroupName = vbNullString Then
+    rest$ = s$ & Mid$(rest$, 6)
+    ElseIf ThatStack.GroupName = vbNullString Then
         rest$ = ThatStack.UseGroupname & Mid$(rest$, 6)
     Else
         rest$ = ThatStack.GroupName & Mid$(rest$, 6)
@@ -27243,7 +27308,10 @@ If Left$(rest$, 5) = "THIS." Then
 
 ElseIf Left$(rest$, 5) = "ΑΥΤΟ." Then
 
-If ThatStack.GroupName = vbNullString Then
+If ThatStack.GetDotNew(s$, 1) Then
+
+    rest$ = s$ & Mid$(rest$, 6)
+    ElseIf ThatStack.GroupName = vbNullString Then
     rest$ = ThatStack.UseGroupname & Mid$(rest$, 6)
 
 Else
@@ -28189,7 +28257,12 @@ If myobject Is Nothing Then GoTo exithere1
                             If Typename(vvl) = myArray Then
                                             s$ = Left$(s$, Len(s$) - 1)
                                             ss$ = vbNullString
+                                            If here$ = vbNullString And bstack.UseGroupname <> vbNullString Then
+                                            If neoGetArrayLinkOnly(bstack, bstack.UseGroupname + s$, j) Then GoTo conthere1111
+                                            
+                                            End If
                                             If Not neoGetArrayLinkOnly(bstack, s$, j) Then  ''
+                                            
                                             j = -1
                                                     Set subgroup = vvl
                                                     GlobalArr bstack, s$, ss$, 0, j
@@ -28197,6 +28270,7 @@ If myobject Is Nothing Then GoTo exithere1
                                                     subgroup.CopyArray pppp
                                                     Set subgroup = Nothing
                                             Else
+conthere1111:
                                                     Set subgroup = vvl
                                                     Set pppp = var(j)
                                                     subgroup.CopyArray pppp
@@ -28578,6 +28652,7 @@ b$() = Split(typo$, " ")
 Set pppp = var(val(b$(1)))
       pppp.SerialItem PP, CLng(p), 5
          Dim a$()
+         If PP < 1 Then dimString$ = b$(0) + ")": Exit Function
          ReDim a$(PP - 1)
       For i = 0 To PP - 1
       pppp.GetDnum i, p, lim
@@ -33311,7 +33386,7 @@ If FastSymbol(s$, ")") Then
 Funcweak = ww$
 Else
 ' check parameters
-ww$ = ww$ + "("
+'ww$ = ww$ + "("
 again12:
 Do
 
@@ -36857,7 +36932,8 @@ MyRead = False
 Exit Function
 End If
 If par Then
-x1 = Abs(IsLabel(bstack, rest$, ss$))
+' make it general...
+x1 = IsLabelBig(bstack, rest$, ss$, , , , par)
 If x1 > 0 And x1 <> 1 Then rest$ = ss$ + " " + rest$
 If x1 = 1 Then
 
@@ -36870,7 +36946,12 @@ If x1 = 1 Then
                 If bstack.UseGroupname <> "" Then
                     Set myobject = var(i).PrepareSoros(var(), "")
                 Else
+                    If par Then
                     Set myobject = var(i).PrepareSoros(var(), ohere$ + "." + Left$(ss$, Len(ss$) - Len(var(i).GroupName) + 1))
+                    Else
+                    Set myobject = var(i).PrepareSoros(var(), ohere$ + ".")
+                    End If
+                    
                 End If
                 Else
                 Set myobject = var(i).PrepareSoros(var(), Left$(ss$, Len(ss$) - Len(var(i).GroupName) + 1))
@@ -44720,9 +44801,13 @@ If IsLabelSymbolNew(rest$, "ΑΥΤΟ", "THIS", Lang) Then
         MyEr "Not in a Group Definition: Remove Group This { }", "Όχι σε ορισμό ομάδας: Αφαίρεσε την Ομάδα Αυτό {} "
         Exit Function
     Else
-        If IsLabel(basestack, ".DELETEME", s$) < 0 Then
-            If Len(s$) = 8 Then: Exit Function '' why
-            what$ = Left$(s$, Len(s$) - 9)
+    s$ = ""
+' s$ = "."
+     If basestack.GetDotNew(s$, 1) Then
+ 
+            If Len(s$) = 0 Then: Exit Function '' why
+
+            what$ = Left$(s$, Len(s$) - 1)
             x1 = 1
         Else
             MyEr "Used in a For statement, For Group { this= or =this }", "Χρησιμοποιείται εντός ενός ΓΙΑ ομάδα { αυτό= ή =αυτό} "
@@ -46564,7 +46649,7 @@ Do
         If Len(Rest1$) = 0 Then
             it = IsLabelDot(ohere$, rest$, ss$)
         Else
-            rest$ = Mid$(rest$, 129 - Len(Rest1$))
+            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
    
@@ -46580,7 +46665,7 @@ Do
         If Len(Rest1$) = 0 Then
             it = IsLabelDot(ohere$, rest$, ss$)
         Else
-            rest$ = Mid$(rest$, 129 - Len(Rest1$))
+            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
     End If
@@ -46741,7 +46826,7 @@ usethisbase = ArrBase
         If Len(Rest1$) = 0 Then
             it = Abs(IsLabelDIM(basestack, rest$, w$))
         Else
-            rest$ = Mid$(rest$, 129 - Len(Rest1$))
+            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
     If basestack.priveflag Then
@@ -46772,7 +46857,7 @@ ArrBase = usethisbase
         If Len(Rest1$) = 0 Then
             it = Abs(IsLabelDIM(basestack, rest$, w$))
         Else
-            rest$ = Mid$(rest$, 129 - Len(Rest1$))
+            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
         End If
     End If
 
@@ -47938,7 +48023,7 @@ Function DriveSerial1(bstack As basetask, a$, r As Variant, SG As Variant) As Bo
     End If
 End Function
 Function ThisPointer(bstack As basetask, w3 As Long) As Boolean ' return var(r)
-Dim s1$, v$
+Dim s1$
     Set bstack.lastobj = Nothing
      If bstack.UseGroupname <> "" Then
      s1$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
@@ -47951,11 +48036,12 @@ Dim s1$, v$
     End If
     Else
 there:
-    s1$ = ".DELETEME"
-    If IsLabel(bstack, s1$, v$) < 0 Then
-    If Len(v$) = 8 Then Exit Function
-    v$ = Left$(v$, Len(v$) - 9)
-        If GetVar(bstack, v$, w3) Then
+    's1$ = "."
+    s1$ = ""
+    If bstack.GetDotNew(s1$, 1) Then
+    If Len(s1$) = 0 Then Exit Function
+    s1$ = Left$(s1$, Len(s1$) - 1)
+        If GetVar(bstack, s1$, w3) Then
             ThisPointer = True
     End If
     End If
@@ -47967,7 +48053,7 @@ there:
 End Function
 
 Function This1(bstack As basetask, original$, r As Variant) As Boolean  ' return a copy
-Dim s1$, w3 As Long, v$
+Dim s1$, w3 As Long
     Set bstack.lastobj = Nothing
      If bstack.UseGroupname <> "" Then
      s1$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
@@ -47981,9 +48067,9 @@ Dim s1$, w3 As Long, v$
     End If
     Else
 there:
-    s1$ = ".DELETEME"
-    If IsLabel(bstack, s1$, v$) < 0 Then
-    If Len(v$) = 8 Then
+    s1$ = ""
+    If bstack.GetDotNew(s1$, 1) Then
+    If Len(s1$) = 0 Then
         If GetVar(bstack, original$, w3) Then
             If MyIsObject(var(w3)) Then
             Set bstack.lastobj = var(w3)
@@ -47998,8 +48084,8 @@ there:
          End If
     Exit Function
     Else
-    v$ = Left$(v$, Len(v$) - 9)
-        If GetVar(bstack, v$, w3) Then
+    s1$ = Left$(s1$, Len(s1$) - 1)
+        If GetVar(bstack, s1$, w3) Then
         If MyIsObject(var(w3)) Then
             If TypeOf var(w3) Is Group Then
                 Set bstack.lastobj = CopyGroupObj(var(w3))
@@ -48939,80 +49025,76 @@ Set GETarrayFROMstr.objref = pppp
 
 End Function
 Function CheckThis(bstack As basetask, w$, b$, v As Long, Lang As Long, i As Long) As Long
-
+Dim bb$
 If Len(w$) > 3 Then
     If Lang = 1 Then
         If Left$(w$, 1) = "T" Then
-        If Left$(w$, 4) = "THIS" Then
-            Dim bb$, ss$
-            If Len(w$) = 4 Then
-                ss$ = ".DELETEME"
-                If IsLabel(bstack, ss$, bb$) < 0 Then
-                        If Len(bb$) = 8 Then CheckThis = -1: Exit Function
-                w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
-                If GetGlobalVar(w$, v) Then GoTo found
+            If Left$(w$, 4) = "THIS" Then
+                If Len(w$) = 4 Then
+                    bb$ = ""
+                    If bstack.GetDotNew(bb$, 1) < 0 Then
+                        If Len(bb$) = 0 Then CheckThis = -1: Exit Function
+                        w$ = Left$(bb$, Len(bb$) - 1) + Mid$(w$, 5)
+                        If GetGlobalVar(w$, v) Then GoTo found
+                    End If
+                ElseIf Mid$(w$, 5, 1) = "." Then
+                    If bstack.UseGroupname <> "" Then
+                        bb$ = bstack.UseGroupname + Mid$(w$, 6)
+                        If varhash.Find(bb$, v) Then GoTo found
+                        bb$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
+                        If varhash.Find(bb$, v) Then GoTo found
+                        
+                    Else
+                        bb$ = ""
+                        If bstack.GetDotNew(bb$, 1) < 0 Then
+                            If Len(bb$) = 0 Then CheckThis = -1: Exit Function
+                            w$ = Left$(bb$, Len(bb$) - 1) + Mid$(w$, 5)
+                            If GetGlobalVar(w$, v) Then GoTo found
+                        End If
+                    End If
                 End If
-            ElseIf Mid$(w$, 5, 1) = "." Then
-             If bstack.UseGroupname <> "" Then
-                  ss$ = bstack.UseGroupname + Mid$(w$, 6)
-                If varhash.Find(ss$, v) Then GoTo found
-                
-                  ss$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
-                If varhash.Find(ss$, v) Then GoTo found
-            Else
-  
-            ss$ = ".DELETEME"
-            If IsLabel(bstack, ss$, bb$) < 0 Then
-                    If Len(bb$) = 8 Then CheckThis = -1: Exit Function
-            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
-            If GetGlobalVar(w$, v) Then GoTo found
             End If
-            End If
+        End If
+    Else
+        If Left$(w$, 1) = "Α" Then
+            If Left$(w$, 4) = "ΑΥΤΟ" Then
+                If Len(w$) = 4 Then
+                    bb$ = ""
+                    If bstack.GetDotNew(bb$, 1) < 0 Then
+                        If Len(bb$) = 0 Then CheckThis = -1: Exit Function
+                        If Len(w$) = 4 Then
+                        If GetGlobalVar(Left$(bb$, Len(bb$) - 1), v) Then GoTo found
+                        Else
+                        w$ = Left$(bb$, Len(bb$) - 1) + Mid$(w$, 5)
+                        End If
+                        If GetGlobalVar(w$, v) Then GoTo found
+                    End If
+                ElseIf Mid$(w$, 5, 1) = "." Then
+                     If bstack.UseGroupname <> "" Then
+                        bb$ = bstack.UseGroupname + Mid$(w$, 6)
+                        If varhash.Find(bb$, v) Then GoTo found
+                        bb$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
+                        If varhash.Find(bb$, v) Then GoTo found
+                    Else
+                        bb$ = ""
+                        If bstack.GetDotNew(bb$, 1) < 0 Then
+                            If Len(bb$) = 0 Then CheckThis = -1: Exit Function
+                            w$ = Left$(bb$, Len(bb$) - 1) + Mid$(w$, 5)
+                            If GetGlobalVar(w$, v) Then GoTo found
+                        End If
+                    End If
+                End If
             End If
         End If
     End If
-Else
-    If Left$(w$, 1) = "Α" Then
-    If Left$(w$, 4) = "ΑΥΤΟ" Then
-    
-        If Len(w$) = 4 Then
-                    ss$ = ".DELETEME"
-            If IsLabel(bstack, ss$, bb$) < 0 Then
-                    If Len(bb$) = 8 Then CheckThis = -1: Exit Function
-            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
-            If GetGlobalVar(w$, v) Then GoTo found
-            End If
-        ElseIf Mid$(w$, 5, 1) = "." Then
-        
-             If bstack.UseGroupname <> "" Then
-                  ss$ = bstack.UseGroupname + Mid$(w$, 6)
-                If varhash.Find(ss$, v) Then GoTo found
-                
-                  ss$ = bstack.UseGroupname + ChrW(&HFFBF) + Mid$(w$, 6)
-                If varhash.Find(ss$, v) Then GoTo found
-            Else
-            ss$ = ".DELETEME"
-            If IsLabel(bstack, ss$, bb$) < 0 Then
-                    If Len(bb$) = 8 Then CheckThis = -1: Exit Function
-            w$ = Left$(bb$, Len(bb$) - 9) + Mid$(w$, 5)
-            If GetGlobalVar(w$, v) Then GoTo found
-            End If
-            End If
-            End If
-            End If
-    End If
-End If
 End If
 Exit Function
 found:
-            CheckThis = 1
-                If FastSymbol(b$, "=") Then Exit Function
-               
-                If FastSymbol(b$, "<=", , 2) Then Exit Function
-                If FastSymbol(b$, "->", , 2) Then CheckThis = 3: Exit Function
-                                CheckThis = 2
-                                
-                 Exit Function
+CheckThis = 1
+If FastSymbol(b$, "=") Then Exit Function
+If FastSymbol(b$, "<=", , 2) Then Exit Function
+If FastSymbol(b$, "->", , 2) Then CheckThis = 3: Exit Function
+CheckThis = 2
 End Function
 Function myHwnd(bstack As basetask) As Double
 If Typename(bstack.Owner) = "GuiM2000" Then

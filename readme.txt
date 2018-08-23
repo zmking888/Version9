@@ -1,9 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 7 active-X
+Version 9.4 rev 9 active-X
 
-A bug removed about a pointer for group ias a closure in a lambda function/
-New form for execute lambda: lambda (x)->{=x**2}(3)  so x get 3 and return 9
+Tested for compatibility with old programs, and some bugs founded and removed.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

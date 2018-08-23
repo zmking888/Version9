@@ -75,6 +75,7 @@ Public StaticInUse$
 Private mIamlambda As Boolean
 Private mIamAnEvent As Boolean
 Public NoError As Boolean, lastpointer As Object
+Public tmpstr As String
 Public Sub CopyStrip(bst As basetask)
 With bst
 .StaticInUse = StaticInUse
