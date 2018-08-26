@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 9
+Global Const Revision = 10
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2022,7 +2022,7 @@ Do While FastSymbol(b$, ",")
         If Len(Rest1$) = 0 Then
             i = IsLabelDot("", b$, w$)
         Else
-            b$ = Mid$(b$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            b$ = Mid$(b$, 129 - Len(Rest1$))
         End If
     End If
 
@@ -4530,7 +4530,7 @@ Else
     If Len(n$) = 0 Then
         v1& = IsLabelBig(bstack, a$, v$, par, s1$, True, , usebackup)
     Else
-        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
+        a$ = Mid$(a$, 129 - Len(n$))
     End If
 End If
 
@@ -7679,7 +7679,7 @@ If Len(rest$) < 129 Then
         If Len(Rest1$) = 0 Then
             k = IsPureLabel(rest$, n$)
         Else
-            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            rest$ = Mid$(rest$, 129 - Len(Rest1$))
         End If
     End If
 
@@ -8403,7 +8403,7 @@ again1947:
    If Abs(rr&) = 3 Then
    cc = LastErNum1
     If IsStr1(bstack, (rrr$), rrr$) Then
-        a$ = rrr$ + " " + a$
+        a$ = rrr$ + a$
         StrPointer = False
         IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$)) * Sgn(rr&)
         
@@ -8416,7 +8416,7 @@ again1947:
         a$ = rrr$ + a$
         cc = LastErNum1
         If IsStr1(bstack, a$, rrr$) Then
-        a$ = rrr$ + " " + a$
+        a$ = rrr$ + a$
         IsLabelBig = Abs(IsLabelBig(bstack, a$, rrr$, , r$)) * Sgn(rr&)
         LastErNum1 = cc
         Else
@@ -8789,7 +8789,7 @@ If Len(a$) < 129 Then IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot): Exi
     If buf$ = vbNullString Then
         IsLabel = innerIsLabel(bstack, a$, rrr$, , , skipdot)
     Else
-        a$ = Mid$(a$, 128 - Len(buf$) + MyTrimLi(buf$, 1))
+        a$ = Mid$(a$, 129 - Len(buf$))
     End If
 
     
@@ -9417,7 +9417,7 @@ Else
     If Len(n$) = 0 Then
         IsLabelOnly = IsLabelOnlyInner(a$, r$)
     Else
-        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
+        a$ = Mid$(a$, 129 - Len(n$))
     End If
 End If
 End Function
@@ -9671,7 +9671,7 @@ If Len(a$) < 129 Then IsLabelF = IsLabelF1(a$, rrr$): Exit Function
     If buf$ = vbNullString Then
         IsLabelF = IsLabelF1(a$, rrr$)
     Else
-        a$ = Mid$(a$, 128 - Len(buf$) + MyTrimLi(buf$, 1))
+        a$ = Mid$(a$, 129 - Len(buf$))
     End If
 End Function
 
@@ -10174,7 +10174,7 @@ Else
     n$ = Left$(a$, 128)
     w1& = IsLabelBig(bstackstr, n$, q$, par, , , , usebackup)
      If Len(n$) > 0 Then
-        a$ = Mid$(a$, 128 - Len(n$) + MyTrimLi(n$, 1))
+        a$ = Mid$(a$, 129 - Len(n$))
     Else
         w1& = IsLabelBig(bstackstr, a$, q$, par, , , , usebackup)
     End If
@@ -16606,7 +16606,7 @@ Else
     x1 = Abs(IsLabelBig(bstack, ss$, w$, , SBB$, , True))
   
      If Len(ss$) > 0 Then
-       b$ = Mid$(b$, 128 - Len(ss$) + MyTrimLi(ss$, 1))
+       b$ = Mid$(b$, 129 - Len(ss$))
     Else
         x1 = Abs(IsLabelBig(bstack, b$, w$, , SBB$, , True))
     End If
@@ -24449,7 +24449,7 @@ ElseIf Not (bstack.IamChild Or bstack.IamAnEvent) Then
 If REFRESHRATE > 25 Then k1 = 0
 REFRESHRATE = 40
 Sleep 1
-ElseIf SLOW Then
+ElseIf SLOW Or IsWine Then
 Sleep 1
 End If
 TaskMaster.rest
@@ -24472,7 +24472,7 @@ If TaskMaster.Processing Then
           TaskMaster.RestEnd1
  TaskMaster.TimerTickNow
 
-ElseIf SLOW Then
+ElseIf SLOW Or IsWine Then
 Sleep 1
 End If
 TaskMaster.rest
@@ -46649,7 +46649,7 @@ Do
         If Len(Rest1$) = 0 Then
             it = IsLabelDot(ohere$, rest$, ss$)
         Else
-            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            rest$ = Mid$(rest$, 129 - Len(Rest1$))
         End If
     End If
    
@@ -46665,7 +46665,7 @@ Do
         If Len(Rest1$) = 0 Then
             it = IsLabelDot(ohere$, rest$, ss$)
         Else
-            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            rest$ = Mid$(rest$, 129 - Len(Rest1$))
         End If
     End If
     End If
@@ -46826,7 +46826,7 @@ usethisbase = ArrBase
         If Len(Rest1$) = 0 Then
             it = Abs(IsLabelDIM(basestack, rest$, w$))
         Else
-            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            rest$ = Mid$(rest$, 129 - Len(Rest1$))
         End If
     End If
     If basestack.priveflag Then
@@ -46857,7 +46857,7 @@ ArrBase = usethisbase
         If Len(Rest1$) = 0 Then
             it = Abs(IsLabelDIM(basestack, rest$, w$))
         Else
-            rest$ = Mid$(rest$, 128 - Len(Rest1$) + MyTrimLi(Rest1$, 1))
+            rest$ = Mid$(rest$, 129 - Len(Rest1$))
         End If
     End If
 
