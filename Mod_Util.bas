@@ -3040,6 +3040,7 @@ End With
 Dim ss$, skipthat As Boolean
 If Not IsSupervisor Then
     ss$ = ReadUnicodeOrANSI(userfiles & "desktop.inf")
+    LastErNum = 0
     If ss$ <> "" Then
      skipthat = interpret(bstack, ss$)
      If mycolor(PenOne) <> d.ForeColor Then
