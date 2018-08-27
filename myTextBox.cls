@@ -28,12 +28,12 @@ Event CtrlPlusF1()
 Private mprompt As String
 Private mkind As String, mPartColor As Long
 Public SkipProcAtExitFocus As Boolean
-Private Declare Function GlobalAlloc Lib "kernel32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
-Private Declare Function GlobalFree Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalReAlloc Lib "kernel32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
-Private Declare Function GlobalSize Lib "kernel32" (ByVal hMem As Long) As Long
-Private Declare Function GlobalUnlock Lib "kernel32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalAlloc Lib "KERNEL32" (ByVal wFlags As Long, ByVal dwBytes As Long) As Long
+Private Declare Function GlobalFree Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalLock Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalReAlloc Lib "KERNEL32" (ByVal hMem As Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long
+Private Declare Function GlobalSize Lib "KERNEL32" (ByVal hMem As Long) As Long
+Private Declare Function GlobalUnlock Lib "KERNEL32" (ByVal hMem As Long) As Long
 Private Const GMEM_DDESHARE = &H2000&
 Private Const GMEM_DISCARDABLE = &H100&
 Private Const GMEM_DISCARDED = &H4000&
@@ -51,7 +51,7 @@ Private Const GMEM_VALID_FLAGS = &H7F72&
 Private Const GMEM_ZEROINIT = &H40&
 Private Const GPTR = (GMEM_FIXED Or GMEM_ZEROINIT)
 Private Const GMEM_LOWER = GMEM_NOT_BANKED
-Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private Declare Function GetClipboardData Lib "user32" _
     (ByVal wFormat As Long) As Long
@@ -219,13 +219,13 @@ RaiseEvent GotFocus
 If enabled Then
 glistN.FadeLastLinePart = mPartColor
 glistN.ForeColor = rgb(0, 0, 0)
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 glistN.NoCaretShow = False:
 glistN.PanPos = 0
 Else
 glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
-glistN.BackColor = rgb(100, 200, 160)
+glistN.backcolor = rgb(100, 200, 160)
 glistN.NoCaretShow = True
 End If
 glistN.ShowMe
@@ -235,7 +235,7 @@ End Sub
 Public Sub Retired()
 glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
-glistN.BackColor = rgb(200, 120, 60)
+glistN.backcolor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 End Sub
 
@@ -251,7 +251,7 @@ End If
 If Not SkipProcAtExitFocus Then
 glistN.FadeLastLinePart = 0
 glistN.ForeColor = rgb(255, 255, 255)
-glistN.BackColor = rgb(200, 120, 60)
+glistN.backcolor = rgb(200, 120, 60)
 glistN.NoCaretShow = True: glistN.PanPos = 0: glistN.ShowMe
 Else
 '
@@ -363,7 +363,6 @@ End Property
 
 Private Function GetTextData(ByVal lFormatId As Long) As String
 '' Addition to myTextBox for ctrl+V
-
 Dim bData() As Byte, sr As String, sr1 As String
 sr1 = Clipboard.GetText(1)
 If (OpenClipboard(0) <> 0) Then
@@ -371,8 +370,14 @@ If (OpenClipboard(0) <> 0) Then
         
         If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
-
-            GetTextData = Left$(sr, Len(sr1))
+    
+     If IsWine Then
+            sr1 = Left$(sr, Len(sr1))
+            GetTextData = Left$(sr1, Len(sr1))
+    Else
+                GetTextData = Left$(sr, Len(sr1))
+    End If
+    
           
         End If
 
@@ -435,7 +440,7 @@ mStayOpen = CBool(vNewValue)
 If mStayOpen Then
 glistN.ForeColor = rgb(0, 0, 0)
 glistN.FadeLastLinePart = mPartColor
-glistN.BackColor = rgb(255, 255, 255)
+glistN.backcolor = rgb(255, 255, 255)
 End If
 End Property
 

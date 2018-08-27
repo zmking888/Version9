@@ -269,9 +269,7 @@ Dim btASM As Long
                 AddPush pASM, CLng(params(0)(i))    ' PUSH dword
             Next
         Else
-            For i = UBound(params) To 0 Step -1
-                AddPush pASM, CLng(params(i))       ' PUSH dword
-            Next
+           AddPush pASM, CLng(params(0))       ' PUSH dword
         End If
     Else
         For i = UBound(params) To 0 Step -1

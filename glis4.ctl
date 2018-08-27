@@ -855,6 +855,8 @@ End Sub
 
 Private Sub timer2bar_Timer()
 If m_showbar Or Shape1.Visible Or Spinner Then Redraw
+On Error Resume Next
+If Me.Parent.Visible = False Then Timer2bar.enabled = False
 End Sub
 Public Sub GiveSoftFocus()
 RaiseEvent CheckGotFocus

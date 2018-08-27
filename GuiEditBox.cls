@@ -48,7 +48,7 @@ Public NumberIntOnly As Boolean
 Public WithEvents glistN As gList
 Attribute glistN.VB_VarHelpID = -1
 Private blockKeyboard As Boolean
-Private LastDocTitle$, Para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
+Private LastDocTitle$, para1 As Long, PosPara1 As Long, Para2 As Long, PosPara2 As Long, Para3 As Long, PosPara3 As Long
 Public fState As Long
 Public WithEvents mDoc As Document    ' document
 Attribute mDoc.VB_VarHelpID = -1
@@ -254,6 +254,9 @@ mDoc.InsertDoc mDoc.MarkParagraphID, Charpos, thisdoc
 'ReColorBlock
 Render
 End Sub
+Private Function Myleft$(a As Variant, pos As Variant)
+Myleft$ = Mid$(a, 1, pos)
+End Function
 Private Function GetTextData(ByVal lFormatId As Long) As String
 Dim bData() As Byte, sr As String, sr1 As String
 sr1 = Clipboard.GetText(1)
@@ -262,8 +265,14 @@ If (OpenClipboard(0) <> 0) Then
         
         If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
-
-            GetTextData = Myleft$(sr, Len(sr1))
+    
+     If IsWine Then
+            sr1 = Myleft$(sr, Len(sr1))
+            GetTextData = Myleft$(sr1, Len(sr1))
+    Else
+                GetTextData = Myleft$(sr, Len(sr1))
+    End If
+    
           
         End If
 
@@ -357,7 +366,7 @@ Dim thisdoc As New Document, header As New Document
 Set mDoc = thisdoc
 mDoc.ColorEvent = True
 Set mDoc1 = header
-Para1 = 0
+para1 = 0
 PosPara1 = 0
 Para2 = 0
 PosPara2 = 0
@@ -1076,7 +1085,7 @@ mDoc.ReWritePara mDoc.MarkParagraphID, mDoc.TextParagraph(mDoc.MarkParagraphID)
 End If
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 If glistN.HeadLine <> "" Then
 If NoTitle Then
 glistN.HeadLine = vbNullString
@@ -1099,7 +1108,7 @@ Dim l1 As Long, c1 As Long
 If KeyCode = 18 Then
 Exit Sub
 End If
-If KeyCode = vbKeyF10 And Shift <> 0 Then
+If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -1108,7 +1117,7 @@ If mIndex >= 0 Then
       End If
 Exit Sub
 End If
-If KeyCode = 16 And Shift <> 0 Then
+If KeyCode = 16 And shift <> 0 Then
 KeyCode = 0
 If glistN.SelStart = 0 Then
   If mIndex >= 0 Then
@@ -1131,14 +1140,14 @@ If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = 
 '
 If NoMark And KeyCode = vbKeyUp Then KeyCode = vbKeyPageUp
 If NoMark And KeyCode = vbKeyDown Then KeyCode = vbKeyPageDown
-ElseIf KeyCode = vbKeyX And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyX And (shift And 3) = 2 Then
 MarkCut
 Show
 KeyCode = 0
-ElseIf KeyCode = vbKeyC And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyC And (shift And 3) = 2 Then
 MarkCopy
 KeyCode = 0
-ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
     Pad$ = GetTextData(13)
     If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
     If NumberOnly Or NumberIntOnly Then
@@ -1170,11 +1179,11 @@ ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
     RemoveUndo Pad$
     KeyCode = 0
     ReColorBlock
-ElseIf KeyCode = vbKeyA And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyA And (shift And 3) = 2 Then
 glistN.MarkNext = 0
 glistN.MarkALL
 KeyCode = 0
-ElseIf KeyCode = vbKeyY And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyY And (shift And 3) = 2 Then
 ' Redo
 If Redopara <> -1 Then
 
@@ -1241,7 +1250,7 @@ Redomode = 0
 End If
 End If
 KeyCode = 0
-ElseIf KeyCode = vbKeyZ And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyZ And (shift And 3) = 2 Then
 ' 2nd version of undo system
 ' undopos now is selstart
 If undopara <> -1 Then
@@ -1301,7 +1310,7 @@ undotext = vbNullString
 undomode = 0
 End If
 KeyCode = 0
-ElseIf KeyCode = vbKeyA And (Shift And 3) = 3 Then
+ElseIf KeyCode = vbKeyA And (shift And 3) = 3 Then
 glistN.MarkNext = 0
 BlockEndPara = mDoc.MarkParagraphID
 BlockStartPara = BlockEndPara
@@ -1328,13 +1337,13 @@ End If
 End If
 conthere:
 If NoMark And EditDoc = False Then glistN.ShowMe2: Exit Sub
-If KeyCode <> 0 Or Shift <> 0 Then PressKey_A KeyCode, Shift
+If KeyCode <> 0 Or shift <> 0 Then PressKey_A KeyCode, shift
 End Sub
 
-Private Sub glistN_KeyDownAfter(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDownAfter(KeyCode As Integer, shift As Integer)
 If NoMark Then Exit Sub
 If HaveMarkedText Then
-If Shift = 0 Then
+If shift = 0 Then
 glistN.MarkNext = 0
 BlockStartPara = BlockEndPara
 BlockStartPos = BlockEndPos
@@ -1345,18 +1354,18 @@ If mIndex >= 0 Then
       End If
 
 
-ElseIf (Shift And 1) = 1 Then
+ElseIf (shift And 1) = 1 Then
 
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN_MarkOut
 End If
 End If
-ElseIf (Shift And 1) = 1 And glistN.MarkNext = 0 Then
+ElseIf (shift And 1) = 1 And glistN.MarkNext = 0 Then
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN.MarkNext = 1
 glistN_MarkIn
 End If
-ElseIf (Shift And 1) = 1 And glistN.MarkNext > 0 Then
+ElseIf (shift And 1) = 1 And glistN.MarkNext > 0 Then
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyUp Or KeyCode = vbKeyDown Or KeyCode = vbKeyRight Or KeyCode = vbKeyEnd Or KeyCode = vbKeyHome Or KeyCode = vbKeyPageUp Or KeyCode = vbKeyPageDown Then
 glistN.MarkNext = 2
 glistN_MarkOut
@@ -3233,7 +3242,7 @@ mDoc.ColorEvent = True
 mDoc.final = mMultiLineComment2
 mDoc.textDoc = RHS
 glistN.ListindexPrivateUse = 0
-Para1 = 0
+para1 = 0
 PosPara1 = 0
 Para2 = 0
 PosPara2 = 0
@@ -4290,14 +4299,14 @@ Public Property Get LineHeight() As Variant
 ''
 LineHeight = glistN.HeightTwips / glistN.lines
 End Property
-Public Sub PressKey(KeyCode As Integer, Shift As Integer)
+Public Sub PressKey(KeyCode As Integer, shift As Integer)
 Dim b As Boolean
   b = enabled
-    PressKey_A KeyCode, Shift
+    PressKey_A KeyCode, shift
 enabled = b
   
 End Sub
-Private Sub PressKey_A(KeyCode As Integer, Shift As Integer)
+Private Sub PressKey_A(KeyCode As Integer, shift As Integer)
 Static ctrl As Boolean, noentrance As Boolean, where As Long
 Dim aa$, a$, JJ As Long, ii As Long
 If noentrance Then
@@ -4328,7 +4337,7 @@ Case vbKeyControl
 ctrl = True
 KeyCode = 0
 Case vbKeyF1
-If (Shift And 2) = 2 Then
+If (shift And 2) = 2 Then
 If SelText <> "" Then
 helpmeSub
 Else
@@ -4347,30 +4356,30 @@ End If
 
 KeyCode = 0
 Case vbKeyF2
-If Shift <> 0 Then
+If shift <> 0 Then
 If s$ = vbNullString And SelText <> "" Then s$ = SelText
 If pagio$ = "GREEK" Then
 s$ = InputBoxN("Αναζήτησε προς τα πάνω:", "Συγγραφή Κειμένου", s$)
 Else
 s$ = InputBoxN("Search to top:", "Text Editor", s$)
 End If
-If s$ <> "" Then Searchup s$, Shift Mod 2 = 1
-Shift = 0
+If s$ <> "" Then Searchup s$, shift Mod 2 = 1
+shift = 0
 ElseIf SelText <> "" Or s$ <> "" Then
 supsub
 End If
 
 KeyCode = 0
 Case vbKeyF3
-If Shift <> 0 Then
+If shift <> 0 Then
 If s$ = vbNullString And SelText <> "" Then s$ = SelText
 If pagio$ = "GREEK" Then
 s$ = InputBoxN("Αναζήτησε προς τα κάτω:", "Συγγραφή Κειμένου", s$)
 Else
 s$ = InputBoxN("Search to down:", "Text Editor", s$)
 End If
-If s$ <> "" Then SearchDown s$, Shift Mod 2 = 1
-Shift = 0
+If s$ <> "" Then SearchDown s$, shift Mod 2 = 1
+shift = 0
 ElseIf SelText <> "" Or s$ <> "" Then
 
 sdnSub
@@ -4383,7 +4392,7 @@ Case vbKeyF5
 If SelText <> "" Then rthissub
 KeyCode = 0
 Case vbKeyF6  ' Set/Show/Reset Para1
-If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para1, PosPara1
+If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton para1, PosPara1
 KeyCode = 0
 Case vbKeyF7  'Set/Show/Reset Para2
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then MarkSoftButton Para2, PosPara2
@@ -4421,7 +4430,7 @@ KeyCode = 0
 Case vbKeyTab
 If Not (UsedAsTextBox Or NumberOnly Or NumberIntOnly) Then
 nochange = True
-Shift = Shift And &H1
+shift = shift And &H1
 glistN.enabled = False
 
 If HaveMarkedText Then SelStartSilent = SelStart
@@ -4443,7 +4452,7 @@ End If
 If SelText <> "" Then
 
     a$ = vbCrLf + SelText & "*"
-    If Shift <> 0 Then  ' βγάλε
+    If shift <> 0 Then  ' βγάλε
     a$ = Replace(a$, vbCrLf + String(6 + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod 6, ChrW(160)), vbCrLf)
         a$ = Replace(a$, vbCrLf + Space$(6 + (Len(CurrentParagraph) - Len(LTrim(CurrentParagraph))) Mod 6), vbCrLf)
         InsertTextNoRender = Mid$(a$, 3, Len(a$) - 3)
@@ -4460,7 +4469,7 @@ If SelText <> "" Then
     
 '  RelocateMarkedText
 Else
-If Shift <> 0 Then
+If shift <> 0 Then
 
     If Mid$(CurrentParagraph, 1, 6) = Space$(6) Or Mid$(CurrentParagraph, 1, 6) = String(6, ChrW(160)) Then
 
@@ -4812,9 +4821,6 @@ fState = -1
 End Select
 mDoc.ColorEvent = Not NoColor
 End Sub
-Private Function Myleft$(a As Variant, pos As Variant)
-Myleft$ = Mid$(a, 1, pos)
-End Function
 Private Function IsmineHere(a$) As Boolean
 IsmineHere = InStr(mColorCollection1, "|" + UCase(a$) + "|") > 0
 End Function

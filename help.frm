@@ -73,12 +73,13 @@ Dim allheight As Long, allwidth As Long, itemWidth As Long
 Dim UAddPixelsTop As Long, flagmarkout As Boolean
 
 Private Sub Form_Deactivate()
+
 jump = False
 End Sub
 
 
 
-Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyF12 Then
 showmodules
 End If
@@ -161,7 +162,7 @@ End If
 End If
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
     
@@ -187,7 +188,7 @@ If Button = 1 Then
 End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
@@ -260,7 +261,7 @@ End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If dr Then Me.mousepointer = 0
 dr = False
@@ -314,8 +315,8 @@ gList1.EditFlag = False
 End If
 End Sub
 
-Private Sub gList1_KeyDown(KeyCode As Integer, Shift As Integer)
-If Shift <> 0 Then
+Private Sub gList1_KeyDown(KeyCode As Integer, shift As Integer)
+If shift <> 0 Then
 If label1.SelectionColor = rgb(255, 64, 128) Then label1.SelectionColor = 0
 label1.NoMark = False
 label1.EditDoc = True
@@ -329,7 +330,7 @@ MKEY$ = MKEY$ & ChrW$(KeyCode)
 KeyCode = 0
 End If
 End Select
-If mHelp Or abt Then Shift = 0
+If mHelp Or abt Then shift = 0
 
 End Sub
 
@@ -342,10 +343,10 @@ flagmarkout = False: Exit Sub
 End If
 End Sub
 
-Private Sub gList1_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub gList1_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 flagmarkout = True
 If mHelp Then
-Shift = 0
+shift = 0
 End If
 End Sub
 

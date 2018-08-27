@@ -2273,11 +2273,11 @@ bb() = HTML(sText)
 If CBool(OpenClipboard(0)) Then
    
       Dim hMemHandle As Long, lpData As Long
-      If IsWine Then
-      hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()))
-      Else
+      'If IsWine Then
+      'hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
+      'Else
       hMemHandle = GlobalAlloc(0, UBound(bb()) - LBound(bb()) + 10)
-      End If
+      'End If
       If CBool(hMemHandle) Then
                
          lpData = GlobalLock(hMemHandle)
@@ -2409,12 +2409,12 @@ If (OpenClipboard(0) <> 0) Then
         
         If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
-If IsWine Then
-        sr1 = Left$(sr, Len(sr1))
-        GetTextData = Left$(sr1, Len(sr1))
-Else
-            GetTextData = Left$(sr, Len(sr1))
-End If
+    If IsWine Then
+            sr1 = Left$(sr, Len(sr1))
+            GetTextData = Left$(sr1, Len(sr1))
+    Else
+                GetTextData = Left$(sr, Len(sr1))
+    End If
         End If
 
 End If

@@ -2,6 +2,8 @@ Attribute VB_Name = "Module1"
 Option Explicit
 ' M2000 starter
 ' We have to give some stack space
+Public Declare Function CoAllowSetForegroundWindow Lib "ole32.dll" (ByVal pUnk As Object, ByVal lpvReserved As Long) As Long
+
 Private Declare Function GetProcByName Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal lpProcName As String) As Long
 Private Declare Function GetProcByOrdinal Lib "KERNEL32" Alias "GetProcAddress" (ByVal hModule As Long, ByVal nOrdinal As Long) As Long
 Private Declare Function LoadLibrary Lib "KERNEL32" Alias "LoadLibraryW" (ByVal lpLibFileName As Long) As Long
@@ -53,6 +55,10 @@ Sub Main()
 dv15 = 1440 / DpiScrX
 DisableProcessWindowsGhosting
 Dim mm As New RunM2000
+Dim o As Object
+Set o = mm
+CoAllowSetForegroundWindow o, 0
+
 mm.doit
 Sleep 500
 End Sub

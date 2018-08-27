@@ -364,18 +364,18 @@ Private Sub glistN_HeaderSelected(Button As Integer)
 Text = Text
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 Dim VR(2)
 VR(0) = KeyCode
-VR(1) = Shift
+VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
 KeyCode = VR(0)
-Shift = VR(1)
-If KeyCode = vbKeyF10 And Shift <> 0 Then
+shift = VR(1)
+If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -386,7 +386,7 @@ Exit Sub
 End If
 If KeyCode = vbKeyUp Then
 ElseIf KeyCode = vbKeyDown Then
-ElseIf KeyCode = vbKeyV And (Shift And 3) = 2 Then
+ElseIf KeyCode = vbKeyV And (shift And 3) = 2 Then
 If Not enabled Then Exit Sub
 Pad$ = GetTextData(13)
 If Pad$ = vbNullString Then Pad$ = Clipboard.GetText(1)
@@ -422,7 +422,7 @@ On Error Resume Next
 glistN.SetFocus
 End Sub
 
-Private Sub glistN_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub glistN_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 ' RaiseEvent MouseMove(Button, shift, x, y)
 End Sub
 
@@ -510,10 +510,11 @@ Public Property Let MaxCharLength(ByVal RHS As Long)
 glistN.maxchar = RHS
 End Property
 
-
+Private Function Myleft$(a As Variant, pos As Variant)
+Myleft$ = Mid$(a, 1, pos)
+End Function
 Private Function GetTextData(ByVal lFormatId As Long) As String
 '' Addition to myTextBox for ctrl+V
-
 Dim bData() As Byte, sr As String, sr1 As String
 sr1 = Clipboard.GetText(1)
 If (OpenClipboard(0) <> 0) Then
@@ -521,8 +522,14 @@ If (OpenClipboard(0) <> 0) Then
         
         If (GetBinaryData(lFormatId, bData())) Then
         sr = bData
-
-            GetTextData = Mid$(sr, 1, Len(sr1))
+    
+     If IsWine Then
+            sr1 = Myleft$(sr, Len(sr1))
+            GetTextData = Myleft$(sr1, Len(sr1))
+    Else
+                GetTextData = Myleft$(sr, Len(sr1))
+    End If
+    
           
         End If
 

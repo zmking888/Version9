@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -27081,6 +27081,7 @@ Else
     End If
 End If
 End Sub
+
 Sub RealMeth(bstack As basetask, rest$, var2() As Variant, var3() As String, NoNameditems As Long, namedargument As Long)
 '  testmeth "122,&beta,121,alfa:=a+4, beta:=122"
 Dim s$, l$
@@ -27164,7 +27165,6 @@ Case "N"
 End Select
 If Not FastSymbol(rest$, ",") Then Exit Do
 Loop Until s$ = vbNullString
-
 End Sub
 Sub TestMeth(rest$)
 '  testmeth "122,&beta,121,alfa:=a+4, beta:=122"
@@ -39089,7 +39089,7 @@ End If
 End Function
 Function MyMethod(bstack As basetask, rest$, Lang As Long) As Boolean
 
-Dim i As Long, s$, pppp As mArray, pa$, ok As Boolean
+Dim i As Long, s$, pppp As mArray, pa$, ok As Boolean, r As Variant
 i = Abs(IsLabel(bstack, rest$, s$))
 MyMethod = True
 ok = True
@@ -39105,6 +39105,7 @@ If i = 1 Or i = 3 Then
               ProcMethod bstack, var(), i, pa$, rest$, Lang, ok
           MyMethod = (Err = 0) And ok
           Err.Clear
+          
                 End If
             End If
         Else
