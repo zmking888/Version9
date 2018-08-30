@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1457,11 +1457,11 @@ Dim s$, ss$, F As Long, col As Long, x1 As Long, i As Long, pppp As mArray, pppp
 
 End Function
 
-Public Sub PushStage(basestack As basetask, dummy As Boolean)
+Public Sub PushStage(basestack As basetask, DUMMY As Boolean)
         With basestack.RetStack
                basestack.SubLevel = basestack.SubLevel + 1
 
-                If dummy Then
+                If DUMMY Then
                         .PushVal 0
                         .PushVal 0
                         .PushVal 0
@@ -5636,7 +5636,7 @@ ElseIf IsExp(bstack, a$, p) Then
     ElseIf TypeOf bstack.lastobj Is mHandler Then
         Set useHandler = bstack.lastobj
         Set bstack.lastobj = Nothing
-        If useHandler.indirect Then
+        If useHandler.indirect >= 0 Then
             If MyIsObject(var(useHandler.indirect)) Then
                 Set bstack.lastobj = New mHandler
                 On Error Resume Next
@@ -5658,7 +5658,54 @@ ElseIf IsExp(bstack, a$, p) Then
             Else
             ExpectedObjInline a$
             End If
+            Else
+            If useHandler.IamEnum Then Set anything = useHandler.objref: GoTo contparamhere
         End If
+    ElseIf TypeOf bstack.lastobj Is PropReference Then
+        If bstack.lastobj.IsObj Then
+            Set anything = bstack.lastobj.Value
+contparamhere:
+            Set bstack.lastobj = New mHandler
+                On Error Resume Next
+                'Err.Clear
+                ' maybe we want the typelib
+                If FastSymbol(a$, ",") Then
+                
+                End If
+                Set bstack.lastobj.objref = MakeATypeLib(anything)
+
+                If Err Then
+                   Set bstack.lastobj = Nothing
+                   cantreadlib a$
+                   Else
+                   bstack.lastobj.t1 = 1
+                End If
+                On Error GoTo 0
+                Set useHandler = Nothing
+         Else
+            ExpectedObjInline a$
+        End If
+    Else
+     
+            Set anything = bstack.lastobj
+            Set bstack.lastobj = New mHandler
+                On Error Resume Next
+                'Err.Clear
+                ' maybe we want the typelib
+                If FastSymbol(a$, ",") Then
+                
+                End If
+                Set bstack.lastobj.objref = MakeATypeLib(anything)
+
+                If Err Then
+                   Set bstack.lastobj = Nothing
+                   cantreadlib a$
+                   Else
+                   bstack.lastobj.t1 = 1
+                End If
+                On Error GoTo 0
+                Set useHandler = Nothing
+
     End If
 
 End If
@@ -7659,7 +7706,7 @@ End If
 End Function
 Function ProcLambda(bstack As basetask, rest$, Lang As Long) As Object
 ' no named functio- object
-Dim body As New lambda, k As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
+Dim body As New lambda, k As Long, n$, DUMMY As Variant, er As Boolean, pos1 As Long, p As Variant, s$
 Dim pppp As mArray, pppp2 As mArray, frm$, Find As basetask, Rest1$
 ' need fixed param...with &
 again1:
@@ -7710,28 +7757,28 @@ Select Case k
 Case 1, 4
 If IsExp(bstack, rest$, p) Then
 If Not bstack.lastobj Is Nothing Then
-    Set dummy = bstack.lastobj
+    Set DUMMY = bstack.lastobj
     Set bstack.lastobj = Nothing
-   body.FeedNonLocal n$, dummy, var()
-   Set dummy = Nothing
+   body.FeedNonLocal n$, DUMMY, var()
+   Set DUMMY = Nothing
     Else
-       dummy = p
-    body.FeedNonLocal n$, dummy, var()
+       DUMMY = p
+    body.FeedNonLocal n$, DUMMY, var()
     End If
-dummy = Empty
+DUMMY = Empty
 End If
 Case 3
 If IsStrExp(bstack, rest$, s$) Then
 If Not bstack.lastobj Is Nothing Then
-    Set dummy = bstack.lastobj
+    Set DUMMY = bstack.lastobj
     Set bstack.lastobj = Nothing
-   body.FeedNonLocal n$, dummy, var()
-   Set dummy = Nothing
+   body.FeedNonLocal n$, DUMMY, var()
+   Set DUMMY = Nothing
     Else
-       dummy = s$
-    body.FeedNonLocal n$, dummy, var()
+       DUMMY = s$
+    body.FeedNonLocal n$, DUMMY, var()
     End If
-dummy = Empty
+DUMMY = Empty
 End If
 Case 5, 7
 
@@ -7740,9 +7787,9 @@ Case 5, 7
       If Typename(bstack.lastobj) = myArray Then
       Set pppp = bstack.lastobj
         pppp.arrname = n$
-        Set dummy = pppp
-        body.FeedNonLocal n$, dummy, var()
-        Set dummy = Nothing
+        Set DUMMY = pppp
+        body.FeedNonLocal n$, DUMMY, var()
+        Set DUMMY = Nothing
         Set pppp = Nothing
         Else
         Exit Function
@@ -7759,9 +7806,9 @@ If Not bstack.lastobj Is Nothing Then
       If Typename(bstack.lastobj) = myArray Then
       Set pppp = bstack.lastobj
         pppp.arrname = n$
-        Set dummy = pppp
-        body.FeedNonLocal n$, dummy, var()
-        Set dummy = Nothing
+        Set DUMMY = pppp
+        body.FeedNonLocal n$, DUMMY, var()
+        Set DUMMY = Nothing
         Set pppp = Nothing
         Else
         Exit Function
@@ -7778,21 +7825,21 @@ ElseIf k < 5 Then
             If Typename(var(pos1)) = "lambda" Then
             Dim aaa As lambda
             var(pos1).CopyTo aaa, var()
-            Set dummy = aaa
-                body.FeedNonLocal n$, dummy, var()
-                Set dummy = Nothing
-                dummy = Empty
+            Set DUMMY = aaa
+                body.FeedNonLocal n$, DUMMY, var()
+                Set DUMMY = Nothing
+                DUMMY = Empty
                 Set aaa = Nothing
             ElseIf Typename(var(pos1)) = "Group" Then
-                Set dummy = CopyGroupObj(var(pos1))
-                body.FeedNonLocal n$, dummy, var()
-                Set bstack.lastobj = dummy
-                Set dummy = Nothing
+                Set DUMMY = CopyGroupObj(var(pos1))
+                body.FeedNonLocal n$, DUMMY, var()
+                Set bstack.lastobj = DUMMY
+                Set DUMMY = Nothing
             Else
                 body.FeedNonLocal n$, var(pos1), var()
             End If
         Else
-            body.FeedNonLocal n$, dummy, var()
+            body.FeedNonLocal n$, DUMMY, var()
         End If
 Else
        
@@ -7800,10 +7847,10 @@ Else
         Set pppp2 = New mArray
         pppp.CopyArray pppp2
   
-        Set dummy = pppp2
+        Set DUMMY = pppp2
         Set pppp2 = Nothing
         Set pppp = Nothing
-        body.FeedNonLocal n$, dummy, var()
+        body.FeedNonLocal n$, DUMMY, var()
         Else
         End If
     End If
@@ -10849,7 +10896,13 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
     If TypeOf bstackstr.lastobj Is mHandler Then
     
         Set anything = bstackstr.lastobj
-        If Not CheckLastHandlerOrIterator(anything, w) Then
+             If bstackstr.lastobj.IamEnum Then
+        r$ = bstackstr.lastobj.index_cursor
+        
+        Set bstackstr.lastobj = Nothing
+         IsStr1 = FastSymbol(a$, ")", True)
+        Exit Function
+        ElseIf Not CheckLastHandlerOrIterator(anything, w) Then
         InternalError
         IsStr1 = False
         Exit Function
@@ -17499,18 +17552,18 @@ getanother:
             'here
 
             If TypeOf .lastobj Is mHandler Then
-                If .lastobj.UseIterator Then
-                i = .lastobj.indirect
-                If i < 0 Then
                 
-                Set myobject = .lastobj.objref
-                If TypeOf myobject Is mHandler Then
-                Set myobject = myobject.objref
-                End If
-                Else
-                InternalEror
-                b$ = ""
-                Exit Function
+                If .lastobj.UseIterator Then
+                    i = .lastobj.indirect
+                    If i < 0 Then
+                        Set myobject = .lastobj.objref
+                        If TypeOf myobject Is mHandler Then
+                            Set myobject = myobject.objref
+                        End If
+                    Else
+                        InternalEror
+                        b$ = ""
+                    Exit Function
                 End If
                 p = .lastobj.index_End <> -1 And Not myobject.IsEmpty
                 If p Then
@@ -17518,6 +17571,15 @@ getanother:
                     .lastobj.index_cursor = .lastobj.index_start
                     If .lastobj.index_start <= .lastobj.index_End Then v = 1 Else v = -1
                 End If
+            ElseIf .lastobj.IamEnum Then
+            
+                p = .lastobj.index_End <> -1
+                If p Then
+                If .lastobj.index_End <> 0 Then
+                p = .lastobj.Iterate()
+                End If
+                End If
+                
                 
             End If
             Set bstack.lastobj = Nothing
@@ -17616,6 +17678,8 @@ another1:
                 End If
                 If p Then myobject.index = .lastobj.index_cursor + v: .lastobj.index_cursor = .lastobj.index_cursor + v
             End If
+            ElseIf .lastobj.IamEnum Then
+                p = .lastobj.Iterate()
             End If
             End If
             End If
@@ -22118,22 +22182,22 @@ End If
 
 End Function
 Function GetSubFullName2(nm$, fullname$, retnum As Long) As Boolean
-Dim dummy As Long
+Dim DUMMY As Long
 If Len(here$) > 0 Then
     If Len(here$) > Len(nm$) Then
         If Mid$(here$, Len(here$) - Len(nm$)) = "." + nm$ Then
-            GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
+            GetSubFullName2 = subHash.Find2(nm$, retnum, DUMMY)
           fullname = nm$: Exit Function
         End If
     End If
 End If
 
 If here$ <> "" Then
-     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, dummy)
+     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, DUMMY)
   If GetSubFullName2 Then fullname$ = here$ & "." & nm$: Exit Function
 End If
 
-    GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
+    GetSubFullName2 = subHash.Find2(nm$, retnum, DUMMY)
  If GetSubFullName2 Then fullname$ = nm$
 
 
@@ -23852,7 +23916,7 @@ oprinter.ClearUp
 Form1.PrinterDocument1.Picture = LoadPicture("")
 End Sub
 Sub Landscape(bstack As basetask)
-Dim dummy As Object, try1 As Long
+Dim DUMMY As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -23866,7 +23930,7 @@ mydpi = 288
 again:
 
 
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
+If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then ChangeOrientation DUMMY, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
 oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
@@ -23895,7 +23959,7 @@ End If
 
 End Sub
 Sub Portrait(bstack As basetask)
-Dim dummy As Object, try1 As Long
+Dim DUMMY As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -23908,7 +23972,7 @@ prFactor = mydpi / 288
 mydpi = 288
 szFactor = mydpi * dv15 / 1440#
 again:
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
+If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then ChangeOrientation DUMMY, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
 oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
@@ -24240,7 +24304,7 @@ VALIDATEmStiva = r$ <> ""
 End Function
 
 Public Function VALIDATE(st$, p$, s$) As Boolean
-Dim dummy As Double
+Dim DUMMY As Double
 Dim i As Long, j As Long, ok As Boolean
 If Len(st$) = 0 Then
 VALIDATE = True
@@ -24311,7 +24375,7 @@ Next i
 End Function
 
 Public Function VALIDATEpart(st$, p$) As Boolean
-Dim dummy As Double
+Dim DUMMY As Double
 Dim i As Long, j As Long, ok As Boolean, s$
 If Len(st$) = 0 Then
 VALIDATEpart = False   ' reverse logic here...
@@ -26657,7 +26721,7 @@ End Sub
 Public Sub ProcProperty(bstack As basetask, v(), vIndex As Long, FN$, rest$, language As Long, Optional hardlink As Boolean = False, Optional usethis As Long)
 Dim var1() As Variant, s$, r As Double, l As Long, newref As Long, many As Long, y1 As Boolean, x1 As Long, y2 As Boolean
 Dim var2() As String, ss$, sp As Variant, indirect As Boolean
-Dim vv As Object
+Dim vv As Object, useHandler As Boolean
 Dim oo As Object, myVar As Variant
 Set vv = v(vIndex)
 Dim pppp As mArray
@@ -26669,6 +26733,8 @@ If vv.indirect >= 0 Then
    
 Else
 If vv.UseIterator Then
+ElseIf vv.IamEnum Then
+useHandler = True
 Else
     Set vv = vv.objref
 End If
@@ -26678,7 +26744,6 @@ End If
 If TypeOf vv Is PropReference Then
 If IsObject(vv.Value) Then Set vv = vv.Value Else MyEr "No Object found", "ƒÂÌ ‚ÒﬁÍ· ·ÌÙÈÍÂﬂÏÂÌÔ": Exit Sub
 End If
-
 Do
 ReDim var1(0 To 0)
 Erase var2()
@@ -26709,7 +26774,7 @@ If IsExp(bstack, rest$, r) Then
                             End If
                                 Set oo = Nothing
                             End If
-                         'CallByNameFixParamArray vv, FN$, VbSet, var1(), var2(), 2
+                    
                            CallByNameFixParamArray vv, FN$, VbLet, var1(), var2(), 2
                          Else
                                 If bstack.lastobj Is Nothing Then
@@ -26748,6 +26813,8 @@ If TypeOf var(vIndex) Is GuiM2000 Then If UCase(FN$) = "VISIBLE" Then FN$ = "Tru
                                                     
 If FN$ = vbNullString Then
 l = usethis
+ElseIf useHandler Then
+l = FindDISPID(vv.objref, FN$)
 Else
 l = FindDISPID(vv, FN$)
 
@@ -26781,7 +26848,21 @@ newref = GlobalVarRefOnly(s$, y1)
 Else
 newref = GlobalVarRefOnly(bstack.GroupName & s$)
 End If
+If l = -4 Then
+' get now object
+
+sp = vbEmpty
+If ReadPropObj(vv, -4, sp) Then
+
+    Set var(newref) = New mHandler
+    var(newref).ConstructEnumerator sp
+ Else
+ NoEnumaretor
+End If
+
+Else
 MakeitPropReference var(newref)
+
 jumpheretoo:
 If hardlink Then
 
@@ -26796,7 +26877,7 @@ End If
 Set oo = Nothing
 Else
 If vv Is var(vIndex) Then
-var(newref).Construct vIndex, l, indirect   ' this is the link vindex is an index to var()
+var(newref).Construct vIndex, l, indirect    ' this is the link vindex is an index to var()
 Else
 var(newref).ConstructObj vv, l
 End If
@@ -26804,7 +26885,7 @@ End If
 End If
 ' so for every method or property we use this simple struct
 ' we can define the value type
-
+End If
 End If
 Else
 
@@ -26899,7 +26980,7 @@ Dim s1$
  If IsExp(bstack, rest$, sp) Then
   Err.Clear
         Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, False)
-                    If Not Err.Number Then
+                    If Err.Number Then
                     Err.Clear
                 Set myVar = ReadOneIndexParameter(vv, l, s1$, sp, True)
                
@@ -26908,7 +26989,7 @@ Dim s1$
                             On Error Resume Next
                 Err.Clear
                 Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, False)
-                If Not Err.Number Then
+                If Err.Number Then
                 Err.Clear
                 Set myVar = ReadOneIndexParameter(vv, l, s1$, ss$, True)
                
@@ -26999,7 +27080,9 @@ ElseIf FastSymbol(rest$, ",") Then
 RealMeth bstack, rest$, var1(), var2(), items, namarg  ' if we have as result then we get an error...
  Result = CallByNameFixParamArray(vv, FN$, VbMethod, var1(), var2(), items, retobject, namarg, bstack.IamAnEvent)
 Else
+
  Result = CallByNameFixParamArray(vv, FN$, VbMethod, var1(), var2(), 0, retobject, namarg, bstack.IamAnEvent)
+
 End If
 If Not retobject Is Nothing Then
     y3 = IsLabelSymbolNew(rest$, "Ã≈√≈√œÕœ‘¡", "WITHEVENTS", language)
@@ -34596,6 +34679,8 @@ ElseIf IsLabelSymbolNew(rest$, "≈…”¡√Ÿ√«", "TEXTBOX", Lang) Then
     Set var(i) = OsInfo
     ElseIf IsLabelSymbolNew(rest$, "Ã¡»«Ã¡‘… ¡", "MATH", Lang) Then
     Set var(i) = New Math
+    ElseIf IsLabelSymbolNew(rest$, "”’ÀÀœ√«", "COLLECTION", Lang) Then
+    Set var(i) = New Collection
     End If
 End Function
 
@@ -50728,7 +50813,13 @@ handlehandlers:
         s$ = ""
         If Typename(bstack.lastobj) = "mHandler" Then
             Set anything = bstack.lastobj
-        If Not CheckLastHandlerOrIterator(anything, w3) Then
+        If bstack.lastobj.IamEnum Then
+        r = bstack.lastobj.index_cursor
+        If SG < 0 Then r = -r
+        Set bstack.lastobj = Nothing
+         IsEval = FastSymbol(a$, ")", True)
+        Exit Function
+        ElseIf Not CheckLastHandlerOrIterator(anything, w3) Then
         InternalError
         IsEval = False
         Exit Function

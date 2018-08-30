@@ -6,7 +6,7 @@ Option Explicit
 ' event support for Late-Bound objects
 ' low level COM Projekt - by [rm_code] 2005
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
-
+Private Declare Sub VariantCopy Lib "OleAut32.dll" (pvargDest As Long, pvargSrc As Long)
 'Public Type GUID
 '    data1       As Long
 '    data2       As Integer
@@ -98,7 +98,36 @@ Private ObjExt_vtbl(6) As Long
 ''get lcid_def1() once
 Public LCID_DEF As Long
 
+Private Type IUnknown100
+    QueryInterface              As Long
+    AddRef                      As Long
+    Release                     As Long
+End Type
+Private Type IEnum100
+    iunk                        As IUnknown100
+    Next                        As Long
+    skip                        As Long
+    Reset                       As Long
+    Clone                       As Long
+End Type
 
+Public Function GetNext(pECP As Long, usethis As Variant) As Boolean
+Dim hRet As Long
+Dim cReturned   As Long
+Dim pVTblECP    As Long
+Dim oECP        As IEnum100
+Dim pCP         As Long
+    CpyMem pVTblECP, ByVal pECP, 4
+    CpyMem oECP, ByVal pVTblECP, Len(oECP)
+    Dim alfa(4) As Long
+
+hRet = CallPointer(oECP.Next, pECP, 1, VarPtr(usethis), VarPtr(cReturned))
+
+If hRet Then Exit Function
+If cReturned = 0 Then Exit Function
+GetNext = True
+
+End Function
 
 Public Sub InitObjExtender()
     Static blnInit  As Boolean
@@ -221,7 +250,7 @@ Private Function addr(p As Long) As Long
 End Function
 
 ' Pointer->Object
-Private Function ResolveObjPtr(ByVal Ptr As Long) As IUnknown
+Public Function ResolveObjPtr(ByVal Ptr As Long) As IUnknown
     'Dim oUnk As IUnknown
 ObjSetAddRef ResolveObjPtr, Ptr
     'CpyMem oUnk, Ptr, 4&
@@ -282,7 +311,8 @@ Dim btASM As Long
 
     CallPointer = CallWindowProcA(btASM, _
                                   0, 0, 0, 0)
-            VirtualUnlock btASM, MAXCODE
+            
+             VirtualUnlock btASM, MAXCODE
         VirtualFree btASM, MAXCODE, MEM_DECOMMIT
         VirtualFree btASM, 0, MEM_RELEASE
     '    Debug.Print btASM

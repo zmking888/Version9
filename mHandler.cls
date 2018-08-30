@@ -20,6 +20,8 @@ Public index_start As Variant ' 1 for start
 Public index_End As Variant  ' -1 for end
 Public index_cursor As Variant
 Public UseIterator As Boolean
+Public oEnum As Variant
+Public IamEnum As Boolean
 Private Sub Class_Initialize()
 indirect = -1
 index_start = 0
@@ -32,6 +34,7 @@ Private Sub Class_Terminate()
 Set objref = Nothing
 End Sub
 Public Sub CopyTo(a As mHandler)
+If IamEnum Then Set a = Me: Exit Sub
 Set a = New mHandler
 a.t1 = t1
 ''A.Par1 = Par1   ' key or index ???
@@ -42,4 +45,19 @@ a.index_End = index_End
 a.index_cursor = index_cursor
 a.UseIterator = UseIterator
 Set a.objref = objref
+End Sub
+Public Function Iterate()
+        Iterate = GetNext(ObjPtr(oEnum), index_cursor)
+        If IsObject(index_cursor) Then Set objref = index_cursor: index_cursor = vbEmpty
+        index_End = 1
+        If Not Iterate Then index_End = -1
+End Function
+Sub ConstructEnumerator(penum As Variant)
+IamEnum = True
+Set oEnum = penum
+Dim mobj As Variant
+If GetNext(ObjPtr(penum), index_cursor) Then
+If IsObject(index_cursor) Then Set objref = index_cursor: index_cursor = vbEmpty
+    index_End = 0
+End If
 End Sub

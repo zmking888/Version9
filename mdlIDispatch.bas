@@ -78,7 +78,7 @@ Public Function CallByNameFixParamArray _
     (pobjTarget As Object, _
     ByVal pstrProcName As Variant, _
     ByVal CallType As cbnCallTypes, _
-     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0, Optional center2mouse As Boolean = False) As Variant
+     pArgs(), pargs2() As String, items As Long, Optional robj As Object, Optional fixnamearg As Long = 0, Optional center2mouse As Boolean = False, Optional pUnk) As Variant
 
 
     ' pobjTarget    :   Class or form object that contains the procedure/property
@@ -341,11 +341,20 @@ End If
     Set IDsp = Nothing
     If IsObject(VarRet) Then
             Set robj = VarRet
-        '    CallByNameFixParamArray = CLng(0)
-'Else
-         '   CallByNameFixParamArray = VarRet
          VarRet = CLng(0)
 End If
+On Error GoTo there
+If TypeOf VarRet Is IUnknown Then
+Set robj = New mHandler
+If UCase(pstrProcName) = "_NEWENUM" Then
+robj.ConstructEnumerator VarRet
+Else
+MyEr "cant use this object", "δεν μπορώ να χειριστώ αυτό το αντικείμενο"
+End If
+VarRet = CLng(0)
+End If
+there:
+Err.Clear
 CallByNameFixParamArray = VarRet
 Exit Function
 exithere:
