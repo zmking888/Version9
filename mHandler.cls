@@ -55,7 +55,6 @@ End Function
 Sub ConstructEnumerator(penum As Variant)
 IamEnum = True
 Set oEnum = penum
-Dim mobj As Variant
 If GetNext(ObjPtr(penum), index_cursor) Then
 If IsObject(index_cursor) Then Set objref = index_cursor: index_cursor = vbEmpty
     index_End = 0

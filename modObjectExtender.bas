@@ -119,7 +119,6 @@ Dim oECP        As IEnum100
 Dim pCP         As Long
     CpyMem pVTblECP, ByVal pECP, 4
     CpyMem oECP, ByVal pVTblECP, Len(oECP)
-    Dim alfa(4) As Long
 
 hRet = CallPointer(oECP.Next, pECP, 1, VarPtr(usethis), VarPtr(cReturned))
 

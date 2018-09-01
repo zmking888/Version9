@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 13
+Global Const Revision = 14
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1457,11 +1457,11 @@ Dim s$, ss$, F As Long, col As Long, x1 As Long, i As Long, pppp As mArray, pppp
 
 End Function
 
-Public Sub PushStage(basestack As basetask, DUMMY As Boolean)
+Public Sub PushStage(basestack As basetask, dummy As Boolean)
         With basestack.RetStack
                basestack.SubLevel = basestack.SubLevel + 1
 
-                If DUMMY Then
+                If dummy Then
                         .PushVal 0
                         .PushVal 0
                         .PushVal 0
@@ -7706,7 +7706,7 @@ End If
 End Function
 Function ProcLambda(bstack As basetask, rest$, Lang As Long) As Object
 ' no named functio- object
-Dim body As New lambda, k As Long, n$, DUMMY As Variant, er As Boolean, pos1 As Long, p As Variant, s$
+Dim body As New lambda, k As Long, n$, dummy As Variant, er As Boolean, pos1 As Long, p As Variant, s$
 Dim pppp As mArray, pppp2 As mArray, frm$, Find As basetask, Rest1$
 ' need fixed param...with &
 again1:
@@ -7757,28 +7757,28 @@ Select Case k
 Case 1, 4
 If IsExp(bstack, rest$, p) Then
 If Not bstack.lastobj Is Nothing Then
-    Set DUMMY = bstack.lastobj
+    Set dummy = bstack.lastobj
     Set bstack.lastobj = Nothing
-   body.FeedNonLocal n$, DUMMY, var()
-   Set DUMMY = Nothing
+   body.FeedNonLocal n$, dummy, var()
+   Set dummy = Nothing
     Else
-       DUMMY = p
-    body.FeedNonLocal n$, DUMMY, var()
+       dummy = p
+    body.FeedNonLocal n$, dummy, var()
     End If
-DUMMY = Empty
+dummy = Empty
 End If
 Case 3
 If IsStrExp(bstack, rest$, s$) Then
 If Not bstack.lastobj Is Nothing Then
-    Set DUMMY = bstack.lastobj
+    Set dummy = bstack.lastobj
     Set bstack.lastobj = Nothing
-   body.FeedNonLocal n$, DUMMY, var()
-   Set DUMMY = Nothing
+   body.FeedNonLocal n$, dummy, var()
+   Set dummy = Nothing
     Else
-       DUMMY = s$
-    body.FeedNonLocal n$, DUMMY, var()
+       dummy = s$
+    body.FeedNonLocal n$, dummy, var()
     End If
-DUMMY = Empty
+dummy = Empty
 End If
 Case 5, 7
 
@@ -7787,9 +7787,9 @@ Case 5, 7
       If Typename(bstack.lastobj) = myArray Then
       Set pppp = bstack.lastobj
         pppp.arrname = n$
-        Set DUMMY = pppp
-        body.FeedNonLocal n$, DUMMY, var()
-        Set DUMMY = Nothing
+        Set dummy = pppp
+        body.FeedNonLocal n$, dummy, var()
+        Set dummy = Nothing
         Set pppp = Nothing
         Else
         Exit Function
@@ -7806,9 +7806,9 @@ If Not bstack.lastobj Is Nothing Then
       If Typename(bstack.lastobj) = myArray Then
       Set pppp = bstack.lastobj
         pppp.arrname = n$
-        Set DUMMY = pppp
-        body.FeedNonLocal n$, DUMMY, var()
-        Set DUMMY = Nothing
+        Set dummy = pppp
+        body.FeedNonLocal n$, dummy, var()
+        Set dummy = Nothing
         Set pppp = Nothing
         Else
         Exit Function
@@ -7825,21 +7825,21 @@ ElseIf k < 5 Then
             If Typename(var(pos1)) = "lambda" Then
             Dim aaa As lambda
             var(pos1).CopyTo aaa, var()
-            Set DUMMY = aaa
-                body.FeedNonLocal n$, DUMMY, var()
-                Set DUMMY = Nothing
-                DUMMY = Empty
+            Set dummy = aaa
+                body.FeedNonLocal n$, dummy, var()
+                Set dummy = Nothing
+                dummy = Empty
                 Set aaa = Nothing
             ElseIf Typename(var(pos1)) = "Group" Then
-                Set DUMMY = CopyGroupObj(var(pos1))
-                body.FeedNonLocal n$, DUMMY, var()
-                Set bstack.lastobj = DUMMY
-                Set DUMMY = Nothing
+                Set dummy = CopyGroupObj(var(pos1))
+                body.FeedNonLocal n$, dummy, var()
+                Set bstack.lastobj = dummy
+                Set dummy = Nothing
             Else
                 body.FeedNonLocal n$, var(pos1), var()
             End If
         Else
-            body.FeedNonLocal n$, DUMMY, var()
+            body.FeedNonLocal n$, dummy, var()
         End If
 Else
        
@@ -7847,10 +7847,10 @@ Else
         Set pppp2 = New mArray
         pppp.CopyArray pppp2
   
-        Set DUMMY = pppp2
+        Set dummy = pppp2
         Set pppp2 = Nothing
         Set pppp = Nothing
-        body.FeedNonLocal n$, DUMMY, var()
+        body.FeedNonLocal n$, dummy, var()
         Else
         End If
     End If
@@ -22182,22 +22182,22 @@ End If
 
 End Function
 Function GetSubFullName2(nm$, fullname$, retnum As Long) As Boolean
-Dim DUMMY As Long
+Dim dummy As Long
 If Len(here$) > 0 Then
     If Len(here$) > Len(nm$) Then
         If Mid$(here$, Len(here$) - Len(nm$)) = "." + nm$ Then
-            GetSubFullName2 = subHash.Find2(nm$, retnum, DUMMY)
+            GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
           fullname = nm$: Exit Function
         End If
     End If
 End If
 
 If here$ <> "" Then
-     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, DUMMY)
+     GetSubFullName2 = subHash.Find2(here$ & "." & nm$, retnum, dummy)
   If GetSubFullName2 Then fullname$ = here$ & "." & nm$: Exit Function
 End If
 
-    GetSubFullName2 = subHash.Find2(nm$, retnum, DUMMY)
+    GetSubFullName2 = subHash.Find2(nm$, retnum, dummy)
  If GetSubFullName2 Then fullname$ = nm$
 
 
@@ -23916,7 +23916,7 @@ oprinter.ClearUp
 Form1.PrinterDocument1.Picture = LoadPicture("")
 End Sub
 Sub Landscape(bstack As basetask)
-Dim DUMMY As Object, try1 As Long
+Dim dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -23930,7 +23930,7 @@ mydpi = 288
 again:
 
 
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then ChangeOrientation DUMMY, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
+If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) < 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
 oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
@@ -23959,7 +23959,7 @@ End If
 
 End Sub
 Sub Portrait(bstack As basetask)
-Dim DUMMY As Object, try1 As Long
+Dim dummy As Object, try1 As Long
 If UBound(MyDM) = 1 Then
 PrinterDim pw, ph, psw, psh, pwox, phoy
 End If
@@ -23972,7 +23972,7 @@ prFactor = mydpi / 288
 mydpi = 288
 szFactor = mydpi * dv15 / 1440#
 again:
-If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then ChangeOrientation DUMMY, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
+If Int(psw / pwox * mydpi + 0.5) / Int(psh / phoy * mydpi + 0.5) > 1 Then ChangeOrientation dummy, Printer.DeviceName, MyDM(): PrinterDim pw, ph, psw, psh, pwox, phoy
 If Not bstack.toprinter Then Exit Sub
 oprinter.ClearUp
 If oprinter.Create(Int(psw / pwox * mydpi + 0.5), Int(psh / phoy * mydpi + 0.5)) Then
@@ -24304,7 +24304,7 @@ VALIDATEmStiva = r$ <> ""
 End Function
 
 Public Function VALIDATE(st$, p$, s$) As Boolean
-Dim DUMMY As Double
+Dim dummy As Double
 Dim i As Long, j As Long, ok As Boolean
 If Len(st$) = 0 Then
 VALIDATE = True
@@ -24375,7 +24375,7 @@ Next i
 End Function
 
 Public Function VALIDATEpart(st$, p$) As Boolean
-Dim DUMMY As Double
+Dim dummy As Double
 Dim i As Long, j As Long, ok As Boolean, s$
 If Len(st$) = 0 Then
 VALIDATEpart = False   ' reverse logic here...
@@ -28261,13 +28261,44 @@ cont1010:
              bstack.GroupName = oldgroupname$
 End Sub
 Sub UnFloatGroupReWriteVars(bstack As basetask, what$, i As Long, myobject As Object, Optional mergesuper As Boolean = False, Optional MakeNew As Boolean)
-Dim ThisGroup As Group
+Dim ThisGroup As Group, ohere$
+Set ThisGroup = var(i)
 If myobject.IamApointer Then
-Set var(i) = myobject
+'If Not TypeOf myobject Is Group Then Exit Sub
+If ThisGroup.IamApointer Then Set var(i) = myobject: Exit Sub
+
+  If myobject.link.IamFloatGroup Or ThisGroup.soros.Total = 0 Then
+        
+        Set var(i) = myobject
+        Exit Sub
+   ElseIf myobject.link.IamFloatGroup Then
+   Set myobject = CopyGroupObj(myobject.link)
+
+    Else  ' need to make a copy group using
+        ohere$ = here$
+        here$ = myobject.lasthere
+       
+        If GetVar(bstack, myobject.GroupName, i, , , True) Then
+        
+        CopyGroup2 myobject.link, bstack
+        End If
+        here$ = ohere$
+        Set myobject = bstack.lastobj
+        Set bstack.lastobj = Nothing
+      '  UnFloatGroup bstack, what$, i, myobject
+'Exit Sub
+    End If
+
+End If
+
+If ThisGroup.IamApointer Then
+ If ThisGroup.link.IamFloatGroup Then
+    Set var(i).link = myobject
+    Else
+    Stop
+End If
 Exit Sub
 End If
-Set ThisGroup = var(i)
-
 While Right$(what$, 1) = "."
 what$ = Left$(what$, Len(what$) - 1)
 Wend
@@ -28278,7 +28309,7 @@ If Not TypeOf myobject Is Group Then Exit Sub
  Dim grtype As Variant, ps2push As String, TT As Long, ff$, uni As Boolean
  Set ps = var(i).soros
  Dim subgroup As Object, pppp As mArray
- Dim ohere$, oldgroupname$, glob As Boolean
+ Dim oldgroupname$, glob As Boolean
  ohere$ = here$
  glob = ThisGroup.IamGlobal
  uni = myobject.IamSuperClass
@@ -36094,10 +36125,12 @@ comehere:
 End Function
 
 Function MyLet(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim what$, ss$, i As Long, x1 As Long, flag As Boolean
+Dim what$, ss$, i As Long, x1 As Long, flag As Boolean, grp As Boolean
+grp = bstack.UseGroupname = vbNullString
 MyLet = True
 Do
-    x1 = IsLabel(bstack, rest$, what$, True)
+   x1 = Abs(IsLabelBig(bstack, rest$, what$))
+    
     If x1 <> 0 Then
             If x1 > 4 Then
                     ss$ = BlockParam(rest$)
@@ -36128,7 +36161,8 @@ ss$ = Left$(rest$, i - 1)
                 Exit Function
                 End If
               If MyLet Then
-              MyLet = MyRead(6, bstack, what$, 1)
+              
+              MyLet = MyRead(6, bstack, what$, 1, what$, x1)
             
             
              rest$ = Mid$(rest$, i)
@@ -36962,9 +36996,9 @@ End If
 ProcPlayer = True
 Exit Function
 End Function
-Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long) As Boolean
+Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional ByVal what$, Optional usex1 As Long) As Boolean
 Dim ps As mStiva, bs As basetask, F As Long, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
-Dim s$, ss$, pa$, what$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
+Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
 Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean
 MyRead = True
 Dim p As Variant, x As Double
@@ -37002,6 +37036,300 @@ flag2 = True
 GoTo read123
 readlet:
 allowglobals = True
+Set bs = bstack
+x1 = usex1
+If x1 > 3 Then x1 = Abs(IsLabel(bstack, rest$, what$))
+'***********************
+Select Case x1
+Case 1
+    If bs.IsObjectRef(myobject) Then
+        MyRead = True
+        If GetVar3(bstack, what$, i, , , flag, s$, checktype, isAglobal, True) Then
+            If Typename$(myobject) = Typename(var(i)) Then
+                If Typename$(var(i)) = "Group" Then
+                                    ss$ = bstack.GroupName
+                                    If s$ <> "" Then what$ = s$
+                                     If Len(var(i).GroupName) > Len(what$) Then
+                                        If var(i).IamRef Then ' Or bstack.UseGroupname <> ""
+                                    
+                                         s$ = here$
+                                          here$ = vbNullString
+                                        UnFloatGroupReWriteVars bstack, what$, i, myobject
+                                        here = s$
+                                        Else
+                                        UnFloatGroupReWriteVars bstack, what$, i, myobject
+                                        End If
+                                    Else
+                                        bstack.GroupName = Left$(what$, Len(what$) - Len(var(i).GroupName) + 1)
+                                        If Len(var(i).GroupName) > 0 Then
+                                            what$ = Left$(var(i).GroupName, Len(var(i).GroupName) - 1)
+                                            s$ = here$
+                                            here$ = vbNullString
+                                            UnFloatGroupReWriteVars bstack, what$, i, myobject
+                                            here = s$
+                                        ElseIf var(i).IamApointer And myobject.IamApointer Then
+                                        Set var(i) = myobject
+                                        
+                                        Else
+                                            Set myobject = Nothing
+                                            bstack.GroupName = ss$
+                                            GroupWrongUse
+                                            MyRead = False
+                                            Exit Function
+                                        End If
+                                    End If
+                                    Set myobject = Nothing
+                                    bstack.GroupName = ss$
+        
+                       
+                        ElseIf Typename$(var(i)) = "mHandler" Then
+                            If var(i).ReadOnly Then
+                                MyRead = False
+                               ReadOnly
+                               Exit Function
+                            ElseIf var(i).t1 = myobject.t1 Or myobject.t1 = 3 Then
+                               Set var(i) = myobject
+                            Else
+                              MyRead = False
+                              MyEr "Wrong object type", "Λάθος τύπος αντικειμένου"
+                              Exit Function
+                            End If
+                        Else
+                        Set var(i) = myobject
+                        End If
+                    ElseIf x1 = 1 And CheckIsmArray(myobject) Then
+                   
+                        ''bstack.lastobj.CopyArray pppp
+                        Set var(i) = New mHandler
+                        var(i).t1 = 3
+                       Set var(i).objref = myobject
+                        'Set pppp = Nothing
+                        Set myobject = Nothing
+                    Else
+                         MyRead = False
+                        MyEr "Wrong object type", "Λάθος τύπος αντικειμένου"
+                        Exit Function
+                    End If
+                    End If
+    ElseIf bs.IsNumber(p) Then
+    If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
+    If MyIsObject(var(i)) Then
+                If TypeOf var(i) Is Group Then
+                    If var(i).HasSet Then
+                       
+                        Set m = bstack.soros
+                        Set bstack.Sorosref = New mStiva
+                        bstack.soros.PushVal p
+                        NeoCall2 ObjPtr(bstack), what$ + "." + ChrW(&H1FFF) + ":=()", ok
+                        Set bstack.Sorosref = m
+                        Set m = Nothing
+                    Else
+                        GoTo there182741
+                    End If
+                Else
+there182741:
+If TypeOf var(i) Is Constant Then
+                CantAssignValue
+Else
+                    MyEr "Can't assign value to object", "Δεν μπορώ να δώσω τιμή σε αντικείμενο"
+                    End If
+                    Exit Function
+                End If
+      
+        Else
+            If checktype Then
+            If ihavetype Then
+                If VarType(var(i)) <> VarType(p) Then
+                    MyEr "Cant' change type of variable", "Δεν μπορώ να αλλάξω τύπο μεταβλητής"
+                ElseIf AssignTypeNumeric(p, VarType(var(i))) Then
+                    var(i) = p
+                Else
+                MyEr "Cant' Assign number", "Δεν μπορώ να θέσω τιμή κατά το διάβασμα τιμών"
+                End If
+            
+           
+            ElseIf AssignTypeNumeric(p, VarType(var(i))) Then
+                var(i) = p
+            Else
+            MyEr "Cant' Assign number", "Δεν μπορώ να θέσω τιμή κατά το διάβασμα τιμών"
+            End If
+            Else
+                var(i) = p
+            End If
+        End If
+
+        ElseIf i = -1 Then
+                bstack.SetVar what$, p
+        Else
+                globalvar what$, p
+        End If
+        End If
+Case 3
+    If bs.IsString(s$) Then
+        MyRead = True
+        If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
+        If MyIsObject(var(i)) Then
+                If TypeOf var(i) Is Group Then
+                        
+                        Set m = bstack.soros
+                        Set bstack.Sorosref = New mStiva
+                        bstack.soros.PushStr s$
+                        NeoCall2 ObjPtr(bstack), Left$(what$, Len(what$) - 1) + "." + ChrW(&H1FFF) + ":=()", ok
+                        Set bstack.Sorosref = m
+                        Set m = Nothing
+                ElseIf TypeOf var(i) Is Constant Then
+                CantAssignValue
+                MyRead = False
+                Exit Function
+                Else
+                    CheckVar var(i), s$
+                End If
+            Else
+                var(i) = s$
+            End If
+        ElseIf i = -1 Then
+            bstack.SetVar what$, s$
+        Else
+            globalvar what$, s$
+        End If
+        Else
+            bstack.soros.drop 1
+        MissStackStr
+        MyRead = False
+              End If
+   
+Case 4
+    If bs.IsNumber(p) Then
+        MyRead = True
+        If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
+            var(i) = MyRound(p)
+        ElseIf i = -1 Then
+            bstack.SetVar what$, p
+        Else
+            globalvar what$, MyRound(p)
+        End If
+    Else
+        bstack.soros.drop 1
+        MissStackNumber
+        MyRead = False
+
+    End If
+Case 5, 7
+
+    MyRead = False
+    If FastSymbol(rest$, ")") Then
+        MyRead = globalArrByPointer(bs, bstack, what$, flag2, allowglobals): If Not MyRead Then SyntaxError: Exit Function
+    Else
+        If neoGetArray(bstack, what$, pppp) And Not flag2 Then
+            If Not NeoGetArrayItem(pppp, bs, what$, it, rest$) Then Exit Function
+        Else
+            Exit Function
+        End If
+        If IsOperator(rest$, ".") Then
+            If Not Typename(pppp.item(it)) = "Group" Then
+                MyEr "Expected group", "Περίμενα ομάδα"
+                MyRead = False: Exit Function
+            Else
+                 i = 1
+                aheadstatus rest$, False, i
+                ss$ = Left$(rest$, i - 1)
+                MyRead = SpeedGroup(bstack, pppp, "@READ", ".", ss$, it) <> 0
+                rest$ = Mid$(rest$, i)
+            End If
+        Else
+            If Not bs.IsNumber(p) Then
+            bstack.soros.drop 1
+                MissStackNumber
+                MyRead = False
+                
+                Exit Function
+            ElseIf x1 = 7 Then
+            pppp.item(it) = Round(p)
+            Else
+            
+            pppp.item(it) = p
+            
+            End If
+        
+        
+        End If
+
+    MyRead = True
+    End If
+ Case 6
+    MyRead = False
+    If FastSymbol(rest$, ")") Then
+        MyRead = globalArrByPointer(bs, bstack, what$, flag2): If Not MyRead Then SyntaxError: Exit Function
+    Else
+        If neoGetArray(bstack, what$, pppp) And Not flag2 Then
+            If Not NeoGetArrayItem(pppp, bs, what$, it, rest$) Then Exit Function
+        Else
+            Exit Function
+        End If
+        If Not bs.IsString(s$) Then
+            If bs.IsObjectRef(myobject) Then
+                If Typename$(myobject) = "lambda" Then
+                    Set pppp.item(it) = myobject
+                    Set myobject = Nothing
+                ElseIf Typename$(myobject) = "Group" Then
+                    Set pppp.item(it) = myobject
+                    Set myobject = Nothing
+
+            ElseIf Typename$(myobject) = myArray Then
+                    If myobject.Arr Then
+                        Set pppp.item(it) = CopyArray(myobject)
+                    Else
+                        Set pppp.item(it) = myobject
+                    End If
+                    Set myobject = Nothing
+                ElseIf Typename$(myobject) = "mHandler" Then
+                    If myobject.indirect > -0 Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    p = myobject.t1
+                    If CheckDeepAny(myobject) Then
+                    If TypeOf myobject Is mHandler Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    Set pppp.item(it) = New mHandler
+                    pppp.item(it).t1 = p
+                    Set pppp.item(it).objref = myobject
+                    End If
+                    Set myobject = Nothing
+                    End If
+                    
+                    End If
+              ElseIf Typename$(myobject) = "PropReference" Then
+                    Set pppp.item(it) = myobject
+                    Set myobject = Nothing
+                Else
+                    MissStackStr
+                    Exit Function
+                End If
+            Else
+            bstack.soros.drop 1
+                MissStackStr
+                Exit Function
+            End If
+
+        Else
+            If Not MyIsObject(pppp.item(it)) Then
+                pppp.item(it) = s$
+            ElseIf Typename(pppp.item(it)) = "Group" Then
+            ' do something
+            Else
+                Set pppp.item(it) = New Document
+                CheckVar pppp.item(it), s$
+            End If
+        End If
+        MyRead = True
+    End If
+
+      
+'*****************************************************
+    End Select
+    p = CDbl(0)
+    Exit Function
 read:
 If FastSymbol(rest$, "?") Then useoptionals = True
 
@@ -37456,11 +37784,10 @@ Case Else
     Exit Do
 End Select
 Else
-'here123
+' here not for LET any more
 x1 = Abs(IsLabel(bstack, rest$, what$))
 If x1 <> 0 Then
     what$ = myUcase(what$)
-    
 End If
 Select Case x1
 Case 1
@@ -37761,16 +38088,7 @@ Else
                     End If
                     Exit Function
                 End If
-       ' ElseIf VarType(var(i)) = vbLong Then
-       ' On Error Resume Next
-        '            var(i) = CLng(Int(p))
-         '           If Err.Number = 6 Then
-          '          Err.Clear
-           '         OverflowLong
-            '        MyRead = False
-             '       Exit Function
-              '      End If
-               '     On Error GoTo 0
+      
         Else
             If checktype Then
             If ihavetype Then

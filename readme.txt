@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 13 active-X
+Version 9.4 rev 14 active-X
 
-We can make Ierators for com objects, for those which support _NewEnum function and for those which support -4 property.
+Fix Let statement
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
