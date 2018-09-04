@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 15
+Global Const Revision = 16
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14458,6 +14458,30 @@ somethingelse:
                             myobject.Compute3 ss$
                             Set myobject = Nothing
                             Set bstack.lastobj = Nothing
+                        End If
+                    ElseIf TypeOf myobject Is mHandler Then
+                    If myobject.t1 = 4 Then
+                        If myobject.ReadOnly Then
+                                ReadOnly
+                             interpret = False
+                                GoTo there1
+                        ElseIf ss$ = "++" Then
+                        If myobject.index_start < myobject.objref.count Then
+                            myobject.index_start = myobject.index_start + 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+                        ElseIf ss$ = "--" Then
+                    If myobject.index_start > 0 Then
+                            myobject.index_start = myobject.index_start - 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+                        Else
+                        NoOperatorForThatObject ss$
+                         interpret = False
+                            GoTo there1
+                        End If
                         End If
                     Else
                     MyEr "Object not support operator " + ss$, "Το αντικείμενο δεν υποστηρίζει το τελεστή " + ss$
@@ -42113,9 +42137,9 @@ Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long
 prive = GetCode(basestack.Owner)
 If Lang = 1 Then
-PlainBaSket basestack.Owner, players(prive), "George Karras (C), Preveza, Greece 1999-2017"
+PlainBaSket basestack.Owner, players(prive), "George Karras (C), Preveza, Greece 1999-2018"
 Else
-PlainBaSket basestack.Owner, players(prive), "Γιώργος Καρράς (C), Πρέβεζα, Ελλάδα 1999-2017"
+PlainBaSket basestack.Owner, players(prive), "Γιώργος Καρράς (C), Πρέβεζα, Ελλάδα 1999-2018"
 End If
 crNew basestack, players(prive)
 ProcWriter = True
@@ -47724,9 +47748,9 @@ NumberId numid, funid
 StringId strid, strfunid
 NoOptimum = False
 If Lang = 0 Then
-sHelp "Μ2000 [ΒΟΗΘΕΙΑ]", "Γράψε ΤΕΛΟΣ για να βγεις από το πρόγραμμα" & vbCrLf & "Δες τα ΟΛΑ (κάνε κλικ στο ΟΛΑ)" & vbCrLf & "George Karras 2016", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Μ2000 [ΒΟΗΘΕΙΑ]", "Γράψε ΤΕΛΟΣ για να βγεις από το πρόγραμμα" & vbCrLf & "Δες τα ΟΛΑ (κάνε κλικ στο ΟΛΑ)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 Else
-sHelp "Μ2000 [HELP]", "Write END for exit from this program" & vbCrLf & "See ALL commands  (click on ALL)" & vbCrLf & "George Karras 2016", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Μ2000 [HELP]", "Write END for exit from this program" & vbCrLf & "See ALL commands  (click on ALL)" & vbCrLf & "George Karras 2018", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 End If
 NERR = False
 lckfrm = 0

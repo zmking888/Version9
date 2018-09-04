@@ -425,7 +425,7 @@ Option Explicit
 Implements InterPress
 Private ex As Boolean
 Private mcd As String
-Private Pen As Long
+Private pen As Long
 Public textbox2 As myTextBox
 Public WithEvents combo1 As dropdownlist
 Attribute combo1.VB_VarHelpID = -1
@@ -450,7 +450,7 @@ Attribute checkbox2.VB_VarHelpID = -1
 Dim myCommand As myButton
 Dim myUnicode As myButton
 Dim myCancel As myButton
-Private Declare Function CopyFromLParamToRect Lib "User32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
+Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
 Dim Lx As Long, ly As Long, dr As Boolean, drmove As Boolean
@@ -501,7 +501,7 @@ If Button = 1 Then
     If lastfactor = 0 Then lastfactor = 1
 
     If bordertop < 150 Then
-    If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then
+    If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -509,7 +509,7 @@ If Button = 1 Then
     End If
     
     Else
-    If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then
+    If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then
     dr = True
     mousepointer = vbSizeNWSE
     Lx = x
@@ -525,9 +525,9 @@ Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
 If bordertop < 150 Then
-If (y > Height - 150 And y < Height) And (x > width - 150 And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+If (y > Height - 150 And y < Height) And (x > Width - 150 And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
  Else
- If (y > Height - bordertop And y < Height) And (x > width - borderleft And x < width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
+ If (y > Height - bordertop And y < Height) And (x > Width - borderleft And x < Width) Then mousepointer = vbSizeNWSE Else If Not (dr Or drmove) Then mousepointer = 0
 End If
 If dr Then
 
@@ -536,11 +536,11 @@ If dr Then
 If bordertop < 150 Then
 
         If y < (Height - 150) Or y > Height Then addy = (y - ly)
-     If x < (width - 150) Or x > width Then addX = (x - Lx)
+     If x < (Width - 150) Or x > Width Then addX = (x - Lx)
      
 Else
     If y < (Height - bordertop) Or y > Height Then addy = (y - ly)
-        If x < (width - borderleft) Or x > width Then addX = (x - Lx)
+        If x < (Width - borderleft) Or x > Width Then addX = (x - Lx)
     End If
     
 
@@ -553,31 +553,31 @@ Else
   
         once = True
         If Height > VirtualScreenHeight() Then addy = -(Height - VirtualScreenHeight()) + addy
-        If width > VirtualScreenWidth() Then addX = -(width - VirtualScreenWidth()) + addX
-        If (addy + Height) / height1 > 0.4 And ((width + addX) / width1) > 0.4 Then
+        If Width > VirtualScreenWidth() Then addX = -(Width - VirtualScreenWidth()) + addX
+        If (addy + Height) / height1 > 0.4 And ((Width + addX) / width1) > 0.4 Then
    
         If addy <> 0 Then SizeDialog = ((addy + Height) / height1)
         lastfactor = ScaleDialogFix(SizeDialog)
 
 
-        If ((width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
-        addX = -width * lastfactor / factor - 1
+        If ((Width * lastfactor / factor + addX) / Height * lastfactor / factor) < (width1 / height1) Then
+        addX = -Width * lastfactor / factor - 1
       
            End If
 
         If addX = 0 Then
-        If lastfactor <> factor Then ScaleDialog lastfactor, width
+        If lastfactor <> factor Then ScaleDialog lastfactor, Width
         Lx = x
         
         Else
         Lx = x * lastfactor / factor
-         ScaleDialog lastfactor, (width + addX) * lastfactor / factor
+         ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
         
          
         
-        LastWidth = width
+        LastWidth = Width
       gList2.HeadlineHeight = gList2.HeightPixels
         gList2.PrepareToShow
       gList3.PrepareToShow
@@ -647,7 +647,7 @@ command1(1).Move borderleft, bordertop * 39, itemwidth3, bordertop * 3
 command1(2).Move borderleft + itemwidth3 + borderleft, bordertop * 39, itemwidth3, bordertop * 3
 command1(0).Move borderleft + itemwidth3 * 2 + borderleft * 2, bordertop * 39, itemwidth3, bordertop * 3
 Gradient Me, rgb(100, 100, 100), rgb(100, 0, 0), 0, 0, ScaleWidth, ScaleHeight, False, True
-Set Me.Picture = Me.image
+Set Me.Picture = Me.Image
 gList11.ShowMe2
 End Sub
 Function ScaleDialogFix(ByVal factor As Single) As Single
@@ -769,17 +769,17 @@ End If
         checkbox1.CheckReset = CStr(cc.Value)
     cc.ValueKey = "PEN"
         cc.ValueType = REG_DWORD
-        Pen = cc.Value
+        pen = cc.Value
     tbPen.enabled = False
-        tbPen = CStr(Pen)
-        tbPen.Value = CStr(Pen)
+        tbPen = CStr(pen)
+        tbPen.Value = CStr(pen)
 tbPen.enabled = True
       DIS.ForeColor = QBColor(tbPen)
     cc.ValueKey = "PAPER"
         cc.ValueType = REG_DWORD
         tbPaper = CStr(cc.Value)
         tbPaper.Value = cc.Value
-        DIS.BackColor = QBColor(cc.Value)
+        DIS.backcolor = QBColor(cc.Value)
         cc.ValueKey = "COMMAND"
         cc.ValueType = REG_SZ
 
@@ -943,7 +943,7 @@ gList11.restrictLines = 6
 gList11.CenterText = True
 gList11.VerticalCenterText = True
 
-gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2015 ©"
+gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2018 ©"
 
 height1 = 6450 * DYP / 15
 width1 = 9900 * DXP / 15
@@ -1288,7 +1288,7 @@ End If
 tbPaper.Value = a
 a = tbPaper.Value  ' cut max or min
 tbPaper.Value = a
-DIS.BackColor = mycolor(a)
+DIS.backcolor = mycolor(a)
 DIS.ShowMe2
 'tbPaper.Info = "This is info box" + vbCrLf + "X = " + CStr(a)
 ThatString = CStr(a)
