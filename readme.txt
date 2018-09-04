@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 14 active-X
+Version 9.4 rev 15 active-X
 
-Fix Let statement
+Enumarations in M2000/
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

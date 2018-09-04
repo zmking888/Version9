@@ -6887,6 +6887,9 @@ End Sub
 Public Sub MissingBlock()  ' this is for identifier or execute part
 MyEr "missing block {} or string expression", "λείπει κώδικας σε {} η αλφαριθμητική έκφραση"
 End Sub
+Public Sub MissingEnumBlock()
+MyEr "missing block {} for enumeration constants", "λείπει μπλοκ {} για σταθερές απαρίθμησης "
+End Sub
 Public Sub MissingCodeBlock()
 MyEr "missing block {}", "λείπει μπλοκ κώδικα σε {}"
 End Sub
@@ -7109,6 +7112,9 @@ MyEr "No with reference in left side of assignment", "Όχι με αναφορά στην εκχώρη
 End Sub
 Public Sub WrongObject()
 MyEr "Wrong object type", "λάθος τύπος αντικειμένου"
+End Sub
+Public Sub WrongType()
+MyEr "Wrong type", "λάθος τύπος"
 End Sub
 Public Sub GroupWrongUse()
 MyEr "Something wrong with group", "Κάτι πάει στραβά με την ομάδα"
@@ -8043,6 +8049,9 @@ End Sub
 Sub NeoProto(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcProto(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
+Sub NeoEnum(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+resp = ProcEnum(ObjFromPtr(basestackLP), rest$)
+End Sub
 Sub NeoModule(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyModule(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
@@ -8498,7 +8507,24 @@ If Remove Then Mid$(a$, i, cl) = Space$(cl)
 FastOperator = True
 End If
 End Function
+Function FastType(a$, c$) As Boolean
+Dim i As Long, j As Long, cl, part$
+cl = Len(c$)
+j = Len(a$)
+If j = 0 Then Exit Function
+i = MyTrimL(a$)
+If i > j Then Exit Function  ' this is not good
+If j - i < cl - 1 Then
+Exit Function
+End If
+If IsLabelOnly(Mid$(a$, i, cl + 1), part$) = 1 Then
 
+If c$ = part$ Then
+a$ = Mid$(a$, MyTrimLi(a$, i + cl))
+FastType = True
+End If
+End If
+End Function
 Function FastSymbol(a$, c$, Optional mis As Boolean = False, Optional cl As Long = 1) As Boolean
 Dim i As Long, j As Long
 j = Len(a$)
@@ -10310,7 +10336,7 @@ AGAIN0:
             GoTo AGAIN0
           End If
             If Not FastSymbol(rest$, ",") Then Exit Do
-        ElseIf IsExp(bstack, rest$, p) Then
+        ElseIf IsExp(bstack, rest$, p, , True) Then
         If VarType(p) = vbBoolean Then q$ = Format$(p, DefBooleanString): GoTo fromboolean
 again1:
         pl2 = InStr(pl2, final$, pat1$)
@@ -10912,14 +10938,25 @@ Else
                     Set basestack.lastobj = Nothing
                     With myobject
                     If myobject.UseIterator Then
+                        If TypeOf myobject.objref Is Enumeration Then
+                        p = myobject.objref.Value
+                        Set myobject = Nothing
+                        GoTo isanumber
+                        Else
                         counter = myobject.index_start
                         Counterend = myobject.index_End
                         If counter <= Counterend Then countDir = 1 Else countDir = -1
+                        End If
+                        
                     Else
                         Counterend = -1
                         counter = 0
                         countDir = 1
-                        If Not CheckIsmArrayOrStackOrCollection(myobject) Then
+                        If myobject.t1 = 4 Then
+                    p = myobject.index_cursor
+                    Set myobject = Nothing
+                    GoTo isanumber
+                        ElseIf Not CheckIsmArrayOrStackOrCollection(myobject) Then
                             Set myobject = Nothing
                             
                         Else
@@ -10931,7 +10968,11 @@ Else
                         
                     End If
                     End With
-                    If Not CheckLastHandler(myobject) Then NoProperObject: rest$ = bck$: RevisionPrint = False: Exit Function
+                    If Not CheckLastHandler(myobject) Then
+                    NoProperObject
+                    rest$ = bck$: RevisionPrint = False: Exit Function
+                    End If
+
                     If Typename(myobject.objref) = "FastCollection" Then
                              Set myobject = myobject.objref
                              SwapStrings rest$, bck$
@@ -10953,7 +10994,13 @@ Else
                         'rest$ = vbNullString
                         GoTo takeone
                         End If
-                    End If
+                   ElseIf Typename(myobject.objref) = "Enumeration" Then
+                 
+                 Set myobject = myobject.objref
+                 
+                            rest$ = bck$
+                       GoTo takeone
+                        End If
                 ElseIf TypeOf basestack.lastobj Is VarItem Then
                     p = basestack.lastobj.ItemVariant
                 End If

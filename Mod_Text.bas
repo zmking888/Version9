@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 14
+Global Const Revision = 15
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3182,8 +3182,17 @@ Do
 again:
     If logical(bstack, aa$, r, parenthesis) Then
 again2:
-        If Not bstack.lastobj Is Nothing Then
-        If MaybeIsSymbol(aa$, "/*-+=~^&|<>?") Then
+      If Not bstack.lastobj Is Nothing Then
+        If TypeOf bstack.lastobj Is mHandler Then
+       ' If MaybeIsSymbol(aa$, "=<>") Then
+        '    r = 0&
+        If bstack.lastobj.t1 = 4 Then r = bstack.lastobj.index_cursor: If po < 0 Then r = -r: po = -po
+         '   GoTo LeaveIt
+       ' Else
+           GoTo cont111333
+       ' End If
+        ElseIf MaybeIsSymbol(aa$, "/*-+=~^&|<>?") Then
+        
                 '' get operator
                 Dim ss$, ss1$
                 If TypeOf bstack.lastobj Is Group Then
@@ -3554,8 +3563,9 @@ again3:
                       '      bstack.lastobj.lasthere$ = here$
             Else
             If TypeOf bstack.lastobj Is Group Then GoTo again3
-    
+           
             End If
+cont111333:
          If MaybeIsSymbol(aa$, "Ii≈Â") Then
              If Fast2Label(aa$, "IS", 2, "≈…Õ¡…", 5, 5) Then
     Set r1 = bstack.lastobj
@@ -3831,12 +3841,12 @@ Do
             MUL = 0
              
     ElseIf FastSymbol(aa$, "*") Then
-            If logical(bstack, aa$, r) Then
+            If logical(bstack, aa$, r, , True) Then
                 MUL = 1
                 r1 = po
                 po = r
             ElseIf FastSymbol(aa$, "(") Then
-                If IsExp(bstack, aa$, r) Then
+                If IsExp(bstack, aa$, r, , True) Then
                     MUL = 1
                     r1 = po
                     po = r
@@ -3853,12 +3863,12 @@ Do
                 Exit Function
             End If
     ElseIf FastSymbol(aa$, "/") Then
-            If logical(bstack, aa$, r) Then
+            If logical(bstack, aa$, r, , True) Then
                 MUL = 2
                 r1 = po
                 po = r
             ElseIf FastSymbol(aa$, "(") Then
-                If IsExp(bstack, aa$, r) Then
+                If IsExp(bstack, aa$, r, , True) Then
                     MUL = 2
                     r1 = po
                     po = r
@@ -3909,7 +3919,7 @@ Do
                             Exit Function
                     End If
                 ElseIf Fast2Label(aa$, "DIV#", 4, "ƒ…¡#", 4, 5) Then
-                    If logical(bstack, aa$, r) Then
+                    If logical(bstack, aa$, r, , True) Then
                         MUL = 44
                         r1 = po
                         If Not rightoperator(bstack, aa$, r) Then
@@ -3918,7 +3928,7 @@ Do
                         End If
                         po = r
                     ElseIf FastSymbol(aa$, "(") Then
-                        If IsExp(bstack, aa$, r) Then
+                        If IsExp(bstack, aa$, r, , True) Then
                             MUL = 44
                             r1 = po
                             If Not FastSymbol(aa$, ")") Then
@@ -3936,7 +3946,7 @@ Do
                     End If
                 ElseIf Fast3Label(aa$, "MOD", 3, "’–œÀœ…–œ", 8, "’–œÀ", 4, 9) Then
         
-                    If logical(bstack, aa$, r) Then
+                    If logical(bstack, aa$, r, , True) Then
                         If UseIntDiv Then
                             MUL = 50
                             r1 = po
@@ -3951,7 +3961,7 @@ Do
                         po = r
                         End If
                     ElseIf FastSymbol(aa$, "(") Then
-                        If IsExp(bstack, aa$, r) Then
+                        If IsExp(bstack, aa$, r, , True) Then
                         If UseIntDiv Then MUL = 50 Else MUL = 5
                             r1 = po
                             If Not FastSymbol(aa$, ")") Then
@@ -3975,7 +3985,7 @@ Do
 
                     ElseIf Fast3Label(aa$, "MOD#", 4, "’–œÀ#", 5, "’–œÀœ…–œ#", 9, 10) Then
         
-                    If logical(bstack, aa$, r) Then
+                    If logical(bstack, aa$, r, , True) Then
                         MUL = 55
                         r1 = po
                         If Not rightoperator(bstack, aa$, r) Then
@@ -3984,7 +3994,7 @@ Do
                         End If
                         po = r
                     ElseIf FastSymbol(aa$, "(") Then
-                        If IsExp(bstack, aa$, r) Then
+                        If IsExp(bstack, aa$, r, , True) Then
                             MUL = 55
                             r1 = po
                             If Not FastSymbol(aa$, ")") Then
@@ -4014,7 +4024,7 @@ If Fast2Label(aa$, "XOR", 3, "¡–œ", 3, 4) Then
 '  good
   MUL = 3
     If priorityOr Then
-       If IsExp(bstack, aa$, r) Then
+       If IsExp(bstack, aa$, r, , True) Then
             If ac <> 0 Then po = (ac + po)
             If po <> 0 Then po = -1
             If r <> 0 Then r = -1
@@ -4023,7 +4033,7 @@ If Fast2Label(aa$, "XOR", 3, "¡–œ", 3, 4) Then
         End If
     Else
         If FastSymbol(aa$, "(") Then
-            If IsExp(bstack, aa$, r) Then
+            If IsExp(bstack, aa$, r, , True) Then
                 If ac <> 0 Then po = (ac + po)
                 If po <> 0 Then po = -1
                 If r <> 0 Then r = -1
@@ -4035,7 +4045,7 @@ If Fast2Label(aa$, "XOR", 3, "¡–œ", 3, 4) Then
            Else
                 IsExpA = False: Exit Function
             End If
-        ElseIf IsExp(bstack, aa$, r, False) Then
+        ElseIf IsExp(bstack, aa$, r, False, True) Then
             If ac <> 0 Then po = (ac + po)
             If po <> 0 Then po = -1
             If r <> 0 Then r = -1
@@ -4051,7 +4061,7 @@ ElseIf Fast2Label(aa$, "OR", 2, "«", 1, 2) Then
 '  good
   MUL = 3
 If priorityOr Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     If ac <> 0 Then po = (ac + po)
     If po <> 0 Then po = -1
     If r <> 0 Then r = -1
@@ -4060,7 +4070,7 @@ If priorityOr Then
     End If
 Else
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     If ac <> 0 Then po = (ac + po)
     If po <> 0 Then po = -1
     If r <> 0 Then r = -1
@@ -4073,7 +4083,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
      If ac <> 0 Then po = (ac + po)
     If po <> 0 Then po = -1
     If r <> 0 Then r = -1
@@ -4089,7 +4099,7 @@ ElseIf Fast2Label(aa$, "AND", 3, " ¡…", 3, 3) Then
 '  good
   MUL = 3
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     If ac <> 0 Then po = (ac + po)
     If po <> 0 Then po = -1
     If r <> 0 Then r = -1
@@ -4101,7 +4111,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
      If ac <> 0 Then po = (ac + po)
     If po <> 0 Then po = -1
     If r <> 0 Then r = -1
@@ -4125,7 +4135,7 @@ ElseIf FastSymbol(aa$, "<>", , 2) Then
 '  good
   MUL = 3
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
   po = (ac + po) <> r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4134,7 +4144,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
   po = (ac + po) <> r
      ac = 0
      Else
@@ -4145,7 +4155,7 @@ ElseIf FastSymbol(aa$, "<=>", , 3) Then
 '  good
   MUL = 1  ' from 3
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     Select Case ac + po
     Case Is < r
     po = -1
@@ -4161,7 +4171,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
     Select Case ac + po
     Case Is < r
     po = -1
@@ -4183,7 +4193,7 @@ ElseIf FastSymbol(aa$, "<=", , 2) Then
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
   po = (ac + po) <= r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4192,7 +4202,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
   po = (ac + po) <= r
      ac = 0
      Else
@@ -4207,7 +4217,7 @@ ElseIf FastSymbol(aa$, ">=", , 2) Then
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
   po = (ac + po) >= r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4216,7 +4226,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
   po = (ac + po) >= r
      ac = 0
      Else
@@ -4249,7 +4259,7 @@ ElseIf FastSymbol(aa$, ">") Then
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
   po = (ac + po) > r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4259,7 +4269,7 @@ If FastSymbol(aa$, "(") Then
    IsExpA = False: Exit Function
         End If
         
-ElseIf IsExp(bstack, aa$, r, False) Then
+ElseIf IsExp(bstack, aa$, r, False, True) Then
   po = (ac + po) > r
      ac = 0
      Else
@@ -4274,7 +4284,7 @@ ElseIf FastSymbol(aa$, "<") Then
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
   po = (ac + po) < r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4283,7 +4293,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
   po = (ac + po) < r
      ac = 0
      Else
@@ -4297,7 +4307,7 @@ ElseIf FastSymbol(aa$, "==", , 2) Then
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     If r = 0 Then
             If ac <> 0 Then po = (ac + po)
             If po = 0 Then
@@ -4331,7 +4341,7 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
     If r = 0 Then
             If ac <> 0 Then po = (ac + po)
             If po = 0 Then
@@ -4353,11 +4363,13 @@ If FastSymbol(aa$, "(") Then
 ElseIf FastSymbol(aa$, "=") Then
 '  good
   MUL = 3
+ 
    
     
 
 If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
+      Set bstack.lastobj = Nothing
   po = (ac + po) = r
      ac = 0
         If Not FastSymbol(aa$, ")") Then
@@ -4366,8 +4378,8 @@ If FastSymbol(aa$, "(") Then
    Else
    IsExpA = False: Exit Function
         End If
-  ElseIf IsExp(bstack, aa$, r, False) Then
-  po = (ac + po) = r
+  ElseIf IsExp(bstack, aa$, r, False, True) Then
+    po = (ac + po) = r
      ac = 0
      Else
     IsExpA = False
@@ -4382,14 +4394,14 @@ ElseIf FastSymbol(aa$, "-") Then
   ' check if we have string logical
   ' or we have parenthesis (....
   ' or just a perform a -1*
-If logical(bstack, aa$, r) Then
+If logical(bstack, aa$, r, , True) Then
     r1 = -r1
     MUL = 1 ' from 3
     If ac = 0 Then ac = po Else ac = ac + po
     po = r
     
  ElseIf FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     r1 = -r1
     MUL = 1 ' from 3
     If ac = 0 Then ac = po Else ac = ac + po
@@ -4408,7 +4420,7 @@ If logical(bstack, aa$, r) Then
     Exit Function
   End If
 ElseIf FastSymbol(aa$, "+") Then
-If logical(bstack, aa$, r) Then
+If logical(bstack, aa$, r, , True) Then
     MUL = 1 ' from 3
     
     If ac = 0 Then ac = po Else ac = ac + po
@@ -4420,7 +4432,7 @@ If logical(bstack, aa$, r) Then
     End If
     po = r
     ElseIf FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r) Then
+    If IsExp(bstack, aa$, r, , True) Then
     MUL = 1 ' from 3
     If ac = 0 Then ac = po Else ac = ac + po
     po = r
@@ -4461,7 +4473,7 @@ Loop
 End Function
 
 
-Function IsNumber(bstack As basetask, a$, r As Variant) As Boolean
+Function IsNumber(bstack As basetask, a$, r As Variant, Optional flatobject As Boolean = False) As Boolean
 Dim VR As Long, v$, v1&, w1 As Long, w2 As Long, p As Variant, s1$, dd As Long, dn As Long, w3 As Long
 Dim PP As Variant, pppp As mArray, nbstack As basetask, useHandler As mHandler, usebackup As Boolean
 Dim anything As Object, n$
@@ -5406,8 +5418,18 @@ foundprivate:
             r = 0
             Else
             If Not var(VR).UseIterator Then
+            If flatobject Then
+            If var(VR).t1 = 4 Then
+            r = var(VR).index_cursor
+            If SG < 0 Then r = -r
+            Else
+            r = 0
+            End If
+            
+            Else
             CopyHandler var(VR), bstack
             r = 0
+            End If
             ElseIf FastSymbol(a$, "^") Then
                    
                     r = var(VR).index_cursor
@@ -10949,7 +10971,11 @@ fstr2: '"EVAL$(", "≈ ÷—$(", "≈ ÷—¡”«$("
                         End If
                     End If
                     End If
+            ElseIf .t1 = 4 Then
             
+            If w = -1 Then anything.objref.index = anything.index_start
+            r$ = anything.objref.KeyToString()
+            Set bstackstr.lastobj = Nothing
             Else ' IS A MEMBLOCK
                 Set bstackstr.lastobj = Nothing
                 If FastSymbol(a$, ",") Then
@@ -12042,6 +12068,8 @@ fstr31: '"TYPE$(", "‘’–œ”$("
                                         Else
                                         r$ = Typename(var(w2).objref)
                                         End If
+                                    Case 4
+                                        r$ = var(w1).objref.EnumName
                         Case Else
                         
                         r$ = Typename(var(w1).objref)
@@ -12873,10 +12901,15 @@ fstr60: '"STR$(", "√—¡÷«$("
     If Not bstackstr.lastobj Is Nothing Then
         If TypeOf bstackstr.lastobj Is Group Then
             If bstackstr.lastobj.HasValue Then
+            
             Else
             MyErMacro a$, "Group has no value", "« ÔÏ‹‰· ‰ÂÌ ›˜ÂÈ ·Óﬂ·"
             Exit Function
             End If
+        ElseIf TypeOf bstackstr.lastobj Is mHandler Then
+        p = 0
+        If bstackstr.lastobj.t1 = 4 Then p = bstackstr.lastobj.index_cursor
+        Set bstackstr.lastobj = Nothing
         End If
         End If
         If FastSymbol(a$, ",") Then
@@ -20681,6 +20714,9 @@ Case "—’»Ã…”≈…”", "SETTINGS"
 Case "PROTOTYPE", "–—Ÿ‘œ‘’–œ"
     Identifier = ProcProto(basestack, rest$, Lang)
     Exit Function
+Case "¡–¡—…»Ã«”«", "¡–¡—", "ENUMERATION", "ENUM"
+    Identifier = ProcEnum(basestack, rest$)
+    Exit Function
 Case Else
     x1 = Len(rest$)
     Identifier = True
@@ -22420,7 +22456,7 @@ If i > 1 Then PosLabel = i + 1 '' Else PosLabel = 1
 End If
 End Function
 
-Function logical(basestack As basetask, s$, d As Variant, Optional par As Long = 0) As Boolean
+Function logical(basestack As basetask, s$, d As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False) As Boolean
 Dim b$, s2$, S3$ ' , OSTAC$
 Dim ah As String
 
@@ -22428,7 +22464,7 @@ ah = aheadstatus(s$, False)    '
 If InStr(ah, "l") = 0 Then
 If InStr(ah, "N") > 0 Then
 
-If Not IsNumber(basestack, s$, d) Then
+If Not IsNumber(basestack, s$, d, flatobject) Then
     Set basestack.lastobj = Nothing
 Else
     logical = True
@@ -22639,7 +22675,7 @@ Else
 
 s$ = s2$
 cont145:
-If IsNumber(basestack, s$, d) Then
+If IsNumber(basestack, s$, d, flatobject) Then
 logical = True
 Else
 
@@ -23540,8 +23576,20 @@ Case 1
     s$ = s$ + "*[Inventory]"
 Case 2
     s$ = s$ + "*[Buffer]"
+Case 4
+    s$ = s$ + "*[" + var(h&).objref.EnumName + "]"
 Case Else
+If Not var(h&).objref Is Nothing Then
+    If TypeOf var(h&).objref Is mHandler Then
+        If var(h&).objref.t1 = 4 Then
+        s$ = s$ + "*[" + var(h&).objref.objref.EnumName + "]"
+        Else
+        s$ = s$ + "*[" + Typename(var(h&).objref) + "]"
+        End If
+    Else
     s$ = s$ + "*[" + Typename(var(h&).objref) + "]"
+    End If
+End If
 End Select
 Else
 
@@ -24653,6 +24701,7 @@ With bstack.lastobj.objref
     If en < 0 Then en = 0
     If st >= .count Then st = .count - 1
     If en >= .count Then en = .count - 1
+    
 End With
 With bstack.lastobj
     .t1 = 3
@@ -24666,6 +24715,11 @@ If MyIsObject(anything) Then
 If TypeOf bstack.lastobj.objref Is FastCollection Then
 bstack.lastobj.t1 = 1
 Set bstack.lastobj.objref = anything
+ElseIf TypeOf bstack.lastobj.objref Is Enumeration Then
+Set bstack.lastobj.objref = New mHandler
+Set bstack.lastobj.objref.objref = anything.objref
+bstack.lastobj.objref.t1 = 4
+bstack.lastobj.objref.index_cursor = st
 End If
 End If
 
@@ -37106,12 +37160,20 @@ Case 1
                         'Set pppp = Nothing
                         Set myobject = Nothing
                     Else
+                    If TypeOf myobject Is mHandler Then
+                    If myobject.t1 = 4 Then
+                    p = myobject.index_cursor
+                    Set myobject = Nothing
+                    GoTo itisinumber
+                    End If
+                    End If
                          MyRead = False
                         MyEr "Wrong object type", "À‹ËÔÚ Ù˝ÔÚ ·ÌÙÈÍÂÈÏ›ÌÔı"
                         Exit Function
                     End If
                     End If
     ElseIf bs.IsNumber(p) Then
+itisinumber:
     If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
     If MyIsObject(var(i)) Then
                 If TypeOf var(i) Is Group Then
@@ -37512,7 +37574,10 @@ checkconstant:
                             ElseIf TypeOf var(i).objref Is FastCollection Then
                                 If Not Fast2Varl(rest$, " ¡‘¡”‘¡”«", 9, "INVENTORY", 9, 9, F) Then MyRead = False: MissType: Exit Function
                             ElseIf TypeOf var(i).objref Is MemBlock Then
-                                If Not Fast2Varl(rest$, "ƒ…¡—»—Ÿ”«", 9, "BUFFER", 6, 9, F) Then MyRead = False
+                                If Not Fast2Varl(rest$, "ƒ…¡—»—Ÿ”«", 9, "BUFFER", 6, 9, F) Then MyRead = False: MissType: Exit Function
+                            ElseIf var(i).t1 = 4 Then
+                              If Not FastType(rest$, var(i).objref.EnumName) Then MyRead = False: MissType: Exit Function
+                   
                             Else
                                 p = IsLabel(bstack, rest$, (what$)) ' just throw any name
                             End If
@@ -37976,6 +38041,13 @@ contpointer:
                             MyRead = False
                             Exit Function
                     End If
+                ElseIf myobject.t1 = 4 Then
+                    If Not FastType(rest$, myobject.objref.EnumName) Then
+                    
+                        p = myobject.index_cursor
+                        Set myobject = Nothing
+                        GoTo conthereEnum
+                    End If
                 End If
                 End If
                 End If
@@ -38018,6 +38090,7 @@ contpointer:
     If Not MaybeIsSymbol(rest$, ",") Then
     ' F used again
         If Fast2VarNoTrim(rest$, "Ÿ”", 2, "AS", 2, 2, F) Then
+conthereEnum:
         ihavetype = True
             If Fast2Varl(rest$, "¡—…»Ãœ”", 7, "DECIMAL", 7, 7, F) Then
                     If FastSymbol(rest$, "=") Then optlocal = Not useoptionals: useoptionals = True: If Not IsNumberD2(rest$, (p)) Then missNumber: Exit Function
@@ -38051,8 +38124,11 @@ contpointer:
             MyEr "No type found", "‰ÂÌ ‚ÒﬁÍ· Ù˝Ô"
             Exit Function
             End If
+            If myobject Is Nothing Then
+            WrongType
+            Else
             MyEr "Object is null", "‘Ô ·ÌÙÈÍÂﬂÏÂÌÔ ÂﬂÌ·È ‹ÙÈÏÔ!"
-                
+                End If
                 MyRead = False
                 Exit Function
             End If
@@ -41472,6 +41548,63 @@ Else
 Beeper 1000, 100
 End If
 ProcTone = True
+End Function
+Function ProcEnum(bstack As basetask, rest$) As Boolean
+
+    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
+    enumvalue = 0
+    If IsLabelOnly(rest$, w1$) = 1 Then
+       ' w1$ = myUcase$(w1$)
+        v = globalvar(w1$, v)
+        Set myenum = New Enumeration
+        
+        myenum.EnumName = w1$
+        Else
+        MyEr "No proper name for enumeration", "ÏÁ Í·ÌÔÌÈÍ¸ ¸ÌÔÏ· „È· ··ÒﬂËÏÁÛÁ"
+        Exit Function
+    End If
+    If FastSymbol(rest$, "{") Then
+        s$ = block(rest$)
+        
+        Do
+        If FastSymbol(s$, vbCrLf, , 2) Then
+        While FastSymbol(s$, vbCrLf, , 2)
+        Wend
+        ElseIf IsLabelOnly(s$, w1$) = 1 Then
+            'w1 = myUcase(w1$)
+            If FastSymbol(s$, "=") Then
+            If IsExp(bstack, s$, enumvalue) Then
+                If Not bstack.lastobj Is Nothing Then
+                    MyEr "No Object allowed as enumeration value", "ƒÂÌ ÂÈÙÒ›ÂÙ·È ·ÌÙÈÍÂﬂÏÂÌÔ „È· ÙÈÏﬁ ··ÒÈËÏÁÙﬁ"
+                    Exit Function
+                    End If
+                End If
+            Else
+                    enumvalue = enumvalue + 1
+            End If
+            myenum.AddOne w1$, enumvalue
+            Set mh = New mHandler
+            Set mh.objref = myenum
+            mh.t1 = 4
+            mh.ReadOnly = True
+            mh.index_cursor = enumvalue
+            mh.index_start = myenum.count - 1
+             v1 = globalvar(w1$, v1)
+             Set var(v1) = mh
+            ProcEnum = True
+        Else
+            Exit Do
+        End If
+        If FastSymbol(s$, ",") Then ProcEnum = False
+        Loop
+        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "¢‰ÂÈ· ¡·ÒﬂËÏÁÛÁ": Exit Function
+        ProcEnum = FastSymbol(rest$, "}", True)
+    Else
+        MissingEnumBlock
+        Exit Function
+    End If
+    
+    
 End Function
 Function ProcProto(bstack As basetask, rest$, Lang As Long) As Boolean
 ProcProto = True
@@ -45678,21 +45811,21 @@ End If
 End If
 End Function
 Private Function GetObjFromHandler(vv As Object, ok As Boolean) As Object
-Dim mH As mHandler, vIndex As Long
+Dim mh As mHandler, vIndex As Long
 If TypeOf vv Is mHandler Then
-    Set mH = vv
-    If mH.indirect >= 0 Then
-    vIndex = mH.indirect
-    If var2used < mH.indirect Then
+    Set mh = vv
+    If mh.indirect >= 0 Then
+    vIndex = mh.indirect
+    If var2used < mh.indirect Then
     MyEr "weak reference  out of scope", "Á ·Ì·ˆÔÒ‹ ÂﬂÌ·È ÂÍÙ¸Ú ÛÍÔÔ˝"
     ok = False
     Exit Function
     End If
     
-    Set GetObjFromHandler = var(mH.indirect)
+    Set GetObjFromHandler = var(mh.indirect)
     ok = True
     Else
-    Set GetObjFromHandler = mH.objref
+    Set GetObjFromHandler = mh.objref
     ok = True
     End If
 End If
@@ -47338,6 +47471,8 @@ ArrBase = usethisbase
                                  pppp.SerialItem 0, 0, 3
                             ElseIf Typename(basestack.lastobj) = "lambda" Then
                                     pppp.FillLambda basestack
+                            ElseIf Typename(basestack.lastobj) = "mHandler" Then
+                                  If basestack.lastobj.t1 = 4 Then pppp.Fillobj basestack Else Set basestack.lastobj = Nothing
                             Else
                             Set basestack.lastobj = Nothing
                      
@@ -48330,7 +48465,7 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
         End If
     ElseIf GetVar(bstack, s$, w1) Then
         If Typename(var(w1)) = "mHandler" Then
-       
+conthere111:
          
        If Not IsSymbol(rest$, ",") Then
                 st = 1: en = -1
@@ -48371,12 +48506,18 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
                 GoTo con12345
             End If
             
-           If Typename(var(w1)) <> "mHandler" And Typename(var(w1).objref) <> myArray Then
+        If Typename(var(w1)) <> "mHandler" Then
+        On Error GoTo there1
+          If Typename(var(w1).objref) <> myArray Then
            
            Set bstack.lastobj = Nothing
            MyEr "Not proper object for iterator", "ƒÂÌ ÂﬂÌ·È Û˘ÛÙ¸ ·ÌÙÈÍÂﬂÏÂÌÔ „È· Â·Ì‹ÎÁ¯Á"
            Exit Function
+           End If
           End If
+there1:
+          Err.Clear
+          
            Set bstack.lastobj = New mHandler
 con12345:
             PlaceIteratorData bstack, var(w1), st, en
@@ -50612,7 +50753,11 @@ len1234:
                             IsLen = FastSymbol(a$, ")", True)
                         Set bstack.lastobj = Nothing
                         Exit Function
-                    
+                    ElseIf .t1 = 4 Then
+                    r = SG * bstack.lastobj.index_start
+                    IsLen = FastSymbol(a$, ")", True)
+                        Set bstack.lastobj = Nothing
+                        Exit Function
                     End If
                 Else
                     r = SG * -1
@@ -51351,6 +51496,24 @@ errortext1:
                 End If
                 End If
                 GoTo there1234459
+               ElseIf .t1 = 4 Then
+               Dim aa As mHandler
+               Set aa = New mHandler
+               If w3 = -1 Then
+               aa.index_cursor = anything.index_cursor
+               Set aa.objref = anything.objref
+               aa.index_start = anything.index_start
+               Else
+               aa.index_cursor = anything.objref.Value
+               Set aa.objref = anything.objref
+               aa.index_start = anything.objref.index
+              
+               End If
+               aa.t1 = 4
+               If SG < 0 Then r = -r
+               Set bstack.lastobj = aa
+                IsEval = FastSymbol(a$, ")", True)
+                       Exit Function
                Else
 there1234459:
                     ' eval for objects???
@@ -53373,7 +53536,12 @@ noexpression1:
                                 Set var(v) = bstack.lastobj
                                 Set myobject = New mHandler
                                 bstack.lastobj.CopyTo myobject
-                                
+                                ElseIf myobject.t1 = 4 Then
+                                If Not var(v).objref Is myobject.objref Then
+                                WrongType
+                                Set bstack.lastobj = Nothing
+                                 Exec1 = 0: ExecuteVar = 8: Exit Function
+                                End If
                                 End If
                                 Set var(v) = myobject
                                 
@@ -53729,6 +53897,33 @@ here1234:
                             myobject.Compute3 ss$
                             Set myobject = Nothing
                             Set bstack.lastobj = Nothing
+                        End If
+                    ElseIf TypeOf myobject Is mHandler Then
+                        If myobject.t1 = 4 Then
+                        If myobject.ReadOnly Then
+                                ReadOnly
+                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                        ElseIf ss$ = "++" Then
+                        If myobject.index_start < myobject.objref.count Then
+                            myobject.index_start = myobject.index_start + 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+                        ElseIf ss$ = "--" Then
+                    If myobject.index_start > 0 Then
+                            myobject.index_start = myobject.index_start - 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+                        Else
+                        NoOperatorForThatObject ss$
+                    Exec1 = 0: ExecuteVar = 8
+                    Exit Function
+                        End If
+                        Else
+                        NoOperatorForThatObject ss$
+                    Exec1 = 0: ExecuteVar = 8
+                    Exit Function
                         End If
                     Else
                     NoOperatorForThatObject ss$
