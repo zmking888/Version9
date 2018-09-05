@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 16 active-X
+Version 9.4 rev 17 active-X
 
-Added ++ -- for enumeration in console (Repl)
+Release Edition
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

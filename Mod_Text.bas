@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 16
+Global Const Revision = 17
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -11856,7 +11856,8 @@ check1236789:
                     IsStr1 = NeoGetArrayItem(pppp, bstackstr, s$, w, a$)
                 Else
                     IsStr1 = FastSymbol(a$, ")", True)
-                    w = pppp.index
+                    w = 0
+                    'w = pppp.index
                 End If
 check999100:
                 If Not pppp.IsEmpty Then
@@ -16713,10 +16714,18 @@ ForCont:
 x1 = Abs(IsLabelBig(bstack, b$, w$, , SBB$, , True))
 Else
     ss$ = Left$(b$, 128)
-    x1 = Abs(IsLabelBig(bstack, ss$, w$, , SBB$, , True))
+    ok = True
+    x1 = Abs(IsLabelBig(bstack, ss$, w$, , SBB$, , ok))
   
      If Len(ss$) > 0 Then
+     If ok Then
        b$ = Mid$(b$, 129 - Len(ss$))
+       ElseIf Len(ss$) <= 128 Then
+        Mid$(b$, 129 - Len(ss$), Len(ss$)) = ss$
+        Mid$(b$, 1, 129 - Len(ss$)) = Space$(128 - Len(ss$))
+       Else
+        b$ = ss$ + Mid$(b$, 129)
+       End If
     Else
         x1 = Abs(IsLabelBig(bstack, b$, w$, , SBB$, , True))
     End If
@@ -17309,8 +17318,11 @@ contNext:
         Case "CALL", "ΚΑΛΕΣΕ"
         ' CHECK FOR NUMBER...
 contCall:
+On Error Resume Next
+ Err.Clear
         NeoCall ObjPtr(bstack), b$, Lang, ok
-        If Not ok Then
+        If Not ok Or Err <> 0 Then
+        
         Execute = 0
         Exit Function
         End If
@@ -19155,9 +19167,9 @@ pa$ = "'11001EDIT " + GetModuleName(mystack, here$) + "," + Mid$(pa$, 11)
 End If
 FK$(13) = Mid$(pa$, 7) + "-" + LTrim(Str(Len(NLtrim$(frm$))))
 If Right$(GetName(sbf(x1).goodname), 2) = "()" Then
-MyErMacro rest$, "Problem in class in function " + GetName(sbf(x1).goodname), "Πρόβλημα στη κλάση στη συνάρτηση " + GetName(sbf(x1).goodname)
+MyErMacro rest$, "Problem in class in function " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "Πρόβλημα στη κλάση στη συνάρτηση " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
 Else
-MyErMacro rest$, "Problem in class in module " + GetName(sbf(x1).goodname), "Πρόβλημα στη κλάση στο τμήμα " + GetName(sbf(x1).goodname)
+MyErMacro rest$, "Problem in class in module " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "Πρόβλημα στη κλάση στο τμήμα " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
 End If
 GoFunc = True
 GoTo there1234
@@ -35373,9 +35385,14 @@ If IsExp(basestack, rest$, p) Then
 i = CLng(p)
 If i >= 0 Or i <= p Then
 If Typename(var(i)) = "stdCallFunction" Then
+On Error Resume Next
+ Err.Clear
 CallByObject basestack, i, Not par
-Set basestack = Nothing
 
+Set basestack = Nothing
+If Err.Number <> 0 Then
+MyEr Err.Description, Err.Description
+End If
 Exit Sub
 ElseIf Typename(var(i)) = "lambda" Then
 ' call lamda
@@ -35608,7 +35625,9 @@ FastSymbol rest$, ","
 MakeThisSub basestack, what$
 it = GetlocalSub(what$, x1)
 If Not it Then
-    If SecureNames Then x1 = iRVAL22(here$)
+    If SecureNames Then
+    x1 = iRVAL22(here$)
+    End If
     If here$ = what$ Then
     ' nothing ??
     ElseIf x1 > 0 Then
@@ -35617,9 +35636,11 @@ If Not it Then
             s$ = what$
             If Replace(here$, ChrW(&HFFBF), "") = what$ Then
                 it = True: x1 = basestack.OriginalCode
-            ElseIf InStr(what$, basestack.UseGroupname) = 1 Then
+            ElseIf Len(basestack.UseGroupname) > 0 Then
+            If InStr(what$, basestack.UseGroupname) = 1 Then
                 what$ = basestack.UseGroupname + ChrW(&HFFBF) + Mid$(what$, Len(basestack.UseGroupname) + 1)
                 it = GetSub(what$, x1)
+                End If
             End If
             If it = 0 Then
                 what$ = s$
@@ -35655,18 +35676,18 @@ If Not it Then
     If it = 0 Then
         If Replace(here$, ChrW(&HFFBF), "") = what$ Then
             it = True: x1 = basestack.OriginalCode
-        ElseIf InStr(what$, basestack.UseGroupname) = 1 Then
+            ElseIf Len(basestack.UseGroupname) > 0 Then
+        If InStr(what$, basestack.UseGroupname) = 1 Then
               s$ = what$
               If Len(basestack.UseGroupname) > 0 Then what$ = basestack.UseGroupname + ChrW(&HFFBF) + Mid$(what$, Len(basestack.UseGroupname) + 1)
               it = GetSub(what$, x1)
               If it = 0 Then it = GetSub(s$, x1): what$ = s$
-          ' Else
-          ' it = GetSub(what$, x1)
-             
+          
+          End If
            End If
            If it = 0 Then
-           x1 = iRVAL22(here$)
-           it = True
+           'x1 = iRVAL22(here$)
+          ' it = True
            End If
        End If
     End If
@@ -35695,7 +35716,7 @@ If Not it Then
                   bs.StaticInUse = basestack.StaticInUse
                   Call GoFunc(bs, "()", rest$, vvl, , x1)
                  If LastErNum Then
-                            MyEr GetName(sbf(x1).goodname), GetName(sbf(x1).goodname)
+                            MyEr Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
                             resp = False
                             GoTo exithere
                 End If
@@ -35709,7 +35730,7 @@ If Not it Then
                 bs.StaticInUse = what$
                 Call GoFunc(bs, "", rest$, vvl, , x1)
                 If LastErNum Then
-                        MyEr GetName(sbf(x1).goodname), GetName(sbf(x1).goodname)
+                        MyEr Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
                         resp = False
                         GoTo exithere
 
@@ -50073,7 +50094,8 @@ check123678:
                     IsArrayFun = NeoGetArrayItem(pppp, bstack, s$, w1, a$)
                 Else
                     IsArrayFun = FastSymbol(a$, ")", True)
-                    w1 = pppp.index
+                    w1 = 0
+                   ' w1 = pppp.index
                 End If
 checkIterator:
                 If Not pppp.IsEmpty Then
@@ -51234,12 +51256,13 @@ Dim s$, w1 As Long, w2 As Long, s1$, dd As Long, w3 As Long, pppp As mArray, ppp
 
 End Function
 Private Function IsEval(v$, bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
-Dim p As Variant, anything As Object, w3 As Long, w2 As Long, w1 As Long, PP As Variant, rB As Byte, ri As Integer, dn As Long, s$
+Dim p As Variant, anything As Object, w3 As Long, w2 As Long, w1 As Long, PP As Variant, rB As Byte, ri As Integer, dn As Long, s$, ss$
 Dim db As Double, pppp As mArray, IsGroupOnly As Group, ReadAsSingle As Boolean, ds As Single
 
 w1 = 1
 s$ = aheadstatus(a$, False, w1)
 s$ = Left$(a$, w1)
+ss$ = s$
     If CheckGroupOrPointer(bstack, s$, IsGroupOnly, pppp, w2) Then
     
             If Not IsGroupOnly Is Nothing Then
@@ -51294,7 +51317,9 @@ s$ = Left$(a$, w1)
             a$ = Mid$(a$, w1 + 1 - Len(s$))
             GoTo getgroup
             End If
-    ElseIf IsExp(bstack, a$, p) Then
+    ElseIf IsExp(bstack, ss$, p) Then
+    If Len(ss$) > 0 Then Mid$(a$, w1 + 1 - Len(ss$), Len(ss$)) = ss$
+    Mid$(a$, 1, w1 + 1 - Len(ss$)) = Space$(w1 - Len(ss$))
 handlehandlers:
         w1 = 0
         s$ = ""
@@ -51588,13 +51613,24 @@ getgroup:
         
         End If
         MissParam a$
-    ElseIf IsStrExp(bstack, a$, s$) Then
+    ElseIf IsStrExp(bstack, ss$, s$) Then
+    If Len(ss$) > 0 Then Mid$(a$, w1 + 1 - Len(ss$), Len(ss$)) = ss$
+    Mid$(a$, 1, w1 + 1 - Len(ss$)) = Space$(w1 - Len(ss$))
     If FastSymbol(a$, ".") Then
     If MaybeIsSymbol(a$, ")") Then
-            a$ = s$ + a$
+        
+            If Not IsExp(bstack, s$, r) Then
+          
+            wrongweakref a$
+        Else
+            If SG < 0 Then r = -r
+            
+            IsEval = FastSymbol(a$, ")", True)
+        End If
+            
         Else
         a$ = s$ + "." + a$
-        End If
+        
         If Not IsExp(bstack, a$, r) Then
           
             wrongweakref a$
@@ -51602,6 +51638,7 @@ getgroup:
         If SG < 0 Then r = -r
             
             IsEval = FastSymbol(a$, ")", True)
+        End If
         End If
     Else
     
