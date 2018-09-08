@@ -68,6 +68,7 @@ Public LastValue As Variant
 Public LastMouse1 As Variant
 Public LastMouse2 As String
 Public LastState As Boolean
+Public LastEnum As Variant
 Private RetSoros As mStiva  ' for basic mimic functions- for education only
 Public SubLevel As Long
 Public OriginalCode As Long

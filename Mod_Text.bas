@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 17
+Global Const Revision = 18
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -1919,6 +1919,7 @@ RetStackSize = bstack.RetStackTotal
                 End If
                 Else
             bstack.MoveNameDot w$
+            
             End If
             Else
             
@@ -2011,7 +2012,7 @@ If subspoint Then v = -100: subspoint = False
 mm.DataVal CDbl(v)
 mm.DataObj pppp
 Do While FastSymbol(b$, ",")
-
+y1 = 0
 
 
          If Len(b$) < 129 Then
@@ -3186,7 +3187,10 @@ again2:
         If TypeOf bstack.lastobj Is mHandler Then
        ' If MaybeIsSymbol(aa$, "=<>") Then
         '    r = 0&
-        If bstack.lastobj.t1 = 4 Then r = bstack.lastobj.index_cursor: If po < 0 Then r = -r: po = -po
+        If bstack.lastobj.t1 = 4 Then
+        r = bstack.lastobj.index_cursor: Set bstack.LastEnum = bstack.lastobj.objref
+        If po < 0 Then r = -r: po = -po
+        End If
          '   GoTo LeaveIt
        ' Else
            GoTo cont111333
@@ -5474,6 +5478,15 @@ If v$ <> "" Then GoTo removethis
 End If
 End If
 IsNumber = False  ''         " " + & String$(w2 - Len(a$), " ")
+If IsObject(bstack.LastEnum) Then
+  r = bstack.LastEnum.SearchSimple(v$, par)
+  If par Then
+  If SG < 0 Then r = -r
+  IsNumber = True
+  Exit Function
+  End If
+ End If
+
  ''If w2 >= Len(a$) Then a$ = " " & String$(w2 - Len(a$), " ") + a$ Else
   If w2 >= Len(a$) Then
   If v$ = myUcase(s1$, True) Then
@@ -5486,7 +5499,9 @@ IsNumber = False  ''         " " + & String$(w2 - Len(a$), " ")
  If FindNameForGroup(bstack, v$) Then
   UnknownProperty1 a$, v$
  Else
+
  If v$ = "" Then v$ = s1$
+  
  UnknownVariable1 a$, v$
 End If
 End If
@@ -18547,6 +18562,16 @@ contNegGlobal:
                     GoTo VarOnly
                 End If
                 If Not GlobalHandler(bstack, b$, Lang, 2) Then Execute = 0: Exit Function
+            
+                ElseIf IsLabelSymbolNew(b$, "¡–¡—", "ENUM", Lang) Then
+
+                If Not ProcEnum(bstack, b$, True) Then Execute = 0: Exit Function
+                GoTo loopcontinue
+                ElseIf IsLabelSymbolNew(b$, "¡–¡—…»Ã«”«", "ENUMERATION", Lang) Then
+
+                If Not ProcEnum(bstack, b$, True) Then Execute = 0: Exit Function
+
+                GoTo loopcontinue
                 Else
                 GoTo CONT12212
                End If
@@ -20122,6 +20147,11 @@ Function IdentifierGroup(basestack As basetask, what$, rest$, Lang As Long) As B
       IdentifierGroup = MyDocument(basestack, rest$, Lang)
     Case "LONG", "Ã¡ —’”"
         IdentifierGroup = MyLong(basestack, rest$, Lang)
+    Case "¡–¡—…»Ã«”«", "¡–¡—", "ENUMERATION", "ENUM"
+
+    IdentifierGroup = ProcEnumGroup(basestack, rest$, here$ = "")
+    
+    Exit Function
     End Select
 End Function
 Function Identifier(basestack As basetask, what$, rest$, Optional nocom As Boolean = False, Optional Lang As Long = 1) As Boolean
@@ -20751,7 +20781,7 @@ Case "PROTOTYPE", "–—Ÿ‘œ‘’–œ"
     Identifier = ProcProto(basestack, rest$, Lang)
     Exit Function
 Case "¡–¡—…»Ã«”«", "¡–¡—", "ENUMERATION", "ENUM"
-    Identifier = ProcEnum(basestack, rest$)
+    Identifier = ProcEnum(basestack, rest$, here$ = "")
     Exit Function
 Case Else
     x1 = Len(rest$)
@@ -24302,7 +24332,11 @@ If j <> 62 Then
             Exit Function
         End If
     Case 925, 957, 913, 945, 78, 110 '' number  - use spellunicode to make it
-        If j <> 78 Then Exit Function
+        If j = 42 Then
+        If Typename(st.StackItem(i)) = "mHandler" Then If st.StackItem(i).t1 <> 4 Then Exit Function
+        ElseIf j <> 78 Then
+        Exit Function
+        End If
     Case 923, 955, 70, 102  ' change from L l to F f form lambda
      If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 1))
         If j <> 108 Then Exit Function
@@ -24375,6 +24409,8 @@ CheckAgain:
                 GoTo CheckAgain
                 End If
                 ss$ = "U"   ' "Undefined"
+                Case 4
+                ss$ = "N"
                 Case Else
                 ss$ = "U"   ' "Undefined"
                 End Select
@@ -25964,11 +26000,19 @@ GoTo there100
 Else
 GoTo contVar
 End If
-Case "DOCUMENT", "≈√√—¡÷œ", "DIM", "–…Õ¡ ¡”", "–…Õ¡ ≈”", "GROUP", "œÃ¡ƒ¡", "LONG", "Ã¡ —’”", " ¡‘¡”‘¡”«", "INVENTORY", "ƒ…¡—»—Ÿ”«", "BUFFER"
+Case "DIM", "–…Õ¡ ¡”", "–…Õ¡ ≈”"
 ' put back, change HERE$ and
 contVar:
-If w$ = "GROUP" Or w$ = "œÃ¡ƒ¡" Then
-            If final Then
+bstack.priveflag = prv
+bstack.uniflag = uni
+bstack.finalFlag = final
+ExecuteGroupStruct = Abs(MyDim(bstack, rest$, Lang, glob))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+     If ExecuteGroupStruct = 0 Then Exit Function
+Case "GROUP", "œÃ¡ƒ¡"
+If final Then
             NoObjectAssign
             ExecuteGroupStruct = 0
             Exit Function
@@ -26026,33 +26070,43 @@ If w$ = "GROUP" Or w$ = "œÃ¡ƒ¡" Then
 
 
 
-Else
-bstack.priveflag = prv
-bstack.uniflag = uni
-bstack.finalFlag = final
-If glob Then
-Select Case w$
-Case "DIM"
-rest$ = " NEW " + rest$
-Case "–…Õ¡ ¡”", "–…Õ¡ ≈”"
-rest$ = " Õ≈œ " + rest$
-
-End Select
-
-
-End If
-  ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, Lang))
-  bstack.priveflag = False
-  bstack.uniflag = False
-  bstack.finalFlag = False
-End If
-
      If ExecuteGroupStruct = 0 Then Exit Function
        ''LogGroup bstack, vvv, oHere$, OvarnameLen, OarrnameLen, lcl
 Case "GLOBAL", "√≈Õ… œ", "√≈Õ… «", "√≈Õ… ≈”"
 MyEr "No global variables in groups, create global group", "º˜È „ÂÌÈÍ›Ú ÏÂÙ·‚ÎÁÙ›Ú ÛÂ ÔÏ‹‰· - ˆÙÈ‹ÓÂ „ÂÌÈÍﬁ ÔÏ‹‰·"
 ExecuteGroupStruct = 0
 Exit Function
+Case "LONG", "Ã¡ —’”"
+    ExecuteGroupStruct = Abs(MyLong(bstack, rest$, Lang))
+    
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+       If ExecuteGroupStruct = 0 Then Exit Function
+Case " ¡‘¡”‘¡”«", "INVENTORY"
+    ExecuteGroupStruct = Abs(ProcInventory(bstack, rest$, Lang))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+       If ExecuteGroupStruct = 0 Then Exit Function
+Case "ƒ…¡—»—Ÿ”«", "BUFFER"
+    ExecuteGroupStruct = Abs(ProcBuffer(bstack, rest$, Lang))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+       If ExecuteGroupStruct = 0 Then Exit Function
+Case "DOCUMENT", "≈√√—¡÷œ"
+    ExecuteGroupStruct = Abs(MyDocument(bstack, rest$, Lang))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+     If ExecuteGroupStruct = 0 Then Exit Function
+Case "¡–¡—…»Ã«”«", "¡–¡—", "ENUMERATION", "ENUM"
+  ExecuteGroupStruct = Abs(ProcEnumGroup(bstack, rest$, here$ = ""))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
+       If ExecuteGroupStruct = 0 Then Exit Function
 Case Else
 ' check if we have a class
 conthereplease:
@@ -36261,7 +36315,7 @@ ss$ = Left$(rest$, i - 1)
                 End If
               If MyLet Then
               
-              MyLet = MyRead(6, bstack, what$, 1, what$, x1)
+              MyLet = MyRead(6, bstack, (what$), 1, what$, x1)
             
             
              rest$ = Mid$(rest$, i)
@@ -37216,7 +37270,41 @@ Case 1
                         MyEr "Wrong object type", "À‹ËÔÚ Ù˝ÔÚ ·ÌÙÈÍÂÈÏ›ÌÔı"
                         Exit Function
                     End If
-                    End If
+                    Else
+                    i = globalvar(what$, 0)
+                    If Typename$(myobject) = "Group" Then
+                   If myobject.IamApointer Then
+               
+                Set var(i) = myobject
+                Else
+               UnFloatGroup bstack, bstack.GroupName & what$, i, myobject, here$ = vbNullString Or bstack.UseGroupname <> "", , True
+               End If
+                 ElseIf Typename$(myobject) = "mEvent" Then
+                Set var(i) = myobject
+            ElseIf Typename$(myobject) = "lambda" Then
+                Set var(i) = myobject
+                If ohere$ = vbNullString Then
+                    GlobalSub what$ + "()", "CALL EXTERN " & Str(i)
+                Else
+                    GlobalSub ohere$ & "." & bstack.GroupName & what$ + "()", "CALL EXTERN " & Str(i)
+                End If
+            ElseIf Typename$(myobject) = "mHandler" Then
+                If myobject.indirect > -1 Then
+                    Set var(i) = MakeitObjectGeneric(myobject.indirect)
+                Else
+                
+                Set var(i) = myobject
+                End If
+            ElseIf Typename$(myobject) = myArray Then
+             Set var(i) = New mHandler
+            var(i).t1 = 3
+            Set var(i).objref = myobject
+
+            Else
+            Set var(i) = myobject
+                    
+            End If
+            End If
     ElseIf bs.IsNumber(p) Then
 itisinumber:
     If GetVar3(bstack, what$, i, , , flag, , checktype, isAglobal, True) Then
@@ -41593,63 +41681,6 @@ Else
 Beeper 1000, 100
 End If
 ProcTone = True
-End Function
-Function ProcEnum(bstack As basetask, rest$) As Boolean
-
-    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
-    enumvalue = 0
-    If IsLabelOnly(rest$, w1$) = 1 Then
-       ' w1$ = myUcase$(w1$)
-        v = globalvar(w1$, v)
-        Set myenum = New Enumeration
-        
-        myenum.EnumName = w1$
-        Else
-        MyEr "No proper name for enumeration", "ÏÁ Í·ÌÔÌÈÍ¸ ¸ÌÔÏ· „È· ··ÒﬂËÏÁÛÁ"
-        Exit Function
-    End If
-    If FastSymbol(rest$, "{") Then
-        s$ = block(rest$)
-        
-        Do
-        If FastSymbol(s$, vbCrLf, , 2) Then
-        While FastSymbol(s$, vbCrLf, , 2)
-        Wend
-        ElseIf IsLabelOnly(s$, w1$) = 1 Then
-            'w1 = myUcase(w1$)
-            If FastSymbol(s$, "=") Then
-            If IsExp(bstack, s$, enumvalue) Then
-                If Not bstack.lastobj Is Nothing Then
-                    MyEr "No Object allowed as enumeration value", "ƒÂÌ ÂÈÙÒ›ÂÙ·È ·ÌÙÈÍÂﬂÏÂÌÔ „È· ÙÈÏﬁ ··ÒÈËÏÁÙﬁ"
-                    Exit Function
-                    End If
-                End If
-            Else
-                    enumvalue = enumvalue + 1
-            End If
-            myenum.AddOne w1$, enumvalue
-            Set mh = New mHandler
-            Set mh.objref = myenum
-            mh.t1 = 4
-            mh.ReadOnly = True
-            mh.index_cursor = enumvalue
-            mh.index_start = myenum.count - 1
-             v1 = globalvar(w1$, v1)
-             Set var(v1) = mh
-            ProcEnum = True
-        Else
-            Exit Do
-        End If
-        If FastSymbol(s$, ",") Then ProcEnum = False
-        Loop
-        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "¢‰ÂÈ· ¡·ÒﬂËÏÁÛÁ": Exit Function
-        ProcEnum = FastSymbol(rest$, "}", True)
-    Else
-        MissingEnumBlock
-        Exit Function
-    End If
-    
-    
 End Function
 Function ProcProto(bstack As basetask, rest$, Lang As Long) As Boolean
 ProcProto = True
@@ -47377,13 +47408,17 @@ MyError = False
 End Function
 
 
-Function MyDim(basestack As basetask, rest$, Lang As Long) As Boolean
+Function MyDim(basestack As basetask, rest$, Lang As Long, Optional dNew As Boolean) As Boolean
 Dim par As Boolean, pppp As mArray, it As Long
 Dim p As Variant, w$, s$, x As Variant, i As Long, F As Long, Reverse As Boolean, ss$, uselocalbase As Boolean, usethisbase As Long
 Dim oldbase As Long, common As Boolean, Rest1$
 MyDim = True
 Reverse = IsLabelSymbolNew(rest$, "OLE", "OLE", Lang)
+If dNew Then
+par = True
+Else
 par = IsLabelSymbolNew(rest$, "Õ≈œ", "NEW", Lang)
+End If
 common = IsLabelSymbolNew(rest$, " œ…Õœ”", "COMMON", Lang)
 If Not common Then common = IsLabelSymbolNew(rest$, " œ…Õœ…", "COMMON", Lang)
 uselocalbase = IsLabelSymbolNew(rest$, "¬¡”«", "BASE", Lang)
@@ -53584,10 +53619,22 @@ noexpression1:
                                 ReadOnly
                                 Exec1 = 0: ExecuteVar = 8: Exit Function
                             End If
+jumpbackhere:
                             If bstack.lastobj Is Nothing Then
+                            If var(v).t1 = 4 Then
+                            Set myobject = var(v).objref.SearchValue(p, ok)
+                            If ok Then
+                            Set var(v) = myobject
+                            Else
+                            WrongType
+                                Exec1 = 0: ExecuteVar = 8: Exit Function
+                            End If
+                            Else
                                 MissingObjReturn
                                 Exec1 = 0: ExecuteVar = 8: Exit Function
+                                End If
                             ElseIf Typename(bstack.lastobj) = "mHandler" Then
+                            
                                 Set myobject = New mHandler
                                 bstack.lastobj.CopyTo myobject
                                 If bstack.lastobj.indirect > -0 Then

@@ -11794,3 +11794,118 @@ Else
 NoUseDec = mNoUseDec
 End If
 End Sub
+Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
+
+    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
+    enumvalue = 0
+    If IsLabelOnly(rest$, w1$) = 1 Then
+       ' w1$ = myUcase$(w1$)
+        v = globalvar(bstack.GroupName + w1$, v, , glob)
+        Set myenum = New Enumeration
+        
+        myenum.EnumName = w1$
+        Else
+        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+        Exit Function
+    End If
+    If FastSymbol(rest$, "{") Then
+        s$ = block(rest$)
+        
+        Do
+        If FastSymbol(s$, vbCrLf, , 2) Then
+        While FastSymbol(s$, vbCrLf, , 2)
+        Wend
+        ElseIf IsLabelOnly(s$, w1$) = 1 Then
+            'w1 = myUcase(w1$)
+            If FastSymbol(s$, "=") Then
+            If IsExp(bstack, s$, enumvalue) Then
+                If Not bstack.lastobj Is Nothing Then
+                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
+                    Exit Function
+                    End If
+                End If
+            Else
+                    enumvalue = enumvalue + 1
+            End If
+            myenum.AddOne w1$, enumvalue
+            Set mh = New mHandler
+            Set mh.objref = myenum
+            mh.t1 = 4
+            mh.ReadOnly = True
+            mh.index_cursor = enumvalue
+            mh.index_start = myenum.count - 1
+             v1 = globalvar(bstack.GroupName + w1$, v1, , glob)
+             Set var(v1) = mh
+            ProcEnumGroup = True
+        Else
+            Exit Do
+        End If
+        If FastSymbol(s$, ",") Then ProcEnumGroup = False
+        Loop
+        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "’δεια Απαρίθμηση": Exit Function
+        ProcEnumGroup = FastSymbol(rest$, "}", True)
+    Else
+        MissingEnumBlock
+        Exit Function
+    End If
+    
+    
+End Function
+Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
+
+    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
+    enumvalue = 0
+    If IsLabelOnly(rest$, w1$) = 1 Then
+       ' w1$ = myUcase$(w1$)
+        v = globalvar(w1$, v, , glob)
+        Set myenum = New Enumeration
+        
+        myenum.EnumName = w1$
+        Else
+        MyEr "No proper name for enumeration", "μη κανονικό όνομα για απαρίθμηση"
+        Exit Function
+    End If
+    If FastSymbol(rest$, "{") Then
+        s$ = block(rest$)
+        
+        Do
+        If FastSymbol(s$, vbCrLf, , 2) Then
+        While FastSymbol(s$, vbCrLf, , 2)
+        Wend
+        ElseIf IsLabelOnly(s$, w1$) = 1 Then
+            'w1 = myUcase(w1$)
+            If FastSymbol(s$, "=") Then
+            If IsExp(bstack, s$, enumvalue) Then
+                If Not bstack.lastobj Is Nothing Then
+                    MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
+                    Exit Function
+                    End If
+                End If
+            Else
+                    enumvalue = enumvalue + 1
+            End If
+            myenum.AddOne w1$, enumvalue
+            Set mh = New mHandler
+            Set mh.objref = myenum
+            mh.t1 = 4
+            mh.ReadOnly = True
+            mh.index_cursor = enumvalue
+            mh.index_start = myenum.count - 1
+             v1 = globalvar(w1$, v1, , glob)
+             Set var(v1) = mh
+            ProcEnum = True
+        Else
+            Exit Do
+        End If
+        If FastSymbol(s$, ",") Then ProcEnum = False
+        Loop
+        If v1 > v Then Set var(v) = var(v1) Else MyEr "Empty Enumeration", "’δεια Απαρίθμηση": Exit Function
+        ProcEnum = FastSymbol(rest$, "}", True)
+    Else
+        MissingEnumBlock
+        Exit Function
+    End If
+    
+    
+End Function
+

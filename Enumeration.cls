@@ -15,6 +15,7 @@ Option Explicit
 Public EnumName As String
 Private Type item
     Key As String
+    KeyUCase As String
     iValue As Variant
 End Type
 Public Done As Boolean
@@ -58,10 +59,31 @@ Dim a As Long
 a = Malloc()
 With PriveSpace(a)
     .Key = Key
+    .KeyUCase = myUcase(Key)
     .iValue = nValue
 End With
 End Sub
-
+Function SearchSimple(what As String, ByRef ok As Boolean) As Variant
+Dim i As Long
+For i = 0 To toplim
+If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: Exit Function
+Next i
+End Function
+Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
+Dim i As Long, mm As mHandler
+For i = 0 To toplim
+If v = PriveSpace(i).iValue Then
+ok = True
+Set mm = New mHandler
+mm.t1 = 4
+Set mm.objref = Me
+mm.index_cursor = v
+mm.index_start = i
+Set SearchValue = mm
+Exit Function
+End If
+Next i
+End Function
 Public Property Get KeyToString() As Variant
     If index <> -1 Then KeyToString = PriveSpace(index).Key
 End Property

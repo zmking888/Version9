@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 17 active-X
+Version 9.4 rev 18 active-X
 
 Release Edition
 
