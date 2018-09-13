@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 18
+Global Const Revision = 19
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -785,9 +785,9 @@ Set bb1 = aa.objref
                           End If
                           Else
                       
-                           If bb1.ValidArea(addr, Len(s$) * 2) Then
+                           If bb1.ValidArea(addr, LenB(s$)) Then
                            ChangeValuesMem = True
-                           CopyBytes Len(s$) * 2, addr, StrPtr(s$)
+                           CopyBytes LenB(s$), addr, StrPtr(s$)
                      
                            Else
                             MyEr "Buffer is small", "Η Διάρθρωση είναι μικρή"
@@ -11038,7 +11038,12 @@ fstr2: '"EVAL$(", "ΕΚΦΡ$(", "ΕΚΦΡΑΣΗ$("
                             ' NOW WE KNOW HOW MANY BYTES WE TAKE (ALWAYS BYTES)
                                 p = MyRound(p)
                                 If .objref.ValidArea(w2, p) Then
-                                    r$ = String$((p + 1) \ 2, Chr(0))
+                                If p Mod 2 = 1 Then
+                                r$ = StrConv(String(p, Chr(0)), vbFromUnicode)
+                                Else
+                                r$ = String$((p + 1) \ 2, Chr(0))
+                                End If
+                                    
                                     CopyBytes CLng(p), StrPtr(r$), w2
                                 Else
                                     MyErMacroStr a$, "Buffer is small, can't get so many bytes", "Η Διάρθρωση είναι μικρή, δεν μπορώ να πάρω τόσα ψηφία"
@@ -16593,6 +16598,11 @@ ContReturn:
                               If ChangeValuesMem(bstack, b$, Lang) Then GoTo loopcontinue
                      Case 3
                               If ChangeValuesArray(bstack, b$) Then GoTo loopcontinue
+                     Case 4
+                        NoProperObject
+                        Set bstack.lastobj = Nothing
+                        Execute = 0
+                        Exit Function
                      End Select
        
        End If

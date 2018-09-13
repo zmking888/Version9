@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 18 active-X
+Version 9.4 rev 19 active-X
 
-Release Edition
+Fix Buffer for binary fields of odd length in files
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
