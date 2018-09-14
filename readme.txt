@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 19 active-X
+Version 9.4 rev 20 active-X
 
 Fix Buffer for binary fields of odd length in files
 

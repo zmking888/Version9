@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 19
+Global Const Revision = 20
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -21109,7 +21109,14 @@ Case "Group"
     
     LinkGroup bstack, name$ + Split(aa$)(0) + ".", var(val(Split(aa$)(1))), True
     End If
-
+Case "lambda"
+    varhash.ItemCreator name$ + Split(aa$)(0), CLng(val(v)), True
+    ' If here$ = vbNullString Then
+      '  GlobalSub name$ + Split(aa$)(0) + "()", "CALL EXTERN " & Str(v), name$
+                                        '    Else
+                                 '               GlobalSub here$ & "." & bstack.GroupName & s$ + "()", "CALL EXTERN " & Str(v), here$ + "." + bstack.GroupName
+                                           ' End If
+         GlobalSub name$ + Split(aa$)(0) + "()", "CALL EXTERN " & Str(v), name$
 Case Else
 
     varhash.ItemCreator name$ + Split(aa$)(0), CLng(val(v)), True
