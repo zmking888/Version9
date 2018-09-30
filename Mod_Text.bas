@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 20
+Global Const Revision = 21
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -24350,9 +24350,13 @@ If j <> 62 Then
         End If
     Case 925, 957, 913, 945, 78, 110 '' number  - use spellunicode to make it
         If j = 42 Then
-        If Typename(st.StackItem(i)) = "mHandler" Then If st.StackItem(i).t1 <> 4 Then Exit Function
+            If Typename(st.StackItem(i)) = "mHandler" Then
+                If st.StackItem(i).t1 <> 4 Then Exit Function
+            Else
+                Exit Function
+            End If
         ElseIf j <> 78 Then
-        Exit Function
+            Exit Function
         End If
     Case 923, 955, 70, 102  ' change from L l to F f form lambda
      If j = 42 Then j = AscW(Mid$(Typename(st.StackItem(i)), 1))

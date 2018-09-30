@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 20 active-X
+Version 9.4 rev 21 active-X
 
-Fix Buffer for binary fields of odd length in files
+Fix Match("N") when top of stack is a pointer.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
