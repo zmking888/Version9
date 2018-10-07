@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 21 active-X
+Version 9.4 rev 22 active-X
 
-Fix Match("N") when top of stack is a pointer.
+Fix Event in Group definition.
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

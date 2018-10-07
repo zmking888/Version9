@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -17481,6 +17481,7 @@ contPart:
                 ok = False
                 TraceRestore bstack, y1
                 x2 = x2 - Len(b$)
+                Execute = 1
                 Call executeblock(Execute, bstack, ss$, (once), ok)
                 If Execute = 0 Then b$ = ss$ + Space$(x2) + b$: Exit Function
                 TraceRestore bstack, x1
@@ -17533,8 +17534,7 @@ ContRepeat:
                  If IsLabelSymbolNew(b$, "левяи", "UNTIL", Lang) Then
                       Execute = 1
                       TraceRestore bstack, y1
-                        
-           Call executeblock(Execute, bstack, ss$, once, ok)
+                      Call executeblock(Execute, bstack, ss$, once, ok)
            
            TraceRestore bstack, x1
                          If Execute = 0 Then
@@ -17569,32 +17569,27 @@ ContRepeat:
             End If
             End If
         End With
-         w$ = Left$(w$, Len(w$) - Len(b$))
+        w$ = Left$(w$, Len(w$) - Len(b$))
         If Not p Then
-        bb$ = w$
-        ok = False
-       
-              Do
-                 ss$ = ec$
-                 w$ = bb$
-                 
-                      Call executeblock(Execute, bstack, ss$, once, ok)
-                    
-                         If Execute = 0 Then
+            bb$ = w$
+            ok = False
+             Do
+                ss$ = ec$
+                w$ = bb$
+                Execute = 1
+                Call executeblock(Execute, bstack, ss$, once, ok)
+                If Execute = 0 Then
                     b$ = Space$(v - (Len(ec$) - Len(ss$)))
-                      here$ = sw$
-                 Execute = 0: Exit Function
-                                      ElseIf Execute = 2 And ss$ <> "" And Not ok Then
-                                        here$ = sw$
-                            b$ = ss$: Exit Function
-                            
-                 End If
-                  If Execute = 3 Then ok = False
-                 If ok Or MOUT Then Exit Do
-                 
-                          IsExp bstack, w$, p
-    
-          Loop Until p
+                    here$ = sw$
+                    Execute = 0: Exit Function
+                ElseIf Execute = 2 And ss$ <> "" And Not ok Then
+                    here$ = sw$
+                    b$ = ss$: Exit Function
+                End If
+                If Execute = 3 Then ok = False
+                If ok Or MOUT Then Exit Do
+                IsExp bstack, w$, p
+              Loop Until p
           here$ = sw$
         End If
               End If
@@ -17603,22 +17598,18 @@ ContRepeat:
                  ' play always
                  If IsLabelSymbolNew(b$, "памта", "ALWAYS", Lang) Then
                       Do
-                 ss$ = ec$
-                 
+                        ss$ = ec$
+                        Execute = 1
                         Call executeblock(Execute, bstack, ss$, once, ok)
-                         If Execute = 0 Then
-                    b$ = Space$(v - (Len(ec$) - Len(ss$)))
-                 Execute = 0: Exit Function
-                                             ElseIf Execute = 2 And ss$ <> "" And Not ok Then
+                        If Execute = 0 Then
+                            b$ = Space$(v - (Len(ec$) - Len(ss$)))
+                            Execute = 0: Exit Function
+                        ElseIf Execute = 2 And ss$ <> "" And Not ok Then
                             b$ = ss$: Exit Function
-                 End If
-                 If ok Or MOUT Then Exit Do
+                         End If
+                         If ok Or MOUT Then Exit Do
                   Loop
- 
-                 
-                 
-                 
-                 Else
+                Else
                  
                  Execute = 0
                  Exit Function
@@ -17822,7 +17813,7 @@ contEvery:
                  p = p + uintnew(timeGetTime)
                  Do
                  ss$ = ec$
-               ''''''''''  w$ = bb$
+                 Execute = 1
                  Call executeblock(Execute, bstack, ss$, once, ok)
                  If Execute = 0 Then   '''Execute(bstack, ss$, ok) = 0
                             If NOEXECUTION Then
@@ -17992,6 +17983,7 @@ ContTry:
          
          b$ = NLtrim$(Mid$(b$, 2))
                 'On Error Resume Next
+                    Execute = 1
                      Call executeblock(Execute, bstack, ss$, once, ok)
           TraceRestore bstack, x1
    bstack.nokillvars = False
@@ -26019,7 +26011,13 @@ Else
 End If
 GoTo there100
 Else
-GoTo contVar
+bstack.priveflag = prv
+bstack.uniflag = uni
+bstack.finalFlag = final
+   ExecuteGroupStruct = Abs(IdentifierGroup(bstack, w$, rest$, Lang))
+  bstack.priveflag = False
+  bstack.uniflag = False
+  bstack.finalFlag = False
 End If
 Case "DIM", "пимайас", "пимайес"
 ' put back, change HERE$ and
