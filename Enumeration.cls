@@ -79,10 +79,29 @@ mm.t1 = 4
 Set mm.objref = Me
 mm.index_cursor = v
 mm.index_start = i
+mm.Sign = 1
 Set SearchValue = mm
 Exit Function
 End If
 Next i
+If Not ok Then
+v = -v
+For i = 0 To toplim
+If v = PriveSpace(i).iValue Then
+ok = True
+Set mm = New mHandler
+mm.t1 = 4
+Set mm.objref = Me
+mm.index_cursor = v
+mm.index_start = i
+mm.Sign = -1
+Set SearchValue = mm
+Exit Function
+End If
+Next i
+
+End If
+Set SearchValue = New mHandler
 End Function
 Public Property Get KeyToString() As Variant
     If index <> -1 Then KeyToString = PriveSpace(index).Key

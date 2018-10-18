@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 22 active-X
+Version 9.4 rev 23 active-X
 
-Fix Event in Group definition.
+Expand Enum to handle variables with negative value
+(for enum -1,2,3 we can use variables with 1 -2 -3)
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

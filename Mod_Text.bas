@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3185,11 +3185,10 @@ again:
 again2:
       If Not bstack.lastobj Is Nothing Then
         If TypeOf bstack.lastobj Is mHandler Then
-       ' If MaybeIsSymbol(aa$, "=<>") Then
-        '    r = 0&
         If bstack.lastobj.t1 = 4 Then
-        r = bstack.lastobj.index_cursor: Set bstack.LastEnum = bstack.lastobj.objref
+        r = bstack.lastobj.index_cursor * bstack.lastobj.sign: Set bstack.LastEnum = bstack.lastobj.objref
         If po < 0 Then r = -r: po = -po
+        
         End If
          '   GoTo LeaveIt
        ' Else
@@ -5770,7 +5769,10 @@ IsNumber = StackItem(bstack, a$, SG, r)
 Exit Function
 fun3: ' "SGN(", "ÓÇÌ("
 If IsExp(bstack, a$, p) Then
+Set bstack.lastobj = Nothing
 r = Sgn(MyRound(p, 28))
+
+
 If SG < 0 Then r = -r
 
 
@@ -14487,7 +14489,7 @@ somethingelse:
                              interpret = False
                                 GoTo there1
                         ElseIf ss$ = "++" Then
-                        If myobject.index_start < myobject.objref.count Then
+                        If myobject.index_start < myobject.objref.count - 1 Then
                             myobject.index_start = myobject.index_start + 1
                             myobject.objref.index = myobject.index_start
                             myobject.index_cursor = myobject.objref.Value
@@ -14498,6 +14500,8 @@ somethingelse:
                             myobject.objref.index = myobject.index_start
                             myobject.index_cursor = myobject.objref.Value
                         End If
+                        ElseIf ss$ = "-!" Then
+                        myobject.sign = -myobject.sign
                         Else
                         NoOperatorForThatObject ss$
                          interpret = False
@@ -24804,6 +24808,7 @@ ElseIf TypeOf bstack.lastobj.objref Is Enumeration Then
 Set bstack.lastobj.objref = New mHandler
 Set bstack.lastobj.objref.objref = anything.objref
 bstack.lastobj.objref.t1 = 4
+'bstack.lastobj.objref.Sign = anything.objref.Sign
 bstack.lastobj.objref.index_cursor = st
 End If
 End If
@@ -51606,15 +51611,18 @@ errortext1:
                aa.index_cursor = anything.index_cursor
                Set aa.objref = anything.objref
                aa.index_start = anything.index_start
+               aa.sign = anything.sign
+               r = aa.index_cursor * aa.sign
                Else
                aa.index_cursor = anything.objref.Value
                Set aa.objref = anything.objref
                aa.index_start = anything.objref.index
-              
+               r = aa.index_cursor
                End If
                aa.t1 = 4
                If SG < 0 Then r = -r
                Set bstack.lastobj = aa
+               
                 IsEval = FastSymbol(a$, ")", True)
                        Exit Function
                Else
@@ -53397,6 +53405,9 @@ checkobject:
                                      Set var(v) = var(myobject.indirect)
                                 Else
                                     Set var(v) = myobject
+                                    If myobject.t1 = 4 Then
+                                    If myobject.sign * myobject.index_cursor <> p Then myobject.sign = -myobject.sign
+                                    End If
                                 End If
                                  With bstack.lastobj
                                         If .UseIterator Then
@@ -54031,7 +54042,7 @@ here1234:
                                 ReadOnly
                                 Exec1 = 0: ExecuteVar = 8: Exit Function
                         ElseIf ss$ = "++" Then
-                        If myobject.index_start < myobject.objref.count Then
+                        If myobject.index_start < myobject.objref.count - 1 Then
                             myobject.index_start = myobject.index_start + 1
                             myobject.objref.index = myobject.index_start
                             myobject.index_cursor = myobject.objref.Value
@@ -54042,6 +54053,8 @@ here1234:
                             myobject.objref.index = myobject.index_start
                             myobject.index_cursor = myobject.objref.Value
                         End If
+                        ElseIf ss$ = "-!" Then
+                        myobject.sign = -myobject.sign
                         Else
                         NoOperatorForThatObject ss$
                     Exec1 = 0: ExecuteVar = 8
@@ -55919,50 +55932,4 @@ GetMem4 VarPtr(b$), j
 PutMem4 VarPtr(a$), j
 PutMem4 VarPtr(b$), i
 End Sub
-
-Function CallLambdaASAP(bstack As basetask, a$, r, Optional forstring As Boolean = False) As Long
-Dim w2 As Long, w1 As Long, nbstack As basetask
-PushStage bstack, False
-w2 = var2used
-If forstring Then
-w1 = globalvar("A_" + CStr(w2) + "$", 0#)
- Set var(w1) = bstack.lastobj
- Set bstack.lastobj = Nothing
-  If here$ = vbNullString Then
-            GlobalSub "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
-        Else
-            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
-    End If
- Set nbstack = New basetask
-    nbstack.reflimit = varhash.count
-    Set nbstack.Parent = bstack
-    If bstack.IamThread Then Set nbstack.Process = bstack.Process
-    Set nbstack.Owner = bstack.Owner
-    nbstack.OriginalCode = 0
-    nbstack.UseGroupname = ""
- CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "$()", a$, r)
-
-Else
-w1 = globalvar("A_" + CStr(w2), 0#)
- Set var(w1) = bstack.lastobj
- Set bstack.lastobj = Nothing
-  If here$ = vbNullString Then
-            GlobalSub "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
-        Else
-            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
-    End If
-     Set nbstack = New basetask
-    nbstack.reflimit = varhash.count
-    Set nbstack.Parent = bstack
-    If bstack.IamThread Then Set nbstack.Process = bstack.Process
-    Set nbstack.Owner = bstack.Owner
-    nbstack.OriginalCode = 0
-    nbstack.UseGroupname = ""
- CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", a$, r)
-End If
-
-
-                 
-PopStage bstack
-End Function
 

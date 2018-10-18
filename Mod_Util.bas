@@ -10952,8 +10952,10 @@ Else
                         Counterend = -1
                         counter = 0
                         countDir = 1
-                        If myobject.t1 = 4 Then
-                    p = myobject.index_cursor
+                       If myobject.t1 = 4 Then
+                       
+                       ' p = myobject.index_cursor * myobject.Sign
+                   
                     Set myobject = Nothing
                     GoTo isanumber
                         ElseIf Not CheckIsmArrayOrStackOrCollection(myobject) Then
@@ -11908,4 +11910,50 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
     
     
 End Function
+Function CallLambdaASAP(bstack As basetask, a$, r, Optional forstring As Boolean = False) As Long
+Dim w2 As Long, w1 As Long, nbstack As basetask
+PushStage bstack, False
+w2 = var2used
+If forstring Then
+w1 = globalvar("A_" + CStr(w2) + "$", 0#)
+ Set var(w1) = bstack.lastobj
+ Set bstack.lastobj = Nothing
+  If here$ = vbNullString Then
+            GlobalSub "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
+        Else
+            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "$()", "CALL EXTERN " & Str(w1)
+    End If
+ Set nbstack = New basetask
+    nbstack.reflimit = varhash.count
+    Set nbstack.Parent = bstack
+    If bstack.IamThread Then Set nbstack.Process = bstack.Process
+    Set nbstack.Owner = bstack.Owner
+    nbstack.OriginalCode = 0
+    nbstack.UseGroupname = ""
+ CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "$()", a$, r)
+
+Else
+w1 = globalvar("A_" + CStr(w2), 0#)
+ Set var(w1) = bstack.lastobj
+ Set bstack.lastobj = Nothing
+  If here$ = vbNullString Then
+            GlobalSub "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
+        Else
+            GlobalSub here$ & "." & bstack.GroupName & "A_" + CStr(Abs(w2)) + "()", "CALL EXTERN " & Str(w1)
+    End If
+     Set nbstack = New basetask
+    nbstack.reflimit = varhash.count
+    Set nbstack.Parent = bstack
+    If bstack.IamThread Then Set nbstack.Process = bstack.Process
+    Set nbstack.Owner = bstack.Owner
+    nbstack.OriginalCode = 0
+    nbstack.UseGroupname = ""
+ CallLambdaASAP = GoFunc(nbstack, "A_" + CStr(Abs(w2)) + "()", a$, r)
+End If
+
+
+                 
+PopStage bstack
+End Function
+
 
