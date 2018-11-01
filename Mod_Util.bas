@@ -11956,3 +11956,82 @@ End If
 PopStage bstack
 End Function
 
+Function ProcText(basestack As basetask, isHtml As Boolean, rest$) As Boolean
+Dim x1 As Long, frm$, pa$, s$
+ProcText = True
+If IsSymbol(rest$, "UTF-8", 5) Then
+x1 = 2
+ElseIf IsSymbol(rest$, "UTF-16", 6) Then
+x1 = 0 ' only little endian (but if something convert it to big we can read...)
+Else
+x1 = 3
+End If
+
+s$ = vbNullString
+If Not IsStrExp(basestack, rest$, s$) Then
+If Not Abs(IsLabelOnly(rest$, s$)) = 1 Then
+    ProcText = False
+    Exit Function
+End If
+End If
+FastSymbol rest$, ","
+If s$ <> "" Then
+
+If FastSymbol(rest$, "+") Then pa$ = vbNullString Else pa$ = "new"
+If FastSymbol(rest$, "{") Then frm$ = NLtrim$(blockString(rest$, 125))
+If frm$ <> "" Then
+If isHtml Then
+If ExtractType(s$) = vbNullString Then s$ = s$ & ".html"
+End If
+ textPUT basestack, mylcasefILE(s$), frm$, pa$, x1
+Else
+ textDel (mylcasefILE(s$))
+ ProcText = True
+ Exit Function
+End If
+ProcText = FastSymbol(rest$, "}")
+End If
+Exit Function
+
+End Function
+Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
+Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, buf$, i As Long
+ThisFile = strTemp + ThisFile
+chk = GetDosPath(ThisFile)
+If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
+On Error GoTo HM
+textPUT = True
+Do
+j = InStr(THISBODY, "##")
+If j = 0 Then PREPARE$ = PREPARE$ & THISBODY: Exit Do
+If j > 1 Then PREPARE$ = PREPARE$ & Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
+THISBODY = Mid$(THISBODY, j + 2)
+j = InStr(THISBODY, "##")
+If j = 0 Then PREPARE$ = PREPARE$ & THISBODY: Exit Do
+If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
+THISBODY = Mid$(THISBODY, j + 2)
+'
+If IsExp(bstack, VR$, v) Then
+buf$ = Trim$(Str$(v))
+ElseIf IsStrExp(bstack, VR$, s$) Then
+buf$ = s$
+Else
+buf$ = VR$
+End If
+PREPARE$ = PREPARE$ & buf$
+Loop
+           If Not WeCanWrite(ThisFile) Then GoTo HM
+
+textPUT = SaveUnicode(ThisFile, PREPARE$, mode2save, Not (c$ = "new"))
+Exit Function
+HM:
+textPUT = False
+End Function
+Private Function textDel(ByVal ThisFile As String) As Boolean
+Dim chk As String
+ThisFile = strTemp + ThisFile
+chk = CFname(ThisFile)
+textDel = (chk <> "")
+If chk <> "" Then KillFile chk
+End Function
+

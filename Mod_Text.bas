@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3481,7 +3481,16 @@ cont4567:
                                     Else
                                     po = po * r
                                     End If
-                                    If ac = 0 Then rr = po Else rr = ac + po
+                                    If ac = 0 Then
+                                    rr = po
+                                    Else
+                                        rr = ac
+                                        rr = rr + po
+                                        If Err.Number = 6 Then
+                                            rr = CDbl(rr) + CDbl(po)
+                                            Err.Clear
+                                        End If
+                                    End If
                                     IsExpA = True
                                      Set park = Nothing
                                     Exit Function
@@ -3557,7 +3566,17 @@ again3:
                                     Else
                                     po = po * r
                                     End If
-                                    If ac = 0 Then rr = po Else rr = ac + po
+                                    If ac = 0 Then
+                                    rr = po
+                                    Else
+                                    rr = ac + po
+                                        rr = ac
+                                        rr = rr + po
+                                        If Err.Number = 6 Then
+                                            rr = CDbl(rr) + CDbl(po)
+                                            Err.Clear
+                                        End If
+                                    End If
                                     IsExpA = True
                                      Set park = Nothing
                                     Exit Function
@@ -3776,6 +3795,7 @@ Do
             If Err.Number = 6 Then
             
             po = CDbl(r1) * CDbl(po)
+            Err.Clear
             End If
             Case 2
                 If po = 0 Then
@@ -4135,7 +4155,16 @@ ElseIf FastSymbol(aa$, ")") Then
                 If ac <> 0 Then po = ac + po: ac = 0
             Else
                 aa$ = ")" & aa$
-                If ac = 0 Then rr = po Else rr = ac + po
+                If ac = 0 Then
+                rr = po
+                Else
+                rr = ac
+                rr = rr + po
+                If Err.Number = 6 Then
+                rr = CDbl(rr) + CDbl(po)
+                Err.Clear
+                End If
+                End If
                 Exit Function
             End If
 ElseIf FastSymbol(aa$, "<>", , 2) Then
@@ -4411,7 +4440,16 @@ If logical(bstack, aa$, r, , True) Then
     If IsExp(bstack, aa$, r, , True) Then
     r1 = -r1
     MUL = 1 ' from 3
-    If ac = 0 Then ac = po Else ac = ac + po
+    If ac = 0 Then
+    ac = po
+    Else
+    ac = ac + po
+    If Err.Number = 6 Then
+    Err.Clear
+    ac = CDbl(ac) + CDbl(po)
+    Err.Clear
+    End If
+    End If
     po = r
     If Not FastSymbol(aa$, ")") Then
     IsExpA = False
@@ -4430,18 +4468,30 @@ ElseIf FastSymbol(aa$, "+") Then
 If logical(bstack, aa$, r, , True) Then
     MUL = 1 ' from 3
     
-    If ac = 0 Then ac = po Else ac = ac + po
-    
+    If ac = 0 Then
+    ac = po
+    Else
+    ac = ac + po
     If Err.Number = 6 Then
     Err.Clear
     ac = CDbl(ac) + CDbl(po)
-    
+    Err.Clear
+    End If
     End If
     po = r
     ElseIf FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
     MUL = 1 ' from 3
-    If ac = 0 Then ac = po Else ac = ac + po
+    If ac = 0 Then
+    ac = po
+    Else
+    ac = ac + po
+    If Err.Number = 6 Then
+    Err.Clear
+    ac = CDbl(ac) + CDbl(po)
+    Err.Clear
+    End If
+    End If
     po = r
     If Not FastSymbol(aa$, ")") Then
     IsExpA = False
@@ -4459,10 +4509,15 @@ logic = True
 Exit Do
 End If
 Loop
-If ac = 0 Then ac = po Else ac = ac + po
+If ac = 0 Then
+ac = po
+Else
+ac = ac + po
 If Err.Number = 6 Then
 Err.Clear
 ac = CDbl(ac) + CDbl(po)
+Err.Clear
+End If
 End If
 po = 1
 Loop Until logic
@@ -23100,46 +23155,7 @@ End If
 End If
 PlaceBasket dd, players(GetCode(dd))
 End Sub
-Private Function textDel(ByVal ThisFile As String) As Boolean
-Dim chk As String
-ThisFile = strTemp + ThisFile
-chk = CFname(ThisFile)
-textDel = (chk <> "")
-If chk <> "" Then KillFile chk
-End Function
-Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
-Dim chk As String, b$, j As Long, PREPARE$, VR$, s$, v As Double, buf$, i As Long
-ThisFile = strTemp + ThisFile
-chk = GetDosPath(ThisFile)
-If chk <> "" And c$ = "new" Then KillFile GetDosPath(chk)
-On Error GoTo HM
-textPUT = True
-Do
-j = InStr(THISBODY, "##")
-If j = 0 Then PREPARE$ = PREPARE$ & THISBODY: Exit Do
-If j > 1 Then PREPARE$ = PREPARE$ & Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
-THISBODY = Mid$(THISBODY, j + 2)
-j = InStr(THISBODY, "##")
-If j = 0 Then PREPARE$ = PREPARE$ & THISBODY: Exit Do
-If j > 1 Then VR$ = Mid$(THISBODY, 1, InStr(THISBODY, "##") - 1)
-THISBODY = Mid$(THISBODY, j + 2)
-'
-If IsExp(bstack, VR$, v) Then
-buf$ = Trim$(Str$(v))
-ElseIf IsStrExp(bstack, VR$, s$) Then
-buf$ = s$
-Else
-buf$ = VR$
-End If
-PREPARE$ = PREPARE$ & buf$
-Loop
-           If Not WeCanWrite(ThisFile) Then GoTo HM
 
-textPUT = SaveUnicode(ThisFile, PREPARE$, mode2save, Not (c$ = "new"))
-Exit Function
-HM:
-textPUT = False
-End Function
 Public Sub DropLeft(ByVal uStr As String, fromStr As String)
 Dim i As Long
 i = InStr(fromStr, uStr)
@@ -29524,44 +29540,6 @@ End If
 PlaceBasket Scr, prive
 End Function
 
-Function ProcText(basestack As basetask, isHtml As Boolean, rest$) As Boolean
-Dim x1 As Long, frm$, pa$, s$
-ProcText = True
-If IsSymbol(rest$, "UTF-8", 5) Then
-x1 = 2
-ElseIf IsSymbol(rest$, "UTF-16", 6) Then
-x1 = 0 ' only little endian (but if something convert it to big we can read...)
-Else
-x1 = 3
-End If
-
-s$ = vbNullString
-If Not IsStrExp(basestack, rest$, s$) Then
-If Not Abs(IsLabelOnly(rest$, s$)) = 1 Then
-    ProcText = False
-    Exit Function
-End If
-End If
-FastSymbol rest$, ","
-If s$ <> "" Then
-
-If FastSymbol(rest$, "+") Then pa$ = vbNullString Else pa$ = "new"
-If FastSymbol(rest$, "{") Then frm$ = NLtrim$(blockString(rest$, 125))
-If frm$ <> "" Then
-If isHtml Then
-If ExtractType(s$) = vbNullString Then s$ = s$ & ".html"
-End If
- textPUT basestack, mylcasefILE(s$), frm$, pa$, x1
-Else
- textDel (mylcasefILE(s$))
- ProcText = True
- Exit Function
-End If
-ProcText = FastSymbol(rest$, "}")
-End If
-Exit Function
-
-End Function
 Function ProcPrinting(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim xp As Printer, Scr As Object
 Set Scr = basestack.Owner
