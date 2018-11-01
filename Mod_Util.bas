@@ -3081,7 +3081,7 @@ SetNormal d
    Dim osbit As String
    If Is64bit Then osbit = " (64-bit)" Else osbit = " (32-bit)"
         LCTbasket d, players(basketcode), BAR, 0
-        rs = RESOURCES
+        rs = ""
             If bstack.myCharSet = 161 Then
             If Revision = 0 Then
             wwPlain bstack, players(DisForm), "Έκδοση Διερμηνευτή: " & CStr(VerMajor) & "." & CStr(VerMinor), d.Width, 0, True
@@ -11955,5 +11955,4 @@ End If
                  
 PopStage bstack
 End Function
-
 

@@ -1,9 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 23 active-X
+Version 9.4 rev 24 active-X
 
-Expand Enum to handle variables with negative value
-(for enum -1,2,3 we can use variables with 1 -2 -3)
+Enum variables can be used as keys in inventories
+Boolean variables also can be uses as keys in inventories
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

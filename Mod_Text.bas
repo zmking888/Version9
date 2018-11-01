@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 23
+Global Const Revision = 24
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -484,6 +484,7 @@ ElseIf MaybeIsSymbol(rest$, ",") Then
                         ChangeValues = False
                         GoTo there
                     End If
+                        If VarType(p) = vbBoolean Then p = CLng(p)
                     If Not bstack.lastobj Is Nothing Then
                         MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
                         ChangeValues = False
@@ -3774,7 +3775,7 @@ Do
                 po = r1 * po
             If Err.Number = 6 Then
             
-            po = CDbl(r) * CDbl(po)
+            po = CDbl(r1) * CDbl(po)
             End If
             Case 2
                 If po = 0 Then
@@ -3786,6 +3787,9 @@ Do
                     Exit Function
                 Else
                     po = r1 / po
+                    If Err.Number = 6 Then
+                    po = CDbl(r1) / CDbl(po)
+                    End If
                 End If
             Case 3
                ' po = r1 * po
@@ -7258,6 +7262,8 @@ syntax1:
                 MyEr "???", "???"
                 Exit Function
                 End If
+                Set bstack.lastobj = Nothing
+                If VarType(p) = vbBoolean Then p = CLng(p)
                 If Not FastSymbol(a$, "!") Then s$ = CStr(p): GoTo contlabel
                  With pppp.GroupRef.objref
                     
@@ -7366,6 +7372,7 @@ contlabel:
                     Else
                     
                      r = rValue(bstack, pppp.GroupRef.objref.ValueObj)
+                     
                     If SG < 0 Then r = -r
                        End If
                        End If
@@ -13363,6 +13370,7 @@ contrightstrpar:
             End If
             With pppp.GroupRef.objref
                If IsExp(bstackstr, a$, p) Then
+               If VarType(p) = vbBoolean Then p = CLng(p)
                If FastSymbol(a$, "!") Then
                  If Abs(p) < .count Then
                  If p < 0 Then
@@ -23175,26 +23183,7 @@ fromStr = Mid$(fromStr, i)
 End If
 End If
 End Function
-Function RESOURCES() As String
-'ON ERROR GoTo r1
- '   r1 = GetFreeResources(GFSR_GDIRESOURCES)
-  '  r2 = GetFreeResources(GFSR_SYSTEMRESOURCES)
-   ' r3 = GetFreeResources(GFSR_USERRESOURCES)
-    'If r1 < 12 Or r2 < 12 Or r3 < 12 Then
-'    If r1 < 12 Then
-'    RESOURCES = "!!GDI!!"
-'    ElseIf r2 < 12 Then
-'    RESOURCES = "!!SYSTEM!!"
-'    Else
-'    RESOURCES = "!!USER!!"
-'    End If
-'    Else
-'    RESOURCES = Left$(Format$((r1 + r2 + r3) / 3#, "#0.0"), 2)
-'    End If
-'    Exit Function
-'r1:
-    RESOURCES = vbNullString
-End Function
+
 Public Function myRegister(tp$) As String
     strTemp = String(MAX_FILENAME_LEN, Chr$(0))
     GetTempPath MAX_FILENAME_LEN, StrPtr(strTemp)
@@ -48070,11 +48059,19 @@ If Left$(ah, 1) = "N" Then
         AddInventory = False
         GoTo there
     End If
+    If VarType(p) = vbBoolean Then p = CLng(p)
     If Not bstack.lastobj Is Nothing Then
+        If TypeOf bstack.lastobj Is mHandler Then
+        If bstack.lastobj.t1 = 4 Then
+        Set bstack.lastobj = Nothing
+        GoTo noenum
+        End If
+        End If
         MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
         AddInventory = False
         GoTo there
     End If
+noenum:
     If bb.ExistKey0(p) Then
         MyEr "Key exist, must be unique", "Το κλειδί υπάρχει, πρέπει να είναι μοναδικό"
         AddInventory = False
@@ -51489,7 +51486,8 @@ absolute:
                                         
                                     Case 8
                                         GetMem8 w2, db
-                                        r = SG * db
+                                        If SG < 0 Then r = -db Else r = db
+                                      
                                     Case 16
                                     
                                     End Select
