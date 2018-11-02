@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 25
+Global Const Revision = 26
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37423,12 +37423,60 @@ Case 5, 7
                 rest$ = Mid$(rest$, i)
             End If
         Else
-            If Not bs.IsNumber(p) Then
+            If bs.IsObjectRef(myobject) Then
+            If Typename$(myobject) = "Group" Then
+                         If myobject.IamFloatGroup Then
+                                    Set pppp.item(it) = myobject
+                                    Set myobject = Nothing
+                             Else
+                             
+                                          BadGroupHandle
+                                          MyRead = False
+                                          Set myobject = Nothing
+                                          Exit Function
+                             End If
+                   ElseIf Typename$(myobject) = "lambda" Then
+                            Set pppp.item(it) = myobject
+                            Set myobject = Nothing
+                    ElseIf Typename$(myobject) = myArray Then
+                                  If myobject.Arr Then
+                        Set pppp.item(it) = CopyArray(myobject)
+                    Else
+                        Set pppp.item(it) = myobject
+                    End If
+                    Set myobject = Nothing
+                    ElseIf Typename$(myobject) = "mHandler" Then
+                    If myobject.indirect > -0 Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    p = myobject.t1
+                    If CheckDeepAny(myobject) Then
+                    If TypeOf myobject Is mHandler Then
+                    Set pppp.item(it) = myobject
+                    Else
+                    Set pppp.item(it) = New mHandler
+                    pppp.item(it).t1 = p
+                    Set pppp.item(it).objref = myobject
+                    End If
+                    Set myobject = Nothing
+                    End If
+                    
+                    End If
+
+                    ElseIf Typename$(myobject) = "PropReference" Then
+                    Set pppp.item(it) = myobject
+                            Set myobject = Nothing
+                    End If
+            ElseIf Not bs.IsNumber(p) Then
+            If bs.IsString(s$) Then
+            pppp.item(it) = s$
+            Else
             bstack.soros.drop 1
                 MissStackNumber
                 MyRead = False
                 
                 Exit Function
+                End If
             ElseIf x1 = 7 Then
             pppp.item(it) = Round(p)
             Else

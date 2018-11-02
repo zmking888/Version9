@@ -1,29 +1,23 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 24 active-X
+Version 9.4 rev 26 active-X
 
-Works with infinity positive and negative. To make a constant use this:
+Fix the Let statement issue, "when we assign an object to an array we get return error". 
 
-      Function Infinity(positive=True) {
-            buffer clear inf as byte*8
-            m=0x7F
-            if not positive then m+=128
-            return inf, 7:=m, 6:=0xF0
-            =eval(inf, 0 as double)
-      }
-      K=Infinity(false)
-      L=Infinity()
-      Function TestNegativeInfinity(k) {
-            =str$(k, 1033) = "-1.#INF"
-      }
-      Function TestPositiveInfinity(k) {
-            =str$(k, 1033) = "1.#INF"
-      }
-      Function TestReturn$ {
-            =str$(Number, 1033)
-      }
- 
-      Print TestNegativeInfinity(K), TestPositiveInfinity(L)
+Dim A(3)
+' ok
+Let A(2)="Ok" 
+' ok
+A(2):="OK1"
+try {
+      ' not ok
+      A(2)="OK"
+}
+try {
+      ' not ok
+      Push "Ok" : Read A(2)
+}
+Print A()
 
 
 From version 9.0 revision 50:
