@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 4
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -20337,6 +20337,8 @@ Identifier = ExecCode(basestack, rest$)
     Identifier = True
 End If
 ' меа киста
+Case "вяылатисе", "PSET"
+    Identifier = MyPset(basestack, rest$)
 Case "амайтгсг", "RETRIEVE"  'ok
 getrow basestack, rest$, , , Lang
 Exit Function
@@ -27604,8 +27606,6 @@ Function ColorRGB(bstack As basetask, n$, r As Variant) As Boolean
 Dim r2 As Variant, r3 As Variant, ss$, par As Boolean
 ColorRGB = True
     If IsExp(bstack, n$, r) Then
-            
-            r = mycolor(r)
             par = True
             If FastSymbol(n$, ",") Then
             par = IsExp(bstack, n$, r2)
@@ -27613,8 +27613,11 @@ ColorRGB = True
             par = IsExp(bstack, n$, r3)
             End If
             r = rgb(Abs(r Mod 256), Abs(r2 Mod 256), Abs(r3 Mod 256))
+            Else
+            r = mycolor(r)
             End If
             If Not par Then ColorRGB = False: Exit Function
+            
     ElseIf IsStrExp(bstack, n$, ss$) Then
             ' value in hexadecimal input as in html RGB
             ' we have to make BGR

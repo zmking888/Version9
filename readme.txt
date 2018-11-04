@@ -1,24 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.4 rev 26 active-X
+Version 9.4 rev 27 active-X
 
-Fix the Let statement issue, "when we assign an object to an array we get return error". 
-
-Dim A(3)
-' ok
-Let A(2)="Ok" 
-' ok
-A(2):="OK1"
-try {
-      ' not ok
-      A(2)="OK"
-}
-try {
-      ' not ok
-      Push "Ok" : Read A(2)
-}
-Print A()
-
+Fix the Color() function. New statement Pset (see Help Pset)
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate

@@ -2793,7 +2793,7 @@ Case "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPERATOR", "OPTIMIZATION", "OR", "ORDER
 Case "OVER", "OVERWRITE", "PAGE", "PARAGRAPH$(", "PARAGRAPH(", "PARAGRAPH.INDEX(", "PARAM(", "PARAM$(", "PARAMETERS$", "PART", "PARENT", "PASSWORD"
 Case "PATH", "PATH$(", "PAUSE", "PEN", "PI", "PIECE$(", "PIPE", "PIPENAME$(", "PLATFORM$", "PLAY"
 Case "PLAYER", "PLAYSCORE", "POINT", "POINTER", "POINT(", "POLYGON", "POS", "POS.X", "POS.Y", "PRINT"
-Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
+Case "PRINTER", "PRINTERNAME$", "PRINTING", "PRIVATE", "PROFILER", "PROPERTY", "PROPERTY(", "PROPERTY$(", "PROPERTIES", "PROPERTIES$", "PROTOTYPE", "PSET", "PUBLIC", "PUSH", "PUT", "QUEUE", "QUOTE$("
 Case "RANDOM", "RANDOM(", "READ", "READY(", "RECORDS(", "RECURSION.LIMIT", "REFER", "REFRESH", "RELEASE", "REM"
 Case "REMOVE", "REPEAT", "REPLACE$(", "REPORT", "REPORTLINES", "RESTART", "RETRIEVE", "RETURN", "REVISION"
 Case "RIGHT", "RIGHT$(", "RIGHTPART$(", "RINSTR(", "RND", "ROUND(", "ROW", "SAVE", "SAVE.AS", "SAVE.DOC", "SCALE.X"
@@ -2870,7 +2870,7 @@ Case "упаявеи(", "упаявеи.йатакоцос(", "упеяйкасг", "уплея(", "упо", "упойатакоц
 Case "уполмгла", "упыяа(", "уьгкос", "уьос", "уьос.сглеиоу", "жайекос$(", "жамеяо$(", "жаядиа", "жеяе"
 Case "жеяеписы", "жхимоуса", "жиктяо$(", "жомто", "жояла", "жояла$", "жоятос", "жоятысе", "жоятысе.еццяажо"
 Case "жяасг", "жымг", "жыто$(", "в.сглеиа", "вая$(", "ваяайтгяес", "ваяане", "ваяйыд$("
-Case "ваяйыд(", "вягсг", "вягстг", "вягстгс", "вягстым", "вяомос$(", "вяомос(", "вяыла", "вяыла(", "вяылата"
+Case "ваяйыд(", "вягсг", "вягстг", "вягстгс", "вягстым", "вяомос$(", "вяомос(", "вяыла", "вяыла(", "вяылата", "вяылатисе"
 Case "выяисла", "ьеудес", "ьеудгс", "ьгжио", "ыс"
 Case Else
 ismine = False
@@ -3910,7 +3910,7 @@ Dim mycommands(), i As Long
 mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "BACK", "BACKGROUND", "BASE", "BEEP", "BINARY", "BITMAPS", "BOLD", "BREAK", "BROWSER", "BUFFER", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURSOR", "CURVE", "DATA", "DB.PROVIDER", "DB.USER" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INVENTORY", "ITALIC", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
-, "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
+, "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "POLYGON", "PRINT", "PRINTER", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
 , "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRUCTURE" _
 , "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "адеиасе", "акт", "аккацг", "аккане", "аккиыс", "аккиыс.ам", "ам", "амафгтгсг" _
 , "амахеыягсг", "амайтгсг", "амакоцио", "амакусг.охомгс", "амакутгс", "амаломг", "амамеысг", "амажояа", "амаье", "амехесе", "амоицла.аявеиоу", "амоицла.еийомас", "амоине", "амтецяаье", "амтицяаье", "апая", "апаяихлгсг", "апедысе", "апо", "апохгйеусг.ыс", "апойопг", "аяца", "аявеиа", "аявеио", "аявг", "аукос", "ауноуса", "ажаияесг", "ажгсе", "баке", "басг", "басг.паяовос", "басг.вягстгс", "баье", "бектистопоигсг" _
@@ -3920,7 +3920,7 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "BACK", "BACKGROU
 , "йуйкийа", "йуйкос", "йукисг", "йуяио.еяцо", "кабг", "кахос", "катимийа", "кенеис", "киста", "коцос", "лайяус", "ле", "леходос", "лекыдиа", "леяос", "лета", "летахесг", "лоусийг", "лпип", "мео", "мгла", "мглата", "нейима", "охомг", "олада", "олака", "омола", "ояио.амадяолгс", "ояисе", "паийтгс", "паине", "памы", "паяахуяо", "паяе", "паяелбокг", "павос", "педио", "пема", "пеяи" _
 , "пеяихыяио", "пета", "пимайас", "пимайес", "пкациа", "пкаисио", "пкгйтяокоцио", "покуцымо", "пяос", "пяосхесе.еццяажо", "пяосхгйг", "пяытотупо", "пяовеияо", "яоутима", "яухлисеис", "с", "саяысе", "сбгсе", "сеияа", "секида", "семаяио", "сгл", "сглади", "сглеио", "стахеяг", "стахеяес", "статийг", "статийес", "стг", "стгм", "сто", "стой", "стовои", "стовос", "суццяажеас", "суццяажг", "суцвымеусе.еццяажо", "сулпиесг" _
 , "сулпкгяысг", "сумаятгсг", "сумевисе", "сумхгла", "сус", "сустгла", "сведиа", "сведио.мглатым", "сыяос", "сысе", "сысе.еццяажо", "таимиа", "таимиес", "танг", "танимолгсг", "текос", "титкос", "тлгла", "тлглата", "томос", "топийа", "топийес", "топийг", "топийо", "тоте", "тупос", "тупысе", "упеяйкасг", "упойатакоцос", "упокоцистг", "жаядиа", "жеяе", "жеяеписы", "жомто", "жояла", "жоятос", "жоятысе" _
-, "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "?")
+, "жоятысе.еццяажо", "жымг", "ваяайтгяес", "ваяане", "вягсг", "вягстг", "вягстгс", "вяыла", "вяылатисе", "?")
 For i = 0 To UBound(mycommands())
 
 Select Case mycommands(i)
@@ -4102,6 +4102,8 @@ Case "DROP", "пета"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoDrop)
 Case "апаяихлгсг", "апая", "ENUMERATION", "ENUM"
 aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoEnum)
+Case "вяылатисе", "PSET"
+aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPset)
 Case "IF", "ам"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 1
 Case "ELSE", "аккиыс"

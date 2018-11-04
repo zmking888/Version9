@@ -8052,6 +8052,9 @@ End Sub
 Sub NeoEnum(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcEnum(ObjFromPtr(basestackLP), rest$)
 End Sub
+Sub NeoPset(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+resp = MyPset(ObjFromPtr(basestackLP), rest$)
+End Sub
 Sub NeoModule(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyModule(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
@@ -12034,4 +12037,31 @@ chk = CFname(ThisFile)
 textDel = (chk <> "")
 If chk <> "" Then KillFile chk
 End Function
-
+Function MyPset(bstack As basetask, rest$) As Boolean
+Dim prive As Long, x As Double, p As Variant, y As Double, col As Long
+Dim Scr As Object, ss$
+Set Scr = bstack.Owner
+prive = GetCode(Scr)
+With players(prive)
+    col = players(prive).mypen
+    If IsExp(bstack, rest$, p) Then col = mycolor(p)
+    If FastSymbol(rest$, ",") Then
+        If IsExp(bstack, rest$, x) Then
+            If FastSymbol(rest$, ",") Then
+                If IsExp(bstack, rest$, y) Then
+                    Scr.PSet (x, y), col: MyPset = True
+                Else
+                    MissPar
+                End If
+            End If
+        Else
+            MissPar
+        End If
+    Else
+        Scr.PSet (.XGRAPH, .YGRAPH), col
+        MyPset = True
+    End If
+End With
+MyDoEvents1 Scr
+Set Scr = Nothing
+End Function
