@@ -49,12 +49,15 @@ End Function
 Property Get count()
     count = toplim + 1
 End Property
+Property Get ZeroValue()
+If toplim >= 0 Then ZeroValue = PriveSpace(0).iValue
+End Property
 
 Property Get IsEmpty()
     IsEmpty = toplim = -1
 End Property
 
-Public Sub AddOne(Key As String, nValue As Variant)
+Public Sub addone(Key As String, nValue As Variant)
 Dim a As Long
 a = Malloc()
 With PriveSpace(a)
@@ -79,7 +82,7 @@ mm.t1 = 4
 Set mm.objref = Me
 mm.index_cursor = v
 mm.index_start = i
-mm.Sign = 1
+mm.sign = 1
 Set SearchValue = mm
 Exit Function
 End If
@@ -94,7 +97,7 @@ mm.t1 = 4
 Set mm.objref = Me
 mm.index_cursor = v
 mm.index_start = i
-mm.Sign = -1
+mm.sign = -1
 Set SearchValue = mm
 Exit Function
 End If

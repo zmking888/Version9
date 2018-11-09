@@ -23,7 +23,10 @@ End Property
  Property Get Typename() As String
 Typename = Chr(mTypeName)
 End Property
-
+Property Let ItemStrVar(ByRef RHS As Variant)
+    slot = 4
+    mItem = RHS
+End Property
  Property Let ItemStr(ByRef RHS As String)
  slot = 4
 mItem = CVar(RHS)
@@ -47,7 +50,9 @@ End Property
  Property Get ItemVariant() As Variant
  If slot = 2 Then ItemVariant = mItem
 End Property
-
+ Property Get ItemNoObject() As Variant
+ If slot <> 1 Then ItemNoObject = mItem
+End Property
 Property Get NoValue() As Boolean
 If slot = 1 Then NoValue = mItem Is Nothing Else NoValue = slot = 0
 End Property

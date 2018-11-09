@@ -386,6 +386,17 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
+Public Sub PushStrVariant(ByRef a As Variant)
+Dim aa As New VarItem
+aa.Typename = "S"
+aa.ItemStrVar = a
+If mstack.count = 0 Then
+mstack.Add aa
+Else
+mstack.Add aa, , 1
+End If
+Inc
+End Sub
 Public Function LookNull() As Boolean
 On Error Resume Next
 If mstack.count = 0 Then
@@ -425,6 +436,12 @@ Public Property Get PopVariant() As Variant
 On Error Resume Next
 dec
 PopVariant = mstack.item(1).ItemVariant
+mstack.Remove 1
+End Property
+Public Property Get PopAnyNoObject() As Variant
+On Error Resume Next
+dec
+PopAnyNoObject = mstack.item(1).ItemNoObject
 mstack.Remove 1
 End Property
 Public Property Get PopValLong() As Variant
@@ -473,6 +490,19 @@ aa.ItemDouble = 0
     End If
 Inc
 End Sub
+Public Sub DataStrVariant(ByRef a As Variant)
+Dim aa As New VarItem
+aa.Typename = "S"
+aa.ItemStrVar = a
+
+If mstack.count = 0 Then
+mstack.Add aa
+Else
+mstack.Add aa, , , mstack.count
+End If
+Inc
+End Sub
+
 Public Sub DataStr(ByRef a As String)
 Dim aa As New VarItem
 aa.Typename = "S"
@@ -675,7 +705,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
 For i = 1 To items

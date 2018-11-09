@@ -514,6 +514,81 @@ k.IHaveGui = Me.IHaveGui
 k.IHaveClass = Me.IHaveClass
 k.final = Me.final
 End Sub
+Public Sub CopyArrayRev(k As mArray)
+'copy this to k
+If k Is Me Then Exit Sub
+Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
+Dim mm As Long, m1 As Long
+k.SerialItem v, Me.UpperMonoLimit, 8
+k.myarrbase = myarrbase
+k.RevOrder = False
+k.StartResize
+For i = 0 To dnum - 1
+k.PushDim limit(i), limBase(i)
+Next i
+
+k.PushEnd
+k.RevOrder = RevOrder
+Set k.GroupRef = Me.GroupRef
+mm = Me.UpperMonoLimit
+If Right$(k.arrname, 2) = "%(" Then
+For i = 0 To Me.UpperMonoLimit
+m1 = mm - i
+If IsObject(Me.item(m1)) Then
+Select Case Typename(Me.item(m1))
+Case "Group"
+Set obj = Me.item(m1)
+CopyGroupObj obj, obj2
+Set k.item(i) = obj2
+Set obj2 = Nothing
+Case "lambda"
+Dim actualdata()
+With Me.item(m1)
+.CopyTo spare, actualdata()
+End With
+Set k.item(i) = spare
+Set spare = Nothing
+
+Case Else
+Set k.item(i) = Me.item(m1)
+End Select
+Else
+k.item(i) = Int(Me.item(m1))
+End If
+Next i
+Else
+''''''''''****************************
+For i = 0 To Me.UpperMonoLimit
+m1 = mm - i
+If IsObject(Me.item(m1)) Then
+Select Case Typename(Me.item(m1))
+Case "Group"
+Set obj = Me.item(i)
+CopyGroupObj obj, obj2
+Set k.item(i) = obj2
+Set obj2 = Nothing
+Case "lambda"
+Dim actualdata1()
+With Me.item(m1)
+.CopyTo spare, actualdata1()
+End With
+Set k.item(i) = spare
+Set spare = Nothing
+Case Else
+Set k.item(i) = Me.item(m1)
+End Select
+Else
+k.item(i) = Me.item(m1)
+End If
+Next i
+End If
+'' new
+
+k.Arr = Me.Arr
+k.IHaveGui = Me.IHaveGui
+k.IHaveClass = Me.IHaveClass
+k.final = Me.final
+End Sub
 
 Public Function UpperMonoLimit()
 UpperMonoLimit = maxitems1
@@ -784,6 +859,17 @@ If maxitems1 >= curitem Then
 If IsObject(actualdata(curitem)) Then
 If Typename(actualdata(curitem)) = "PropReference" Then
 itemnumeric = actualdata(curitem).Value
+ElseIf Typename(actualdata(curitem)) = "mHandler" Then
+If actualdata(curitem).t1 = 4 Then
+If actualdata(curitem).sign = -1 Then
+itemnumeric = CDbl(-actualdata(curitem).index_cursor)
+Else
+itemnumeric = CDbl(actualdata(curitem).index_cursor)
+End If
+
+Else
+itemnumeric = 0
+End If
 Else
 itemnumeric = 0
 End If
@@ -834,6 +920,10 @@ If Not MyIsObject(item) Then
         actualdata(curitem).Value = item
     ElseIf TypeOf actualdata(curitem) Is VarItem Then
         actualdata(curitem) = item
+    ElseIf TypeOf actualdata(curitem) Is mHandler Then
+        If actualdata(curitem).t1 = 4 Then
+            actualdata(curitem) = item
+        End If
     Else
         Set actualdata(curitem) = Nothing
         actualdata(curitem) = CLng(0)
@@ -1014,4 +1104,7 @@ Function MyIsObject(v As Variant) As Boolean
 Dim n As Integer
 GetMem2 VarPtr(v), n
 MyIsObject = n = 9
+End Function
+Function GetCopy() As Variant()
+GetCopy = actualdata
 End Function
