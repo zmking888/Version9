@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 0
+Global Const Revision = 1
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4345,7 +4345,7 @@ IsNumber = 0
 InternalError
 Exit Function
 num93:
-Set bstack.lastobj = New VarItem
+Set bstack.lastobj = NewVarItem()
 bstack.lastobj.Typename = ">"
 r = 0
 IsNumber = True
@@ -5200,7 +5200,7 @@ foundprivate:
                             r = 0
                         End If
                     Else
-                        Set nbstack = Nothing  ' ???
+                        Set nbstack = Nothing ' ???
                         If FastSymbol(a$, "#") Then
                             IsNumber = Matrix(bstack, a$, usehandler, r)
                             
@@ -6713,7 +6713,7 @@ If MaybeIsSymbol2(a$, ")", w3) Then
         Set usehandler = New mHandler
         usehandler.t1 = 3
         Set usehandler.objref = pppp
-        Set nbstack = Nothing  ' ???
+        Set nbstack = Nothing
         Set bstack.lastobj = usehandler
         GoTo comehere
         End If
@@ -6979,7 +6979,7 @@ againlambda:
      
                r = rValue(bstack, pppp.item(w2))
                 If FastSymbol(a$, "#") Then
-                Set nbstack = Nothing  ' ???
+                Set nbstack = Nothing ' ???
 comehere:
                            If Not bstack.lastobj Is Nothing Then
                                 If Typename(bstack.lastobj) = "mHandler" Then
@@ -28018,7 +28018,7 @@ Wend
 If Trim$(what$) = vbNullString Then Exit Sub
 If (myobject Is Nothing) Then Exit Sub
 If Not TypeOf myobject Is Group Then Exit Sub
- Dim ps As mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
+ Dim ps As mStiva2, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
  Dim grtype As Variant, ps2push As String, uni As Boolean, uni1 As Boolean
  
  Set var(i) = New Group
@@ -28373,7 +28373,7 @@ Wend
 If Trim$(what$) = vbNullString Then Exit Sub
 If (myobject Is Nothing) Then Exit Sub
 If Not TypeOf myobject Is Group Then Exit Sub
- Dim ps As mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
+ Dim ps As mStiva2, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$, frmarr$, sss$, j As Long
  Dim grtype As Variant, ps2push As String, TT As Long, ff$, uni As Boolean
  Set ps = var(i).soros
  Dim subgroup As Object, pppp As mArray
@@ -31513,7 +31513,6 @@ thh1:
                         If .numnum <> numid.count Then numid.ReduceHash .numnum
                         If .strnum <> strid.count Then strid.ReduceHash .strnum
                     End With
-                   
                     Set bs = Nothing
                     here$ = ohere$
                 

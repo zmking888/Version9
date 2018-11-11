@@ -5025,6 +5025,18 @@ Dim x  As Long, y As Long
 glistN.BackStyle = 1
 glistN.GetLeftTop x, y
 glistN.RepaintFromOut Callback.Image, x, y
+glistN.ShowMe
+Callback.RefreshList = Callback.RefreshList + 1
+End Sub
+Sub TransparentOff()
+On Error Resume Next
+If Not glistN Is Nothing Then
+glistN.BackStyle = 0
+glistN.backcolor = mycolor(dimm2)
+glistN.PanPos = 0
+glistN.ShowMe
+Callback.RefreshList = Callback.RefreshList - 1
+End If
 End Sub
 Sub ColorsReset()
 white = rgb(255, 255, 255)

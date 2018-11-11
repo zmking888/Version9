@@ -340,6 +340,7 @@ glistN.BackStyle = 1
 glistN.GetLeftTop x, y
 glistN.RepaintFromOut Callback.Image, x, y
 glistN.ShowMe
+Callback.RefreshList = Callback.RefreshList + 1
 End Sub
 Sub TransparentOff()
 On Error Resume Next
@@ -348,6 +349,7 @@ glistN.BackStyle = 0
 glistN.backcolor = mycolor(dimm2)
 glistN.PanPos = 0
 glistN.ShowMe
+Callback.RefreshList = Callback.RefreshList - 1
 End If
 End Sub
 Sub Shadow(ByVal vNewValue As Variant)

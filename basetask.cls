@@ -833,3 +833,4 @@ End Property
 Public Property Let IamLambda(ByVal RHS As Variant)
 mIamlambda = RHS
 End Property
+

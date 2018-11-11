@@ -1,5 +1,6 @@
 Attribute VB_Name = "Module2"
 Option Explicit
+Public Trush As New Collection
 Public k1 As Long, Kform As Boolean
 Public stackshowonly As Boolean, NoBackFormFirstUse As Boolean
 Public Enum Ftypes
@@ -2573,7 +2574,7 @@ End If
 dq.ForeColor = .mypen
 
 If Not dq.backcolor = .Paper Then
-    dq.backcolor = .Paper
+   dq.backcolor = .Paper
 End If
 End With
 End Sub
@@ -3146,7 +3147,14 @@ spl = .mysplit * .Yt
 Set im = d.Image
 .Paper = c1
 
-If d.name = "Form1" Or mb.used = True Then
+If TypeOf d Is GuiM2000 Then
+If .mysplit = 0 Then
+    d.backcolor = c1
+Else
+    d.Line (0, spl)-(d.ScaleWidth - dv15, d.ScaleHeight - dv15), .Paper, BF
+    End If
+    .currow = .mysplit
+ElseIf d.name = "Form1" Or mb.used Then
 d.Line (0, spl)-(d.ScaleWidth - dv15, d.ScaleHeight - dv15), .Paper, BF
 .curpos = 0
 .currow = .mysplit
@@ -7535,10 +7543,20 @@ MergeOperators = b$
 End If
 End Function
 Public Sub GarbageFlush()
-' obsolate
+Set Trush = New Collection
+Dim i As Long, aa As VarItem
+For i = 1 To 500
+Set aa = New VarItem
+Trush.Add aa, Str$(ObjPtr(aa))
+Next i
 End Sub
 Public Sub GarbageFlush2()
-'obsolate
+Set Trush = New Collection
+Dim i As Long, aa As VarItem
+For i = 1 To 500
+Set aa = New VarItem
+Trush.Add aa, Str$(ObjPtr(aa))
+Next i
 End Sub
 Function PointPos(F$) As Long
 Dim er As Long, er2 As Long
@@ -10086,6 +10104,7 @@ BLen = LenB(a$)
             MultiByteToWideChar 65001, 0, b(0), (BLen), StrPtr(utf8decode), WChars
 End Function
 Sub test(a$)
+
 Dim pos1 As Long
 pos1 = 1
 'Debug.Print BlockParam3(a$, pos1)
@@ -13166,4 +13185,14 @@ Dim ss$
                     GetOneAsString = True
             End If
     
+End Function
+Function NewVarItem() As VarItem
+    If Trush.count = 0 Then
+    Set NewVarItem = New VarItem
+    ' Debug.Print "New :" + Str$(ObjPtr(NewVarItem))
+      Exit Function
+    End If
+    Set NewVarItem = Trush(1)
+    'Debug.Print "from trush:" + Str$(ObjPtr(NewVarItem))
+    Trush.Remove 1
 End Function

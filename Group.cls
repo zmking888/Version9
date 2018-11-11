@@ -16,7 +16,7 @@ Dim VarRef As String
 Dim FuncRef As String
 Public oldFuncRef As String
 Dim LocalRef As String  ' used only for classes
-Dim OwnSoros As mStiva
+Dim OwnSoros As mStiva2
 Dim mName As String
 Dim mFloatGroupName As String
 Dim FloatGroup As Boolean
@@ -90,8 +90,8 @@ End If
 End With
 End Function
 
-Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva
-Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
+Public Function PrepareSoros(ByRef v(), ByVal topname$) As mStiva2
+Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
 For i = 1 To OwnSoros.Total
 s = OwnSoros.StackItem(i)
 'Debug.Print s, topname$, GroupName
@@ -117,8 +117,8 @@ Next
 Set PrepareSoros = AllSoros
 
 End Function
-Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva
-Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
+Public Function PrepareSoros1(ByRef v(), ByVal topname$) As mStiva2
+Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
 For i = 1 To OwnSoros.Total
 s = OwnSoros.StackItem(i)
 If Left$(s$, 1) = "*" Then
@@ -143,8 +143,8 @@ End If
 Set PrepareSoros1 = AllSoros
 
 End Function
-Public Function PrepareSorosToCompare(ByRef v()) As mStiva
-Dim i As Long, AllSoros As New mStiva, s As String, vv As mStiva
+Public Function PrepareSorosToCompare(ByRef v()) As mStiva2
+Dim i As Long, AllSoros As New mStiva2, s As String, vv As mStiva2
 For i = 1 To OwnSoros.Total
 s = OwnSoros.StackItem(i)
 'Debug.Print s, topname$, GroupName
@@ -282,17 +282,17 @@ End Property
 Friend Property Get LinkGroup() As Group
 Set LinkGroup = LinkToGroup
 End Property
-Public Property Get Link() As Object
-Set Link = LinkToGroup
+Public Property Get link() As Object
+Set link = LinkToGroup
 End Property
-Public Property Set Sorosref(a As mStiva)
+Public Property Set Sorosref(a As mStiva2)
 If FloatGroup And Not IamApointer Then
 ' we can't do anything with stored values
 Else
 Set OwnSoros = a
 End If
 End Property
-Public Property Get soros() As mStiva
+Public Property Get soros() As mStiva2
 Set soros = OwnSoros
 End Property
 
@@ -306,7 +306,7 @@ End Property
 
 Public Property Get FuncList() As String
 If IamApointer Then
-FuncList = Me.Link.FuncList
+FuncList = Me.link.FuncList
 Else
 FuncList = FuncRef$
 End If
@@ -342,7 +342,7 @@ End Property
 
 
 Private Sub Class_Initialize()
-Set OwnSoros = New mStiva
+Set OwnSoros = New mStiva2
 End Sub
 
 Private Sub Class_Terminate()
@@ -368,7 +368,7 @@ Public Sub ResetGroup()
 Set SuperClassList = Nothing
 If IamFloatGroup Then EndFloat
 Set LinkToGroup = Nothing
-Set OwnSoros = New mStiva
+Set OwnSoros = New mStiva2
 HasValue = False
 HasSet = False
 HasStrValue = False
@@ -390,7 +390,7 @@ Private Function GetRefCount(ByRef vvv) As Long
     Dim obj As IUnknown
     Set obj = vvv
     If obj Is Nothing Then Exit Function
-    CopyMemory GetRefCount, ByVal (objptr(obj)) + 4, 4
+    CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
     GetRefCount = GetRefCount - 2
     Set obj = Nothing
 End Function

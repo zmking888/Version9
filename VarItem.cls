@@ -15,8 +15,11 @@ Option Explicit
 Private mItem As Variant
 Private slot As Byte
 Private mTypeName As Byte
+Private Key As String * 30
+Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
+    lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 
- Property Let Typename(ByRef RHS As String)
+Property Let Typename(ByRef RHS As String)
 mTypeName = Asc(RHS)
 End Property
 
@@ -65,3 +68,18 @@ Public Property Get ObjectRef() As Object
 If slot = 1 Then Set ObjectRef = mItem
 End Property
 
+Public Sub Recycle()
+Dim obj As IUnknown, GetRefCount As Long
+Set obj = Me
+CopyMemory GetRefCount, ByVal (ObjPtr(obj)) + 4, 4
+If GetRefCount > 4 Then Exit Sub
+On Error Resume Next
+mItem = vbEmpty
+slot = 0
+mTypeName = 0
+If Trush.count = 0 Then Trush.Add Me, Key Else Trush.Add Me, Key
+End Sub
+
+Private Sub Class_Initialize()
+Key = Str$(ObjPtr(Me))
+End Sub

@@ -182,13 +182,22 @@ Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
 End Sub
 Public Sub MyRefresh(bstack As basetask)
 On Error Resume Next
+Dim some As Object
 With Prefresh(GetCode(bstack.Owner))
             If uintnew(timeGetTime) > .k1 Then .RRCOUNTER = 0
             
                 If .RRCOUNTER = 0 Then
                     .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
                     If Not bstack.toprinter Then
-                    If bstack.Owner.Visible Then bstack.Owner.Refresh
+                    Set some = bstack.Owner
+                    
+                     If some.Visible Then
+                    If TypeOf some Is GuiM2000 Then
+                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                    Else
+                    some.Refresh
+                    End If
+                    End If
                     End If
                  End If
                  
@@ -254,7 +263,13 @@ With Prefresh(GetCode(some))
                 If .RRCOUNTER = 0 Then
                     .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
                     If byPassCallback Then Exit Sub
-                    If some.Visible Then some.Refresh
+                    If some.Visible Then
+                    If TypeOf some Is GuiM2000 Then
+                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                    Else
+                    some.Refresh
+                    End If
+                    End If
                   
                    End If
  
@@ -344,7 +359,13 @@ If DOeVONLY Then
             If .RRCOUNTER = 0 Then
             .k1 = uintnew(timeGetTime + REFRESHRATE): .RRCOUNTER = 1
             If byPassCallback Then Exit Sub
-            If some.Visible Then some.Refresh
+            If some.Visible Then
+            If TypeOf some Is GuiM2000 Then
+                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                    Else
+                    some.Refresh
+                    End If
+            End If
             End If
             End If
 Else
@@ -369,7 +390,13 @@ Else
              If .RRCOUNTER = 0 Then
             .k1 = uintnew(timeGetTime) + REFRESHRATE: .RRCOUNTER = 1
          If byPassCallback Then Exit Sub
-         If some.Visible Then some.Refresh
+         If some.Visible Then
+         If TypeOf some Is GuiM2000 Then
+                    If some.RefreshList > 0 Then some.RefreshALL Else some.Refresh
+                    Else
+                    some.Refresh
+                    End If
+         End If
         
          
          

@@ -1,11 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.5  active-X
+Version 9.5  Revision 1 active-X
 
-1. We can use by reference for array items and static variables
-2. We can use #Filter() #Map() #Fold() etc for arrays
-see Help "(,)"
-3. StrRev$()  to reverse a string
+Minor details plus Speed improvement.
 
 
 From version 9.0 revision 50:

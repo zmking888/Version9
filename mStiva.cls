@@ -25,7 +25,7 @@ Public index As Long
 'Stiva.DataStr
 'Stiva.PushVal
 'Stiva.DataVal
-'Stiva.PopType  (η κορυφή)
+'Stiva.PopType  (? ????f?)
 'Stiva.PopStr
 'Stiva.PopVal
 'Stiva.Flush
@@ -75,31 +75,36 @@ End If
 End Sub
 Public Sub Copy2TopItem(where As Long)
 'we pick an item and to the top
-Dim aa As VarItem, mm As Object, mn As mArray, work As Object
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
-Set work = mstack.item(where).ObjectRef
-Select Case Typename(work)
-Case "Group"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    CopyGroupObj work, mm
-    Set aa.ObjectRef = mm
-Case "lambda"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    ' use copylambdaAny from module 1
-    CopyLambdaAny work, mm
-    Set aa.ObjectRef = mm
-Case "mArray"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    Set mn = New mArray
-    work.CopyArray mn
-    Set aa.ObjectRef = mn
-Case Else
-Set aa = mstack.item(where)
-End Select
-Set work = Nothing
+Set bb = mstack.item(where)
+If bb.ObjectRef Is Nothing Then
+    Set aa = bb
+Else
+    Set work = bb.ObjectRef
+    Select Case Typename(work)
+        Case "Group"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            CopyGroupObj work, mm
+            Set aa.ObjectRef = mm
+        Case "lambda"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            ' use copylambdaAny from module 1
+            CopyLambdaAny work, mm
+            Set aa.ObjectRef = mm
+        Case "mArray"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            Set mn = New mArray
+            work.CopyArray mn
+            Set aa.ObjectRef = mn
+        Case Else
+            Set aa = mstack.item(where)
+        End Select
+    Set work = Nothing
+End If
 If mstack.count = 0 Then
 mstack.Add aa
 Else
@@ -128,84 +133,96 @@ MergeFromOther.MergeBottom mm
 End Function
 Public Sub Copy2TopNItems2FromStiva(many As Long, Source As mStiva)
 'we pick an item and to the top
-Dim aa As VarItem, mm As Object, mn As mArray, work As Object
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
 For many = many To 1 Step -1
-Set work = Source.objref(many)
-Select Case Typename(work)
-Case "Group"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    CopyGroupObj work, mm
-    Set aa.ObjectRef = mm
-Case "lambda"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    ' use copylambdaAny from module 1
-    CopyLambdaAny work, mm
-    Set aa.ObjectRef = mm
-Case "mArray"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    Set mn = New mArray
-    work.CopyArray mn
-    Set aa.ObjectRef = mn
-Case Else
-If Source.Total >= many Then
-
-Set aa = Source.StackPickRef(many)
-Else
-Exit For
-End If
-End Select
-Set work = Nothing
-If mstack.count = 0 Then
-mstack.Add aa
-Else
-mstack.Add aa, , 1
-End If
-Inc
+    If Source.Total >= many Then
+        Set bb = Source.StackPickRef(many)
+        If bb.ObjectRef Is Nothing Then
+            Set aa = bb
+        Else
+            Set work = bb.ObjectRef
+            Select Case Typename(work)
+            Case "Group"
+                Set aa = NewVarItem()
+                aa.Typename = "*"
+                CopyGroupObj work, mm
+                Set aa.ObjectRef = mm
+            Case "lambda"
+                Set aa = NewVarItem()
+                aa.Typename = "*"
+                ' use copylambdaAny from module 1
+                CopyLambdaAny work, mm
+                Set aa.ObjectRef = mm
+            Case "mArray"
+                Set aa = NewVarItem()
+                aa.Typename = "*"
+                Set mn = New mArray
+                work.CopyArray mn
+                Set aa.ObjectRef = mn
+            Case Else
+            
+            
+            Set aa = bb
+            
+            End Select
+            Set work = Nothing
+        End If
+        If mstack.count = 0 Then
+            mstack.Add aa
+        Else
+            mstack.Add aa, , 1
+        End If
+        Inc
+    Else
+        Exit For
+    End If
 Next many
 End Sub
 Public Sub Copy2BottomNItems2FromStiva(many1 As Long, Source As mStiva)
 ' reverse order
-Dim aa As VarItem, mm As Object, mn As mArray, work As Object, many As Long
+Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object, many As Long
 On Error Resume Next
 For many = Source.Total - many1 + 1 To Source.Total
-Set work = Source.objref(many)
-Select Case Typename(work)
-Case "Group"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    CopyGroupObj work, mm
-    Set aa.ObjectRef = mm
-Case "lambda"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    ' use copylambdaAny from module 1
-    CopyLambdaAny work, mm
-    Set aa.ObjectRef = mm
-Case "mArray"
-    Set aa = New VarItem
-    aa.Typename = "*"
-    Set mn = New mArray
-    work.CopyArray mn
-    Set aa.ObjectRef = mn
-Case Else
-If Source.Total >= many Then
 
-Set aa = Source.StackPickRef(many)
-Else
-Exit For
-End If
-End Select
-Set work = Nothing
-If mstack.count = 0 Then
-mstack.Add aa
-Else
-mstack.Add aa, , 1
-End If
-Inc
+If Source.Total >= many Then
+    Set bb = Source.StackPickRef(many)
+    If bb.ObjectRef Is Nothing Then
+        Set aa = bb
+    Else
+        Set work = bb.ObjectRef
+        Select Case Typename(work)
+        Case "Group"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            CopyGroupObj work, mm
+            Set aa.ObjectRef = mm
+        Case "lambda"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            ' use copylambdaAny from module 1
+            CopyLambdaAny work, mm
+            Set aa.ObjectRef = mm
+        Case "mArray"
+            Set aa = NewVarItem()
+            aa.Typename = "*"
+            Set mn = New mArray
+            work.CopyArray mn
+            Set aa.ObjectRef = mn
+        Case Else
+        Set aa = bb
+        End Select
+        Set work = Nothing
+        End If
+        If mstack.count = 0 Then
+            mstack.Add aa
+        Else
+            mstack.Add aa, , 1
+        End If
+        Inc
+    Else
+        Exit For
+    End If
 Next many
 End Sub
 Public Property Get StackPick(where As Long) As VarItem
@@ -283,26 +300,36 @@ mMany = mMany - 1
 End Sub
 Public Sub drop(ByVal items As Long)
 Dim num As Long
+Dim aa As VarItem
 On Error Resume Next
 mMany = mMany - items
 If mMany < 0 Then mMany = 0: Set mstack = New Collection: Exit Sub
 For num = 1 To items
+    Set aa = mstack.item(1)
     mstack.Remove 1
+    aa.Recycle
+    
+    
+    
 Next num
 
 End Sub
 Public Sub Flush()
 
-Dim num As Long
+Dim num As Long, aa As VarItem
 For num = 1 To mstack.count
 dec
-  mstack.Remove 1
+  Set aa = mstack(1)
+   mstack.Remove 1
+  aa.Recycle
+  
  
 Next num
 mMany = 0
 End Sub
 Public Sub PushUndefine()
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "?"
 If mstack.count = 0 Then
 mstack.Add aa
@@ -313,7 +340,8 @@ Inc
 End Sub
 
 Public Sub PushVal(a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "N"
 aa.ItemDouble = a
 If mstack.count = 0 Then
@@ -324,7 +352,8 @@ End If
 Inc
 End Sub
 Public Sub PushOptional()
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = ">"
 aa.ItemDouble = 0
 If mstack.count = 0 Then
@@ -335,7 +364,8 @@ End If
 Inc
 End Sub
 Public Sub PushValLong(a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "L"
 aa.ItemVariant = a
 If mstack.count = 0 Then
@@ -346,7 +376,8 @@ End If
 Inc
 End Sub
 Public Sub PushObj(RHS As Object)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "*"  'something
 Set aa.ObjectRef = RHS
 Set RHS = Nothing
@@ -367,16 +398,22 @@ Inc
 End Sub
 Public Property Get PopObj() As Object
 On Error Resume Next
+Dim aa As VarItem
 dec
-Set PopObj = mstack.item(1).ObjectRef
-mstack.Remove 1   '
+Set aa = mstack.item(1)
+Set PopObj = aa.ObjectRef
+mstack.Remove 1
+aa.Recycle
+
+  '
 End Property
 Public Property Get objref(where As Long) As Object
 On Error Resume Next
 Set objref = mstack.item(where).ObjectRef
 End Property
 Public Sub PushStr(ByRef a As String)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStr = a
 If mstack.count = 0 Then
@@ -387,7 +424,8 @@ End If
 Inc
 End Sub
 Public Sub PushStrVariant(ByRef a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStrVar = a
 If mstack.count = 0 Then
@@ -428,37 +466,62 @@ End Property
 
 Public Property Get PopVal() As Variant
 On Error Resume Next
+Dim aa As VarItem
 dec
-PopVal = mstack.item(1).ItemDouble
+Set aa = mstack.item(1)
 mstack.Remove 1
+PopVal = aa.ItemDouble
+aa.Recycle
+
 End Property
 Public Property Get PopVariant() As Variant
 On Error Resume Next
+Dim aa As VarItem
 dec
-PopVariant = mstack.item(1).ItemVariant
+Set aa = mstack.item(1)
 mstack.Remove 1
+PopVariant = aa.ItemVariant
+aa.Recycle
+
+
 End Property
 Public Property Get PopAnyNoObject() As Variant
 On Error Resume Next
+Dim aa As VarItem
 dec
-PopAnyNoObject = mstack.item(1).ItemNoObject
+Set aa = mstack.item(1)
+PopAnyNoObject = aa.ItemNoObject
 mstack.Remove 1
+aa.Recycle
+
+
 End Property
 Public Property Get PopValLong() As Variant
 On Error Resume Next
+Dim aa As VarItem
 dec
-PopValLong = CLng(mstack.item(1).ItemDouble)
+Set aa = mstack.item(1)
 mstack.Remove 1
+PopValLong = CLng(aa.ItemDouble)
+aa.Recycle
+
+
 End Property
 Public Property Get PopStr() As String
 On Error Resume Next
+Dim aa As VarItem
 dec
-PopStr = mstack.item(1).ItemStr
+Set aa = mstack.item(1)
 mstack.Remove 1
+PopStr = aa.ItemStr
+aa.Recycle
+
+
 
 End Property
 Public Sub DataValLong(a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "L"
 aa.ItemVariant = a
 If mstack.count = 0 Then
@@ -469,7 +532,8 @@ End If
 Inc
 End Sub
 Public Sub DataVal(a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "N"
 aa.ItemVariant = a
 If mstack.count = 0 Then
@@ -480,7 +544,8 @@ End If
 Inc
 End Sub
 Public Sub DataOptional()
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = ">"
 aa.ItemDouble = 0
     If mstack.count = 0 Then
@@ -491,7 +556,8 @@ aa.ItemDouble = 0
 Inc
 End Sub
 Public Sub DataStrVariant(ByRef a As Variant)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStrVar = a
 
@@ -504,7 +570,8 @@ Inc
 End Sub
 
 Public Sub DataStr(ByRef a As String)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
 aa.Typename = "S"
 aa.ItemStr = a$
 
@@ -517,7 +584,9 @@ End If
 Inc
 End Sub
 Public Sub DataStrUn(a As String)
-Dim aa As New VarItem, i As Long, b As String
+Dim aa As VarItem
+Set aa = NewVarItem()
+Dim i As Long, b As String
 b = Split(a)(0)
 aa.Typename = "S"
 aa.ItemStr = a
@@ -546,14 +615,14 @@ End Sub
 Public Sub DataObj(RHS As Object)
 Dim aa As VarItem
 If RHS Is Nothing Then
-    Set aa = New VarItem
+    Set aa = NewVarItem()
     aa.Typename = "*"  'something
     Set aa.ObjectRef = RHS
 ElseIf TypeOf RHS Is VarItem Then
     Set aa = RHS
     Set RHS = Nothing
 Else
-    Set aa = New VarItem
+    Set aa = NewVarItem()
     aa.Typename = "*"  'something
     Set aa.ObjectRef = RHS
     Set RHS = Nothing
@@ -577,7 +646,8 @@ Public Sub Begin(from As Long)
 BeginFrom = from
 End Sub
 Public Sub additem(ByRef a As String)
-Dim aa As New VarItem
+Dim aa As VarItem
+Set aa = NewVarItem()
     aa.Typename = "S"
     aa.ItemStr = a$
     If mstack.count = 0 Then
@@ -705,7 +775,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .arr = True
+    .Arr = True
 
 
 For i = 1 To items
@@ -739,6 +809,9 @@ Inc
 Loop Until a.Total < 1
 End If
 End Sub
+
+
+
 Private Sub Class_Terminate()
 Flush
 End Sub
@@ -794,7 +867,6 @@ Function Copy() As mStiva
 Dim i As Long
 Set Copy = New mStiva
 For i = Total To 1 Step -1
-'Debug.Print Me.StackItem(i)
 Copy.PushStr Me.StackItem(i)
 Next i
 End Function
@@ -843,4 +915,5 @@ For i = item To thisstiva.count
         Inc
 Next i
 End Sub
+
 

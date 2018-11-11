@@ -232,7 +232,7 @@ Iam = True
 
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = vbKeyLeft Or KeyCode = vbKeyRight Then
 If Textbox.glistN.EditFlag Then
 Iam = True
@@ -340,7 +340,7 @@ Textbox.SetFocus
 ShowMenu
 End Sub
 
-Private Sub textbox_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub textbox_KeyDown(KeyCode As Integer, shift As Integer)
 Dim b$
 Dim gl As Long, x As Long, x1 As gList, XX As Boolean
 Iam = True
@@ -575,7 +575,7 @@ End If
 End Sub
 
 
-Private Sub textbox_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub textbox_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Dim gl As Long
 
 If Textbox.glistN.DblClick Then
@@ -1051,6 +1051,7 @@ Dim x  As Long, y As Long
 Textbox.glistN.BackStyle = 1
 Textbox.glistN.GetLeftTop x, y
 Textbox.glistN.RepaintFromOut Callback.Image, x, y
+Callback.RefreshList = Callback.RefreshList + 1
 End Sub
 Public Property Get FadePartColor() As Variant
 FadePartColor = Textbox.FadePartColor

@@ -241,19 +241,19 @@ Private Sub glistN_GetBackPicture(pic As Object)
 Set pic = Point2Me
 End Sub
 
-Private Sub glistN_KeyDown(KeyCode As Integer, Shift As Integer)
-lastshift = (Shift And 1) = 0
+Private Sub glistN_KeyDown(KeyCode As Integer, shift As Integer)
+lastshift = (shift And 1) = 0
 Dim VR(2)
 VR(0) = KeyCode
-VR(1) = Shift
+VR(1) = shift
    If mIndex >= 0 Then
    Callback.CallbackNow mesCtrlName + ".KeyDown(" + Str(mIndex) + ")", VR()
    Else
       Callback.CallbackNow mesCtrlName + ".KeyDown()", VR()
       End If
 KeyCode = VR(0)
-Shift = VR(1)
-If KeyCode = vbKeyF10 And Shift <> 0 Then
+shift = VR(1)
+If KeyCode = vbKeyF10 And shift <> 0 Then
 KeyCode = 0
 If mIndex >= 0 Then
    Callback.Callback mesCtrlName + ".PopUp(" + Str(mIndex) + "," + Str(MOUSEX(Callback.Left)) + "," + Str(MOUSEY(Callback.Top)) + "," + Str(2) + "," + Str(glistN.ListIndex + 1) + ")"
@@ -505,12 +505,13 @@ glistN.NoCaretShow = True
 Set Point2Me = Callback.Picture
 glistN.SkipForm = False
 glistN.BackStyle = 1
+Callback.RefreshList = Callback.RefreshList + 1
 Else
 glistN.NoCaretShow = False
 Set Point2Me = Nothing
 glistN.SkipForm = True
 glistN.BackStyle = 0
-
+Callback.RefreshList = Callback.RefreshList - 1
 End If
 
 End Property
