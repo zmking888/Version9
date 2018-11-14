@@ -428,7 +428,7 @@ Sub ReWritePara(ParaNum As Long, ByVal data$, Optional skipcolor As Boolean = Fa
     End If
     RaiseEvent BreakLine(data$, NeoData$)  ' no method inside this class
     If NeoData$ = vbNullString Then NeoData$ = data$: data$ = vbNullString
-    If Len(NeoData$) > 1000 And data$ = "" Then
+    If Len(NeoData$) > 1000 And LenB(data$) = 0 Then
     data$ = Mid$(NeoData$, 1001)
     NeoData$ = Left$(NeoData$, 1000)
     End If
@@ -2257,7 +2257,7 @@ On Error GoTo ErrHandler
   BLen = FileLen(GetDosPath(FileName))
     If BLen = 0 Then
   If DocLines = 0 Then
-  textDoc = ""
+  textDoc = vbNullString
   End If
   Exit Sub
   End If

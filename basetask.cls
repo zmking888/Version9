@@ -710,10 +710,10 @@ End If
 End Function
 Public Function IsString(r As String) As Boolean
 If parentSoros.LookNull Then
-r = parentSoros.PopStr
+parentSoros.PopStr2 r
 IsString = True
 ElseIf parentSoros.PopType = "S" Then
-r = parentSoros.PopStr
+parentSoros.PopStr2 r
 IsString = True
 End If
 End Function

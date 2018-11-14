@@ -53,7 +53,7 @@ With eventlist
 For i = 0 To .count - 1
     .index = i
     .Done = True
-    .Value = ""
+    .Value = vbNullString
     .sValue = 0
 Next i
 .Done = False
@@ -378,7 +378,7 @@ FuncRef = vbNullString
 LocalRef = vbNullString
 VarRef = vbNullString
 End Sub
-Friend Property Get refcount1() As Long
+Public Property Get refcount1() As Long
 Dim m As Long
 m = GetRefCount(Me)
 If m > 3 Then refcount1 = m - 3 Else refcount1 = 0

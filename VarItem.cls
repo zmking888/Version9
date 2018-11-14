@@ -32,9 +32,15 @@ Property Let ItemStrVar(ByRef RHS As Variant)
 End Property
  Property Let ItemStr(ByRef RHS As String)
  slot = 4
-mItem = CVar(RHS)
+ MoveStringToVariant RHS, mItem
 End Property
-
+Public Sub PopString(s$)
+If slot = 4 Then
+SwapString2Variant s$, mItem
+Else
+s$ = vbNullString
+End If
+End Sub
  Property Get ItemStr() As String
 If slot = 4 Then ItemStr = mItem
 End Property

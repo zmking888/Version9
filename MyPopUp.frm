@@ -647,11 +647,11 @@ If fname$ <> "" Then
 If pagio$ = "GREEK" Then
 s$ = "Πόρος"
 neo$ = Trim$(InputBoxN("Όνομα Μεταβλητής (αριθμητική ή αλφαριθμητική)", "Συγγραφή Κειμένου", s$))
-If neo$ = "" Then neo$ = "Πόρος"
+If Len(neo$) = 0 Then neo$ = "Πόρος"
 Else
 s$ = "Resource"
 neo$ = Trim$(InputBoxN("Variable Name (numeric or string)", "Text Editor", s$))
-If neo$ = "" Then neo$ = "Resource"
+If Len(neo$) = 0 Then neo$ = "Resource"
 End If
 If Right$(neo$, 1) = "$" Then
     s$ = "$"
@@ -660,7 +660,7 @@ ElseIf Right$(neo$, 1) = ")" Then
     s$ = ")"
     neo$ = Left$(neo$, Len(neo$) - 1)
 Else
-    s$ = ""
+    s$ = vbNullString
 End If
     If ReturnListOfFiles <> "" Then
         files() = Split(ReturnListOfFiles, "#")

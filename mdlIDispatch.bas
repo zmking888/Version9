@@ -202,11 +202,25 @@ jumphere:
                Set mm = Nothing
                 'CallByName pobjTarget, "MyHide", VbMethod
             ElseIf UCase(pstrProcName) = "SHOW" Then
+
+                If pobjTarget.Quit Then MyEr "Form unloaded, use declare again using declare A new Form", "η φόρμα δεν έχει φορτωθεί, χρησιμοποίησε την Όρισε Α Νεα Φορμα": Exit Function
                 CallByName pobjTarget, "ShowmeALl", VbMethod
                 If items = 0 Then
                     CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform
+               ElseIf items = 2 Then
+                    If Not varArr(1) = 0 Then
+                    GoTo conthere
+                    Else
+                    CallByName pobjTarget, pstrProcName, VbMethod, 0, varArr(0)
+
+                   
+                    Set myform = pobjTarget
+                    MoveFormToOtherMonitorOnly myform
+                    pobjTarget.Modal = 0
+                    pobjTarget.Modal = 0
+                    End If
                ElseIf varArr(0) = 0 Then
                     CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
                     Set myform = pobjTarget
@@ -214,6 +228,7 @@ jumphere:
                     pobjTarget.Modal = 0
                     pobjTarget.Modal = 0
                Else
+conthere:
                    Dim oldmoldid As Double, mycodeid As Double
                    oldmoldid = Modalid
                    mycodeid = Rnd * 1000000
@@ -234,7 +249,11 @@ jumphere:
                     End If
                     If pobjTarget.NeverShow Then
                     Modalid = mycodeid
+                    If items = 2 Then
+                    CallByName pobjTarget, pstrProcName, VbMethod, 0, varArr(0)
+                    Else
                     CallByName pobjTarget, pstrProcName, VbMethod, 0, GiveForm()
+                    End If
                     Set myform = pobjTarget
                     MoveFormToOtherMonitorOnly myform, center2mouse
                     pobjTarget.Refresh

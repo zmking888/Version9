@@ -272,13 +272,13 @@ Private Sub Class_Initialize()
         Set colOS = oWMI.ExecQuery("Select * from Win32_OperatingSystem")
         
         For Each oOS In colOS
-            pos = InStr(oOS.version, ".")
+            pos = InStr(oOS.Version, ".")
             If pos = 0 Then
-                osi.dwMajorVersion = CLng(oOS.version)
+                osi.dwMajorVersion = CLng(oOS.Version)
                 osi.dwMinorVersion = 0
                 osi.dwBuildNumber = 0
             Else
-                Ver = Split(oOS.version, ".")
+                Ver = Split(oOS.Version, ".")
                 If UBound(Ver) = 1 Then
                     osi.dwMajorVersion = CLng(Ver(0))
                     osi.dwMinorVersion = CLng(Ver(1))
@@ -484,7 +484,7 @@ Private Sub Class_Initialize()
         Platform_ = "WinCE"
     End If
     
-    If OSName_ = "" Then
+    If OSName_ = vbNullString Then
         OSName_ = "Windows Unknown" & "(ver: " & MajorMinor_ & ". PT: " & osi.wProductType & ". Build: " & osi.dwBuildNumber & ")" & " Registry's data: " & _
             RegRead_REG_SZ("SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName")
     End If
@@ -496,7 +496,7 @@ Private Sub Class_Initialize()
     End If
     
     'Редакция
-    If Edition_ = "" Then
+    If Edition_ = vbNullString Then
         If MajorMinor_ >= 6 Then
             If GetProductInfo(osi.dwMajorVersion, osi.dwMinorVersion, osi.wServicePackMajor, osi.wServicePackMinor, ProductType) Then
                 Edition_ = GetProductName(ProductType)

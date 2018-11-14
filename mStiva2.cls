@@ -35,6 +35,8 @@ mstack.Add a, , 1
 End If
 End Sub
 Public Sub PushStr(ByRef a As String)
+
+
 If mstack.count = 0 Then
 mstack.Add CVar(a)
 Else
@@ -45,12 +47,20 @@ Public Property Get StackItem(where As Long) As Variant
 StackItem = mstack.item(where)
 End Property
 Public Sub DataStr(ByRef a As String)
+Dim v As Variant
+v = vbNullString
+SwapString2Variant a, v
 If mstack.count = 0 Then
-mstack.Add CVar(a)
+mstack.Add v
 Else
-mstack.Add CVar(a), , , mstack.count
+mstack.Add v, , , mstack.count
 End If
 End Sub
+Sub GetStackPick(where, ByRef v As Variant)
+SwapVariant v, mstack.item(where)
+mstack.Remove where
+End Sub
+
 Public Property Get StackPick(where As Long) As Variant
 StackPick = mstack.item(where)
 mstack.Remove where

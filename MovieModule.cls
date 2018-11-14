@@ -359,7 +359,7 @@ Public Function openMovie()
     'Error = mciSendString("open " & Filename & " alias m"+cstr(myID)+"", 0, 0, 0)
 End Function
 
-Public Function openMovieWindow(hWnd As Long, WindowStyle As String)
+Public Function openMovieWindow(hWND As Long, WindowStyle As String)
     'Style types = popup , child or overlapped
     'Child window would be a .hwnd window of your choice.
     'Ex. A picturebox control or a frame control would be
@@ -373,10 +373,10 @@ Public Function openMovieWindow(hWnd As Long, WindowStyle As String)
    ' error = mciSendString("open " & LASTF & " type mpegvideo alias m"+cstr(myID)+" parent " & hWnd & " style " & WindowStyle & " ", 0, 0, 0)
     
     'Let the mci device decide which driver to use
-      error = mciSendString("open " & LASTF & " alias m" & CStr(myid) & " parent " & hWnd & " style " & WindowStyle & " ", 0, 0, 0)
+      error = mciSendString("open " & LASTF & " alias m" & CStr(myid) & " parent " & hWND & " style " & WindowStyle & " ", 0, 0, 0)
  
     If error <> 0 Then
-    error = mciSendString("open " & LASTF & " type mpegvideo alias m" & CStr(myid) & " parent " & hWnd & " style " & WindowStyle & " ", 0, 0, 0)
+    error = mciSendString("open " & LASTF & " type mpegvideo alias m" & CStr(myid) & " parent " & hWND & " style " & WindowStyle & " ", 0, 0, 0)
     
     
     End If
@@ -419,15 +419,15 @@ Public Function extractCurrentMovieSize(wLeft As Long, wTop As Long, wWidth As L
     Dim a As String
     Dim b As String
     Dim c As String
-    Dim f As String
+    Dim F As String
     Dim g As String
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
-    f = Mid$(a, c + 1)
-    g = InStr(1, f, " ")
-    wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid$(f, g)) 'height
+    F = Mid$(a, c + 1)
+    g = InStr(1, F, " ")
+    wWidth = val(Left(F, g)) 'width
+    wHeight = val(Mid$(F, g)) 'height
 End Function
 Public Function MovieHeight() As Long
     'Returns the size parameters of the m"+cstr(myID)+"
@@ -435,14 +435,14 @@ Public Function MovieHeight() As Long
     Dim a As String
     Dim b As String
     Dim c As String
-    Dim f As String
+    Dim F As String
     Dim g As String
     a = getCurrentSize
     b = InStr(1, a, " ")
     c = InStr(b + 1, a, " ")
-    f = Mid$(a, c + 1)
-    g = InStr(1, f, " ")
-       MovieHeight = val(Mid$(f, g)) 'height
+    F = Mid$(a, c + 1)
+    g = InStr(1, F, " ")
+       MovieHeight = val(Mid$(F, g)) 'height
 End Function
 Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     'Returns the default size of the m"+cstr(myID)+" even if the size
@@ -451,15 +451,15 @@ Public Function extractDefaultMovieSize(wWidth As Long, wHeight As Long)
     Dim a As String
     Dim b As String
     Dim c As String
-    Dim f As String
+    Dim F As String
     Dim g As String
     a = getDefaultSize
     b = InStr(1, a, " ") '2
     c = InStr(b + 1, a, " ") '4
-    f = Mid$(a, c + 1) '9
-    g = InStr(1, f, " ")
-    wWidth = val(Left(f, g)) 'width
-    wHeight = val(Mid$(f, g)) 'height
+    F = Mid$(a, c + 1) '9
+    g = InStr(1, F, " ")
+    wWidth = val(Left(F, g)) 'width
+    wHeight = val(Mid$(F, g)) 'height
 End Function
 Public Function getBitsPerPixel()
     'Will get the m"+cstr(myID)+" bitsperpixel
@@ -482,11 +482,11 @@ Public Function getAudioStatus() As String
     error = mciSendString("status m" & CStr(myid) & " audio", data, 128, 0)
     getAudioStatus = CStr(data)
 End Function
-Public Function sizeLocateMovie(Left As Long, top As Long, Width As Long, Height As Long)
+Public Function sizeLocateMovie(Left As Long, Top As Long, Width As Long, Height As Long)
     'Change the size of the m"+cstr(myID)+" and the location of
     'the m"+cstr(myID)+" in Pixels
 ' 120 120 200 200 frame 0 0 200 200 source 0 0 200 200
-    error = mciSendString("put m" & CStr(myid) & " window at " & Left & " " & top & " " & Width & " " & Height, 0, 0, 0)
+    error = mciSendString("put m" & CStr(myid) & " window at " & Left & " " & Top & " " & Width & " " & Height, 0, 0, 0)
 
 'error = mciSendString("put m"+cstr(myID)+" video 120 120 200 200 frame 0 0 200 200 source 0 0 200 200 ", 0, 0, 0)
 

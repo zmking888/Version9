@@ -397,7 +397,7 @@ Case vbString
 If MyVal Like "[-0-9.]*" Then
     MyVal = CDbl(Replace$(MyVal, ".", NowDec$))
 Else
-    MyVal = ""
+    MyVal = vbNullString
 End If
 Case vbDouble
 MyVal = CDbl(Replace$(MyVal, ".", NowDec$))

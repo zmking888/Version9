@@ -109,7 +109,27 @@ End If
 End If
 
 End Property
+Public Property Let ValueStr(S As String)
+Dim vNewValue
+vNewValue = vbNullString
+SwapString2Variant S, vNewValue
+If Init Then
+If Not UseIndex Then
+If useobj Then
+WritePropObj hardlink, vtref, vNewValue
+Else
+WriteProp ObjectRef, vtref, vNewValue
+End If
+Else
+If useobj Then
+WritePropIndexObj hardlink, vtref, vNewValue, mIndex
+Else
+WritePropIndex ObjectRef, vtref, vNewValue, mIndex
+End If
+End If
+End If
 
+End Property
 Public Property Get isMethod() As Boolean
 isMethod = IamMethod
 End Property

@@ -46,14 +46,22 @@ Begin VB.Form GuiM2000
       TabStop         =   0   'False
       Top             =   0
       Width           =   9180
-      _extentx        =   16193
-      _extenty        =   873
-      max             =   1
-      vertical        =   -1  'True
-      font            =   "GuiM2000.frx":000C
-      backcolor       =   3881787
-      forecolor       =   16777215
-      capcolor        =   16777215
+      _ExtentX        =   16193
+      _ExtentY        =   873
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   161
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Backcolor       =   3881787
+      ForeColor       =   16777215
+      CapColor        =   16777215
    End
 End
 Attribute VB_Name = "GuiM2000"
@@ -143,7 +151,7 @@ mNoCaption = NewValue
 If mNoCaption Then
 Static WndProc As Long, VBWndProc As Long
    
-    m_Caption = ""
+    m_Caption = vbNullString
 
     If WndProc = 0 Then
         WndProc = GetProcAddress(GetModuleHandleW(StrPtr("user32")), "DefWindowProcW")
@@ -156,7 +164,7 @@ Static WndProc As Long, VBWndProc As Long
         SetWindowTextW hWND, StrPtr(m_Caption)
         SetWindowLongA hWND, GWL_WNDPROC, VBWndProc
     Else
-        Caption = ""
+        Caption = vbNullString
        
     End If
 End If
@@ -165,7 +173,7 @@ End Property
 Public Property Let CaptionW(ByVal NewValue As String)
 If mNoCaption Then Exit Property
     Static WndProc As Long, VBWndProc As Long
-    If NewValue = "" Then NewValue = "M2000"
+    If LenB(NewValue) = 0 Then NewValue = "M2000"
     m_Caption = NewValue
 
     If WndProc = 0 Then
@@ -410,7 +418,7 @@ Dim aa As gList
 
 Set aa = Controls(DefaultName)
 aa.SetFocus
-DefaultName = ""
+DefaultName = vbNullString
 End If
 If IamPopUp Then Exit Sub
 If Not moveMe Then
@@ -1393,8 +1401,8 @@ End If
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
             End If
             If Err Then Debug.Print "error": Exit Sub
-            If MyForm3 Is Nothing Then LastActive = "": Exit Sub
-            If MyForm3.WindowState <> 1 Then LastActive = ""
+            If MyForm3 Is Nothing Then LastActive = vbNullString: Exit Sub
+            If MyForm3.WindowState <> 1 Then LastActive = vbNullString
             
         End If
 End Sub
@@ -1650,7 +1658,7 @@ End If
             If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
             End If
-            LastActive = ""
+            LastActive = vbNullString
             End If
         Else
     If gList2.Visible Then gList2.SetFocus
@@ -1718,7 +1726,7 @@ If item >= 0 Then
             If Controls(LastActive).enabled Then
             If Controls(LastActive).Visible Then Controls(LastActive).SetFocus
             End If
-            LastActive = ""
+            LastActive = vbNullString
             End If
         Else
     If gList2.Visible Then gList2.SetFocus
@@ -2073,11 +2081,11 @@ Public Function GetPicture(ByVal s$, Optional Size, Optional ColorDepth, Optiona
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
-If where$ = "" Then
+If LenB(where$) = 0 Then
     Set GetPicture = Form1.Icon
 Else
 where$ = GetDosPath(where$)
-If where$ = "" Then Set GetPicture = LoadPicture(""): Exit Function
+If LenB(where$) = 0 Then Set GetPicture = LoadPicture(""): Exit Function
 If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
 Set GetPicture = LoadPicture(where$)
 ElseIf IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
@@ -2095,11 +2103,11 @@ Public Sub ReloadIcon(ByVal s$, Optional Size, Optional ColorDepth, Optional x, 
 Dim where$
 On Error Resume Next
 where$ = CFname(s$)
-If where$ = "" Then
+If LenB(where$) = 0 Then
     Set Icon = Form1.Icon
 Else
 where$ = GetDosPath(where$)
-    If where$ = "" Then Exit Sub
+    If LenB(where$) = 0 Then Exit Sub
 If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
 Set Icon = LoadPicture(where$)
 ElseIf IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then

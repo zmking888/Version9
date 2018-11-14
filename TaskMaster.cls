@@ -231,11 +231,19 @@ If Not (task Is Nothing) Then
         Case 3
         task.Interval = param
         Case 4
+        Set task.Process.Owner = task.Owner
         If Execute(task.Process, Exec$, True) = 0 Then
             task.Dispose tmAllTasks
             ThrowOne Mes
         End If
-        
+        Set task.Process.Owner = Nothing
+        Case 5
+        Set task.Process.Owner = task.Owner
+        If Execute(task.Process, Exec$, False) = 0 Then
+            task.Dispose tmAllTasks
+            ThrowOne Mes
+        End If
+        Set task.Process.Owner = Nothing
         End Select
         
 

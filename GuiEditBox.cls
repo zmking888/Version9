@@ -2358,7 +2358,7 @@ again1:
     If IsmineHere3(r$) Then
     use14 = True
     End If
-    ElseIf r$ = "" Then
+    ElseIf LenB(r$) = 0 Then
     If InStr(ExtraFront, c$) > 0 Then
         r$ = c$
         a$ = Mid$(a$, 2)
@@ -2410,11 +2410,11 @@ again1:
                             While MaybeIsSymbolNoSpace(a$, "1234567890", True)
                             Wend
                             If MaybeIsSymbolNoSpace(a$, ".") Then
-                                a$ = ""
+                                a$ = vbNullString
                             End If
                         End If
                         If MaybeIsSymbolNoSpace(a$, ".") Then
-                    'a$ = ""
+                    'a$ = vbnullstring
                             IsLabelOnly = 1
                         Else
                             IsLabelOnly = 100
@@ -2463,7 +2463,7 @@ checkexp:
                   Wend
                   If MaybeIsSymbolNoSpace(a$, ".") Then
                   IsLabelOnly = 1
-                  a$ = ""
+                  a$ = vbNullString
                   Exit Function
                   End If
               Else
@@ -3784,7 +3784,7 @@ a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
 End If
 Else
 a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
-If Len(a$) > Charpos Then a$ = ""
+If Len(a$) > Charpos Then a$ = vbNullString
 End If
 
 If a$ <> "" Then

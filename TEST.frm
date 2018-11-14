@@ -236,7 +236,7 @@ Public Sub ComputeNow()
 stackshow MyBaseTask
 End Sub
 
-Private Sub compute_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub compute_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = 13 Then
 KeyCode = 0
     If Compute.Prompt = "? " Then
@@ -255,7 +255,7 @@ KeyCode = 0
         End If
         testpad.Show
         Else
-        Compute = ""
+        Compute = vbNullString
         End If
         End If
         
@@ -272,11 +272,11 @@ KeyCode = 0
         If MyBaseTask.IamChild And sb2used = 0 Then
         NOEXECUTION = True
         MOUT = True
-        If Form2.Visible Then Compute = "": FillAgainLabels
+        If Form2.Visible Then Compute = vbNullString: FillAgainLabels
         End If
     End If
 ElseIf KeyCode = 8 Then
-If Compute = "" Then
+If Compute = vbNullString Then
     If Compute.Prompt = "? " Then
         Compute.Prompt = ">"
          If pagio$ = "GREEK" Then
@@ -318,7 +318,7 @@ stolemodalid = 0
 End If
 End Sub
 
-Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
 If KeyCode = 27 Then
 KeyCode = 0
 Unload Me
@@ -566,7 +566,7 @@ doubleclick = 0
 
 End Sub
 
-Private Sub gList2_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub gList2_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 If Button <> 0 Then tracecounter = 100
 End Sub
 
@@ -784,7 +784,7 @@ End Sub
  Private Sub PrintItem(mHdc As Long, c As String, r As RECT, Optional way As Long = DT_SINGLELINE Or DT_NOPREFIX Or DT_NOCLIP Or DT_CENTER Or DT_VCENTER)
     DrawText mHdc, StrPtr(c), -1, r, way
     End Sub
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If Button = 1 Then
     
@@ -811,7 +811,7 @@ If Button = 1 Then
 
 End If
 End Sub
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(Button As Integer, shift As Integer, x As Single, y As Single)
 Dim addX As Long, addy As Long, factor As Single, once As Boolean
 If once Then Exit Sub
 If Button = 0 Then dr = False: drmove = False
@@ -883,7 +883,7 @@ End If
 once = False
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(Button As Integer, shift As Integer, x As Single, y As Single)
 
 If dr Then Me.mousepointer = 0
 tracecounter = 0

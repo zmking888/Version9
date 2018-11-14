@@ -507,13 +507,24 @@ aa.Recycle
 
 
 End Property
+Public Sub PopStr2(s$)
+On Error Resume Next
+Dim aa As VarItem
+dec
+Set aa = mstack.item(1)
+mstack.Remove 1
+aa.PopString s$
+'PopStr = aa.ItemStr
+aa.Recycle
+End Sub
 Public Property Get PopStr() As String
 On Error Resume Next
 Dim aa As VarItem
 dec
 Set aa = mstack.item(1)
 mstack.Remove 1
-PopStr = aa.ItemStr
+aa.PopString PopStr
+'PopStr = aa.ItemStr
 aa.Recycle
 
 

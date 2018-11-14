@@ -208,17 +208,19 @@ End Function
 Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False, Optional isglobal As Boolean = False, Optional deftype As Boolean = False)
 Dim a As Long
 a = Malloc()
+
 On Error GoTo exxx
+place HashFunc(Key), a
 With PriveSpace(a)
-    .Key = Key
+  '  .Key = Key
     .ndx = num
     .KeyType = CByte(Abs(isref))
     .originaltype = CByte(deftype)
     .globalvar = CByte(isglobal)
     .firsthash = HashFunc0(Key)
-    
+     SwapStrings .Key, Key
 End With
-place HashFunc(Key), a
+
 exxx:
 End Sub
 Property Get Percent()

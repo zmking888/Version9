@@ -53,7 +53,7 @@ End Property
 Public Sub SetExtCaption(a$)
 On Error Resume Next
 If ExtForm Is Nothing Then Exit Sub
-If a$ = "" Then
+If LenB(a$) = 0 Then
 Hide
 Form1.CaptionW = ExtForm.CaptionW
 Else
@@ -265,17 +265,17 @@ Do
   End If
 End Sub
 Public Function Eval(code$) As Variant
-Dim pos As Long, P As Double, s As String, drop$
+Dim pos As Long, p As Double, s As String, drop$
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
   If drop$ = vbNullString And pos > Len(code$) Then Exit Function
   If InStr(drop$, "N") Then
-  If IsExp(objref, Left$(code$, pos), P) Then
+  If IsExp(objref, Left$(code$, pos), p) Then
   If Not objref.lastobj Is Nothing Then
   Set Eval = objref.lastobj
   
   Else
-    Eval = P
+    Eval = p
    End If
   End If
   Else
@@ -391,7 +391,7 @@ End Sub
 Public Sub Show()
 On Error Resume Next
 If UseMe Is Nothing Then Exit Sub
-Form1.CaptionW = ""
+Form1.CaptionW = vbNullString
 If ExtForm.WindowState = 0 Then ExtForm.Visible = True
 End Sub
 

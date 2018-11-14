@@ -75,7 +75,7 @@ End Property
 
 Public Property Let CaptionW(ByVal NewValue As String)
     Static WndProc As Long, VBWndProc As Long
-    If NewValue = "" Then NewValue = "M2000"
+    If NewValue = vbNullString Then NewValue = "M2000"
     m_Caption = NewValue
     ' get window procedures if we don't have
     '     them
@@ -112,7 +112,7 @@ Public Property Let CaptionW(ByVal NewValue As String)
 End Property
 Public Property Let CaptionWsilent(ByVal NewValue As String)
     Static WndProc As Long, VBWndProc As Long
-    If NewValue = "" Then NewValue = "M2000"
+    If NewValue = vbNullString Then NewValue = "M2000"
     m_Caption = NewValue
     
   '  ttl = True
@@ -577,7 +577,7 @@ Private Sub Timer1_Timer()
 Static once As Boolean
 If once Then Exit Sub
 once = True
-Dim F As Form, F1 As GuiM2000, i As Long, thismodal As Double, F2 As GuiM2000
+Dim F As Form, F1 As GuiM2000, i As Long, thismodal As Double, f2 As GuiM2000
 If DIALOGSHOW Or ASKINUSE Or skiptimer Then
 skiptimer = False
 Timer1.enabled = False
@@ -592,16 +592,16 @@ If Not hideme Then
     Set F1 = lastform
     If F1.NeverShow Then
 starthere:
-        Set F2 = F1
+        Set f2 = F1
         If F1.Modal <> 0 Then
             thismodal = F1.Modal
-            Set F2 = F1
+            Set f2 = F1
             If F1.Enablecontrol Then
             'we have the top
                 For i = 0 To Forms.count - 1
                     If TypeOf Forms(i) Is GuiM2000 Then
                         Set F1 = Forms(i)
-                        If Not F2 Is F1 Then
+                        If Not f2 Is F1 Then
                             F1.Visible = F1.VisibleOldState Or F1.Visible
                             F1.VisibleOldState = False
                             F1.MinimizeOff
@@ -616,7 +616,7 @@ starthere:
                         End If
                     End If
                 Next i
-                Set F1 = F2
+                Set F1 = f2
                 F1.Visible = F1.VisibleOldState Or F1.Visible
                 F1.VisibleOldState = False
                 If F1.Visible Then
@@ -628,7 +628,7 @@ starthere:
                     End If
                 End If
                 Set F1 = Nothing
-                Set F2 = Nothing
+                Set f2 = Nothing
             Else
             ' we have something else
                 

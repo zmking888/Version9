@@ -124,7 +124,7 @@ Private Sub glistN_CheckGotFocus()
 If mlocked Then
 On Error Resume Next
 'Callback.Controls(ctrlName).TabStop = False
-If Callback.LastActive = "" Then
+If Callback.LastActive = vbNullString Then
 Callback.LastActive = "gList2"
 End If
 Callback.Controls(Callback.LastActive).SetFocus

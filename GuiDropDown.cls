@@ -224,7 +224,7 @@ Private Sub glistN_CheckLostFocus()
 If Textbox.SkipProcAtExitFocus Then
 Textbox.Retired
 Textbox.SkipProcAtExitFocus = False
-Callback.LastActive = ""
+Callback.LastActive = vbNullString
 Else
 Pad.Visible = False
 End If
@@ -399,7 +399,7 @@ End With
 Set x1 = Nothing
 ElseIf KeyCode = vbKeyDown Or (KeyCode = vbKeyReturn And UseOnlyTheList) Then
 Iam = False
-If glistN.listcount > 0 Then Callback.LastActive = ""
+If glistN.listcount > 0 Then Callback.LastActive = vbNullString
 
 If Pad.Visible Then If glistN.Visible Then glistN.enabled = True: Textbox.SkipProcAtExitFocus = True: glistN.SetFocus: Exit Sub
 
@@ -479,7 +479,7 @@ End If
 If Textbox.glistN.TabStopSoft Then Callback.LastActive = ctrlName
 
 ElseIf KeyCode = vbKeyTab Then
-Callback.LastActive = ""
+Callback.LastActive = vbNullString
 Textbox.SkipProcAtExitFocus = False
 Pad.Visible = False
 'glistN.Visible = False

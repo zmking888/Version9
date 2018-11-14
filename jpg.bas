@@ -80,7 +80,7 @@ Public Function SaveJPG( _
       Optional UserComment As String) As Boolean
    Dim j As New cJpeg
 j.Quality = lQuality
-If UserComment = "" Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
+If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
 If lQuality <= 50 Then
 j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
 Else

@@ -34,7 +34,6 @@ Private Sub Class_Initialize()
     ReDim PriveSpace(MaxSpace) As item, Hash(MaxSpace * 2 + 3)
     hashlen = MaxSpace * 2 + 3
     toplim = -1
-
 End Sub
 Friend Sub ReadVar(where, name$, num As Long)
     name$ = PriveSpace(where).Key
@@ -159,8 +158,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Property Get LastKnown() As String
 LastKnown = lastfind
@@ -218,9 +217,8 @@ End Function
 Friend Sub ItemCreator(Key As String, num As Long, Optional isref As Boolean = False)
 Dim a As Long
 a = Malloc()
-
+place HashFunc(Key), a
 With PriveSpace(a)
-    .Key = Key
     .ndx = num
     If isref Then
         .KeyType = 1
@@ -228,24 +226,27 @@ With PriveSpace(a)
         .KeyType = 0
     End If
     .firsthash = HashFunc0(Key)
+    SwapStrings .Key, Key
 End With
-place HashFunc(Key), a
+
+
+
 End Sub
 Friend Sub ItemCreator2(Key As String, num As Long, internal As Long)
 '' used with KeyType as Long not a flag
 Dim a As Long
 a = Malloc()
-
+place HashFunc(Key), a
 With PriveSpace(a)
-    .Key = Key
     .ndx = num
     .KeyType = internal
     .firsthash = HashFunc0(Key)
+     SwapStrings .Key, Key
 End With
-place HashFunc(Key), a
+
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long

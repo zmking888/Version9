@@ -149,8 +149,8 @@ Private Function Malloc() As Long
         toplim = toplim + 1
         Malloc = toplim
 End Function
-Property Get Count()
-Count = toplim + 1
+Property Get count()
+count = toplim + 1
 End Property
 Property Get LastKnown() As String
 LastKnown = lastfind
@@ -198,16 +198,16 @@ End Function
 Friend Sub ItemCreator(Key As String, num As Long)
 Dim a As Long
 a = Malloc()
-
+place HashFunc(Key), a
 With PriveSpace(a)
     .Key = Key
     .ndx = num
     .firsthash = HashFunc0(Key)
 End With
-place HashFunc(Key), a
+
 End Sub
 Property Get Percent()
-Percent = Count / hashlen
+Percent = count / hashlen
 End Property
 Private Sub place(ByVal b, ByVal a)
     Dim k As Long

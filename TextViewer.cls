@@ -2025,7 +2025,7 @@ End If
 newjump:
  feedback = feedthis
  If col((UBound(col()) \ 2) * 2) = 7 Then
- a$ = ""
+ a$ = vbNullString
  Else
  
   a$ = Mid$(a$, pos1)
@@ -2094,7 +2094,7 @@ If kind > 0 Then
 If MaybeIsSymbol(a$, ".") Then
 If FastSymbol(a$, ".(", , 2) Then
 addone pos2, 14
-a$ = ""
+a$ = vbNullString
     pos2 = k + 1
     
 ElseIf FastSymbol(a$, "..", , 2) Then
@@ -2298,7 +2298,7 @@ End If
          Else
         addone 1, 7
         End If
-        a$ = ""
+        a$ = vbNullString
         pos2 = k
         If pos2 > 0 Then
          addone pos2 + 1, 14
@@ -2519,7 +2519,7 @@ If kind = 0 Then
             'pos2 = k - Len(a$) + 1
            If pos2 <= k Then ColorizeInnerStatements a$, k, pos2, localfeedthis
             kind = 0
-            drop$ = ""
+            drop$ = vbNullString
             If pos2 > k Then Exit Sub
         Else
            GoTo checklambda
@@ -2939,7 +2939,7 @@ a$ = NLtrim$(a$)
                         While MaybeIsSymbolNoSpace(a$, "1234567890", True)
                         Wend
                         If MaybeIsSymbolNoSpace(a$, ".") Then
-                            a$ = ""
+                            a$ = vbNullString
                         End If
                     End If
                     If MaybeIsSymbolNoSpace(a$, ".") Then
@@ -3019,7 +3019,7 @@ checkexp:
                   Wend
                   If MaybeIsSymbolNoSpace(a$, ".") Then
                   IsLabelOnly = 1
-                  a$ = ""
+                  a$ = vbNullString
                   Exit Function
                   End If
               Else
@@ -3917,11 +3917,11 @@ End If
 End If
 Else
 a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
-If Len(a$) > Charpos Then a$ = ""
+If Len(a$) > Charpos Then a$ = vbNullString
 End If
 Else
 a$ = Space$(Len(CurrentParagraph) - Len(NLtrim$(CurrentParagraph)))
-If Len(a$) > Charpos Then a$ = ""
+If Len(a$) > Charpos Then a$ = vbNullString
 
 End If
 
@@ -4201,7 +4201,7 @@ Do While pos <= Len(a$)
 
     If part$ <> "" Then
         b$ = b$ & part$
-        ElseIf b$ = "" Then
+        ElseIf LenB(b$) = 0 Then
         ElseIf Right(b$, 1) <> "l" Then
         Exit Do
         End If
@@ -4300,7 +4300,7 @@ jumphere:
         part$ = "S"
         End If
         Case "e", "E", "å", "Å"
-        If word$ = "" Then part$ = "N"
+        If LenB(word$) = 0 Then part$ = "N"
         
         word$ = word$ + w$
            If part$ = "S" Then

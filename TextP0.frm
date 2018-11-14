@@ -276,7 +276,7 @@ End Property
 
 Public Property Let CaptionW(ByVal NewValue As String)
     Static WndProc As Long, VBWndProc As Long
-    'If NewValue = "" Then NewValue = "M2000"
+    'If NewValue = vbnullstring Then NewValue = "M2000"
     m_Caption = NewValue
 
     If WndProc = 0 Then

@@ -518,7 +518,7 @@ Public Sub CopyArrayRev(k As mArray)
 'copy this to k
 If k Is Me Then Exit Sub
 Dim v As Variant, i As Long, obj As Object, obj2 As Object, spare As lambda
-Dim mm As Long, m1 As Long
+Dim mm As Long, M1 As Long
 k.SerialItem v, Me.UpperMonoLimit, 8
 k.myarrbase = myarrbase
 k.RevOrder = False
@@ -533,35 +533,35 @@ Set k.GroupRef = Me.GroupRef
 mm = Me.UpperMonoLimit
 If Right$(k.arrname, 2) = "%(" Then
 For i = 0 To Me.UpperMonoLimit
-m1 = mm - i
-If IsObject(Me.item(m1)) Then
-Select Case Typename(Me.item(m1))
+M1 = mm - i
+If IsObject(Me.item(M1)) Then
+Select Case Typename(Me.item(M1))
 Case "Group"
-Set obj = Me.item(m1)
+Set obj = Me.item(M1)
 CopyGroupObj obj, obj2
 Set k.item(i) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata()
-With Me.item(m1)
+With Me.item(M1)
 .CopyTo spare, actualdata()
 End With
 Set k.item(i) = spare
 Set spare = Nothing
 
 Case Else
-Set k.item(i) = Me.item(m1)
+Set k.item(i) = Me.item(M1)
 End Select
 Else
-k.item(i) = Int(Me.item(m1))
+k.item(i) = Int(Me.item(M1))
 End If
 Next i
 Else
 ''''''''''****************************
 For i = 0 To Me.UpperMonoLimit
-m1 = mm - i
-If IsObject(Me.item(m1)) Then
-Select Case Typename(Me.item(m1))
+M1 = mm - i
+If IsObject(Me.item(M1)) Then
+Select Case Typename(Me.item(M1))
 Case "Group"
 Set obj = Me.item(i)
 CopyGroupObj obj, obj2
@@ -569,16 +569,16 @@ Set k.item(i) = obj2
 Set obj2 = Nothing
 Case "lambda"
 Dim actualdata1()
-With Me.item(m1)
+With Me.item(M1)
 .CopyTo spare, actualdata1()
 End With
 Set k.item(i) = spare
 Set spare = Nothing
 Case Else
-Set k.item(i) = Me.item(m1)
+Set k.item(i) = Me.item(M1)
 End Select
 Else
-k.item(i) = Me.item(m1)
+k.item(i) = Me.item(M1)
 End If
 Next i
 End If
@@ -934,6 +934,33 @@ End If
 End If
 
 End Property
+Public Property Let itemstr(curitem As Long, item As String)
+
+On Error Resume Next
+If curitem < 0 Then
+
+ElseIf final Then
+If Not MyIsObject(actualdata(curitem)) Then
+If VarType(actualdata(curitem)) = vbEmpty Then
+MoveStringToVariant item, actualdata(curitem)
+Else
+CantAssignValue
+End If
+Else
+CantAssignValue
+End If
+ElseIf Not IsObject(actualdata(curitem)) Then
+MoveStringToVariant item, actualdata(curitem)
+Else
+If TypeOf actualdata(curitem) Is PropReference Then
+    actualdata(curitem).ValueStr = item
+Else
+    Set actualdata(curitem) = Nothing
+    actualdata(curitem) = CLng(0)
+End If
+End If
+
+End Property
 Public Property Set item(curitem As Long, item As Variant)
 If final Then CantAssignValue: Exit Property
 On Error Resume Next
@@ -1009,7 +1036,7 @@ Set var = aa
 End Sub
 Sub CopyGroupObj(myobject1 As Object, myobject2 As Object, Optional LinkToMe As Boolean = False)
 'Special Copy
- Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
+ Dim ps As New mStiva, v As Long, S$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
 
 Dim mygroup2 As New Group

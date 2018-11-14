@@ -966,10 +966,10 @@ a$ = LCase(a$)
 b$ = LCase(b$)
 If CompareString(useclid, 0, StrPtr(a$), Len(a$), StrPtr(b$), Len(a$)) = 2 Then Exit Function
 a0$ = Mid$(a$, InStrRev(a$, ".") + 1)
-If Len(a0$) = Len(a$) Then a0$ = "" Else a$ = Left$(a$, Len(a$) - Len(a0$) - 1)
+If Len(a0$) = Len(a$) Then a0$ = vbNullString Else a$ = Left$(a$, Len(a$) - Len(a0$) - 1)
 
 b0$ = Mid$(b$, InStrRev(b$, ".") + 1)
-If Len(b0$) = Len(b$) Then b0$ = "" Else b$ = Left$(b$, Len(b$) - Len(b0$) - 1)
+If Len(b0$) = Len(b$) Then b0$ = vbNullString Else b$ = Left$(b$, Len(b$) - Len(b0$) - 1)
 'GoTo 1111
 Select Case CompareString(useclid, 0, StrPtr(a0$), Len(a0$), StrPtr(b0$), Len(a0$))
     Case 1
@@ -1069,10 +1069,10 @@ Dim a0$, b0$
 a$ = LCase(a$)
 b$ = LCase(b$)
 a0$ = Mid$(a$, InStrRev(a$, ".") + 1)
-If Len(a0$) = Len(a$) Then a0$ = "" Else a$ = Left$(a$, Len(a$) - Len(a0$) - 1)
+If Len(a0$) = Len(a$) Then a0$ = vbNullString Else a$ = Left$(a$, Len(a$) - Len(a0$) - 1)
 
 b0$ = Mid$(b$, InStrRev(b$, ".") + 1)
-If Len(b0$) = Len(b$) Then b0$ = "" Else b$ = Left$(b$, Len(b$) - Len(b0$) - 1)
+If Len(b0$) = Len(b$) Then b0$ = vbNullString Else b$ = Left$(b$, Len(b$) - Len(b0$) - 1)
 'GoTo 1111
 Select Case CompareString(useclid, 0, StrPtr(a0$), Len(a0$), StrPtr(b0$), Len(a0$))
     Case 1
