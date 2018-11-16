@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Private mItem As Variant
-Private slot As Byte
+Public slot As Byte
 Private mTypeName As Byte
 Private Key As String * 30
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
@@ -30,19 +30,21 @@ Property Let ItemStrVar(ByRef RHS As Variant)
     slot = 4
     mItem = RHS
 End Property
- Property Let ItemStr(ByRef RHS As String)
- slot = 4
- MoveStringToVariant RHS, mItem
+Property Let ItemStr(ByRef RHS As String)
+slot = 4
+MoveStringToVariant RHS, mItem
 End Property
 Public Sub PopString(s$)
 If slot = 4 Then
 SwapString2Variant s$, mItem
+ElseIf slot = 5 Then
+s$ = mItem
 Else
 s$ = vbNullString
 End If
 End Sub
  Property Get ItemStr() As String
-If slot = 4 Then ItemStr = mItem
+If slot > 3 Then ItemStr = mItem
 End Property
  Property Let ItemDouble(ByVal RHS As Variant)
  slot = 2
@@ -56,6 +58,10 @@ End Property
  slot = 2
 mItem = RHS
 End Property
+ Property Get ItemVariantOnly() As Variant
+ ItemVariantOnly = mItem
+End Property
+
  Property Get ItemVariant() As Variant
  If slot = 2 Then ItemVariant = mItem
 End Property

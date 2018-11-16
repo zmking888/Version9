@@ -137,7 +137,7 @@ Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
 For many = many To 1 Step -1
     If Source.Total >= many Then
-        Set bb = Source.StackPickRef(many)
+        Set bb = Source.StackPickRef2(many)
         If bb.ObjectRef Is Nothing Then
             Set aa = bb
         Else
@@ -186,8 +186,9 @@ On Error Resume Next
 For many = Source.Total - many1 + 1 To Source.Total
 
 If Source.Total >= many Then
-    Set bb = Source.StackPickRef(many)
+    Set bb = Source.StackPickRef2(many)
     If bb.ObjectRef Is Nothing Then
+        
         Set aa = bb
     Else
         Set work = bb.ObjectRef
@@ -236,6 +237,11 @@ End Property
 Public Property Get StackPickRef(where As Long) As VarItem
 Set StackPickRef = mstack.item(where)
 End Property
+Public Property Get StackPickRef2(where As Long) As VarItem
+Set StackPickRef2 = mstack.item(where)
+If StackPickRef2.slot = 4 Then StackPickRef2.slot = 5
+End Property
+
 Public Property Get StackItemType(where As Long) As String
 Dim aa As VarItem
 On Error Resume Next
@@ -886,11 +892,7 @@ Dim aa As VarItem
 If index >= 0 And index < mMany Then
     Set aa = StackPickRef(index + 1)
     If aa.ObjectRef Is Nothing Then
-        If aa.Typename = "S" Then
-            Value = aa.ItemStr
-        Else
-            Value = aa.ItemDouble
-        End If
+        Value = aa.ItemVariantOnly
     Else
         Set Value = aa.ObjectRef
     End If
@@ -926,5 +928,6 @@ For i = item To thisstiva.count
         Inc
 Next i
 End Sub
+
 
 

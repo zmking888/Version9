@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 3
+Global Const Revision = 4
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -29135,16 +29135,16 @@ If basestack.toprinter Then
 Else
         If IsLabelSymbolNew(rest$, " —’ÿ≈", "HIDE", Lang) Then
                     If FastSymbol(rest$, "!") Then
-                    Set Form1.MouseIcon = Form1.Picture2.MouseIcon
+                    Set Form1.mouseicon = Form1.Picture2.mouseicon
                     Form1.mousepointer = 99
-                    Set Form1.DIS.MouseIcon = Form1.Picture2.MouseIcon
+                    Set Form1.DIS.mouseicon = Form1.Picture2.mouseicon
                     Form1.DIS.mousepointer = 99
                     For i = 1 To PobjNum
-                    Set Form1.dSprite(i).MouseIcon = Form1.Picture2.MouseIcon
+                    Set Form1.dSprite(i).mouseicon = Form1.Picture2.mouseicon
                     Form1.dSprite(i).mousepointer = 99
                     Next i
                     Else
-                    Set Scr.MouseIcon = Form1.Picture2.MouseIcon
+                    Set Scr.mouseicon = Form1.Picture2.mouseicon
                     Scr.mousepointer = 99
                     With players(GetCode(Scr))
                         .HideIcon = True
@@ -29156,25 +29156,25 @@ Else
                     
                     With players(-1)
                     
-                    If Form1.MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                    If Form1.mouseicon = Form1.Picture2.mouseicon And Not .HideIcon Then
                         Form1.mousepointer = .LastIcon
-                        Set Form1.MouseIcon = .LastIconPic
+                        Set Form1.mouseicon = .LastIconPic
                         
                         End If
                     End With
                     
                     With players(0)
-                    If Form1.DIS.MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                    If Form1.DIS.mouseicon = Form1.Picture2.mouseicon And Not .HideIcon Then
                         Form1.DIS.mousepointer = .LastIcon
-                        Set Form1.DIS.MouseIcon = .LastIconPic
+                        Set Form1.DIS.mouseicon = .LastIconPic
                         End If
                     End With
                     For i = 1 To PobjNum
                     
                     With players(val(Form1.dSprite(i).Tag))
-                        If Form1.dSprite(i).MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                        If Form1.dSprite(i).mouseicon = Form1.Picture2.mouseicon And Not .HideIcon Then
                         Form1.dSprite(i).mousepointer = .LastIcon
-                       Set Form1.dSprite(i).MouseIcon = .LastIconPic
+                       Set Form1.dSprite(i).mouseicon = .LastIconPic
                         End If
                     End With
                     Next i
@@ -29182,12 +29182,12 @@ Else
             Else
                 
                     With players(GetCode(Scr))
-                    If Scr.MouseIcon = Form1.Picture2.MouseIcon Then
+                    If Scr.mouseicon = Form1.Picture2.mouseicon Then
                      .HideIcon = False
                      If .LastIcon = 99 And Scr.mousepointer = 99 Then
-                        Set Scr.MouseIcon = .LastIconPic
+                        Set Scr.mouseicon = .LastIconPic
                      ElseIf .LastIcon = 99 Then
-                        Set Scr.MouseIcon = .LastIconPic
+                        Set Scr.mouseicon = .LastIconPic
                         Scr.mousepointer = 99
                      Else
                         Scr.mousepointer = .LastIcon
@@ -29212,9 +29212,9 @@ Else
                         
                         If aPic Is Nothing Then MissCdib: Exit Sub
                         If Not FastSymbol(rest$, ";") Then
-                        If LCase(Right$(s$, 4)) = ".ico" Then Set Scr.MouseIcon = Form1.Picture2.MouseIcon: Scr.mousepointer = 99
+                        If LCase(Right$(s$, 4)) = ".ico" Then Set Scr.mouseicon = Form1.Picture2.mouseicon: Scr.mousepointer = 99
                         End If
-                        Set Scr.MouseIcon = aPic
+                        Set Scr.mouseicon = aPic
                         Scr.mousepointer = 99
                         With players(GetCode(Scr))
                             Set .LastIconPic = aPic
@@ -29224,7 +29224,7 @@ Else
                     MissFile
                     End If
                 Else
-                    Set Scr.MouseIcon = Nothing
+                    Set Scr.mouseicon = Nothing
                     Scr.mousepointer = 1
                     With players(GetCode(Scr))
                         Set .LastIconPic = Nothing
@@ -29239,10 +29239,10 @@ Else
                 If CLng(x) = 99 Then
                 With players(GetCode(Scr))
                 If .LastIconPic Is Nothing Then
-                Set Scr.MouseIcon = Form1.PrinterDocument1.MouseIcon
-                Set .LastIconPic = Form1.PrinterDocument1.MouseIcon
+                Set Scr.mouseicon = Form1.PrinterDocument1.mouseicon
+                Set .LastIconPic = Form1.PrinterDocument1.mouseicon
                 Else
-                Set Scr.MouseIcon = .LastIconPic
+                Set Scr.mouseicon = .LastIconPic
                 End If
                 Scr.mousepointer = 99
                 
@@ -45926,17 +45926,17 @@ On Error Resume Next
                 Exit Function
             End If
         Else
-            Set aPic = Form2.Icon
+            Set aPic = Form2.icon
             End If
     Else
-            Set aPic = Form2.Icon
+            Set aPic = Form2.icon
     End If
     If Not UseMe Is Nothing Then
         PlaceIcon aPic
         Else
-        Set Form3.Icon = aPic
+        Set Form3.icon = aPic
     End If
-    Set Form1.Icon = aPic
+    Set Form1.icon = aPic
     MyIcon = ok
 End Function
 Function ProcTitle(basestack As basetask, rest$, Lang As Long) As Boolean
