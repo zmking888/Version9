@@ -57,7 +57,9 @@ Public Type basket
     pathgdi As Long  ' only for gdi+
     pathcolor As Long ' only for gdi+
     pathfillstyle As Integer
-
+    LastIcon As Integer  ' 1..   / 99 loaded
+    LastIconPic As StdPicture
+    HideIcon As Boolean
 End Type
 Private stopwatch As Long
 Private Const myArray = "mArray"
@@ -5831,6 +5833,9 @@ MyErMacro a$, "Unknown Offset " & s$, "’γνωστη Μετάθεση " & s$
 End Sub
 Sub wronguseofenum(a$)
 MyErMacro a$, "Wrong use of enumerator", "λάθος χρήση απαριθμητή"
+End Sub
+Sub nosuchfile()
+MyEr "No such file", "Δεν υπάρχει τέτοιο αρχείο"
 End Sub
 Public Function MyDoEvents()
 On Error GoTo there

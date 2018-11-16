@@ -258,3 +258,8 @@ On Error Resume Next
 If glistN.TabStopSoft Then Callback.LastActive = ctrlName
 End Sub
 
+Public Property Let icon(RHS)
+glistN.icon = RHS
+
+End Property
+

@@ -606,3 +606,6 @@ Public Property Let Default(RHS)
 On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
 End Property
+Public Property Let icon(RHS)
+glistN.icon = RHS
+End Property

@@ -74,6 +74,7 @@ Option Explicit
 Dim waitforparent As Boolean
 Dim havefocus As Boolean, UKEY$
 Dim dummy As Long
+Dim nopointerchange As Boolean
 Private Type Myshape
     Visible As Boolean
     hatchType As Long
@@ -358,6 +359,7 @@ Public SkipForm As Boolean
 Public dropkey As Boolean
 Public MenuGroup As String
 Private mTabStop As Boolean
+Private oldpointer As Integer
 Public Function GetLastKeyPressed() As Long
 Dim Message As Msg
 If mynum$ <> "" Then
@@ -1573,7 +1575,7 @@ If (TIMESTAMP + 0.02) > Timer And shift = 0 Then Exit Sub
 TIMESTAMP = Timer
 
 If Not FreeMouse Then Exit Sub
-If Button = 0 Then If mousepointer < 2 Then mousepointer = 1
+If Button = 0 Then If Not nopointerchange Then If mousepointer < 2 Then mousepointer = 1
 If (x > Width - barwidth) And tListcount > lines + 1 And Not BarVisible Then
 Hidebar = True: BarVisible = m_showbar Or AutoHide Or MultiLineEditBox
 
@@ -1602,7 +1604,7 @@ Else
     End If
 End If
 oldbutton = Button
-If (Button And 3) > 0 And useFloatList And FloatList Then FloatListMe useFloatList, x, y: Button = 0 Else If mousepointer > 1 Then mousepointer = 1
+If (Button And 3) > 0 And useFloatList And FloatList Then FloatListMe useFloatList, x, y: Button = 0 Else If Not nopointerchange Then If mousepointer > 1 Then mousepointer = 1
 If mHeadline <> "" Then
 If YYT = 0 Then ' we move in mHeadline
 ' -1 is mHeadline
@@ -4050,6 +4052,9 @@ If Not myEnabled Then
 Exit Property
 End If
 If RHS = False And Shape1.Visible = False Then
+If nopointerchange Then
+UserControl.mousepointer = oldpointer
+End If
 Else
 If listcount = 0 Then RHS = False
 Shape1.Visible = RHS Or Spinner
@@ -4058,6 +4063,13 @@ Shape3.Visible = RHS Or Spinner
 Shape Shape1
 Shape Shape2
 Shape Shape3
+If nopointerchange Then
+If (RHS Or Spinner) Then
+UserControl.mousepointer = 1
+Else
+UserControl.mousepointer = oldpointer
+End If
+End If
 If Not NoFire = True Then Timer1.enabled = True
 End If
 End Property
@@ -4975,6 +4987,10 @@ End Property
 Public Property Let mousepointer(ByVal RHS As Integer)
 UserControl.mousepointer = RHS
 End Property
+Public Property Set mouseicon(RHS)
+Set UserControl.mouseicon = RHS
+End Property
+
 Function GetKeY(ascii As Integer) As String
     Dim Buffer As String, ret As Long
     Buffer = String$(514, 0)
@@ -5036,7 +5052,7 @@ Function DoubleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long
 Static Lx As Long, ly As Long
 If item = itemline Then
    If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
-      mousepointer = 1
+     If Not nopointerchange Then mousepointer = 1
       
       FloatList = False
             If Button = 1 Then
@@ -5065,7 +5081,7 @@ End Function
 Function SingleClickCheck(Button As Integer, ByVal item As Long, ByVal x As Long, ByVal y As Long, ByVal Xorigin As Long, ByVal Yorigin As Long, setupxy As Long, itemline As Long) As Boolean
 If item = itemline Then
    If Abs(x - Xorigin) < setupxy And Abs(y - Yorigin) < setupxy Then
-        mousepointer = 1
+      If Not nopointerchange Then mousepointer = 1
         FloatList = False
             If Button = 1 Then
             SingleClickCheck = True
@@ -5139,4 +5155,46 @@ Public Sub PaintPicture1(pic As StdPicture, x1 As Long, y1 As Long, width1 As Lo
     UserControl.PaintPicture pic, x1, y1, width1, height1
     UserControl.ScaleMode = 1
 End Sub
-
+Public Property Let icon(RHS)
+On Error Resume Next
+nopointerchange = True
+If IsNumeric(RHS) Then
+    UserControl.mousepointer = CInt(RHS)
+Else
+    Dim aPic As StdPicture, s$, Scr As Object
+    s$ = RHS
+    If s$ <> vbNullString Then
+                    s$ = CFname(s$)
+                    If s$ <> vbNullString Then
+                    If LCase(Right$(s$, 4)) = ".ico" Or LCase(Right$(s$, 4)) = ".cur" Then
+                        Set aPic = LoadPicture(GetDosPath(s$))
+                    Else
+                        
+                        Set aPic = LoadMyPicture(GetDosPath(s$))
+                        End If
+                         Set UserControl.mouseicon = Form1.Picture2.mouseicon: UserControl.mousepointer = 99
+                 
+                        If aPic Is Nothing Then MissCdib: Exit Property
+                        Set UserControl.mouseicon = aPic
+                        UserControl.mousepointer = 99
+                    Else
+                    MissFile
+                    End If
+                Else
+                 Set UserControl.mouseicon = Form1.Picture2.mouseicon: UserControl.mousepointer = 99
+                    
+                    
+                End If
+End If
+oldpointer = UserControl.mousepointer
+End Property
+Friend Sub SetIcon(RHS, mpointer As Integer)
+On Error Resume Next
+nopointerchange = True
+Set UserControl.mouseicon = RHS
+oldpointer = mpointer
+UserControl.mousepointer = mpointer
+End Sub
+Public Property Get icon()
+Set icon = UserControl.mouseicon
+End Property

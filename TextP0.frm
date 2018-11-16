@@ -41,7 +41,8 @@ Begin VB.Form Form1
       EndProperty
       Height          =   465
       Left            =   0
-      Picture         =   "TextP0.frx":0582
+      MouseIcon       =   "TextP0.frx":0582
+      Picture         =   "TextP0.frx":06D4
       ScaleHeight     =   405
       ScaleWidth      =   390
       TabIndex        =   6
@@ -93,6 +94,7 @@ Begin VB.Form Form1
       ForeColor       =   &H80000008&
       Height          =   1140
       Left            =   8010
+      MouseIcon       =   "TextP0.frx":081E
       ScaleHeight     =   1140
       ScaleWidth      =   1185
       TabIndex        =   0
@@ -170,7 +172,7 @@ Begin VB.Form Form1
       NoFolders       =   0   'False
       Transparent     =   0   'False
       ViewID          =   "{0057D0E0-3573-11CF-AE69-08002B2E1262}"
-      Location        =   ""
+      Location        =   "http:///"
    End
    Begin VB.PictureBox DIS 
       Appearance      =   0  'Flat
@@ -190,7 +192,7 @@ Begin VB.Form Form1
       ForeColor       =   &H80000008&
       Height          =   5640
       Left            =   780
-      MouseIcon       =   "TextP0.frx":06CC
+      MouseIcon       =   "TextP0.frx":0B28
       MousePointer    =   1  'Arrow
       ScaleHeight     =   5640
       ScaleWidth      =   5640
@@ -2830,21 +2832,21 @@ If OperatingSystem > System_Windows_7 Then
                 MouseShow True
                 ElseIf basestack.tolayer > 0 Or basestack.toback Then
                  DIS.mousepointer = 1
-                          Set DIS.MouseIcon = Nothing
+                          Set DIS.mouseicon = Nothing
                            
                 
                 Else
-                            If basestack.LastState Then
-                                    basestack.LastState = False
-                                    If basestack.LastMouse1 = 99 Then
-                                          s$ = CFname(basestack.LastMouse2)
-                                           Set aPic = LoadMyPicture(GetDosPath(s$))
-                                            If Not aPic Is Nothing Then
-                                           DIS.MouseIcon = aPic
-                                          End If
-                                    End If
-                                    DIS.mousepointer = basestack.LastMouse1
-                            End If
+                           ' If basestack.LastState Then
+                                    'basestack.LastState = False
+                                    'If basestack.LastMouse1 = 99 Then
+                                   '       s$ = CFname(basestack.LastMouse2)
+                                   '        Set aPic = LoadMyPicture(GetDosPath(s$))
+                                   '         If Not aPic Is Nothing Then
+                                   '        DIS.MouseIcon = aPic
+                                   '       End If
+                                  '  End If
+                                  '  DIS.mousepointer = basestack.LastMouse1
+                          '  End If
                 End If
 End Sub
 

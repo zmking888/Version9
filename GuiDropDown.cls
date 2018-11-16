@@ -321,9 +321,6 @@ Private Sub Pad_Activate()
 glistN.SetFocus
 End Sub
 
-Private Sub Pad_Deactivate()
-'Pad.UNhookMe
-End Sub
 
 Private Sub Textbox_CtrlPlusF1()
   If mIndex >= 0 Then
@@ -425,8 +422,6 @@ Pad.Width = CLng(Callback.Controls(ctrlName).Width / 1.618 * dv15) \ dv15
 End If
 If Callback.Controls(ctrlName).Height * gl < VirtualScreenHeight() * 2 / 5 Then
 
-'Pad.Height = (((Callback.Controls(ctrlName).Height * gl) \ dv15) + 1) * dv15
-'glistN.restrictLines = gl
 Pad.Height = Callback.Controls(ctrlName).Height * gl
 Debug.Print Pad.Height
 glistN.restrictLines = gl
@@ -435,6 +430,7 @@ glistN.restrictLines = (VirtualScreenHeight() * 2 / 5) \ Callback.Controls(ctrlN
 Pad.Height = Callback.Controls(ctrlName).Height * glistN.restrictLines
 
 End If
+
 glistN.AutoHide = False
 glistN.StickBar = False
 glistN.ShowBar = False
@@ -470,7 +466,6 @@ glistN.ShowPan
   
     End If
 End If
-'Hook Pad.hWnd, glistN
     If mMenuWidth <> 0 Then
     Callback.PopUpPos Pad, Left, Top, Callback.Controls(ctrlName).Height
     Else
@@ -658,8 +653,6 @@ glistN.ShowBar = False
     Else
 Callback.PopUpPos Pad, Left + Callback.Controls(ctrlName).Width - Pad.Width, Top, Callback.Controls(ctrlName).Height
 End If
-
-
 Button = 0
 Textbox.glistN.dropkey = False
 Iam = Not Pad.Visible
@@ -1064,4 +1057,7 @@ End Property
 Public Property Let Default(RHS)
 On Error Resume Next
 If CBool(RHS) Then Callback.Default = ctrlName
+End Property
+Public Property Let icon(RHS)
+Textbox.glistN.icon = RHS
 End Property

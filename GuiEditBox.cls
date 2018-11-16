@@ -2057,11 +2057,11 @@ col(k + 2) = thispos
 
 End Sub
 Private Sub ColorizeExpressions(ByVal a$, k As Long, pos2 As Long, feedthis As Long)
-Dim drop$, pos1 As Long, kind As Long
+Dim Drop$, pos1 As Long, kind As Long
 Dim lastcol As Long
 again:
 If a$ = vbNullString Then Exit Sub
-kind = IsLabelOnly(a$, drop$)
+kind = IsLabelOnly(a$, Drop$)
 If kind = 100 Then
     If pos2 > 0 Then
             addone pos2, 14
@@ -2074,21 +2074,21 @@ If kind = 100 Then
     GoTo again
     
     End If
-If kind = 0 Then drop$ = vbNullString
+If kind = 0 Then Drop$ = vbNullString
 If kind > 0 Then
-    If IsmineHere2(drop$) Then
+    If IsmineHere2(Drop$) Then
     lastcol = 11
     If pos2 > 0 Then
        addone pos2, 11
     Else
-       addone k - Len(a$) - Len(drop$) + 1, 11
+       addone k - Len(a$) - Len(Drop$) + 1, 11
        End If
-    ElseIf IsmineHere(drop$) Then  ' FALL TO MAIN VOC
+    ElseIf IsmineHere(Drop$) Then  ' FALL TO MAIN VOC
     lastcol = 11
     If pos2 > 0 Then
        addone pos2, 11
     Else
-       addone k - Len(a$) - Len(drop$) + 1, 11
+       addone k - Len(a$) - Len(Drop$) + 1, 11
        End If
         '' for the end
    Else
@@ -2096,7 +2096,7 @@ If kind > 0 Then
    If pos2 > 0 Then
        addone pos2, lastcol
    Else
-       addone k - Len(a$) - Len(drop$) + 1, lastcol
+       addone k - Len(a$) - Len(Drop$) + 1, lastcol
       
        End If
   End If
@@ -2104,7 +2104,7 @@ If kind > 0 Then
   If kind > 3 Then
   Do
   pos1 = 1
-  drop$ = aheadstatus(a$, False, pos1)
+  Drop$ = aheadstatus(a$, False, pos1)
   If pos1 > 1 Then
   ColorizeExpressions Mid$(a$, 1, pos1 - 1), k - Len(a$) + pos1 - 1, pos2, feedthis
   
@@ -2140,7 +2140,7 @@ addone pos2, 14
 pos2 = k - Len(a$) + 1
     GoTo again
  ElseIf MaybeIsSymbol(a$, LineComment2) Then
-drop$ = "  "
+Drop$ = "  "
 If pos2 > 0 Then
  addone pos2, 7
 
@@ -2150,7 +2150,7 @@ End If
 feedthis = 1
  Exit Sub
 ElseIf MaybeIsSymbol2(a$, ComSymbolsWidth, CommentSymbols) Then
-drop$ = "  "
+Drop$ = "  "
 If pos2 > 0 Then
  addone pos2, 7
 
@@ -2162,27 +2162,27 @@ feedthis = 1
 ElseIf FastSymbol(a$, MultiLineComment1, , Len(MultiLineComment1)) Then
 addone pos2, 15
 
-drop$ = blockString(a$)
-If drop$ <> "" Or (drop$ = vbNullString And Myleft$(a$, 1) = mMultiLineComment2) Then
+Drop$ = blockString(a$)
+If Drop$ <> "" Or (Drop$ = vbNullString And Myleft$(a$, 1) = mMultiLineComment2) Then
 feedthis = 0
 If Not MaybeIsSymbol(a$, mMultiLineComment2, , True) Then feedthis = 15
 Else
 feedthis = 15
 End If
-drop$ = vbNullString
+Drop$ = vbNullString
 pos2 = k - Len(a$) + 1
 If feedthis = 15 Then Exit Sub
     GoTo again
 
 ElseIf MaybeIsSymbol(a$, Chr(34)) Then
 
-If Not ISSTRINGA(a$, drop$) Then
+If Not ISSTRINGA(a$, Drop$) Then
 a$ = vbNullString
 addone pos2, 10
 Else
 addone pos2, 15
 End If
-drop$ = vbNullString
+Drop$ = vbNullString
 pos2 = k - Len(a$) + 1
     GoTo again
 
@@ -2645,7 +2645,7 @@ End If
 Exit Sub
 End If
 ReDim col(1)
-Dim a$, k As Long, drop$, pos1 As Long, pos2 As Long, onetime As Boolean, kind As Long
+Dim a$, k As Long, Drop$, pos1 As Long, pos2 As Long, onetime As Boolean, kind As Long
 Dim lastcol As Long
 a$ = data
 onetime = True
@@ -2716,21 +2716,21 @@ If IsSymbol(a$, "@") Then
      pos2 = k - Len(a$) + 1
 End If
 End If
-kind = IsLabelDot("", a$, drop$)
+kind = IsLabelDot("", a$, Drop$)
 
 'If kind = 0 Then drop$ = "$(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
 'If kind = 0 Then drop$ = "~(": kind = Abs(FastSymbol(a$, drop$, , 2)) * 4
-If kind = 0 Then drop$ = vbNullString
+If kind = 0 Then Drop$ = vbNullString
 If kind > 0 Then
-    If IsmineHere(drop$) Then
+    If IsmineHere(Drop$) Then
                 lastcol = 11
                 If pos2 > 0 Then
                    addone pos2, 11
                 Else
-                   addone k - Len(a$) - Len(drop$) + 1, 11
+                   addone k - Len(a$) - Len(Drop$) + 1, 11
                    End If
         '' for the end
-                If IsmineHere1(drop$) Then
+                If IsmineHere1(Drop$) Then
               
                 kind = -2
                 If Trim$(a$) <> "" Then
@@ -2740,13 +2740,13 @@ If kind > 0 Then
                                             pos2 = k - Len(a$) + 1
                                             onetime = True
                                             GoTo again
-                                        ElseIf IsmineHere2(drop$) Then
+                                        ElseIf IsmineHere2(Drop$) Then
                                         onetime = True
                                         kind = -2
                                         GoTo again2
                                         End If
                                 End If
-                ElseIf IsmineHere1(drop$) Then
+                ElseIf IsmineHere1(Drop$) Then
                   
                 kind = -1
                                 If Trim$(a$) <> "" Then
@@ -2772,7 +2772,7 @@ If kind > 0 Then
                 If pos2 > 0 Then
                  addone pos2, 10
                 Else
-                 addone k - Len(a$) - Len(drop$) + 1, 10
+                 addone k - Len(a$) - Len(Drop$) + 1, 10
                 
                  End If
   End If
@@ -2780,7 +2780,7 @@ If kind > 0 Then
   If kind > 3 Then
 herecol:
   pos1 = 1
- drop$ = aheadstatus(a$, False, pos1)
+ Drop$ = aheadstatus(a$, False, pos1)
 ''  pos1 = Len(A$) + 1
 
 marvel:
@@ -2798,13 +2798,13 @@ marvel2:
   a$ = Mid$(a$, pos1)
   If SeekNextLine And a$ = vbNullString Then
   thispara = 0
-  drop$ = mDoc.NextTextParagraph(oldpara, thispara)
+  Drop$ = mDoc.NextTextParagraph(oldpara, thispara)
   If thispara <> 0 Then
   ' for java
-  If MaybeIsSymbol(drop$, ";,+-*/&|!=)" + Chr(34)) Then
+  If MaybeIsSymbol(Drop$, ";,+-*/&|!=)" + Chr(34)) Then
   mDoc.Paracolordata(oldpara) = col()
     
-    a$ = drop$
+    a$ = Drop$
     k = Len(a$)
     pos2 = 1
     ReDim col(1)
@@ -2820,13 +2820,13 @@ marvel2:
        addone pos2, 14
     pos2 = k - Len(a$) + 1
   pos1 = 1
-  drop$ = aheadstatus(a$, False, pos1)
+  Drop$ = aheadstatus(a$, False, pos1)
 GoTo marvel2
 ElseIf MaybeIsSymbol(a$, OtherSymbols, , True) Then
 addone pos2, 14
     pos2 = k - Len(a$) + 1
   pos1 = 1
-  drop$ = aheadstatus(a$, False, pos1)
+  Drop$ = aheadstatus(a$, False, pos1)
 GoTo marvel2
 
 End If
@@ -2834,17 +2834,17 @@ End If
   End If
   If SeekNextLine And a$ = vbNullString Then
   thispara = 0
-  drop$ = mDoc.NextTextParagraph(oldpara, thispara)
+  Drop$ = mDoc.NextTextParagraph(oldpara, thispara)
   If thispara <> 0 Then
   ' for java
-  If MaybeIsSymbol(drop$, ";,+-*/&|!=)" + Chr(34)) Or kind > 4 Then
+  If MaybeIsSymbol(Drop$, ";,+-*/&|!=)" + Chr(34)) Or kind > 4 Then
   mDoc.Paracolordata(oldpara) = col()
   If mDoc.startfrom(oldpara) = 0 Then
   mDoc.startfrom(oldpara) = oldpara
   End If
   mDoc.startfrom(thispara) = mDoc.startfrom(oldpara)
   kind = 0
-    a$ = drop$
+    a$ = Drop$
     k = Len(a$)
     pos2 = 1
     ReDim col(1)
@@ -2889,19 +2889,19 @@ again3:
   pos1 = 1
  '' kind = -2 maybe
 a$ = NLtrim$(a$)
-  drop$ = aheadstatus(a$, False, pos1)
+  Drop$ = aheadstatus(a$, False, pos1)
   
-  If pos1 > 1 Or drop$ = "S" Then
+  If pos1 > 1 Or Drop$ = "S" Then
   If pos1 = 1 Then
-  drop$ = a$
+  Drop$ = a$
   pos1 = Len(a$) + 1
   Else
-  drop$ = Mid$(a$, 1, pos1 - 1)
-  If drop$ = vbNullString Then drop$ = " "
+  Drop$ = Mid$(a$, 1, pos1 - 1)
+  If Drop$ = vbNullString Then Drop$ = " "
   End If
 feedback = 0
- ColorizeExpressions drop$, k - Len(a$) + pos1 - 1, pos2, feedback
- If drop$ = "(" Then
+ ColorizeExpressions Drop$, k - Len(a$) + pos1 - 1, pos2, feedback
+ If Drop$ = "(" Then
 If feedback = 100 Then
     lastcol = 14
 End If
@@ -2914,14 +2914,14 @@ End If
   a$ = Mid$(a$, pos1)   '''was pos1
     If SeekNextLine And a$ = vbNullString Then
   thispara = 0
-  drop$ = mDoc.NextTextParagraph(oldpara, thispara)
+  Drop$ = mDoc.NextTextParagraph(oldpara, thispara)
   If thispara <> 0 Then
   
   ' for java
-  If MaybeIsSymbol(drop$, ";,+-*/&|!=)" + Chr(34)) Then
+  If MaybeIsSymbol(Drop$, ";,+-*/&|!=)" + Chr(34)) Then
   mDoc.Paracolordata(oldpara) = col()
     kind = 0
-    a$ = drop$
+    a$ = Drop$
     k = Len(a$)
     pos2 = 1
     ReDim col(1)
@@ -2933,7 +2933,7 @@ End If
   End If
   End If
 ''  If InStr(DROP$, " ") = 0 Then
-If InStr(drop$, " ") = 0 Or kind >= 0 Then GoTo again3
+If InStr(Drop$, " ") = 0 Or kind >= 0 Then GoTo again3
   End If
     If MaybeIsSymbol(a$, OtherSymbols, , True) Then
      addone pos2, 14
@@ -3045,8 +3045,8 @@ End If
 
 ElseIf pos2 = 0 Then
 If AutoNumber Then
-If IsNumberLabel(a$, drop$) Then
-        addone k - Len(a$) - Len(drop$) + 1, 15
+If IsNumberLabel(a$, Drop$) Then
+        addone k - Len(a$) - Len(Drop$) + 1, 15
         pos2 = k - Len(a$) + 1
         GoTo again
  End If
@@ -5141,3 +5141,20 @@ glistN.WordCharRightButIncluded = vNewValue
 End If
 
 End Property
+Public Property Let icon(RHS)
+glistN.icon = RHS
+
+End Property
+Public Property Let Drag(RHS)
+glistN.DragEnabled = RHS
+End Property
+Public Property Get Drag()
+Drag = glistN.DragEnabled
+End Property
+Public Property Let Drop(RHS)
+glistN.DropEnabled = RHS
+End Property
+Public Property Get Drop()
+Drop = glistN.DropEnabled
+End Property
+

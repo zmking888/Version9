@@ -689,4 +689,19 @@ On Error Resume Next
 mPartColor = CLng(vNewValue)
 End Property
 
+Public Property Let icon(RHS)
+glistN.icon = RHS
 
+End Property
+Public Property Let Drag(RHS)
+glistN.DragEnabled = RHS
+End Property
+Public Property Get Drag()
+Drag = glistN.DragEnabled
+End Property
+Public Property Let Drop(RHS)
+glistN.DropEnabled = RHS
+End Property
+Public Property Get Drop()
+Drop = glistN.DropEnabled
+End Property

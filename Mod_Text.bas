@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 2
+Global Const Revision = 3
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -29127,84 +29127,134 @@ Dim ss() As String, w2 As Long
 End Function
 Sub i3MouseIcon(basestack As basetask, rest$, Lang As Long)
 On Error Resume Next
-Dim Scr As Object, s$, x As Double, aPic As StdPicture
+Dim Scr As Object, s$, x As Double, aPic As StdPicture, i As Long
 Set Scr = basestack.Owner
 
-If Typename(basestack.Owner) Like "Gui*" Then
-oxiforforms
-ElseIf basestack.toprinter Then
+If basestack.toprinter Then
     oxiforPrinter
 Else
         If IsLabelSymbolNew(rest$, "ΚΡΥΨΕ", "HIDE", Lang) Then
-                If FastSymbol(rest$, "!") Or OperatingSystem > System_Windows_7 Then
-                MouseShow False
-                ElseIf basestack.tolayer > 0 Or basestack.toback Then
-                            Scr.MouseIcon = Form1.Picture2.Picture
-                            Scr.mousepointer = 99
-                Else
-                            If Not basestack.LastState Then
-                                        basestack.LastState = True
-                                        Scr.MouseIcon = Form1.Picture2.Picture
-                                        Scr.mousepointer = 99
-                            End If
+                    If FastSymbol(rest$, "!") Then
+                    Set Form1.MouseIcon = Form1.Picture2.MouseIcon
+                    Form1.mousepointer = 99
+                    Set Form1.DIS.MouseIcon = Form1.Picture2.MouseIcon
+                    Form1.DIS.mousepointer = 99
+                    For i = 1 To PobjNum
+                    Set Form1.dSprite(i).MouseIcon = Form1.Picture2.MouseIcon
+                    Form1.dSprite(i).mousepointer = 99
+                    Next i
+                    Else
+                    Set Scr.MouseIcon = Form1.Picture2.MouseIcon
+                    Scr.mousepointer = 99
+                    With players(GetCode(Scr))
+                        .HideIcon = True
+                    End With
                 End If
+                 
         ElseIf IsLabelSymbolNew(rest$, "ΔΕΙΞΕ", "SHOW", Lang) Then
-                If FastSymbol(rest$, "!") Or OperatingSystem > System_Windows_7 Then
-                MouseShow True
-                ElseIf basestack.tolayer > 0 Or basestack.toback Then
-                 Scr.mousepointer = 1
-                          Set Scr.MouseIcon = Nothing
-                           
-                
-                Else
-                            If basestack.LastState Then
-                                    basestack.LastState = False
-                                    If basestack.LastMouse1 = 99 Then
-                                          s$ = CFname(basestack.LastMouse2)
-                                           Set aPic = LoadMyPicture(GetDosPath(s$))
-                                            If aPic Is Nothing Then Exit Sub
-                                          Scr.MouseIcon = aPic
-                                    End If
-                                    Scr.mousepointer = basestack.LastMouse1
-                            End If
-                End If
-        ElseIf IsStrExp(basestack, rest$, s$) Then
+            If FastSymbol(rest$, "!") Then
                     
-                If basestack.tolayer > 0 Or basestack.toback Then
-                            If CFname(s$) <> "" Then
-                                        s$ = CFname(s$)
-                                       Set aPic = LoadMyPicture(GetDosPath(s$))
-                                            If aPic Is Nothing Then Exit Sub
-                                          Scr.MouseIcon = aPic
-                            End If
-                Else
-                            If Not basestack.LastState Then
-                                     s$ = CFname(s$)
-                                              Set aPic = LoadMyPicture(GetDosPath(s$))
-                                            If aPic Is Nothing Then Exit Sub
-                                          Scr.MouseIcon = aPic
-                                        Scr.mousepointer = 99
-                            Else
-                                        If CFname(s$) <> "" Then
-                                                s$ = CFname(s$)
-                                                basestack.LastMouse1 = 99
-                                                basestack.LastMouse2 = s$
-                                                If Not basestack.LastState Then
-                                                 s$ = CFname(s$)
-                                                        Set aPic = LoadMyPicture(GetDosPath(s$))
-                                                             If aPic Is Nothing Then Exit Sub
-                                                                Scr.MouseIcon = aPic
-                                                                Scr.mousepointer = 99
-                                                End If
-                                        End If
+                    With players(-1)
+                    
+                    If Form1.MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                        Form1.mousepointer = .LastIcon
+                        Set Form1.MouseIcon = .LastIconPic
+                        
                         End If
+                    End With
+                    
+                    With players(0)
+                    If Form1.DIS.MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                        Form1.DIS.mousepointer = .LastIcon
+                        Set Form1.DIS.MouseIcon = .LastIconPic
+                        End If
+                    End With
+                    For i = 1 To PobjNum
+                    
+                    With players(val(Form1.dSprite(i).Tag))
+                        If Form1.dSprite(i).MouseIcon = Form1.Picture2.MouseIcon And Not .HideIcon Then
+                        Form1.dSprite(i).mousepointer = .LastIcon
+                       Set Form1.dSprite(i).MouseIcon = .LastIconPic
+                        End If
+                    End With
+                    Next i
+                    
+            Else
+                
+                    With players(GetCode(Scr))
+                    If Scr.MouseIcon = Form1.Picture2.MouseIcon Then
+                     .HideIcon = False
+                     If .LastIcon = 99 And Scr.mousepointer = 99 Then
+                        Set Scr.MouseIcon = .LastIconPic
+                     ElseIf .LastIcon = 99 Then
+                        Set Scr.MouseIcon = .LastIconPic
+                        Scr.mousepointer = 99
+                     Else
+                        Scr.mousepointer = .LastIcon
+                     End If
+                     
+                      
+                     
+                    End If
+                    End With
                 End If
+                
+        ElseIf IsStrExp(basestack, rest$, s$) Then
+                If s$ <> vbNullString Then
+                    s$ = CFname(s$)
+                    If s$ <> vbNullString Then
+                    If LCase(Right$(s$, 4)) = ".ico" Or LCase(Right$(s$, 4)) = ".cur" Then
+                        Set aPic = LoadPicture(GetDosPath(s$))
+                    Else
+                        
+                        Set aPic = LoadMyPicture(GetDosPath(s$))
+                        End If
+                        
+                        If aPic Is Nothing Then MissCdib: Exit Sub
+                        If Not FastSymbol(rest$, ";") Then
+                        If LCase(Right$(s$, 4)) = ".ico" Then Set Scr.MouseIcon = Form1.Picture2.MouseIcon: Scr.mousepointer = 99
+                        End If
+                        Set Scr.MouseIcon = aPic
+                        Scr.mousepointer = 99
+                        With players(GetCode(Scr))
+                            Set .LastIconPic = aPic
+                            .LastIcon = 99
+                        End With
+                    Else
+                    MissFile
+                    End If
+                Else
+                    Set Scr.MouseIcon = Nothing
+                    Scr.mousepointer = 1
+                    With players(GetCode(Scr))
+                        Set .LastIconPic = Nothing
+                        .LastIcon = 1
+                    End With
+                End If
+                
+                
     ElseIf IsExp(basestack, rest$, x) Then
                 basestack.LastState = False
                 On Error Resume Next
+                If CLng(x) = 99 Then
+                With players(GetCode(Scr))
+                If .LastIconPic Is Nothing Then
+                Set Scr.MouseIcon = Form1.PrinterDocument1.MouseIcon
+                Set .LastIconPic = Form1.PrinterDocument1.MouseIcon
+                Else
+                Set Scr.MouseIcon = .LastIconPic
+                End If
+                Scr.mousepointer = 99
+                
+                    .LastIcon = CLng(x)
+                End With
+                Else
                 Scr.mousepointer = CLng(x)
-                If Err Then MyEr "Bad icon bumber", "Πρόβλημα με τον αριθμό" Else basestack.LastMouse1 = CLng(x)
-                Err.Clear
+                If Err Then MyEr "Bad icon bumber", "Πρόβλημα με τον αριθμό": Err.Clear: Exit Sub
+                With players(GetCode(Scr))
+                    .LastIcon = CLng(x)
+                End With
+                End If
     Else
              MyEr "Missing  filename or icon number", "Λείπει όνομα αρχείου ή αριθμός εικονιδίου"
     End If
@@ -37134,12 +37184,12 @@ If IsExp(bstack, rest$, p) Then
                 MissNumExpr
                 ProcPlayer = False: Exit Function
             End Select
-            col = rgb(255, 255, 255)
+            col = 0
             sX = 0
             If FastSymbol(rest$, ",") Then  ' get image manipulators..
                     If IsExp(bstack, rest$, sY) Then
-                     col = CLng(sY)
-                     If col > 0 Then col = QBColor(col Mod 16) Else col = -col
+                     col = mycolor(sY)
+                    ' If col > 0 Then col = QBColor(col Mod 16) Else col = -col
                      ElseIf IsStrExp(bstack, rest$, frm$) Then
                      '' maybe is a mask
                      
@@ -37200,12 +37250,14 @@ If IsExp(bstack, rest$, p) Then
         Case Else
              ProcPlayer = False: MissNumExpr: Exit Function
         End Select
-        col = rgb(255, 255, 255)
+        col = 0 'rgb(255, 255, 255)
         sX = 0
     If FastSymbol(rest$, ",") Then
+    
         If IsExp(bstack, rest$, sY) Then
-            col = CLng(sY)
-            If col > 0 Then col = QBColor(col) Else col = -col
+            'col = CLng(sY)
+            col = mycolor(sY)
+            'If col > 0 Then col = QBColor(col) Else col = -col
         ElseIf IsStrExp(bstack, rest$, frm$) Then
             '' maybe is a mask
             col = 0
@@ -46906,7 +46958,7 @@ If x1 <> 0 Then
         
         End If
         If CFname(s$) = vbNullString Then
-            MyEr "No such file", "Δεν υπάρχει τέτοιο αρχείο"
+            nosuchfile
             ProcLoad = False
             Exit Function
         End If
@@ -46921,7 +46973,7 @@ If x1 <> 0 Then
         Switches ss$
     End If
     If ExtractNameOnly(s$) = vbNullString Or LenB(CFname(s$)) = 0 Then
-        MyEr "No such file", "Δεν υπάρχει τέτοιο αρχείο"
+        nosuchfile
         ProcLoad = False
         Exit Function
     End If

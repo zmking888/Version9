@@ -1,6 +1,6 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 2 active-X
+Version 9.5  Revision 3 active-X
 
 Minor details plus Speed improvement.
 

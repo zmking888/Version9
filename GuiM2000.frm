@@ -230,7 +230,7 @@ Friend Property Let MyName(RHS As String)
 mMyName$ = RHS
 If IamPopUp Then Exit Property
 drawminimized = Not IsWine
-Set Icon = Form1.Icon
+Set icon = Form1.icon
 If mNoTaskBar Then Exit Property
 Set MyForm3 = New Form3
 Set MyForm3.lastform = Me
@@ -2050,10 +2050,10 @@ Private Sub drawicon(HDC1 As Long)
 Dim picthis As StdPicture, my_brush As Long, msize As Long
 
 msize = setupxy
-If Me.Icon Is Nothing Then
-    Set picthis = Form1.Icon
+If Me.icon Is Nothing Then
+    Set picthis = Form1.icon
 Else
-    Set picthis = Icon
+    Set picthis = icon
 End If
 my_brush = CreateSolidBrush(gList2.CapColor)
 If IsWine Then
@@ -2082,7 +2082,7 @@ Dim where$
 On Error Resume Next
 where$ = CFname(s$)
 If LenB(where$) = 0 Then
-    Set GetPicture = Form1.Icon
+    Set GetPicture = Form1.icon
 Else
 where$ = GetDosPath(where$)
 If LenB(where$) = 0 Then Set GetPicture = LoadPicture(""): Exit Function
@@ -2104,24 +2104,24 @@ Dim where$
 On Error Resume Next
 where$ = CFname(s$)
 If LenB(where$) = 0 Then
-    Set Icon = Form1.Icon
+    Set icon = Form1.icon
 Else
 where$ = GetDosPath(where$)
     If LenB(where$) = 0 Then Exit Sub
 If IsMissing(Size) And IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
-Set Icon = LoadPicture(where$)
+Set icon = LoadPicture(where$)
 ElseIf IsMissing(ColorDepth) And IsMissing(x) And IsMissing(y) Then
-Set Icon = LoadPicture(where$, Size)
+Set icon = LoadPicture(where$, Size)
 ElseIf IsMissing(x) And IsMissing(y) Then
-Set Icon = LoadPicture(where$, Size, ColorDepth)
+Set icon = LoadPicture(where$, Size, ColorDepth)
 ElseIf IsMissing(y) Then
-Set Icon = LoadPicture(where$, Size, ColorDepth, x)
+Set icon = LoadPicture(where$, Size, ColorDepth, x)
 Else
-Set Icon = LoadPicture(where$, Size, ColorDepth, x, y)
+Set icon = LoadPicture(where$, Size, ColorDepth, x, y)
 End If
 End If
 If MyForm3 Is Nothing Then Exit Sub
-Set MyForm3.Icon = Icon
+Set MyForm3.icon = icon
 End Sub
 Public Sub MakeStandardInfo(RHS)
 MakeInfo -7

@@ -229,23 +229,23 @@ Public Property Get index() As Long
 index = mIndex
 End Property
 
-Public Property Let index(ByVal RHS As Long)
-mIndex = RHS
+Public Property Let index(ByVal rhs As Long)
+mIndex = rhs
 End Property
 Public Property Get enabled() As Long
 enabled = glistN.enabled
 End Property
 
-Public Property Let enabled(ByVal RHS As Long)
+Public Property Let enabled(ByVal rhs As Long)
 If glistN Is Nothing Then Exit Property
-glistN.enabled = RHS
+glistN.enabled = rhs
 End Property
 Public Property Get WrapText() As Long
 WrapText = glistN.WrapText
 End Property
 
-Public Property Let WrapText(ByVal RHS As Long)
-glistN.WrapText = RHS <> 0
+Public Property Let WrapText(ByVal rhs As Long)
+glistN.WrapText = rhs <> 0
 End Property
 Sub ColorsReset()
 white = rgb(255, 255, 255)
@@ -282,21 +282,21 @@ aa.bold = ThisBold
 Set glistN.Font = aa
 End If
 End Sub
-Public Sub Curve(RHS As Single)
-glistN.Curve False, RHS
+Public Sub Curve(rhs As Single)
+glistN.Curve False, rhs
 End Sub
 Public Property Get Top() As Variant
 Top = Callback.Controls(ctrlName).Top
 End Property
-Public Property Let Top(ByVal RHS As Variant)
-Callback.Controls(ctrlName).Top = RHS
+Public Property Let Top(ByVal rhs As Variant)
+Callback.Controls(ctrlName).Top = rhs
 End Property
 Public Property Get Left() As Variant
 Left = Callback.Controls(ctrlName).Left
 End Property
 
-Public Property Let Left(ByVal RHS As Variant)
-Callback.Controls(ctrlName).Left = RHS
+Public Property Let Left(ByVal rhs As Variant)
+Callback.Controls(ctrlName).Left = rhs
 End Property
 Sub GetFocus()
 On Error Resume Next
@@ -364,12 +364,17 @@ Colors shadowcol
 Me.locked = False
 Show
 End Sub
-Public Property Let Default(RHS)
+Public Property Let Default(rhs)
 On Error Resume Next
-If CBool(RHS) Then Callback.Default = ctrlName
+If CBool(rhs) Then Callback.Default = ctrlName
 End Property
 
 Private Sub glistN_UnregisterGlist()
 On Error Resume Next
 If glistN.TabStopSoft Then Callback.LastActive = ctrlName
 End Sub
+Public Property Let icon(rhs)
+glistN.icon = rhs
+
+End Property
+
