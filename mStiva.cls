@@ -36,14 +36,7 @@ Public Property Get StackItem(where As Long) As Variant
 Dim aa As VarItem
 On Error Resume Next
 Set aa = mstack.item(where)
-Select Case aa.Typename
-Case "S"
-StackItem = aa.ItemStr
-Case "N", "?", "L"
-StackItem = aa.ItemDouble
-Case Else
-Set StackItem = aa.ObjectRef
-End Select
+If aa.slot = 1 Then Set StackItem = aa.mItem Else StackItem = aa.mItem
 End Property
 Public Sub MakeTopItemBack(where As Long)
 'we pick an item from top to any other place
@@ -700,6 +693,7 @@ Inc
 Loop Until i <= 1
 End If
 End Sub
+
 Public Sub MergeBottomCopyArray(a As mArray)
 If a.count = 0 Then Exit Sub
 Dim x1 As Long, vvl As Variant, aa As Object
@@ -890,11 +884,11 @@ End Function
 Property Get Value() As Variant
 Dim aa As VarItem
 If index >= 0 And index < mMany Then
-    Set aa = StackPickRef(index + 1)
-    If aa.ObjectRef Is Nothing Then
-        Value = aa.ItemVariantOnly
+    Set aa = mstack.item(index + 1)
+    If aa.slot = 1 Then
+        Set Value = aa.mItem
     Else
-        Set Value = aa.ObjectRef
+        Value = aa.mItem
     End If
 End If
 End Property

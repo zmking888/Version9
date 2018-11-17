@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 4
+Global Const Revision = 5
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -15704,7 +15704,9 @@ Dim p As Variant, ii As Long, ss$, aaa As mHandler
 If bstack.StaticCollection Is Nothing Then
 
 Set bstack.StaticCollection = New FastCollection
-bstack.Parent.SetVarobJ "%_" + bstack.StaticInUse, bstack.StaticCollection
+If Not bstack.IamThread Then
+If Not bstack.Parent Is Nothing Then bstack.Parent.SetVarobJ "%_" + bstack.StaticInUse, bstack.StaticCollection
+End If
 End If
 Do
     Select Case IsLabel(bstack, b$, w$)
@@ -25163,6 +25165,7 @@ Function ExecuteGroupStruct(bstack As basetask, ohere$, vvv As Long, rest$, Lang
 Dim w$, w1$, p As Variant, v As Long, s$, ss$, b$, i As Long, lcl As Boolean, j As Long, nm$, x1 As Long, y1 As Long, frm$, skip As Boolean
 Dim uni As Boolean, prv As Boolean, stripstack1 As New basetask, hlp As String, vl As String, NoRec As Boolean, final As Boolean
 Dim highpriority As Boolean, ThisGroup As Group, RightAssociative As Boolean, removebypass As Boolean
+Dim usehandler As mHandler
 Const TT$ = "=-+*/<!,{" + vbCr
 If Trim(rest$) = vbNullString Then
     var(vvv) = CLng(0)
@@ -26259,8 +26262,84 @@ Case 1
                 If FastSymbol(rest$, "=") Then If Not IsNumberD2(rest$, p) Then missNumber: Exit Function
                 p = CCur(p)
             Else
+              If IsLabelA(here$, rest$, s$) Then
+              If GetVar(bstack, bstack.GroupName + s$, v, True) Then
+              If MyIsObject(var(v)) Then
+              
+              If TypeOf var(v) Is mHandler Then
+              If var(v).t1 = 4 Then
+                CopyHandler var(v), bstack
+                Set usehandler = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                usehandler.index_start = 0
+                usehandler.index_cursor = usehandler.objref.ZeroValue
+                usehandler.sign = 1
+                If FastSymbol(rest$, "=") Then
+                If IsLabelA(here$, rest$, s$) Then
+                If GetVar(bstack, bstack.GroupName + s$, v, True) Then
+                    
+                    If MyIsObject(var(v)) Then
+                    Set p = var(v)
+                        If TypeOf p Is mHandler Then
+                            If p.t1 = 4 Then
+                            If Not usehandler.objref Is p.objref Then
+                            s$ = usehandler.objref.EnumName
+                            Expected s$, s$
+                                Exit Function
+                            End If
+                            Else
+                                ExpectedEnumType
+                                Exit Function
+                            End If
+                        Else
+                            ExpectedEnumType
+                            Exit Function
+                        End If
+                    Else
+                        ExpectedEnumType
+                        Exit Function
+                    End If
+                    Else
+                        ExpectedEnumType
+                        Exit Function
+                    End If
+                Else
+                        ExpectedEnumType
+                        Exit Function
+                    End If
+                Else
+                Set p = usehandler
+                End If
+                If glob Then
+                    v = globalvar(w$, p)
+                ElseIf here$ = vbNullString Then
+    
+       ' If Not GetVar(bstack, w$, v) Then v = globalvar(w$, p) ': GetVar bstack, W$, v
+                    Else
+              If Not GetlocalVar(w$, v) Then v = globalvar(w$, p)  ': GetlocalVar W$, v
+        Set var(v) = p
+                End If
+                        GoTo continuehere
+              Else
+              ExpectedEnumType
+            Exit Function
+            End If
+              Else
+              ExpectedEnumType
+            Exit Function
+              End If
+              Else
+              ExpectedEnumType
+            Exit Function
+              End If
+               Stop
+              End If
+             
+            Else
+            
             MyEr "No type found", "δεν βρήκα τύπο"
             Exit Function
+            End If
             End If
      
     End If
@@ -37318,6 +37397,7 @@ Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional 
 Dim ps As mStiva, bs As basetask, F As Long, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
 Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean
+Dim usehandler As mHandler
 MyRead = True
 Dim p As Variant, x As Double
 Dim pppp As mArray
@@ -37401,16 +37481,33 @@ Case 1
         
                        
                         ElseIf Typename$(var(i)) = "mHandler" Then
+                             Set usehandler = myobject
                             If var(i).ReadOnly Then
                                 MyRead = False
                                ReadOnly
                                Exit Function
-                            ElseIf var(i).t1 = myobject.t1 Or myobject.t1 = 3 Then
-                               Set var(i) = myobject
+                           ElseIf var(i).t1 = usehandler.t1 Then
+                         If var(i).t1 = 4 Then
+                         If var(i).objref Is usehandler.objref Then
+                         
+                           Set var(i) = myobject
+                         ElseIf var(i).objref.EnumName = usehandler.objref.EnumName Then
+                                    If var(i).objref.ExistFromOther(usehandler.index_cursor) Then
+                                        Set usehandler.objref = var(i).objref
+                                        Set var(i) = usehandler
+                                    Else
+                                        GoTo contwrong
+                                    End If
+                         Else
+                         GoTo contwrong
+                         End If
+                         Else
+                           Set var(i) = myobject
+                           End If
+                        ElseIf var(i).t1 <> 4 And myobject.t1 = 3 Then
+                           Set var(i) = myobject
                             Else
-                              MyRead = False
-                              MyEr "Wrong object type", "Λάθος τύπος αντικειμένου"
-                              Exit Function
+                              GoTo contwrong
                             End If
                         Else
                         Set var(i) = myobject
@@ -37454,11 +37551,12 @@ Case 1
                     GlobalSub ohere$ & "." & bstack.GroupName & what$ + "()", "CALL EXTERN " & Str(i)
                 End If
             ElseIf Typename$(myobject) = "mHandler" Then
-                If myobject.indirect > -1 Then
-                    Set var(i) = MakeitObjectGeneric(myobject.indirect)
+            Set usehandler = myobject
+                If usehandler.indirect > -1 Then
+                    Set var(i) = MakeitObjectGeneric(usehandler.indirect)
                 Else
                 
-                Set var(i) = myobject
+                Set var(i) = usehandler
                 End If
             ElseIf Typename$(myobject) = myArray Then
              Set var(i) = New mHandler
@@ -37622,10 +37720,11 @@ Case 5, 7
                     End If
                     Set myobject = Nothing
                     ElseIf Typename$(myobject) = "mHandler" Then
-                    If myobject.indirect > -0 Then
-                    Set pppp.item(it) = myobject
+                    Set myobject = usehandler
+                    If usehandler.indirect > -0 Then
+                    Set pppp.item(it) = usehandler
                     Else
-                    p = myobject.t1
+                    p = usehandler.t1
                     If CheckDeepAny(myobject) Then
                     If TypeOf myobject Is mHandler Then
                     Set pppp.item(it) = myobject
@@ -37693,10 +37792,11 @@ Case 5, 7
                     End If
                     Set myobject = Nothing
                 ElseIf Typename$(myobject) = "mHandler" Then
-                    If myobject.indirect > -0 Then
+                Set myobject = usehandler
+                    If usehandler.indirect > -0 Then
                     Set pppp.item(it) = myobject
                     Else
-                    p = myobject.t1
+                    p = usehandler.t1
                     If CheckDeepAny(myobject) Then
                     If TypeOf myobject Is mHandler Then
                     Set pppp.item(it) = myobject
@@ -38255,13 +38355,33 @@ contread123:
     
                    
                     ElseIf Typename$(var(i)) = "mHandler" Then
+                    Set usehandler = myobject
                         If var(i).ReadOnly Then
                             MyRead = False
                            ReadOnly
                            Exit Function
-                        ElseIf var(i).t1 = myobject.t1 Or myobject.t1 = 3 Then
+                           
+                        ElseIf var(i).t1 = usehandler.t1 Then
+                            If var(i).t1 = 4 Then
+                                If var(i).objref Is usehandler.objref Then
+                                    Set var(i) = myobject
+                                ElseIf var(i).objref.EnumName = usehandler.objref.EnumName Then
+                                    If var(i).objref.ExistFromOther(usehandler.index_cursor) Then
+                                        Set usehandler.objref = var(i).objref
+                                        Set var(i) = usehandler
+                                    Else
+                                        GoTo contwrong
+                                    End If
+                                Else
+                                    GoTo contwrong
+                                End If
+                            Else
+                                Set var(i) = myobject
+                           End If
+                        ElseIf var(i).t1 <> 4 And usehandler.t1 = 3 Then
                            Set var(i) = myobject
                         Else
+contwrong:
                           MyRead = False
                           MyEr "Wrong object type", "Λάθος τύπος αντικειμένου"
                           Exit Function
@@ -53650,9 +53770,19 @@ jumpbackhere:
                                 bstack.lastobj.CopyTo myobject
                                 ElseIf myobject.t1 = 4 Then
                                 If Not var(v).objref Is myobject.objref Then
+                                If var(v).objref.EnumName = myobject.objref.EnumName Then
+                                 If var(v).objref.ExistFromOther(myobject.index_cursor) Then
+                                        Set myobject.objref = var(v).objref
+                                        Set var(v) = myobject
+                                    Else
+                                        GoTo contwrong1
+                                    End If
+                                Else
+contwrong1:
                                 WrongType
                                 Set bstack.lastobj = Nothing
                                  Exec1 = 0: ExecuteVar = 8: Exit Function
+                                End If
                                 End If
                                 End If
                                 Set var(v) = myobject

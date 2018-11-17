@@ -3071,14 +3071,14 @@ ICO = TextWidth(d, b$ & "M2000") + 100
 Dim IX As Long, IY As Long
 With players(DisForm)
 IX = (.Xt \ 25) * 25
-IY = Form1.Icon.Height * IX / Form1.Icon.Width
+IY = Form1.icon.Height * IX / Form1.icon.Width
 If IsWine Then
-Form1.DIS.PaintPicture Form1.Icon, ICO, (.Yt - IY) / 2, IX, IY
-Form1.DIS.PaintPicture Form1.Icon, ICO, (.Yt - IY) / 2, IX, IY
+Form1.DIS.PaintPicture Form1.icon, ICO, (.Yt - IY) / 2, IX, IY
+Form1.DIS.PaintPicture Form1.icon, ICO, (.Yt - IY) / 2, IX, IY
 Else
 Dim myico As New cDIBSection
 myico.backcolor = Form1.DIS.backcolor
-myico.CreateFromPicture Form1.Icon
+myico.CreateFromPicture Form1.icon
 Form1.DIS.PaintPicture myico.Picture(1), ICO, (.Yt - IY) / 2, IX, IY
 End If
 End With

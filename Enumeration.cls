@@ -66,6 +66,13 @@ With PriveSpace(a)
     .iValue = nValue
 End With
 End Sub
+Function ExistFromOther(RHS) As Boolean
+Dim i As Long
+For i = 0 To toplim
+If RHS = PriveSpace(i).iValue Then ExistFromOther = True: Exit Function
+Next i
+
+End Function
 Function SearchSimple(what As String, ByRef ok As Boolean) As Variant
 Dim i As Long
 For i = 0 To toplim

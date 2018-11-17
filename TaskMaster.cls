@@ -215,7 +215,7 @@ thh:
         RestEnd
 End Property
 Public Sub Message(Mes As Long, code As Long, Optional param As Long = 0, Optional Exec$)
-Dim ok As Boolean
+Dim ok As Boolean, bs As basetask, m As mStiva
 Dim task As TaskInterface
 Set task = getone(Mes)
 ok = False
@@ -231,19 +231,32 @@ If Not (task Is Nothing) Then
         Case 3
         task.Interval = param
         Case 4
-        Set task.Process.Owner = task.Owner
-        If Execute(task.Process, Exec$, True) = 0 Then
+        Set bs = GetNewBaseTask(task)
+        If Execute(bs, Exec$, True) = 0 Then
             task.Dispose tmAllTasks
             ThrowOne Mes
+        ElseIf Not task.Process Is Nothing Then
+         If task.Process.StaticCollection Is Nothing Then
+            Set task.Process.StaticCollection = bs.StaticCollection
+         End If
+         Set m = task.Process.soros
+         m.MergeBottom bs.soros
         End If
-        Set task.Process.Owner = Nothing
+
+       
         Case 5
-        Set task.Process.Owner = task.Owner
-        If Execute(task.Process, Exec$, False) = 0 Then
+        Set bs = GetNewBaseTask(task)
+        If Execute(bs, Exec$, False) = 0 Then
             task.Dispose tmAllTasks
             ThrowOne Mes
+         ElseIf Not task.Process Is Nothing Then
+         If task.Process.StaticCollection Is Nothing Then
+            Set task.Process.StaticCollection = bs.StaticCollection
+         End If
+         Set m = task.Process.soros
+         m.MergeBottom bs.soros
+          
         End If
-        Set task.Process.Owner = Nothing
         End Select
         
 
@@ -251,6 +264,22 @@ If Not (task Is Nothing) Then
 End If
 End Sub
 
+Private Function GetNewBaseTask(task As TaskInterface)
+Dim b As New basetask, bstack As basetask
+Set bstack = task.Process
+Set b.Process = Nothing
+Set b.Owner = task.Owner
+'Set b.Parent = b
+Set b.Sorosref = bstack.soros
+'If Len(bstack.StaticInUse) > 0 Then
+'b.StaticInUse = bstack.StaticInUse
+'End If
+Set b.StaticCollection = bstack.StaticCollection
+b.OriginalCode = bstack.OriginalCode
+b.OriginalName = bstack.OriginalName
+
+Set GetNewBaseTask = b
+End Function
 
 
 

@@ -12,10 +12,10 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Private mItem As Variant
+Public mItem As Variant
 Public slot As Byte
-Private mTypeName As Byte
-Private Key As String * 30
+Public mTypeName As Byte
+Private Key As String * 12
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 

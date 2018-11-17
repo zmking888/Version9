@@ -58,9 +58,6 @@ myDone = True
 Else
 Set myProcess.Process = Me
 Set myOwner = myProcess.Parent.Owner
-' σύνδεση του νήματος (το πρόγραμμα που  θα τρέξει)  με τη κλάση αυτή
-' έτσι όταν θέλω να σταματήσω το νήμα θα πάω στο myProcess από εδώ
-' ή από εκεί (με το this) θα βρω το me.
 MyMode = 1
 End If
 End If
@@ -262,7 +259,6 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner))
      
     If Not look Then GoTo conthere
      End If
-       '' If Not NowProcess.Parent.IamRunning Then
        If LastErNum <> 0 Or x = 0 Then
        myDone = True
        End If
@@ -275,7 +271,7 @@ If Interrupted Then SetTextBasketBack myOwner, players(GetCode(myOwner))
               TaskMaster.RestEnd1
               TaskMaster.RestEnd
               
-            myProcessPureParent.ThrowThreads   '  διώχνει την λίστα και εκτελεί το done
+            myProcessPureParent.ThrowThreads
 
             MyMode = 0
             myDone = True
