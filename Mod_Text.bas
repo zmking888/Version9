@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 7
+Global Const Revision = 8
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2727,11 +2727,11 @@ bstack.lastobj.t1 = 3
 Set bstack.lastobj.objref = pppp
 GetArr = True
 End Function
-Function IsExp(basestack As basetask, a$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False) As Boolean
+Function IsExp(basestack As basetask, a$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional comp As Boolean = True) As Boolean
 Dim par As Long
 If LastErNum = -2 Then LastErNum = 0
 If a$ = vbNullString Or a$ = vbCrLf Then Exit Function
-IsExp = IsExpA(basestack, a$, r, par, noand1)
+IsExp = IsExpA(basestack, a$, r, par, noand1, comp)
 again:
 If par > 0 Then
 If MaybeIsSymbol(a$, ",") Then
@@ -2850,7 +2850,7 @@ Do
         End If
 Loop
 End Function
-Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True) As Boolean
+Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True, Optional comp As Boolean = True) As Boolean
 Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant, ut$
 Dim logic As Boolean, l As Boolean, park As Object, objlist As mStiva, rightlevel As Long
 On Error Resume Next
@@ -3861,298 +3861,6 @@ ElseIf FastSymbol(aa$, ")") Then
                 End If
                 Exit Function
             End If
-ElseIf FastSymbol(aa$, "<>", , 2) Then
-'  good
-  MUL = 3
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-            If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-  po = (ac + po) <> r
-     ac = 0
-
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-  po = (ac + po) <> r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-ElseIf FastSymbol(aa$, "<=>", , 3) Then
-'  good
-  MUL = 1  ' from 3
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-    Select Case ac + po
-    Case Is < r
-    po = -1
-    Case Is = r
-    po = 0
-    Case Else
-    po = 1
-    End Select
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-    Select Case ac + po
-    Case Is < r
-    po = -1
-    Case Is = r
-    po = 0
-    Case Else
-    po = 1
-    End Select
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
- 
-ElseIf FastSymbol(aa$, "<=", , 2) Then
-'  good
-  MUL = 3
-   
-    
-
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-            If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-  po = (ac + po) <= r
-     ac = 0
-
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-  po = (ac + po) <= r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-
-ElseIf FastSymbol(aa$, ">=", , 2) Then
-'  good
-  MUL = 3
- 
-    
-
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-           If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-          If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-  po = (ac + po) >= r
-     ac = 0
-
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-  po = (ac + po) >= r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-ElseIf FastSymbol(aa$, "<<", , 2) Then
-If logical(bstack, aa$, r) Then
-                MUL = 500
-               
-                r1 = po
-                po = r
-            ElseIf FastSymbol(aa$, "(") Then
-                If IsExp(bstack, aa$, r) Then
-                    MUL = 1
-                    r1 = po
-                    po = r
-                    If Not FastSymbol(aa$, ")") Then
-                        IsExpA = False
-                        Exit Function
-                    End If
-                End If
-            Else
-                IsExpA = False
-                Exit Function
-            End If
-ElseIf FastSymbol(aa$, ">") Then
-'  good
-  MUL = 3
-    
-
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-           If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-  po = (ac + po) > r
-     ac = 0
- 
-   Else
-   IsExpA = False: Exit Function
-        End If
-        
-ElseIf IsExp(bstack, aa$, r, False, True) Then
-  po = (ac + po) > r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-    
-ElseIf FastSymbol(aa$, "<") Then
-'  good
-  MUL = 3
-   
-    
-
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-           If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-   
-  po = (ac + po) < r
-     ac = 0
-
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-  po = (ac + po) < r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-ElseIf FastSymbol(aa$, "==", , 2) Then
-'  good
-  MUL = 3
-   
-    
-
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-        If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-
-    If r = 0 Then
-            If ac <> 0 Then po = (ac + po)
-            If po = 0 Then
-                po = True
-            Else
-            Select Case VarType(r)
-            Case vbDouble
-                po = MyRound(po, 13) = 0
-            Case vbSingle
-                po = MyRound(po, 4) = 0
-            Case Else
-                po = po = 0
-            End Select
-            
-            End If
-    Else
-    Select Case VarType(r)
-    Case vbDouble
-      po = MyRound((((ac + po) - r) / r), 10) = 0
-    Case vbSingle
-          po = (MyRound(ac + po, 4) - MyRound(r, 4)) = 0
-    Case Else
-              po = ((ac + po) - r) = 0
-    End Select
-  
-  End If
-     ac = 0
-
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-    If r = 0 Then
-            If ac <> 0 Then po = (ac + po)
-            If po = 0 Then
-                po = True
-            Else
-                po = MyRound(po, 13) = 0
-            End If
-    Else
-  po = MyRound((((ac + po) - r) / r), 10) = 0
-  
-  End If
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
-
-
-ElseIf FastSymbol(aa$, "=") Then
-'  good
-  MUL = 3
- 
-If FastSymbol(aa$, "(") Then
-    If IsExp(bstack, aa$, r, , True) Then
-    '  Set bstack.lastobj = Nothing
-   If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
-        If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
-      
-         
-      
-  po = (ac + po) = r
-     ac = 0
-
-        
-   Else
-   IsExpA = False: Exit Function
-        End If
-  ElseIf IsExp(bstack, aa$, r, False, True) Then
-    po = (ac + po) = r
-     ac = 0
-     Else
-    IsExpA = False
-    Exit Function
- End If
 ElseIf MaybeIsTwoSymbol(aa$, "->", 2) Then
 logic = True
 Exit Do
@@ -4170,13 +3878,6 @@ If logical(bstack, aa$, r, , True) Then
     
  ElseIf FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-        If Not FastSymbol(aa$, ")") Then
-    IsExpA = False
-    Exit Function
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
     r1 = -r1
     MUL = 1 ' from 3
     If ac = 0 Then
@@ -4190,7 +3891,9 @@ If logical(bstack, aa$, r, , True) Then
     End If
     End If
     po = r
-
+    If Not FastSymbol(aa$, ")") Then
+    IsExpA = False
+    Exit Function
     End If
     End If
   Else
@@ -4218,13 +3921,6 @@ If logical(bstack, aa$, r, , True) Then
     po = r
     ElseIf FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-        If Not FastSymbol(aa$, ")") Then
-    IsExpA = False
-    Exit Function
-       If Not rightoperator(bstack, aa$, r) Then
-            IsExpA = False
-            Exit Function
-        End If
     MUL = 1 ' from 3
     If ac = 0 Then
     ac = po
@@ -4237,13 +3933,157 @@ If logical(bstack, aa$, r, , True) Then
     End If
     End If
     po = r
-
+    If Not FastSymbol(aa$, ")") Then
+    IsExpA = False
+    Exit Function
     End If
     End If
 Else
     MissNumExpr
     IsExpA = False
     Exit Function
+End If
+
+ElseIf FastSymbol(aa$, "<<", , 2) Then
+If logical(bstack, aa$, r) Then
+                MUL = 500
+               
+                r1 = po
+                po = r
+            ElseIf FastSymbol(aa$, "(") Then
+                If IsExp(bstack, aa$, r) Then
+                    MUL = 1
+                    r1 = po
+                    po = r
+                    If Not FastSymbol(aa$, ")") Then
+                        IsExpA = False
+                        Exit Function
+                    End If
+                End If
+            Else
+                IsExpA = False
+                Exit Function
+            End If
+            
+'**********************************************************************
+ElseIf comp And MaybeIsSymbol(aa$, "<=>") Then
+If FastSymbol(aa$, "=") Then
+'  good
+  MUL = 3
+ 
+If IsExp(bstack, aa$, r, False, True, False) Then
+    po = (ac + po) = r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+ElseIf FastSymbol(aa$, "<>", , 2) Then
+'  good
+  MUL = 3
+If IsExp(bstack, aa$, r, False, True, False) Then
+  po = (ac + po) <> r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+ElseIf FastSymbol(aa$, "<=>", , 3) Then
+'  good
+  MUL = 1  ' from 3
+If IsExp(bstack, aa$, r, False, True, False) Then
+    Select Case ac + po
+    Case Is < r
+    po = -1
+    Case Is = r
+    po = 0
+    Case Else
+    po = 1
+    End Select
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+ 
+ElseIf FastSymbol(aa$, "<=", , 2) Then
+'  good
+  MUL = 3
+   
+  
+
+If IsExp(bstack, aa$, r, False, True, False) Then
+  po = (ac + po) <= r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+
+ElseIf FastSymbol(aa$, ">=", , 2) Then
+'  good
+  MUL = 3
+ 
+  
+
+If IsExp(bstack, aa$, r, False, True, False) Then
+  po = (ac + po) >= r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+ElseIf FastSymbol(aa$, ">") Then
+'  good
+  MUL = 3
+    
+
+If IsExp(bstack, aa$, r, False, True, False) Then
+  po = (ac + po) > r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+    
+ElseIf FastSymbol(aa$, "<") Then
+'  good
+  MUL = 3
+   
+    
+
+If IsExp(bstack, aa$, r, False, True, False) Then
+  po = (ac + po) < r
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+ElseIf FastSymbol(aa$, "==", , 2) Then
+'  good
+  MUL = 3
+   
+
+If IsExp(bstack, aa$, r, False, True, False) Then
+    If r = 0 Then
+            If ac <> 0 Then po = (ac + po)
+            If po = 0 Then
+                po = True
+            Else
+                po = MyRound(po, 13) = 0
+            End If
+    Else
+  po = MyRound((((ac + po) - r) / r), 10) = 0
+  
+  End If
+     ac = 0
+     Else
+    IsExpA = False
+    Exit Function
+ End If
+Else
+logic = True
+Exit Do
 End If
 
 Else

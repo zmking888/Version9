@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 7 active-X
+Version 9.5  Revision 8 active-X
 
-Fix precedence for logical operators on numbers: (12)*4>(12)*3 now works fine (previus: ((12)*4>(12))*3=-3 which is true also (no zero).
+Fix precedence for logical operators on numbers
+
 
 
 From version 9.0 revision 50:
