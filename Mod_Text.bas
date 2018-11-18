@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 6
+Global Const Revision = 7
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3462,7 +3462,7 @@ Do
             If IsNumber(bstack, aa$, r, True) Then ' κοιτάμε αν είναι αριθμός ή μεταβλητή
             Set bstack.lastobj = Nothing
                 po = po ^ r
-            ElseIf FastSymbol(aa$, "(") Then  ' πρώτα ανοίγει την παρένθεση ώστε να μην προχωρήσει όταν η IsExp βρεί την παρένθεση )
+            ElseIf FastSymbol(aa$, "(") Then
                 If IsExp(bstack, aa$, r, , True) Then
                     po = po ^ r
                     If Not FastSymbol(aa$, ")") Then
@@ -3866,11 +3866,16 @@ ElseIf FastSymbol(aa$, "<>", , 2) Then
   MUL = 3
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-  po = (ac + po) <> r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+            If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+  po = (ac + po) <> r
+     ac = 0
+
    Else
    IsExpA = False: Exit Function
         End If
@@ -3924,11 +3929,16 @@ ElseIf FastSymbol(aa$, "<=", , 2) Then
 
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-  po = (ac + po) <= r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+            If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+  po = (ac + po) <= r
+     ac = 0
+
    Else
    IsExpA = False: Exit Function
         End If
@@ -3943,16 +3953,21 @@ If FastSymbol(aa$, "(") Then
 ElseIf FastSymbol(aa$, ">=", , 2) Then
 '  good
   MUL = 3
-   
+ 
     
 
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-  po = (ac + po) >= r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+           If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+          If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+  po = (ac + po) >= r
+     ac = 0
+
    Else
    IsExpA = False: Exit Function
         End If
@@ -3990,11 +4005,16 @@ ElseIf FastSymbol(aa$, ">") Then
 
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-  po = (ac + po) > r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+           If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+  po = (ac + po) > r
+     ac = 0
+ 
    Else
    IsExpA = False: Exit Function
         End If
@@ -4015,11 +4035,17 @@ ElseIf FastSymbol(aa$, "<") Then
 
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-  po = (ac + po) < r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+           If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+   
+  po = (ac + po) < r
+     ac = 0
+
    Else
    IsExpA = False: Exit Function
         End If
@@ -4038,6 +4064,14 @@ ElseIf FastSymbol(aa$, "==", , 2) Then
 
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
+        If Not FastSymbol(aa$, ")") Then
+        IsExpA = False: Exit Function
+        End If
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+
     If r = 0 Then
             If ac <> 0 Then po = (ac + po)
             If po = 0 Then
@@ -4065,9 +4099,7 @@ If FastSymbol(aa$, "(") Then
   
   End If
      ac = 0
-        If Not FastSymbol(aa$, ")") Then
-        IsExpA = False: Exit Function
-        End If
+
    Else
    IsExpA = False: Exit Function
         End If
@@ -4094,17 +4126,23 @@ ElseIf FastSymbol(aa$, "=") Then
 '  good
   MUL = 3
  
-   
-    
-
 If FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
-      Set bstack.lastobj = Nothing
-  po = (ac + po) = r
-     ac = 0
-        If Not FastSymbol(aa$, ")") Then
+    '  Set bstack.lastobj = Nothing
+   If Not FastSymbol(aa$, ")") Then
         IsExpA = False: Exit Function
         End If
+        If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
+      
+         
+      
+  po = (ac + po) = r
+     ac = 0
+
+        
    Else
    IsExpA = False: Exit Function
         End If
@@ -4132,6 +4170,13 @@ If logical(bstack, aa$, r, , True) Then
     
  ElseIf FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
+        If Not FastSymbol(aa$, ")") Then
+    IsExpA = False
+    Exit Function
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
     r1 = -r1
     MUL = 1 ' from 3
     If ac = 0 Then
@@ -4145,9 +4190,7 @@ If logical(bstack, aa$, r, , True) Then
     End If
     End If
     po = r
-    If Not FastSymbol(aa$, ")") Then
-    IsExpA = False
-    Exit Function
+
     End If
     End If
   Else
@@ -4175,6 +4218,13 @@ If logical(bstack, aa$, r, , True) Then
     po = r
     ElseIf FastSymbol(aa$, "(") Then
     If IsExp(bstack, aa$, r, , True) Then
+        If Not FastSymbol(aa$, ")") Then
+    IsExpA = False
+    Exit Function
+       If Not rightoperator(bstack, aa$, r) Then
+            IsExpA = False
+            Exit Function
+        End If
     MUL = 1 ' from 3
     If ac = 0 Then
     ac = po
@@ -4187,9 +4237,7 @@ If logical(bstack, aa$, r, , True) Then
     End If
     End If
     po = r
-    If Not FastSymbol(aa$, ")") Then
-    IsExpA = False
-    Exit Function
+
     End If
     End If
 Else
@@ -48170,174 +48218,6 @@ MyDelay = True
 End Function
 Private Function MyMod(r1, po) As Variant
 MyMod = r1 - Fix(r1 / po) * po
-End Function
-Function AddInventory(bstack As basetask, rest$, Optional ret2logical As Boolean = False) As Boolean
-Dim p As Variant, s$, pppp As mArray, lastindex As Long
-If Not bstack.lastobj Is Nothing Then
-If Typename(bstack.lastobj) = "mHandler" Then
-Dim aa As mHandler
-Set aa = bstack.lastobj
-Set bstack.lastobj = Nothing
-If Not aa.objref Is Nothing Then
-If TypeOf aa.objref Is FastCollection Then
-Dim bb As FastCollection
-Set bb = aa.objref
-If bb.StructLen > 0 Then
-MyEr "Structure members are ReadOnly", "Τα μέλη της δομής είναι μόνο για ανάγνωση"
-Exit Function
-End If
-
-Dim ah As String
-FastSymbol rest$, ","
-again:
-AddInventory = True
-ah = aheadstatus(rest$, False) + " "
-If InStr(ah, "l") Then
-If ret2logical Then ret2logical = False: Exit Function
-MyEr "No logical expression", "Όχι λογική έκφραση"
-AddInventory = False
-Else
-If Left$(ah, 1) = "N" Then
-    If Not IsExp(bstack, rest$, p) Then
-        AddInventory = False
-        GoTo there
-    End If
-    If VarType(p) = vbBoolean Then p = CLng(p)
-    If Not bstack.lastobj Is Nothing Then
-        If TypeOf bstack.lastobj Is mHandler Then
-        If bstack.lastobj.t1 = 4 Then
-        Set bstack.lastobj = Nothing
-        GoTo noenum
-        End If
-        End If
-        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
-        AddInventory = False
-        GoTo there
-    End If
-noenum:
-    If bb.ExistKey0(p) Then
-        MyEr "Key exist, must be unique", "Το κλειδί υπάρχει, πρέπει να είναι μοναδικό"
-        AddInventory = False
-        GoTo there
-    End If
-    bb.AddKey p
-ElseIf Left$(ah, 1) = "S" Then
-    If Not IsStrExp(bstack, rest$, s$) Then
-        AddInventory = False
-        GoTo there
-    End If
-    If Not bstack.lastobj Is Nothing Then
-        MyEr "No Object Allowed for Key", "Δεν επιτρέπεται αντικείμενο για κλειδί"
-        AddInventory = False
-        GoTo there
-    End If
-    If bb.ExistKey0(s$) Then
-        MyEr "Key exist, must be unique", "Το κλειδί υπάρχει, πρέπει να είναι μοναδικό"
-        AddInventory = False
-        GoTo there
-    End If
-    bb.AddKey s$
-
-Else
-        MyEr "No Key found", "Δεν βρέθηκε κλειδί"
-        AddInventory = False
-        GoTo there
-
-End If
-lastindex = bb.index
-If FastSymbol(rest$, ":=", , 2) Then
-ah = aheadstatus(rest$, False) + " "
-If Left$(ah, 1) = "N" Or InStr(ah, "l") > 0 Then
-    If Not IsExp(bstack, rest$, p) Then
-        AddInventory = False
-        GoTo there
-    End If
-    bb.index = lastindex
-    If Not bstack.lastobj Is Nothing Then
-    If TypeOf bstack.lastobj Is mArray Then
-        Set pppp = New mArray
-        bstack.lastobj.CopyArray pppp
-        Set bb.ValueObj = pppp
-        Set pppp = Nothing
-        
-    Else
-      Set bb.ValueObj = bstack.lastobj
-    End If
-        Set bstack.lastobj = Nothing
-    Else
-        bb.Value = p
-    End If
-    
-ElseIf Left$(ah, 1) = "S" Then
-    If Not IsStrExp(bstack, rest$, s$) Then
-        AddInventory = False
-        GoTo there
-    End If
-    bb.index = lastindex
-    If Not bstack.lastobj Is Nothing Then
-    If TypeOf bstack.lastobj Is mArray Then
-        Set pppp = New mArray
-        bstack.lastobj.CopyArray pppp
-        Set bb.ValueObj = pppp
-        Set pppp = Nothing
-    Else
-    
-        Set bb.ValueObj = bstack.lastobj
-    End If
-        Set bstack.lastobj = Nothing
-    Else
-        bb.Value = s$
-    End If
-
-Else
-        MyEr "No Data found", "Δεν βρέθηκαν στοιχεία"
-        AddInventory = False
-        GoTo there
-
-End If
-
-
-End If
-
-
-End If
-If FastSymbol(rest$, ",") Then GoTo again
-there:
-Set bb = Nothing
-Set aa = Nothing
-
-Exit Function
-ElseIf TypeOf aa.objref Is mArray Then
-While IsSymbol(rest$, ",")
-If Not IsExp(bstack, rest$, p) Then
-    MyEr "Expected Array", "Περίμενα Πίνακα"
-    Set aa = Nothing
-    Set bstack.lastobj = Nothing
-    Exit Function
-End If
-Dim myobject As Object
-Set myobject = bstack.lastobj
-Set bstack.lastobj = Nothing
-If CheckIsmArray(myobject) Then
-Set pppp = myobject
-pppp.AppendArray aa.objref
-Else
-    MyEr "Expected Array", "Περίμενα Πίνακα"
-    Set aa = Nothing
-    Set bstack.lastobj = Nothing
-    Exit Function
-End If
-Wend
-Set aa = Nothing
-AddInventory = True
-Exit Function
-End If
-End If
-End If
-MyEr "Wrong type of object (not Inventory or pointer to Array)", "Λάθος τύπος αντικειμένου (όχι Κατάσταση ή δείκτης σε Πίνακα)"
-Set aa = Nothing
-End If
-Set bstack.lastobj = Nothing
 End Function
 Function Appfields(basestack As basetask, rest$) As Boolean
 Dim s$, p As Variant
