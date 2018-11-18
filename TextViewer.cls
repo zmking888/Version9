@@ -2515,9 +2515,17 @@ If kind = 0 Then
         If MaybeIsSymbol(a$, "{") Then
             localfeedthis = 0
             If col((UBound(col()) \ 2) * 2) <> 14 Then addone pos2, 14
-           ' FastSymbol a$, "{"
-            'pos2 = k - Len(a$) + 1
-           If pos2 <= k Then ColorizeInnerStatements a$, k, pos2, localfeedthis
+                 localfeedthis = 0
+            FastSymbol a$, "{"
+            pos2 = k - Len(a$) + 1
+            addone pos2 - 1, 14
+           If pos2 <= k Then
+            drop$ = block(a$) + Chr$(13)
+            pos1 = Len(drop$) + 1
+           ColorizeInnerStatements drop$, k, pos2, localfeedthis
+              a$ = Mid$(a$, pos1)
+              drop$ = vbNullString
+           End If
             kind = 0
             drop$ = vbNullString
             If pos2 > k Then Exit Sub

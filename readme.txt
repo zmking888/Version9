@@ -1,10 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 5 active-X
+Version 9.5  Revision 6 active-X
 
-1.Threads Execute for out of order code work fine now
-2. Enum variables can be declared with a value in a group/class from enum type declared in same group/class.
-3. Optimizations for more speed.
+Fix syntax color for lambda with blocks of statements as argument. For any error we can use F11 in editor to remove syntax color (produced on the fly)
 
 From version 9.0 revision 50:
 there is a new ca.crt - install ca.crt as root certificate
