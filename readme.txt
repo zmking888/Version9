@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 8 active-X
+Version 9.5  Revision 9 active-X
 
-Fix precedence for logical operators on numbers
+1. New object Mutex (use Declare M Mutex to define one)
+2. Now By reference we can use Long for calling libraries.
 
 
 

@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 8
+Global Const Revision = 9
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2727,11 +2727,11 @@ bstack.lastobj.t1 = 3
 Set bstack.lastobj.objref = pppp
 GetArr = True
 End Function
-Function IsExp(basestack As basetask, a$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional comp As Boolean = True) As Boolean
+Function IsExp(basestack As basetask, a$, r As Variant, Optional ByVal noand1 As Boolean = True, Optional flatobject As Boolean = False, Optional Comp As Boolean = True) As Boolean
 Dim par As Long
 If LastErNum = -2 Then LastErNum = 0
 If a$ = vbNullString Or a$ = vbCrLf Then Exit Function
-IsExp = IsExpA(basestack, a$, r, par, noand1, comp)
+IsExp = IsExpA(basestack, a$, r, par, noand1, Comp)
 again:
 If par > 0 Then
 If MaybeIsSymbol(a$, ",") Then
@@ -2850,7 +2850,7 @@ Do
         End If
 Loop
 End Function
-Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True, Optional comp As Boolean = True) As Boolean
+Function IsExpA(bstack As basetask, aa$, rr As Variant, parenthesis As Long, Optional ByVal noand As Boolean = True, Optional Comp As Boolean = True) As Boolean
 Dim r As Variant, ac As Variant, po As Variant, MUL As Long, r1 As Variant, ut$
 Dim logic As Boolean, l As Boolean, park As Object, objlist As mStiva, rightlevel As Long
 On Error Resume Next
@@ -3966,7 +3966,7 @@ If logical(bstack, aa$, r) Then
             End If
             
 '**********************************************************************
-ElseIf comp And MaybeIsSymbol(aa$, "<=>") Then
+ElseIf Comp And MaybeIsSymbol(aa$, "<=>") Then
 If FastSymbol(aa$, "=") Then
 '  good
   MUL = 3
@@ -17852,7 +17852,7 @@ contTask:
              If TaskMaster Is Nothing Then Execute = 0: Exit Function
              If TaskMaster.Processing Then TaskMaster.TimerTick
                MyDoEvents0 di
-                 bstack.TaskMain = bstack.Exist(CLng(sp), "_multi") = False
+                 bstack.TaskMain = bstack.exist(CLng(sp), "_multi") = False
                 
                
                
@@ -26797,8 +26797,11 @@ For k = 1 To Up
                                          ' THIS IS NOT GOOD
                                     
                                     Else
+                                        If that.ReadType(k - 1) = 2 Then
+                                         final(k - 1) = CLng(VarPtr(var(x1)) + 8)
+                                        Else
                                              final(k - 1) = var(x1)
-                                             
+                                            End If
                                              ' so if this is a long we place a variant long
                                            ' thisref(k - 1) = x1
                                      End If
@@ -26896,7 +26899,7 @@ For k = 1 To that.count
 If that.IsByRef(k - 1) Then
 ' RESTORE VALUES...
     If that.ReadType(k - 1) < 5 Then
-    var(thisref(k - 1)) = final(k - 1)
+    If that.ReadType(k - 1) <> 2 Then var(thisref(k - 1)) = final(k - 1)
     
     End If
 End If
@@ -34560,30 +34563,7 @@ Dim pppp As mArray, mmmm As mEvent
 ' for these events no use of noHere property because no copyevent/upgrade happens
 '         see .upgrade in UnFloatGroupReWriteVars and UnFloatGroup
 
- If IsLabelSymbolNew(rest$, "ежаялоцг", "APPLICATION", Lang) Then
  If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
-     Set var(i) = Form1
- Else
-    Set mm = New CallBack2
- 
-                     With mm
-                     .NoPublic bstack, ""
-                     
-                    End With
-
-                     Set var(i) = mm
-                     Set mm = Nothing
-    End If
-                        Exit Function
-ElseIf IsLabelSymbolNew(rest$, "тлгла", "MODULE", Lang) Then
-         Set mm = New CallBack2
-                     With mm
-                     .NoPublic bstack, here$
-                    End With
-                     Set var(i) = mm
-                     Set mm = Nothing
-                     Exit Function
-ElseIf IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
                   If IsLabelSymbolNew(rest$, "цецомос", "EVENT", Lang) Then
                   
                              x1 = Abs(IsLabel(bstack, rest$, w$))
@@ -34948,6 +34928,32 @@ ElseIf IsLabelSymbolNew(rest$, "еисацыцг", "TEXTBOX", Lang) Then
     Set var(i) = New Math
     ElseIf IsLabelSymbolNew(rest$, "суккоцг", "COLLECTION", Lang) Then
     Set var(i) = New Collection
+    ElseIf IsLabelSymbolNew(rest$, "ломадийо", "MUTEX", Lang) Then
+    Set var(i) = New Mutex
+    ElseIf IsLabelSymbolNew(rest$, "ежаялоцг", "APPLICATION", Lang) Then
+         If IsLabelSymbolNew(rest$, "жояла", "FORM", Lang) Then
+             Set var(i) = Form1
+         Else
+            Set mm = New CallBack2
+         
+                             With mm
+                             .NoPublic bstack, ""
+                             
+                            End With
+        
+                             Set var(i) = mm
+                             Set mm = Nothing
+            End If
+                        Exit Function
+            ElseIf IsLabelSymbolNew(rest$, "тлгла", "MODULE", Lang) Then
+                     Set mm = New CallBack2
+                                 With mm
+                                 .NoPublic bstack, here$
+                                End With
+                                 Set var(i) = mm
+                                 Set mm = Nothing
+                                 Exit Function
+            Else
     End If
 End Function
 
@@ -37281,7 +37287,7 @@ End If
 ProcPlayer = True
 Exit Function
 End Function
-Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional ByVal what$, Optional usex1 As Long, Optional Exist As Boolean = False) As Boolean
+Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional ByVal what$, Optional usex1 As Long, Optional exist As Boolean = False) As Boolean
 Dim ps As mStiva, bs As basetask, F As Long, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
 Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean
@@ -37507,7 +37513,7 @@ Else
         ElseIf i = -1 Then
                 bstack.SetVar what$, p
         Else
-                If Not Exist Then globalvar what$, p Else Nosuchvariable what$
+                If Not exist Then globalvar what$, p Else Nosuchvariable what$
         End If
         End If
 Case 3
@@ -37536,7 +37542,7 @@ Case 3
         ElseIf i = -1 Then
             bstack.SetVar what$, s$
         Else
-            If Not Exist Then globalvar what$, s$ Else Nosuchvariable what$
+            If Not exist Then globalvar what$, s$ Else Nosuchvariable what$
             
         End If
         Else
@@ -37553,7 +37559,7 @@ Case 4
         ElseIf i = -1 Then
             bstack.SetVar what$, p
         Else
-        If Not Exist Then globalvar what$, MyRound(p) Else Nosuchvariable what$
+        If Not exist Then globalvar what$, MyRound(p) Else Nosuchvariable what$
         End If
     Else
         bstack.soros.drop 1

@@ -307,17 +307,17 @@ Do
   End If
 End Sub
 Public Function Eval(code$) As Variant
-Dim pos As Long, P As Double, s As String, drop$
+Dim pos As Long, p As Double, s As String, drop$
  pos = 1
   drop$ = aheadstatus(code$, True, pos)
   If drop$ = vbNullString And pos > Len(code$) Then Exit Function
   If InStr(drop$, "N") Then
-  If IsExp(objref, Left$(code$, pos), P) Then
+  If IsExp(objref, Left$(code$, pos), p) Then
   If Not objref.lastobj Is Nothing Then
   Set Eval = objref.lastobj
   
   Else
-    Eval = P
+    Eval = p
    End If
   End If
   Else
