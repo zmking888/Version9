@@ -1,11 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 10 active-X
+Version 9.5  Revision 11 active-X
 
-Fix == operator (break in rev 9)
-Fix Over statement (for stack of values)
-Add: Queue:=1,2,3 and List:=1,2,3 as unamed inventories 
-(list use unique keys and has delete, queue use any key and has drop for newer only)
+Fix inventories in static variables.
 
 
 From version 9.0 revision 50:

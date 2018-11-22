@@ -3988,12 +3988,12 @@ UnHook Form1.hWND
 Form1.KeyPreview = True
 Targets = ot
 End Sub
-Private Sub mywait11(bstack As basetask, pp As Double)
+Private Sub mywait11(bstack As basetask, PP As Double)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If pp = 0 Then Exit Sub
+If PP = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -4005,7 +4005,7 @@ Exit Sub
 End If
 End If
 End If
-pp = pp + CDbl(timeGetTime)
+PP = PP + CDbl(timeGetTime)
 
 Do
 
@@ -4029,7 +4029,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -8265,10 +8265,10 @@ End Sub
 Sub NeoLet(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyLet(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
-Function GetArrayReference(bstack As basetask, a$, v$, pp, Result As mArray, index As Long) As Boolean
+Function GetArrayReference(bstack As basetask, a$, v$, PP, Result As mArray, index As Long) As Boolean
 Dim dn As Long, dd As Long, p, w3, w2 As Long, pppp As mArray
-If Not Typename$(pp) = "mArray" Then Exit Function
-Set pppp = pp
+If Not Typename$(PP) = "mArray" Then Exit Function
+Set pppp = PP
 
 If pppp.Arr Then
 dn = 0
@@ -8334,10 +8334,10 @@ p = 0
                         index = w2
     End If
 End Function
-Function ProcessArray(bstack As basetask, a$, v$, pp, Result) As Boolean
+Function ProcessArray(bstack As basetask, a$, v$, PP, Result) As Boolean
 Dim dn As Long, dd As Long, p, w3, w2 As Long, pppp As mArray
-If Not Typename$(pp) = "mArray" Then Exit Function
-Set pppp = pp
+If Not Typename$(PP) = "mArray" Then Exit Function
+Set pppp = PP
 
 If pppp.Arr Then
 dn = 0
