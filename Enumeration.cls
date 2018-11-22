@@ -81,6 +81,7 @@ Next i
 End Function
 Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
 Dim i As Long, mm As mHandler
+ok = False
 For i = 0 To toplim
 If v = PriveSpace(i).iValue Then
 ok = True

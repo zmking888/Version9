@@ -44,7 +44,7 @@ Private Type SAFEArrayPart
 Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
 Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
-
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Byte)
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
   Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
@@ -934,7 +934,7 @@ End If
 End If
 
 End Property
-Public Property Let itemstr(curitem As Long, item As String)
+Public Property Let ItemStr(curitem As Long, item As String)
 
 On Error Resume Next
 If curitem < 0 Then
@@ -1036,7 +1036,7 @@ Set var = aa
 End Sub
 Sub CopyGroupObj(myobject1 As Object, myobject2 As Object, Optional LinkToMe As Boolean = False)
 'Special Copy
- Dim ps As New mStiva, v As Long, S$, frm$, vvl As Variant, x1 As Long, ss$
+ Dim ps As New mStiva, v As Long, s$, frm$, vvl As Variant, x1 As Long, ss$
 Dim subgroup As Object, sub2 As Object, myArray As mArray, mySecondArray As mArray
 
 Dim mygroup2 As New Group
@@ -1122,14 +1122,14 @@ Next j
 GetAnyName$ = ChrW(&H1FFF) + ss$
 End Function
 Function MyIsNumeric(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
+Dim n As Byte
+GetMem1 VarPtr(v), n
 If n < 2 Then Exit Function
 MyIsNumeric = n < 8 Or n = 14
 End Function
 Function MyIsObject(v As Variant) As Boolean
-Dim n As Integer
-GetMem2 VarPtr(v), n
+Dim n As Byte
+GetMem1 VarPtr(v), n
 MyIsObject = n = 9
 End Function
 Function GetCopy() As Variant()

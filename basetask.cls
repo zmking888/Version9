@@ -103,6 +103,37 @@ Public Sub SetVarobJ(ByVal name$, var As Variant)
     If Not StaticCollection.Find(name$) Then StaticCollection.AddKey name$
     Set StaticCollection.ValueObj = var
 End Sub
+Public Sub SetVarobJvalue(ByVal name$, var As Variant)
+    If Not StaticCollection.Find(name$) Then
+    StaticCollection.AddKey name$
+    End If
+    Dim myobject As Object
+    
+    If MyIsObject(var) Then
+      Set StaticCollection.ValueObj = var
+    ElseIf StaticCollection.IsObj Then
+
+    Set myobject = StaticCollection.ValueObj
+    If TypeOf myobject Is Group Then
+        StaticCollection.Value = var
+    ElseIf TypeOf myobject Is mHandler Then
+    If myobject.t1 = 4 Then
+        Dim ok As Boolean
+        Set var = myobject.objref.SearchValue(var, ok)
+        If ok Then
+            Set StaticCollection.ValueObj = var
+        Else
+            ExpectedEnumType
+        End If
+    Else
+        NoNumberAssign
+    End If
+    End If
+    Else
+    StaticCollection.Value = var
+    
+    End If
+End Sub
 
 Function AlterVar(ByVal name$, p As Variant, ss$, inttype As Boolean) As Boolean
 
@@ -118,7 +149,28 @@ If Not StaticCollection.Find(name$) Then Exit Function
                 mm.Compute0 p, ss$
             End If
             Set mm = Nothing
+        ElseIf .ValueObj.t1 = 4 Then
+          Dim myobject As mHandler
+          Set myobject = .ValueObj
+        If ss$ = "++" Then
+                        If myobject.index_start < myobject.objref.count - 1 Then
+                            myobject.index_start = myobject.index_start + 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+        ElseIf ss$ = "--" Then
+                    If myobject.index_start > 0 Then
+                            myobject.index_start = myobject.index_start - 1
+                            myobject.objref.index = myobject.index_start
+                            myobject.index_cursor = myobject.objref.Value
+                        End If
+        ElseIf ss$ = "-!" Then
+                        myobject.sign = -myobject.sign
+                        Else
+                        NoOperatorForThatObject ss$
+        
         End If
+End If
     End If
   Else
   Dim isLong As Boolean
@@ -260,9 +312,11 @@ MyRound = a
 If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
 End Function
 
-Public Function ExistVar(ByVal name$) As Boolean
+Public Function ExistVar(ByVal name$, Optional IsObj As Boolean = False) As Boolean
         ExistVar = StaticCollection.ExistKey(name$)
+        IsObj = StaticCollection.IsObj
 End Function
+
 Public Function ExistVar2(ByVal name$) As Boolean
         If StaticCollection Is Nothing Then Exit Function
         ExistVar2 = StaticCollection.ExistKey(name$)
@@ -275,7 +329,7 @@ Public Sub ReadVar(ByVal name$, var As Variant)
             If .IsObj Then
                     Set var = .ValueObj
                     
-          If Left$(name$, 1) = "%" Then Set .ValueObj = Nothing
+            If Left$(name$, 1) = "%" Then Set .ValueObj = Nothing
             Else
                     var = .Value
             End If
@@ -530,12 +584,12 @@ If Not threadsnames.Find(Threadid) Then threadsnames.AddKey Threadid
 Set threadsnames.ValueObj = aa
 
 End Sub
-Public Function Exist(Threadid As Long, ThreadName As String) As Boolean
+Public Function exist(Threadid As Long, ThreadName As String) As Boolean
 'Dim aa As mThreadref
-If threadsnames Is Nothing Then Exist = False: Exit Function
+If threadsnames Is Nothing Then exist = False: Exit Function
 If threadsnames.Find(Threadid) Then
  With threadsnames.ValueObj
-    Exist = .varname = ThreadName
+    exist = .varname = ThreadName
 End With
 End If
 

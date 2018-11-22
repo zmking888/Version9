@@ -232,6 +232,7 @@ If Not (task Is Nothing) Then
         task.Interval = param
         Case 4
         Set bs = GetNewBaseTask(task)
+        Set bs.Process = task
         If Execute(bs, Exec$, True) = 0 Then
             task.Dispose tmAllTasks
             ThrowOne Mes
@@ -246,6 +247,7 @@ If Not (task Is Nothing) Then
        
         Case 5
         Set bs = GetNewBaseTask(task)
+        Set bs.Process = task
         If Execute(bs, Exec$, False) = 0 Then
             task.Dispose tmAllTasks
             ThrowOne Mes

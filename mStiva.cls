@@ -72,6 +72,7 @@ Dim aa As VarItem, bb As VarItem, mm As Object, mn As mArray, work As Object
 On Error Resume Next
 Set bb = mstack.item(where)
 If bb.ObjectRef Is Nothing Then
+    If bb.slot = 4 Then bb.slot = 5
     Set aa = bb
 Else
     Set work = bb.ObjectRef
@@ -132,6 +133,7 @@ For many = many To 1 Step -1
     If Source.Total >= many Then
         Set bb = Source.StackPickRef2(many)
         If bb.ObjectRef Is Nothing Then
+            If bb.slot = 4 Then bb.slot = 5
             Set aa = bb
         Else
             Set work = bb.ObjectRef
@@ -181,7 +183,6 @@ For many = Source.Total - many1 + 1 To Source.Total
 If Source.Total >= many Then
     Set bb = Source.StackPickRef2(many)
     If bb.ObjectRef Is Nothing Then
-        
         Set aa = bb
     Else
         Set work = bb.ObjectRef

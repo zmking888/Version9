@@ -1493,11 +1493,11 @@ cDIBbuffer1.LoadPictureBlt cDibbuffer0.hDC
 Set cDibbuffer0 = cDIBbuffer1
 Set cDIBbuffer1 = Nothing
 End Sub
-Public Function CmpHeight_pixels(S As Single) As Single
-CmpHeight_pixels = S * 20# / DYP
+Public Function CmpHeight_pixels(s As Single) As Single
+CmpHeight_pixels = s * 20# / DYP
 End Function
-Public Function CmpHeight(S As Single) As Single
-CmpHeight = S * 20#
+Public Function CmpHeight(s As Single) As Single
+CmpHeight = s * 20#
 End Function
 Public Function FindSpriteByTag(sp As Long) As Long
 Dim i As Long
@@ -1570,21 +1570,21 @@ Public Function ScaleRegion(hRgn As Long, Size As Single) As Long
     End If
      DeleteObject hRgn
 End Function
-Function GetNewSpriteObj(Priority As Long, S$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal ROT As Single = 0, Optional bb$ = vbNullString) As Long
+Function GetNewSpriteObj(Priority As Long, s$, tr As Long, rr As Long, Optional ByVal SZ As Single = 1, Optional ByVal ROT As Single = 0, Optional bb$ = vbNullString) As Long
 Dim photo As Object, myRgn As Long, oldobj As Long
 Dim photo2 As Object
  oldobj = FindSpriteByTag(Priority)
  If oldobj Then
 ' this priority...is used
 ' so change only image
-SpriteGetOtherImage oldobj, S$, tr, rr, SZ, ROT, bb$
+SpriteGetOtherImage oldobj, s$, tr, rr, SZ, ROT, bb$
 GetNewSpriteObj = oldobj
 
 Exit Function
 Else
       Set photo = New cDIBSection
         Set photo2 = New cDIBSection
-           If cDib(S$, photo) Then
+           If cDib(s$, photo) Then
  
  If rr >= 0 Then
 
@@ -1792,10 +1792,10 @@ If k = 0 Then Exit Sub  ' there is no such a player
     Next i
 End If
 End Sub
-Private Sub SpriteGetOtherImage(S As Long, b$, tran As Long, rrr As Long, SZ As Single, ROT As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
+Private Sub SpriteGetOtherImage(s As Long, b$, tran As Long, rrr As Long, SZ As Single, ROT As Single, Optional bb$ = vbNullString) ' before take from priority the original sprite
 Dim photo As Object, myRgn As Long
 Dim photo2 As Object
-If S < 1 Or S > PobjNum Then Exit Sub
+If s < 1 Or s > PobjNum Then Exit Sub
 
       Set photo = New cDIBSection
        Set photo2 = New cDIBSection
@@ -1837,14 +1837,14 @@ myRgn = RotateRegion(myRgn, (ROT), photo.Width * SZ, photo.Height * SZ, SZ)
 Dim oldtag As Long
 
 
-With Form1.dSprite(S)
+With Form1.dSprite(s)
 .Height = photo.Height * DYP * SZ
 .Width = photo.Width * DXP * SZ
 .Picture = photo.Picture(SZ)
-.Left = .Left + players(S).x - .Width / 2
-players(S).x = .Width / 2
-.Top = .Top + players(S).y - .Height / 2
-players(S).y = .Height / 2
+.Left = .Left + players(s).x - .Width / 2
+players(s).x = .Width / 2
+.Top = .Top + players(s).y - .Height / 2
+players(s).y = .Height / 2
 Call SetWindowRgn(.hWND, myRgn, True)
 ''''''''''''''''''''''''UpdateWindow .hwnd
  DeleteObject myRgn
@@ -2625,18 +2625,18 @@ Function GetCharSet(codepage As Long)
         GetCharSet = cp.ciCharset
     End If
 End Function
-Sub SwapString2Variant(ByRef S$, ByRef a As Variant)
+Sub SwapString2Variant(ByRef s$, ByRef a As Variant)
    Dim t As Long ' 4 Longs * 4 bytes each = 16 bytes
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
-   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
-Sub MoveStringToVariant(ByRef S$, ByRef a As Variant)
+Sub MoveStringToVariant(ByRef s$, ByRef a As Variant)
    Dim t As Long ' 4 Longs * 4 bytes each = 16 bytes
    a = vbNullString
    CopyMemory ByVal VarPtr(t), ByVal VarPtr(a) + 8, 4
-   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(S$), 4
-   CopyMemory ByVal VarPtr(S$), ByVal VarPtr(t), 4
+   CopyMemory ByVal VarPtr(a) + 8, ByVal VarPtr(s$), 4
+   CopyMemory ByVal VarPtr(s$), ByVal VarPtr(t), 4
 End Sub
 
 Sub testthis()
@@ -3228,14 +3228,14 @@ End Function
 Public Function ScrY() As Long
 ScrY = GetSystemMetrics(SM_CYSCREEN) * dv15
 End Function
-Public Function MyTrimLi(S$, l As Long) As Long
+Public Function MyTrimLi(s$, l As Long) As Long
 Dim i&
 Dim p2 As Long, p1 As Integer, p4 As Long
- If l > Len(S) Then MyTrimLi = Len(S) + 1: Exit Function
+ If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
  If l <= 0 Then MyTrimLi = 1: Exit Function
   l = l - 1
-  i = Len(S)
-  p2 = StrPtr(S) + l * 2:  p4 = p2 + i * 2
+  i = Len(s)
+  p2 = StrPtr(s) + l * 2:  p4 = p2 + i * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
   Select Case p1
@@ -3245,13 +3245,13 @@ Dim p2 As Long, p1 As Integer, p4 As Long
    Exit Function
   End Select
   Next i
- MyTrimLi = Len(S) + 1
+ MyTrimLi = Len(s) + 1
 End Function
-Public Function MyTrimL2(S$) As Long
+Public Function MyTrimL2(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL2 = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL2 = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3264,11 +3264,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimL2 = l + 2
 End Function
-Public Function MyTrimL(S$) As Long
+Public Function MyTrimL(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimL = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimL = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
@@ -3282,11 +3282,11 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimL = l + 2
 End Function
-Public Function MyTrimR(S$) As Long
+Public Function MyTrimR(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then MyTrimR = 1: Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then MyTrimR = 1: Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
   GetMem2 i, p1
@@ -3299,12 +3299,12 @@ Dim p2 As Long, p1 As Integer, p4 As Long
   Next i
  MyTrimR = l + 2
 End Function
-Public Function MyTrim(S$) As String
+Public Function MyTrim(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = Len(S): If l = 0 Then Exit Function
+l = Len(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l * 2
   For i = p4 To p2 Step -2
@@ -3326,15 +3326,15 @@ l = Len(S): If l = 0 Then Exit Function
    Exit For
   End Select
   Next i
-  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(S$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
+  If p2 > p4 Then MyTrim = vbNullString Else MyTrim = Mid$(s$, (p2 - p22) \ 2 + 1, (p4 - p2) \ 2 + 1)
  
 End Function
-Public Function MyTrimB(S$) As String
+Public Function MyTrimB(s$) As String
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long, p22 As Long
-l = LenB(S): If l = 0 Then Exit Function
+l = LenB(s): If l = 0 Then Exit Function
 
-  p2 = StrPtr(S): l = l - 1
+  p2 = StrPtr(s): l = l - 1
   p22 = p2
   p4 = p2 + l
   For i = p4 To p2 Step -1
@@ -3356,14 +3356,14 @@ l = LenB(S): If l = 0 Then Exit Function
    Exit For
   End Select
   Next i
-  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(S$, (p2 - p22) + 1, (p4 - p2) + 1)
+  If p2 > p4 Then MyTrimB = vbNullString Else MyTrimB = MidB$(s$, (p2 - p22) + 1, (p4 - p2) + 1)
  
 End Function
-Public Function excludespace(S$) As Long
+Public Function excludespace(s$) As Long
 Dim i&, l As Long
 Dim p2 As Long, p1 As Integer, p4 As Long
-  l = Len(S): If l = 0 Then Exit Function
-  p2 = StrPtr(S): l = l - 1
+  l = Len(s): If l = 0 Then Exit Function
+  p2 = StrPtr(s): l = l - 1
   p4 = p2 + l * 2
   For i = p2 To p4 Step 2
   GetMem2 i, p1
@@ -3886,7 +3886,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "PLAYSCORE", 64, "паифеижымг", 64, "MOVIE", 65, "MEDIA", 65, "MUSIC", 65, "таимиа", 65, "лоусийг", 65, "DURATION", 66, "диаяйеиа", 66 _
 , "VOLUME", 67, "емтасг", 67, "TAB", 68, "стгкг", 68, "HEIGHT", 69, "уьос", 69, "POS", 70, "хесг", 70, "ROW", 71, "цяаллг", 71, "TIMECOUNT", 72, "жоятос", 72 _
 , "TICK", 73, "тий", 73, "TODAY", 74, "сглеяа", 74, "NOW", 75, "тыяа", 75, "MENU.VISIBLE", 76, "епикоцес.жамеяес", 76, "MENUITEMS", 77, "епикоцес", 77 _
-, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "паяахуяо", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95)
+, "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85, "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "паяахуяо", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95, "LIST", 96, "киста", 96, "QUEUE", 97, "оуяа", 97)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))

@@ -3988,12 +3988,12 @@ UnHook Form1.hWND
 Form1.KeyPreview = True
 Targets = ot
 End Sub
-Private Sub mywait11(bstack As basetask, PP As Double)
+Private Sub mywait11(bstack As basetask, pp As Double)
 Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents
-If PP = 0 Then Exit Sub
+If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
@@ -4005,7 +4005,7 @@ Exit Sub
 End If
 End If
 End If
-PP = PP + CDbl(timeGetTime)
+pp = pp + CDbl(timeGetTime)
 
 Do
 
@@ -4029,7 +4029,7 @@ Exit Do
 End If
 End If
 End If
-Loop Until PP <= CDbl(timeGetTime) Or NOEXECUTION
+Loop Until pp <= CDbl(timeGetTime) Or NOEXECUTION
 
                        If exWnd <> 0 Then
                 MyTitle$ bstack
@@ -7173,6 +7173,9 @@ End Sub
 Public Sub WrongObject()
 MyEr "Wrong object type", "λάθος τύπος αντικειμένου"
 End Sub
+Public Sub NullObject()
+MyEr "object type is Nothing", "O τύπος αντικειμένου είναι Τίποτα"
+End Sub
 Public Sub WrongType()
 MyEr "Wrong type", "λάθος τύπος"
 End Sub
@@ -8262,10 +8265,10 @@ End Sub
 Sub NeoLet(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyLet(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
-Function GetArrayReference(bstack As basetask, a$, v$, PP, Result As mArray, index As Long) As Boolean
+Function GetArrayReference(bstack As basetask, a$, v$, pp, Result As mArray, index As Long) As Boolean
 Dim dn As Long, dd As Long, p, w3, w2 As Long, pppp As mArray
-If Not Typename$(PP) = "mArray" Then Exit Function
-Set pppp = PP
+If Not Typename$(pp) = "mArray" Then Exit Function
+Set pppp = pp
 
 If pppp.Arr Then
 dn = 0
@@ -8331,10 +8334,10 @@ p = 0
                         index = w2
     End If
 End Function
-Function ProcessArray(bstack As basetask, a$, v$, PP, Result) As Boolean
+Function ProcessArray(bstack As basetask, a$, v$, pp, Result) As Boolean
 Dim dn As Long, dd As Long, p, w3, w2 As Long, pppp As mArray
-If Not Typename$(PP) = "mArray" Then Exit Function
-Set pppp = PP
+If Not Typename$(pp) = "mArray" Then Exit Function
+Set pppp = pp
 
 If pppp.Arr Then
 dn = 0
@@ -13682,3 +13685,97 @@ End If
 Set bstack.lastobj = Nothing
 End Function
 
+Function IsEnumAs(bstack As basetask, b$, p) As Boolean
+Dim aaa As mHandler, usehandler As mHandler, ss$, i As Long, that
+If MaybeIsSymbol(b$, ".") Then
+            If IsNumber(bstack, b$, that) Then
+                If bstack.lastobj Is Nothing Then
+                    GoTo aa2
+                Else
+                    If TypeOf bstack.lastobj Is mHandler Then
+                        Set aaa = bstack.lastobj
+                        Set bstack.lastobj = Nothing
+                        GoTo conthere1001
+                    End If
+                End If
+            End If
+            GoTo aa2
+            ElseIf IsLabelOnly(b$, ss$) = 1 Then
+           
+            If GetVar(bstack, myUcase(ss$), i) Then
+            If MyIsObject(var(i)) Then
+                If TypeOf var(i) Is mHandler Then
+                    Set aaa = var(i)
+conthere1001:
+                    If aaa.t1 = 4 And aaa.IamEnum = False Then
+                        Set usehandler = New mHandler
+                        usehandler.t1 = 4
+                        Set usehandler.objref = aaa.objref
+                        usehandler.index_start = 0
+                        usehandler.index_cursor = aaa.objref.ZeroValue
+                        usehandler.sign = 1
+                        Set p = usehandler
+                        
+                        If FastSymbol(b$, "=") Then
+                            If MaybeIsSymbol(b$, ".") Then
+                                If IsNumber(bstack, b$, that) Then
+                                    If Not bstack.lastobj Is Nothing Then
+                                        If TypeOf bstack.lastobj Is mHandler Then
+                                            Set aaa = bstack.lastobj
+                                            Set bstack.lastobj = Nothing
+                                            GoTo conthere1002
+                                        End If
+                                    End If
+                                End If
+                                GoTo aa2
+                            ElseIf IsLabelOnly(b$, ss$) = 1 Then
+                                If GetVar(bstack, myUcase(ss$), i) Then
+                                    If TypeOf var(i) Is mHandler Then
+                                        Set aaa = var(i)
+conthere1002:
+                                        If aaa.t1 = 4 Then
+                                            If aaa.objref.EnumName = usehandler.objref.EnumName Then
+                                                usehandler.index_start = aaa.index_start
+                                                usehandler.index_cursor = aaa.index_cursor
+                                                usehandler.sign = 1
+                                            Else
+                                                GoTo aa2
+                                            End If
+                                        Else
+                                            GoTo aa2
+                                        End If
+                                    Else
+                                        GoTo aa2
+                                    End If
+                                Else
+                                    GoTo aa2
+                                End If
+                            Else
+                                GoTo aa2
+                            End If
+                        End If
+                       
+                        IsEnumAs = True
+                        End If
+                    End If
+                End If
+            
+            End If
+            Else
+aa2:
+                ExpectedEnumType
+                End If
+End Function
+Function NewInventory(bstack As basetask, rest$, r, Queue As Boolean) As Boolean
+            Dim serr As Boolean
+            If Not FastSymbol(rest$, ":=", True, 2) Then Exit Function
+                    MakeitObjectInventory r, Queue
+                       If Queue Then r.objref.AllowAnyKey
+                            Set bstack.lastobj = r
+                        If AddInventory(bstack, rest$, serr) Then
+                        Set bstack.lastobj = r
+                        r = 0
+                        NewInventory = True
+                        End If
+     
+End Function

@@ -1,10 +1,11 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 9 active-X
+Version 9.5  Revision 10 active-X
 
-1. New object Mutex (use Declare M Mutex to define one)
-2. Now By reference we can use Long for calling libraries.
-
+Fix == operator (break in rev 9)
+Fix Over statement (for stack of values)
+Add: Queue:=1,2,3 and List:=1,2,3 as unamed inventories 
+(list use unique keys and has delete, queue use any key and has drop for newer only)
 
 
 From version 9.0 revision 50:
