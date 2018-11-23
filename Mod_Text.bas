@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 11
+Global Const Revision = 12
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -37913,7 +37913,14 @@ checkconstant:
                         End Select
                     Else
                         If TypeOf var(i) Is Group Then
-                            If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then MyRead = False: MissType: Exit Function
+                            If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then
+                            If var(i).IamApointer And Not Fast2Varl(rest$, "деийтгс", 7, "POINTER", 7, 7, F) Then
+                                    MyRead = False: MissType: Exit Function
+                            End If
+                            Else
+                                    MyRead = False: MissType: Exit Function
+                            
+                            End If
                         ElseIf TypeOf var(i) Is mHandler Then
                             If TypeOf var(i).objref Is mArray Then
                                 If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, F) Then MyRead = False: MissType: Exit Function
@@ -38301,8 +38308,24 @@ contwrong:
                     Set var(i) = myobject
                     End If
                     If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 2, F) Then
+                    
                     IsLabelOnly rest$, s$  ' just throw
                     ' no second time
+                    If Not myobject Is Nothing Then
+                    If TypeOf myobject Is mHandler Then
+                        Set usehandler = myobject
+                        If usehandler.t1 = 1 Then
+                        s$ = myUcase(s$)
+                        If Not Fast2Varl(s$, "йатастасг", 9, "INVENTORY", 9, 9, 0) Then
+                        If usehandler.objref.IsQueue Then
+                            If Not Fast2Varl(s$, "оуяа", 4, "QUEUE", 5, 5, 0) Then GoTo contwrong
+                        Else
+                            If Not Fast2Varl(s$, "киста", 5, "LIST", 4, 5, 0) Then GoTo contwrong
+                        End If
+                        End If
+                        End If
+                    End If
+                    End If
                     
                     End If
                 ElseIf x1 = 1 And CheckIsmArray(myobject) Then
@@ -38321,10 +38344,62 @@ contwrong:
                 
         Else
         If i = -1 Then
+        F = 0
         If TypeOf myobject Is mHandler Then
+        If Fast2Varl(rest$, "ыс", 2, "AS", 2, 2, F) Then
+                If myobject.t1 = 1 Then
+                    If Not Fast2Varl(rest$, "йатастасг", 9, "INVENTORY", 9, 9, F) Then
+                         If Not Fast2Varl(rest$, "киста", 5, "LIST", 4, 5, F) Then
+                            If Not Fast2Varl(rest$, "оуяа", 4, "QUEUE", 5, 5, F) Then
+                                WrongObject
+                                MyRead = False
+                                Exit Function
+                            ElseIf Not myobject.objref.IsQueue Then
+                                WrongObject
+                                MyRead = False
+                                Exit Function
+                            End If
+                        ElseIf myobject.objref.IsQueue Then
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                        End If
+                    End If
+                ElseIf myobject.t1 = 2 Then
+                    If Not Fast2Varl(rest$, "диаяхяысг", 9, "BUFFER", 6, 9, F) Then
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                    End If
+                ElseIf myobject.t1 = 3 Then
+                    If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, F) Then
+                    If Not Fast2Varl(rest$, "сыяос", 7, "STACK", 5, 7, F) Then
+                    
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                    End If
+                    End If
+                    
+                ElseIf myobject.t1 = 4 Then
+                    If Not FastType(rest$, myobject.objref.EnumName) Then
+                    
+                        p = myobject.index_cursor
+                        Set myobject = Nothing
+                        GoTo conthereEnum
+                    End If
+                End If
+        End If
         bstack.SetVarobJ what$, myobject
         GoTo loopcont123
         ElseIf TypeOf myobject Is Group Then
+        If Fast2Varl(rest$, "ыс", 2, "AS", 2, 2, F) Then
+            If Fast2Varl(rest$, "деийтгс", 7, "POINTER", 7, 7, F) Then GoTo checkpointer
+            WrongObject
+            MyRead = False
+            Exit Function
+        End If
+checkpointer:
         If myobject.IamApointer Then
         If myobject.link.IamFloatGroup Then
             bstack.SetVarobJ what$, myobject
@@ -38427,7 +38502,7 @@ contpointer:
                 Set var(i) = MakeitObjectGeneric(myobject.indirect)
                 Else
                 If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 2, F) Then
-                If Not Fast2Varl(rest$, "деийтгс", 7, "POINTER", 7, 7, F) Then
+      
                 If myobject.t1 = 1 Then
                     If Not Fast2Varl(rest$, "йатастасг", 9, "INVENTORY", 9, 9, F) Then
                          If Not Fast2Varl(rest$, "киста", 5, "LIST", 4, 5, F) Then
@@ -38469,7 +38544,6 @@ contpointer:
                         Set myobject = Nothing
                         GoTo conthereEnum
                     End If
-                End If
                 End If
                 End If
                 Set var(i) = myobject
@@ -38672,13 +38746,21 @@ Else
                 End If
                 p = CCur(p)
             Else
-            If Not flag2 And GetVar3(bstack, what$, i, , , flag, , , isAglobal, True) Then
+            If Not flag2 And GetVar3(bstack, what$, i, , , flag, , , isAglobal, True, ok) Then
                 If isAglobal Then
                 GoTo nofound
              Else
              
                     If TypeOf var(i) Is Group Then
-                            If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then MyRead = False: MissType: Exit Function
+                            If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then
+                            If var(i).IamApointer Then
+                            If Not Fast2Varl(rest$, "деийтгс", 7, "POINTER", 7, 7, F) Then
+                             MyRead = False: MissType: Exit Function
+                            End If
+                            Else
+                            MyRead = False: MissType: Exit Function
+                            End If
+                            End If
                         ElseIf TypeOf var(i) Is mHandler Then
                             If TypeOf var(i).objref Is mArray Then
                                 If Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, F) Then MyRead = False: MissType: Exit Function
@@ -38725,8 +38807,56 @@ Else
              End If
             
             Else
-             
-                    If Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then
+                    If i = -1 Then
+                    IsLabelOnly rest$, s$
+                    bstack.ReadVar what$, p
+                    Set myobject = p
+                    F = 0
+                    If Not Fast2Varl(s$, "деийтгс", 7, "POINTER", 7, 7, F) Then
+                If myobject.t1 = 1 Then
+                    If Not Fast2Varl(s$, "йатастасг", 9, "INVENTORY", 9, 9, F) Then
+                         If Not Fast2Varl(s$, "киста", 5, "LIST", 4, 5, F) Then
+                            If Not Fast2Varl(s$, "оуяа", 4, "QUEUE", 5, 5, F) Then
+                                WrongObject
+                                MyRead = False
+                                Exit Function
+                            ElseIf Not myobject.objref.IsQueue Then
+                                WrongObject
+                                MyRead = False
+                                Exit Function
+                            End If
+                        ElseIf myobject.objref.IsQueue Then
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                        End If
+                    End If
+                ElseIf myobject.t1 = 2 Then
+                    If Not Fast2Varl(s$, "диаяхяысг", 9, "BUFFER", 6, 9, F) Then
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                    End If
+                ElseIf myobject.t1 = 3 Then
+                    If Not Fast2Varl(s$, "пимайас", 7, "ARRAY", 5, 7, F) Then
+                    If Not Fast2Varl(s$, "сыяос", 7, "STACK", 5, 7, F) Then
+                    
+                            WrongObject
+                            MyRead = False
+                            Exit Function
+                    End If
+                    End If
+                    End If
+                ElseIf myobject.t1 = 4 Then
+                    If Not FastType(s$, myobject.objref.EnumName) Then
+                    
+                        p = myobject.index_cursor
+                        Set myobject = Nothing
+                        GoTo conthereEnum
+                    End If
+                End If
+                    GoTo loopcont123
+                    ElseIf Not Fast2Varl(rest$, "олада", 5, "GROUP", 5, 5, F) Then
                     ElseIf Not Fast2Varl(rest$, "пимайас", 7, "ARRAY", 5, 7, F) Then
                     ElseIf Not Fast2Varl(rest$, "йатастасг", 9, "INVENTORY", 9, 9, F) Then
                     ElseIf Not Fast2Varl(rest$, "диаяхяысг", 9, "BUFFER", 6, 9, F) Then

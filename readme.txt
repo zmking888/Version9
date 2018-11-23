@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 11 active-X
+Version 9.5  Revision 12 active-X
 
-Fix inventories in static variables.
+Improvements for declaring types in functions/modules/subs and static variables.
 
 
 From version 9.0 revision 50:
