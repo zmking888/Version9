@@ -12644,6 +12644,8 @@ Mid$(a$, 1, cut) = Space$(cut)
 Set bstack.lastobj = Nothing
 
 Loop
+Else
+WrongObject
 End If
 End Function
 Function getone(bstack As basetask, rest$) As Boolean

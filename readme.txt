@@ -1,8 +1,8 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 12 active-X
+Version 9.5  Revision 13 active-X
 
-Improvements for declaring types in functions/modules/subs and static variables.
+x=(1,2,3,4) : Print x#max()-x#min()   now is ok
 
 
 From version 9.0 revision 50:

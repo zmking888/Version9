@@ -80,7 +80,7 @@ Public TestShowCode As Boolean, TestShowSub As String, TestShowStart As Long, Wa
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 9
 Global Const VerMinor = 5
-Global Const Revision = 12
+Global Const Revision = 13
 Private Const doc = "Document"
 Public UserCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5065,25 +5065,25 @@ foundprivate:
             Else
                 Set usehandler = var(VR)
                 If Not usehandler.UseIterator Then
-                    If flatobject Then
-                        If usehandler.t1 = 4 Then
-                            r = usehandler.index_cursor
-                            If SG < 0 Then r = -r
-                        Else
-                            r = 0
-                        End If
-                    Else
-                        Set nbstack = Nothing ' ???
+
+                        Set nbstack = Nothing  ' ???
                         If FastSymbol(a$, "#") Then
+                            If Not usehandler.t1 = 3 Then WrongObject: Exit Function
                             IsNumber = Matrix(bstack, a$, usehandler, r)
-                            
                             If SG < 0 Then r = -r
-                            
+                            If flatobject Then Set bstack.lastobj = Nothing
+                        ElseIf flatobject Then
+                            If usehandler.t1 = 4 Then
+                                r = usehandler.index_cursor
+                                If SG < 0 Then r = -r
+                            Else
+                                r = 0
+                            End If
                         Else
-                        CopyHandler var(VR), bstack
-                        r = 0
+                                CopyHandler var(VR), bstack
+                                r = 0
                         End If
-                    End If
+                    
                 ElseIf FastSymbol(a$, "^") Then
     
                             r = var(VR).index_cursor
