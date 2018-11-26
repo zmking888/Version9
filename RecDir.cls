@@ -42,11 +42,11 @@ dwReserved1 As Long
 cFileName(MAX_PATH * 2 - 1) As Byte
 cAlternate(14 * 2 - 1) As Byte
 End Type
-Private Declare Function CompareString Lib "KERNEL32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
+Private Declare Function CompareString Lib "Kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 
-Private Declare Function FindFirstFile Lib "KERNEL32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindFirstFile Lib "Kernel32" Alias "FindFirstFileW" (ByVal lpFileName As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 
-Private Declare Function FindNextFile Lib "KERNEL32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
+Private Declare Function FindNextFile Lib "Kernel32" Alias "FindNextFileW" (ByVal hFindFile As Long, lpFindFileData As WIN32_FIND_DATA) As Long
 Private Declare Function FindClose Lib "kernel32.dll" (ByVal hFindFile As Long) As Long
 
 Dim myfile$(), myLevel() As Integer
@@ -63,24 +63,24 @@ Private mTopFolder As String
 Dim InUseItems As Long
 Public LevelStop As Long
 
-Private Declare Function GetDiskFreeSpace Lib "KERNEL32" _
+Private Declare Function GetDiskFreeSpace Lib "Kernel32" _
  Alias "GetDiskFreeSpaceA" (ByVal lpRootPathName As String, _
  lpSectorsPerCluster As Long, lpBytesPerSector As Long, _
  lpNumberOfFreeClusters As Long, lpTtoalNumberOfClusters As Long) _
  As Long
-Private Declare Function GetLogicalDriveStrings Lib "KERNEL32" _
+Private Declare Function GetLogicalDriveStrings Lib "Kernel32" _
   Alias "GetLogicalDriveStringsW" _
   (ByVal nBufferLength As Long, ByVal lpBuffer As Long) As Long
 
-Private Declare Function GetLongPathName Lib "KERNEL32" _
+Private Declare Function GetLongPathName Lib "Kernel32" _
    Alias "GetLongPathNameW" _
   (ByVal lpszShortPath As Long, _
    ByVal lpszLongPath As Long, _
    ByVal cchBuffer As Long) As Long
 Public lastTimeStamp As Date
 Public lastTimeStamp2 As Date
-Private Declare Function FileTimeToSystemTime Lib "KERNEL32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
-Private Declare Function FileTimeToLocalFileTime Lib "KERNEL32" (lpFileTime As FILETIME, lpLocalFileTime As FILETIME) As Long
+Private Declare Function FileTimeToSystemTime Lib "Kernel32" (lpFileTime As FILETIME, lpSystemTime As SYSTEMTIME) As Long
+Private Declare Function FileTimeToLocalFileTime Lib "Kernel32" (lpFileTime As FILETIME, lpLocalFileTime As FILETIME) As Long
 Public UseUTC As Boolean
 Private Function FileTimeToDate(File_Time As FILETIME) As Date
 Dim System_Time As SYSTEMTIME
@@ -101,20 +101,10 @@ End Function
  
 Private Function SystemTimeToDate(System_Time As SYSTEMTIME) As Date
     
-    '
-    ' Convert a SYSTEMTIME into a Date.
-    '
      With System_Time
      SystemTimeToDate = DateSerial(.wYear, .wMonth, .wDay) + _
                    TimeSerial(.wHour, .wMinute, .wSecond)
     End With
-      ' SystemTimeToDate = CDate( _
-            Format$(.wMonth) & "/" & _
-            Format$(.wDay) & "/" & _
-            Format$(.wYear) & " " & _
-            Format$(.wHour) & ":" & _
-            Format$(.wMinute, "00") & ":" & _
-            Format$(.wSecond, "00"))
    
     
 End Function

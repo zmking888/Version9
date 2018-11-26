@@ -1,8 +1,9 @@
 M2000 Interpreter and Environment
 
-Version 9.5  Revision 13 active-X
+Version 9.5  Revision 14 active-X
 
-x=(1,2,3,4) : Print x#max()-x#min()   now is ok
+Add encoder/decoder for URI, and  URL parser see Help String$(
+Fix also expression evaluator (break from Rev. 13)
 
 
 From version 9.0 revision 50:

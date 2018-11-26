@@ -1653,7 +1653,7 @@ st = DXP
 MinDispl = (TextWidth(dd, "A") \ 2) \ st
 If MinDispl <= 1 Then MinDispl = 3
 MinDispl = st * MinDispl
-INTD = TextWidth(dd, Space$(Len(wh$) - Len(NLtrim$(wh$))))
+INTD = TextWidth(dd, space$(Len(wh$) - Len(NLtrim$(wh$))))
 dd.CurrentX = dd.CurrentX + INTD
 
 wi = wi - INTD
@@ -1670,7 +1670,7 @@ MyPrintNew dd, mb.uMineLineSpace, wh$, Not nocr, fake
     'dd.Print wh$
 Else
  If Len(whNoSpace$) > 0 Then
-   whSpace$ = Space$(Len(Trim$(wh$)) - Len(whNoSpace$))
+   whSpace$ = space$(Len(Trim$(wh$)) - Len(whNoSpace$))
    
         Displ = st * ((wi - TextWidth(dd, whNoSpace)) \ (Len(whSpace)) \ st)
         some = (wi - TextWidth(dd, whNoSpace) - Len(whSpace) * Displ) \ st  ' ((Displ - MinDispl) * Len(whSpace)) \ st
@@ -1716,7 +1716,7 @@ Dim whNoSpace$, Displ As Long, DisplLeft As Long, i As Long, whSpace$, INTD As L
 MinDispl = (TextWidth(dd, "A") \ 2) \ DXP
 If MinDispl <= 1 Then MinDispl = 3
 MinDispl = DXP * MinDispl
-If whr = 3 Or whr = 0 Then INTD = TextWidth(dd, Space$(Len(wh$) - Len(NLtrim$(wh$))))
+If whr = 3 Or whr = 0 Then INTD = TextWidth(dd, space$(Len(wh$) - Len(NLtrim$(wh$))))
 dd.CurrentX = dd.CurrentX + INTD
 wi = wi - INTD
 wh$ = NLtrim$(wh$)
@@ -1736,7 +1736,7 @@ If whNoSpace$ = wh$ Then
  MyPrintNew dd, mb.uMineLineSpace, wh$, Not nocr, fake
 Else
  If Len(whNoSpace$) > 0 Then
-   whSpace$ = Space$(Len(Trim$(wh$)) - Len(whNoSpace$))
+   whSpace$ = space$(Len(Trim$(wh$)) - Len(whNoSpace$))
    INTD = TextWidth(dd, whSpace$) + dd.CurrentX
    
    wh$ = Trim$(wh$)
@@ -1893,7 +1893,7 @@ spcc = (Len(buf$ & b$) - Len(ReplaceStr(" ", "", Trim$(buf$ & b$))))
 
 kkl = spcc * OverDispl
 hstr$ = ReplaceStr(" ", "", buf$ & b$)
-help1 = TextWidth(ddd, Space(INTD) + hstr$)
+help1 = TextWidth(ddd, space(INTD) + hstr$)
 kk& = (help1 + help2) < (w2 - kkl)
     If kk& Then '- 15 * Len(buf$) Then
         buf$ = buf$ & b$
@@ -6027,13 +6027,13 @@ utf16conthere:
           If BLen >= 4 Then
             ReDim b(0 To BLen - 4): Get FNr, 4, b 'read the Bytes
             WChars = MultiByteToWideChar(65001, 0, b(0), BLen - 3, 0, 0)
-            ReadUnicodeOrANSI = Space$(WChars)
+            ReadUnicodeOrANSI = space$(WChars)
             MultiByteToWideChar 65001, 0, b(0), BLen - 3, StrPtr(ReadUnicodeOrANSI), WChars
           End If
         Else 'not an UTF8-BOM, so read the whole Text as ANSI
         feedback = 3
         
-          ReadUnicodeOrANSI = StrConv(Space$(BLen), vbFromUnicode)
+          ReadUnicodeOrANSI = StrConv(space$(BLen), vbFromUnicode)
           Get FNr, 1, ReadUnicodeOrANSI
         End If
         
@@ -6054,7 +6054,7 @@ utf16conthere:
       nobom = -1
         ReDim b(0 To BLen - 1): Get FNr, 1, b
             WChars = MultiByteToWideChar(65001, 0, b(0), BLen, 0, 0)
-            ReadUnicodeOrANSI = Space$(WChars)
+            ReadUnicodeOrANSI = space$(WChars)
             MultiByteToWideChar 65001, 0, b(0), BLen, StrPtr(ReadUnicodeOrANSI), WChars
         Else
         notok = True
@@ -6076,9 +6076,9 @@ utf16conthere:
         If notok Then
         ReDim b(0 To BLen - 1): Get FNr, 1, b
         If BLen Mod 2 = 1 Then
-        ReadUnicodeOrANSI = StrConv(Space$(BLen), vbFromUnicode)
+        ReadUnicodeOrANSI = StrConv(space$(BLen), vbFromUnicode)
         Else
-        ReadUnicodeOrANSI = Space$(BLen \ 2)
+        ReadUnicodeOrANSI = space$(BLen \ 2)
         End If
          CopyMemory ByVal StrPtr(ReadUnicodeOrANSI), b(0), BLen
          
@@ -7347,7 +7347,7 @@ For i = 1 To Len(RHS)
                     Case Is < " ", DEL To H9F
                         ch = "\u" & Right$("000" & Hex$(AscW(ch)), 4)
                 End Select
-                If cursor + Len(ch) > Len(StringToEscapeStr) Then StringToEscapeStr = StringToEscapeStr + Space$(500)
+                If cursor + Len(ch) > Len(StringToEscapeStr) Then StringToEscapeStr = StringToEscapeStr + space$(500)
                 Mid$(StringToEscapeStr, cursor, Len(ch)) = ch
                 cursor = cursor + Len(ch) - 1
 Next
@@ -7376,7 +7376,7 @@ Dim i As Long, cursor As Long, ch As String
                     Case "u":      ch = ParseHexChar(RHS, cursor, Len(RHS))
                 End Select
         End Select
-                If i + Len(ch) > Len(EscapeStrToString) Then EscapeStrToString = EscapeStrToString + Space$(500)
+                If i + Len(ch) > Len(EscapeStrToString) Then EscapeStrToString = EscapeStrToString + space$(500)
                 Mid$(EscapeStrToString, i, Len(ch)) = ch
                 i = i + Len(ch) - 1
     Next
@@ -7686,7 +7686,16 @@ End Function
 Public Function LONGNAME(Spath As String) As String
 LONGNAME = ExtractPath(Spath, , True)
 End Function
-
+Public Function ExpEnvirStr(strInput) As String
+Dim Result As Long
+Dim strOutput As String
+'' Two calls required, one to get expansion buffer length first then do expansion
+strOutput = space$(1000)
+Result = ExpandEnvironmentStrings(StrPtr(strInput), StrPtr(strOutput), Result)
+strOutput = space$(Result)
+Result = ExpandEnvironmentStrings(StrPtr(strInput), StrPtr(strOutput), Result)
+ExpEnvirStr = StripTerminator(strOutput)
+End Function
 
 Public Function ExtractPath(ByVal F$, Optional Slash As Boolean = True, Optional existonly As Boolean = False) As String
 If F$ = vbNullString Then Exit Function
@@ -8582,7 +8591,7 @@ i = MyTrimLi(a$, i)
 If i > j Then i = 1 ' no spaces
 If j - i < cl - 1 Then Exit Function
 If InStr(c$, Mid$(a$, i, cl)) > 0 Then
-If Remove Then Mid$(a$, i, cl) = Space$(cl)
+If Remove Then Mid$(a$, i, cl) = space$(cl)
 FastOperator = True
 End If
 End Function
@@ -8644,10 +8653,10 @@ i = InStr(i, a$, vbLf)
 If i = 0 Then a$ = vbNullString Else a$ = Mid$(a$, i + 1): GoTo again
 Case 13
 ' drop one line
-Mid$(a$, 1, i + 1) = Space$(i + 1)
+Mid$(a$, 1, i + 1) = space$(i + 1)
 GoTo again
 Case Else
-If i > 1 Then Mid$(a$, 1, i - 1) = Space$(i - 1)
+If i > 1 Then Mid$(a$, 1, i - 1) = space$(i - 1)
 End Select
 
 
@@ -10112,7 +10121,7 @@ BLen = LenB(a$)
             ReDim b(0 To BLen - 1)
             CopyMemory b(0), ByVal StrPtr(a$), BLen
             WChars = MultiByteToWideChar(65001, 0, b(0), (BLen), 0, 0)
-            utf8decode = Space$(WChars)
+            utf8decode = space$(WChars)
             MultiByteToWideChar 65001, 0, b(0), (BLen), StrPtr(utf8decode), WChars
 End Function
 Sub test(a$)
@@ -10410,9 +10419,9 @@ AGAIN0:
            pl3 = val(Mid$(final$, pl2 + Len(pat1$)) + "}")
            If pl3 <> 0 Then
         If pl3 > 0 Then
-            pd$ = Left$(q$ + Space$(pl3), pl3)
+            pd$ = Left$(q$ + space$(pl3), pl3)
             Else
-            pd$ = Right$(Space$(Abs(pl3)) + q$, Abs(pl3))
+            pd$ = Right$(space$(Abs(pl3)) + q$, Abs(pl3))
             End If
       End If
             final$ = Replace$(final$, Mid$(final$, pl2, pl1 - pl2 + 1), pd$)
@@ -10475,9 +10484,9 @@ again1:
    
       If pl3 <> 0 Then
         If pl3 > 0 Then
-            pd$ = Left$(pd$ + Space$(pl3), pl3)
+            pd$ = Left$(pd$ + space$(pl3), pl3)
             Else
-            pd$ = Right$(Space$(Abs(pl3)) + pd$, Abs(pl3))
+            pd$ = Right$(space$(Abs(pl3)) + pd$, Abs(pl3))
             End If
       End If
             final$ = Replace$(final$, Mid$(final$, pl2, pl1 - pl2 + 1), pd$)
@@ -10548,7 +10557,7 @@ If MaybeIsSymbol2(rest$, "#", F) Then
    If Mid$(rest$, F + 1, 6) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
    
    Else
-  Mid$(rest$, 1, F) = Space$(F)
+  Mid$(rest$, 1, F) = space$(F)
         If IsExp(basestack, rest$, p, , True) Then
         If p < 0 Then
         If p < -1 Then
@@ -10596,17 +10605,17 @@ If InStr("BOUP", UCase(Left$(s$, 1))) > 0 Then
 
 Select Case UCase(s$)
         Case "BACK"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 4
         Case "OVER"
         F = 1
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         Case "UNDER"
         F = 2
-         Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+         Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         Case "PART"
         F = 3
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         Case Else
         ''rest$ = s$ + rest$
         F = 0
@@ -10622,16 +10631,16 @@ If Len(s$) > 2 Then
 If InStr("ΦΠΥΜ", myUcase(Left$(s$, 1))) > 0 Then
         Select Case myUcase(s$, True)
         Case "ΦΟΝΤΟ"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 4
         Case "ΠΑΝΩ"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 1
         Case "ΥΠΟ"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 2
         Case "ΜΕΡΟΣ"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 3
         Case Else
         F = 0
@@ -10647,16 +10656,16 @@ If Len(s$) > 2 Then
 If InStr("BOUPΦΠΥΜ", myUcase(Left$(s$, 1))) > 0 Then
 Select Case myUcase(s$)
         Case "ΦΟΝΤΟ", "BACK"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 4
         Case "ΠΑΝΩ", "OVER"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 1
         Case "ΥΠΟ", "UNDER"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 2
         Case "ΜΕΡΟΣ", "PART"
-        Mid$(rest$, 1, ls - Len(ss$)) = Space$(ls - Len(ss$))
+        Mid$(rest$, 1, ls - Len(ss$)) = space$(ls - Len(ss$))
         F = 3
         Case Else
         F = 0
@@ -11335,15 +11344,15 @@ contboolean2:
             Case 0
             
                           
-                       PlainBaSket Scr, prive, Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + s$, w4, w4, , clearline
+                       PlainBaSket Scr, prive, space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + s$, w4, w4, , clearline
                        
             Case 3
-                        PlainBaSket Scr, prive, Right$(Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + Left$(s$, .Column + 1), .Column + 1), w4, w4, , clearline
+                        PlainBaSket Scr, prive, Right$(space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)) + Left$(s$, .Column + 1), .Column + 1), w4, w4, , clearline
             Case 2
                         If RealLen(s$) > .Column + 1 Then s$ = "????"
-                        PlainBaSket Scr, prive, Left$(Space$((.Column + 1 - RealLen(s$)) \ 2) + Left$(s$, .Column + 1) & Space$(.Column), .Column + 1), w4, w4, , clearline
+                        PlainBaSket Scr, prive, Left$(space$((.Column + 1 - RealLen(s$)) \ 2) + Left$(s$, .Column + 1) & space$(.Column), .Column + 1), w4, w4, , clearline
             Case 1
-                        PlainBaSket Scr, prive, Left$(s$ & Space$(.Column), .Column + 1), w4, w4, , clearline
+                        PlainBaSket Scr, prive, Left$(s$ & space$(.Column), .Column + 1), w4, w4, , clearline
             Case 5
                         x1 = .curpos
                         y1 = .currow
@@ -11495,19 +11504,19 @@ End If
                            '' GetXY scr, X1, y1
                           ''  If s$ = VbNullString Then s$ = " "
                           dlen = RealLen(s$)
-                          PlainBaSket Scr, prive, Left$(s$ & Space$(Len(s$) - dlen + .Column - (dlen - 1) Mod (.Column + 1)), .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
+                          PlainBaSket Scr, prive, Left$(s$ & space$(Len(s$) - dlen + .Column - (dlen - 1) Mod (.Column + 1)), .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
                 Case 2
                             dlen = RealLen(s$)
                             If dlen > (.Column + 1 + Len(s$) - dlen) Then s$ = Left$(s$, .Column + 1 + Len(s$) - dlen):  dlen = RealLen(s$)
                             
-                            PlainBaSket Scr, prive, Left$(Space$((.Column + 1 + Len(s$) - dlen - dlen) \ 2) + s$ & Space$(.Column), .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
+                            PlainBaSket Scr, prive, Left$(space$((.Column + 1 + Len(s$) - dlen - dlen) \ 2) + s$ & space$(.Column), .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
                 Case 3
                             dlen = RealLen(s$)
-                            PlainBaSket Scr, prive, Right$(Space$(.Column + Len(s$) - dlen - (dlen - 1) Mod (.Column + 1)) & s$, .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
+                            PlainBaSket Scr, prive, Right$(space$(.Column + Len(s$) - dlen - (dlen - 1) Mod (.Column + 1)) & s$, .Column + 1 + Len(s$) - dlen), w4, w4, , clearline
                 Case 0
                            '' If s$ = VbNullString Then s$ = " "
                         
-                            PlainBaSket Scr, prive, s$ + Space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)), w4, w4, , clearline
+                            PlainBaSket Scr, prive, s$ + space$(.Column - (RealLen(s$) - 1) Mod (.Column + 1)), w4, w4, , clearline
                        
                 Case 4
                             
@@ -11963,8 +11972,8 @@ Function ProcEnumGroup(bstack As basetask, rest$, Optional glob As Boolean = Fal
 End Function
 Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) As Boolean
 
-    Dim s$, w1$, v As Long, enumvalue As Long, myenum As Enumeration, mh As mHandler, v1 As Long
-    enumvalue = 0
+    Dim s$, w1$, v As Long, enumvalue As Variant, myenum As Enumeration, mh As mHandler, v1 As Long
+    enumvalue = 0#
     If IsLabelOnly(rest$, w1$) = 1 Then
        ' w1$ = myUcase$(w1$)
         v = globalvar(w1$, v, , glob)
@@ -11982,6 +11991,9 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
         If FastSymbol(s$, vbCrLf, , 2) Then
         While FastSymbol(s$, vbCrLf, , 2)
         Wend
+        ElseIf MaybeIsSymbol(s$, "\'") Then
+        
+        SetNextLine s$
         ElseIf IsLabelOnly(s$, w1$) = 1 Then
             'w1 = myUcase(w1$)
             If FastSymbol(s$, "=") Then
@@ -11989,7 +12001,11 @@ Function ProcEnum(bstack As basetask, rest$, Optional glob As Boolean = False) A
                 If Not bstack.lastobj Is Nothing Then
                     MyEr "No Object allowed as enumeration value", "Δεν επιτρέπεται αντικείμενο για τιμή απαριθμητή"
                     Exit Function
-                    End If
+                   End If
+            Else
+                    MyEr "No String allowed as enumeration value", "Δεν επιτρέπεται αλφαριθμητικό για τιμή απαριθμητή"
+                    Exit Function
+            Exit Function
                 End If
             Else
                     enumvalue = enumvalue + 1
@@ -12180,7 +12196,7 @@ Pad$ = myUcase(Left$(a$, 20))  ' 20??
 cut = InStr(Pad$, "(")
 
 If cut <= 1 Then Exit Function
-Mid$(a$, 1, cut) = Space$(cut)
+Mid$(a$, 1, cut) = space$(cut)
 Set usehandler = anything
 If TypeOf usehandler.objref Is mArray Then
 Set pppp = usehandler.objref
@@ -12371,7 +12387,7 @@ If FastSymbol(a$, ",") Then
     Else
         w2 = 1
         aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = Space$(w2)
+        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
     End If
 End If
 Matrix = True
@@ -12425,7 +12441,7 @@ If FastSymbol(a$, ",") Then
     Else
         w2 = 1
         aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = Space$(w2)
+        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
     End If
 End If
 Matrix = True
@@ -12632,7 +12648,7 @@ If pppp.count = 0 Then
         Do
         w2 = 1
         aheadstatus a$, , w2
-        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = Space$(w2)
+        If w2 > 1 Then Mid$(a$, 1, w2 - 1) = space$(w2)
         If Not FastSymbol(a$, ")") Then Matrix = False: Exit Function
         Loop Until Not IsOperator(a$, "#")
 Exit Function
@@ -12640,7 +12656,7 @@ End If
 Pad$ = myUcase(Left$(a$, 20))
 cut = InStr(Pad$, "(")
 If cut <= 1 Then Exit Do
-Mid$(a$, 1, cut) = Space$(cut)
+Mid$(a$, 1, cut) = space$(cut)
 Set bstack.lastobj = Nothing
 
 Loop
@@ -12659,7 +12675,7 @@ FastSymbol rest$, "&"
                     ss$ = BlockParam(rest$)
                     what$ = what$ + ss$ + ")"
                     'rest$ = Mid$(rest$, Len(ss$) + 2)
-                    Mid$(rest$, 1, Len(ss$) + 1) = Space(Len(ss$) + 1)
+                    Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
                     Do While IsSymbol(rest$, ".")
                     x1 = IsLabel(bstack, rest$, ss$)
                     If x1 > 0 Then what$ = what$ + "." + ss$ Else Exit Do
@@ -12667,7 +12683,7 @@ FastSymbol rest$, "&"
                             ss$ = BlockParam(rest$)
                             what$ = what$ + ss$ + ")"
                             'rest$ = Mid$(rest$, Len(ss$) + 2)
-                            Mid$(rest$, 1, Len(ss$) + 1) = Space(Len(ss$) + 1)
+                            Mid$(rest$, 1, Len(ss$) + 1) = space(Len(ss$) + 1)
                             End If
                     Loop
             End If
@@ -13780,4 +13796,124 @@ Function NewInventory(bstack As basetask, rest$, r, Queue As Boolean) As Boolean
                         NewInventory = True
                         End If
      
+End Function
+Function IsCdate(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim PP As Variant, par As Boolean, r2 As Variant, r3 As Variant, r4 As Variant
+   If IsExp(bstack, a$, r, , True) Then
+    PP = Abs(r) - Fix(Abs(r))
+    r = Abs(r Mod 2958466)
+    par = True
+    If FastSymbol(a$, ",") Then
+    par = IsExp(bstack, a$, r2, , True)
+    If FastSymbol(a$, ",") Then
+    par = IsExp(bstack, a$, r3, , True) And par
+    If FastSymbol(a$, ",") Then
+    par = IsExp(bstack, a$, r4, , True) And par
+    
+    End If
+    End If
+    End If
+    
+    If Not par Then
+     MissParam a$
+     Exit Function
+                End If
+                On Error Resume Next
+     r = CDbl(DateSerial(Year(r) + r2, Month(r) + r3, Day(r) + r4) + PP)
+     If SG < 0 Then r = -r
+              If Err.Number > 0 Then
+    WrongArgument a$
+    Err.Clear
+    Exit Function
+    End If
+    On Error GoTo 0
+ IsCdate = FastSymbol(a$, ")", True)
+   Else
+   
+     MissParam a$
+    
+    End If
+    
+End Function
+Function IsTimeVal(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+Dim s$
+    If IsStrExp(bstack, a$, s$) Then
+    On Error Resume Next
+    If s$ = "UTC" Then
+    r = CDbl(GetUTCTime)
+    r = r - Int(r)
+    Else
+    r = CDbl(CDate(TimeValue(s$)))
+    End If
+    If SG < 0 Then r = -r
+         If Err.Number > 0 Then
+    
+    WrongArgument a$
+    Err.Clear
+    Exit Function
+    End If
+        On Error GoTo 0
+    
+    
+    Else
+     Dim usehandler As mHandler
+     Set usehandler = New mHandler
+     usehandler.t1 = 1
+     usehandler.ReadOnly = True
+     Set usehandler.objref = zones
+        Set bstack.lastobj = usehandler
+     r = r - r
+    End If
+IsTimeVal = FastSymbol(a$, ")", True)
+End Function
+Function IsDataVal(bstack As basetask, a$, r As Variant, SG As Variant) As Boolean
+ Dim s$, p
+    If IsStrExp(bstack, a$, s$) Then
+    If FastSymbol(a$, ",") Then
+    If Not IsExp(bstack, a$, p) Then
+        p = cLid
+    End If
+    On Error Resume Next
+    r = CDbl(DateFromString(s$, p))
+    If SG < 0 Then r = -r
+     If Err.Number > 0 Then
+    
+    WrongArgument a$
+    Err.Clear
+    Exit Function
+    End If
+    Else
+    On Error Resume Next
+    If s$ = "UTC" Then
+    r = CDbl(Int(GetUTCDate))
+    Else
+    r = CDbl(DateValue(s$))
+    End If
+    If SG < 0 Then r = -r
+     If Err.Number > 0 Then
+    
+    WrongArgument a$
+    Err.Clear
+    Exit Function
+    End If
+    End If
+    On Error GoTo 0
+    
+    IsDataVal = FastSymbol(a$, ")", True)
+      Else
+     
+                MissParam a$
+    End If
+
+End Function
+Function IsSymbolNoSpace(a$, c$, Optional l As Long = 1) As Boolean
+' not for greek identifiers. see isStr1()
+    Dim j As Long
+    j = Len(a$)
+    If j = 0 Then Exit Function
+    If UCase(Mid$(a$, 1, l)) = c$ Then
+        a$ = NLtrim$(Mid$(a$, l + 1))
+        
+        IsSymbolNoSpace = True
+    End If
 End Function

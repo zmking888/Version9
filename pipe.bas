@@ -175,14 +175,150 @@ Public Enum FOFACTION
     FOF_WANTMAPPINGHANDLE = &H20
     FOF_WANTNUKEWARNING = &H4000
 End Enum
-   
-   
+Private Type SYSTEMTIME
+   wYear         As Integer
+   wMonth        As Integer
+   wDayOfWeek    As Integer
+   wDay          As Integer
+   wHour         As Integer
+   wMinute       As Integer
+   wSecond       As Integer
+   wMilliseconds As Integer
+End Type
+
+Private Type TIME_ZONE_INFORMATION
+   Bias As Long
+   StandardName As String * 64
+   StandardDate As SYSTEMTIME
+   StandardBias As Long
+   DaylightName As String * 64
+   DaylightDate As SYSTEMTIME
+   DaylightBias As Long
+End Type
+Private Declare Function getTimeFormat Lib "KERNEL32" Alias "GetTimeFormatW" ( _
+    ByVal Locale As Long, _
+    ByVal dwFlags As Long, _
+    ByRef lpTime As SYSTEMTIME, _
+    ByVal lpFormat As Long, _
+    ByVal lpTimeStr As Long, _
+    ByVal cchTime As Long _
+) As Long
+Private Declare Function GetDateFormat Lib "KERNEL32" Alias "GetDateFormatW" ( _
+    ByVal Locale As Long, _
+    ByVal dwFlags As Long, _
+    ByRef lpDate As SYSTEMTIME, _
+    ByVal lpFormat As Long, _
+    ByVal lpDateStr As Long, _
+    ByVal cchDate As Long _
+) As Long
+Private Declare Function VarDateFromStr Lib "OleAut32.dll" ( _
+    ByVal psDateIn As Long, _
+    ByVal lcid As Long, _
+    ByVal uwFlags As Long, _
+    ByRef dtOut As Date) As Long
+Private Const S_OK = 0
+Private Const DISP_E_BADVARTYPE = &H80020008
+Private Const DISP_E_OVERFLOW = &H8002000A
+Private Const DISP_E_TYPEMISMATCH = &H80020005
+Private Const E_INVALIDARG = &H80070057
+Private Const E_OUTOFMEMORY = &H8007000E
+Private Declare Function VariantTimeToSystemTime Lib "OleAut32.dll" ( _
+    ByVal vtime As Date, _
+    ByRef lpSystemTime As SYSTEMTIME _
+) As Long
+Private Declare Function GetTimeZoneInformation Lib "kernel32.dll" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
+  
 Private Declare Function CreateDirectory Lib "KERNEL32" Alias "CreateDirectoryW" (ByVal lpszPath As Long, ByVal lpSA As Long) As Long
 Private Declare Sub CopyMemory Lib "KERNEL32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 Private EncbTrans(63) As Byte, EnclPowers8(255) As Long, EnclPowers16(255) As Long
 Dim lPowers18(63) As Long, bTrans(255) As Byte, lPowers6(63) As Long, lPowers12(63) As Long
+Public Function DateFromString(ByVal sDateIn As String, ByVal lcid As Long) As Date
+
+    Dim HRESULT As Long
+    Dim dtOut As Date
+
+    ' Do not want user's own settings to override the standard formatting settings
+    ' if they are using the same locale that we are converting from.
+    '
+    Const LOCALE_NOUSEROVERRIDE = &H80000000
+
+    ' Do the conversion
+    HRESULT = VarDateFromStr(StrPtr(sDateIn), lcid, LOCALE_NOUSEROVERRIDE, dtOut)
+
+    Select Case HRESULT
+
+        Case S_OK:
+            DateFromString = dtOut
+        Case Else
+            MyEr "Can't convert to date", "δεν μπορώ να το μετατρέψω σε ημερομηνία"
+    End Select
+
+End Function
+Public Function FormatTimeWithLocale(ByRef the_sFormat As String, the_datTime As Date, ByVal the_nLocale As Long) As String
+
+    Dim uSystemTime As SYSTEMTIME
+    Dim nBufferSize As Long
+
+
+    If VariantTimeToSystemTime(the_datTime, uSystemTime) = 1 Then
+        nBufferSize = getTimeFormat(the_nLocale, 0&, uSystemTime, StrPtr(the_sFormat), 0&, 0&)
+        If nBufferSize > 0 Then
+            FormatTimeWithLocale = Space$(nBufferSize - 1)
+            getTimeFormat the_nLocale, 0&, uSystemTime, StrPtr(the_sFormat), StrPtr(FormatTimeWithLocale), nBufferSize
+        End If
+
+    End If
+
+End Function
+
+Public Function FormatDateWithLocale(ByRef the_sFormat As String, the_datDate As Date, ByVal the_nLocale As Long) As String
+
+    Dim uSystemTime As SYSTEMTIME
+    Dim nBufferSize As Long
+
+    'https://stackoverflow.com/questions/11530790/force-date-to-us-format-regardless-of-locale-settings
+    If VariantTimeToSystemTime(the_datDate, uSystemTime) = 1 Then
+        nBufferSize = GetDateFormat(the_nLocale, 0&, uSystemTime, StrPtr(the_sFormat), 0&, 0&)
+        If nBufferSize > 0 Then
+            FormatDateWithLocale = Space$(nBufferSize - 1)
+            GetDateFormat the_nLocale, 0&, uSystemTime, StrPtr(the_sFormat), StrPtr(FormatDateWithLocale), nBufferSize
+        End If
+
+    End If
+
+End Function
+Public Function GetTimeZoneInfo() As String
+
+Dim TZI As TIME_ZONE_INFORMATION ' receives information on the time zone
+Dim retval As Long ' return value
+Dim c As Long ' counter variable needed to display time zone name
+
+    retval = GetTimeZoneInformation(TZI) ' read information on the computer's selected time zone
+     If zones.ExistKey(Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")) Then
+     ' do nothing. now zone$ has set the index field to standard name.
+     End If
+    If retval = 2 Then
+    GetTimeZoneInfo = Replace(StrConv(TZI.DaylightName, vbFromUnicode), Chr(0), "")
+    Else
+    GetTimeZoneInfo = Replace(StrConv(TZI.StandardName, vbFromUnicode), Chr(0), "")
+    End If
     
+End Function
+Public Function GetUTCDate() As Date
+    Dim tzTime As TIME_ZONE_INFORMATION
+    Dim lngUTCTime As Long
+     
+    lngUTCTime = GetTimeZoneInformation(tzTime)
+    GetUTCDate = DateAdd("n", tzTime.Bias, Now)
+End Function
+Public Function GetUTCTime() As Date
+    Dim tzTime As TIME_ZONE_INFORMATION
+    Dim lngUTCTime As Long
+     
+    lngUTCTime = GetTimeZoneInformation(tzTime)
+    GetUTCTime = DateAdd("n", tzTime.Bias, Now)
+End Function
 Public Sub SetUp64()
     Dim lTemp As Long
     For lTemp = 0 To 63                                 'Fill the translation table.
@@ -241,18 +377,22 @@ Else
 PurifyPath = ExtractPath(Join(a$, "\") & "\", False)
 End If
 End Function
-Function PurifyName(sStr As String) As String
-Const noValidcharList = "\<>:/|"
-Dim a$, i As Long, ddt As Boolean
+Public Function PurifyName(sStr As String) As String
+Dim noValidcharList
+noValidcharList = "*?\<>:/|" + Chr$(34)
+Dim a$, i As Long, ddt As Boolean, j As Long
 If Len(sStr) > 0 Then
+a$ = Space$(Len(sStr))
+j = 1
 For i = 1 To Len(sStr)
 If InStr(noValidcharList, Mid$(sStr, i, 1)) = 0 Then
-a$ = a$ & Mid$(sStr, i, 1)
+Mid$(a$, j, 1) = Mid$(sStr, i, 1)
 Else
-a$ = a$ & "-"
+Mid$(a$, j, 1) = "-"
 End If
-
+j = j + 1
 Next i
+a$ = Left$(a$, j - 1)
 End If
 PurifyName = a$
 End Function

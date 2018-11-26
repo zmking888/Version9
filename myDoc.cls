@@ -53,7 +53,7 @@ Private words$, unique As Long
 Private p3 As Long
 Dim mlcid As Long
 Dim sortmlcid As Long
-Private pos() As Long, SLen() As Long, hit() As Long
+Private pos() As Long, slen() As Long, hit() As Long
 Dim Buffer() As Byte, bufOffset As Long, bufsize As Long, SeekBuf As Long
 Public busy As Boolean
 Private mSortstyle As VbCompareMethod
@@ -639,14 +639,14 @@ Public Function textFormat(ByVal linebreak2use$) As String
 Dim mlines As Long, NeoData As String
  Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
-textFormat = Space$(500)
+textFormat = space$(500)
 Do While mycur <> 0
     If thiscur <> 0 Then NeoData = linebreak2use$ Else thiscur = 1
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
 l = Len(NeoData)
-If Len(textFormat) < thiscur + l Then textFormat = textFormat + Space$((thiscur + l) + 100)
+If Len(textFormat) < thiscur + l Then textFormat = textFormat + space$((thiscur + l) + 100)
 Mid$(textFormat, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -658,14 +658,14 @@ Private Function textArray(ByVal linebreak2use$, mycur As Long, minimumbytes2exi
 Dim mlines As Long, NeoData As String
  Dim thiscur, l As Long, textbuf As String
 If minimumbytes2exit < 500 Then minimumbytes2exit = 500
-textbuf = Space$(500)
+textbuf = space$(500)
 Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
     If thiscur <> 0 Then NeoData = linebreak2use$ Else thiscur = 1
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
 l = Len(NeoData)
-If Len(textbuf) < thiscur + l Then textbuf = textbuf + Space$((thiscur + l) + 100)
+If Len(textbuf) < thiscur + l Then textbuf = textbuf + space$((thiscur + l) + 100)
 Mid$(textbuf, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -677,14 +677,14 @@ Private Function textString(ByVal linebreak2use$, mycur As Long, minimumbytes2ex
 Dim mlines As Long, NeoData As String
  Dim thiscur, l As Long, textbuf As String
 If minimumbytes2exit < 500 Then minimumbytes2exit = 500
-textbuf = Space$(500)
+textbuf = space$(500)
 Do While mycur <> 0 And Not Len(textbuf) > minimumbytes2exit
     If thiscur <> 0 Then NeoData = linebreak2use$ Else thiscur = 1
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
 l = Len(NeoData)
-If Len(textbuf) < thiscur + l Then textbuf = textbuf + Space$((thiscur + l) + 100)
+If Len(textbuf) < thiscur + l Then textbuf = textbuf + space$((thiscur + l) + 100)
 Mid$(textbuf, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -696,14 +696,14 @@ Attribute textDoc.VB_UserMemId = 0
 Dim mlines As Long, NeoData As String
  Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
-textDoc = Space$(500)
+textDoc = space$(500)
 Do While mycur <> 0
     If thiscur <> 0 Then NeoData = vbCrLf Else thiscur = 1
     For mlines = 1 To para(mycur).lines
         NeoData = NeoData + para(mycur).content(mlines)
     Next mlines
 l = Len(NeoData)
-If Len(textDoc) < thiscur + l Then textDoc = textDoc + Space$((thiscur + l) + 100)
+If Len(textDoc) < thiscur + l Then textDoc = textDoc + space$((thiscur + l) + 100)
 Mid$(textDoc, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -718,7 +718,7 @@ Dim mlines As Long, NeoData As String
  Dim mycur As Long, thiscur, l As Long, a$, i As Long, mColor() As Variant, qu$
  qu$ = """"
 mycur = DocParaNext(0)
-textHtmlDoc = Space$(500)
+textHtmlDoc = space$(500)
 Do While mycur <> 0
     NeoData = vbNullString
     For mlines = 1 To para(mycur).lines
@@ -788,7 +788,7 @@ If thiscur <> 0 Then NeoData = "<br>" + a$ Else thiscur = 1: NeoData = a$
 
 End If
 l = Len(NeoData)
-If Len(textHtmlDoc) < thiscur + l Then textHtmlDoc = textHtmlDoc + Space$((thiscur + l) + 100)
+If Len(textHtmlDoc) < thiscur + l Then textHtmlDoc = textHtmlDoc + space$((thiscur + l) + 100)
 Mid$(textHtmlDoc, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -803,13 +803,13 @@ Property Get textDoc1LINE() As String  ' MORE SPEED IF WE KNOW THAT WE DON'T USE
 Dim mlines As Long, NeoData As String
  Dim mycur As Long, thiscur, l As Long
 mycur = DocParaNext(0)
-textDoc1LINE = Space$(1000)
+textDoc1LINE = space$(1000)
 Do While mycur <> 0
     If thiscur <> 0 Then NeoData = vbCrLf Else thiscur = 1
         NeoData = NeoData + para(mycur).content(1)
    
 l = Len(NeoData)
-If Len(textDoc1LINE) < thiscur + l Then textDoc1LINE = textDoc1LINE + Space$((thiscur + l) + 100)
+If Len(textDoc1LINE) < thiscur + l Then textDoc1LINE = textDoc1LINE + space$((thiscur + l) + 100)
 Mid$(textDoc1LINE, thiscur, l) = NeoData
 thiscur = thiscur + l
 mycur = DocParaNext(mycur)
@@ -824,7 +824,7 @@ Private Sub InsertLine(b$, ParaNum, cur)
         NeoData = NeoData + para(ParaNum).content(mlines)
     Next mlines
 
-If Len(b$) < cur + Len(NeoData) Then b$ = b$ + Space$(Len(b$) * 2)
+If Len(b$) < cur + Len(NeoData) Then b$ = b$ + space$(Len(b$) * 2)
 Mid$(b$, cur, Len(NeoData)) = NeoData
 cur = cur + Len(NeoData)
 End Sub
@@ -855,11 +855,11 @@ Dim i As Long, k As Long, j As Long, ii As Long
         t_text = vbNullString
         For ii = k To j
         If Len(t(ii)) = 0 Then
-        t_text = t_text + Space(tabwidth)
+        t_text = t_text + space(tabwidth)
         ElseIf Len(t_text) Mod tabwidth = 0 Then
         t_text = t_text + t(ii)
         Else
-            t_text = t_text + Space(tabwidth - (Len(t_text) Mod tabwidth)) + t(ii)
+            t_text = t_text + space(tabwidth - (Len(t_text) Mod tabwidth)) + t(ii)
             End If
         Next ii
       
@@ -1435,21 +1435,14 @@ Property Let TextParagraphOrder(ByVal order As Long, data$)
     Loop
 End Property
 Property Get TextParagraph(ByVal ParaNum As Long) As String
-If InvalidPara(ParaNum) Then Exit Property
-    Dim mlines As Long, NeoData As String
+    If InvalidPara(ParaNum) Then Exit Property
     If ParaNum = 0 Then TextParagraph = vbNullString: Exit Property
-    For mlines = 1 To para(ParaNum).lines
-        NeoData = NeoData + para(ParaNum).content(mlines)
-    Next mlines
-    TextParagraph = NeoData
+    TextParagraph = Join(para(ParaNum).content, "")
+     
 End Property
 Property Get TextParagraphKey(ByVal ParaNum As Long) As String
-    Dim mlines As Long, NeoData As String
     If ParaNum = 0 Then TextParagraphKey = vbNullString: Exit Property
-    For mlines = 1 To para(ParaNum).lines
-        NeoData = NeoData + para(ParaNum).content(mlines)
-    Next mlines
-    TextParagraphKey = Mid$(NeoData, mKeystart)
+    TextParagraphKey = Mid$(Join(para(ParaNum).content, ""), mKeystart)
 End Property
 
 Property Let TextParagraph(ByVal ParaNum As Long, data$)
@@ -2350,7 +2343,7 @@ utf8cont:
         GoTo utf16
     End Select
     Dim cc$
-    cc$ = Space$(30)
+    cc$ = space$(30)
     LSet cc$ = buf()
 lbt = 0
 If mlcid < 4 Then mlcid = Module1.cLid
@@ -2491,14 +2484,14 @@ If l = 1 Then
 CountWords2 = -(Trim(a$) <> "")
 Top = CountWords2
 If Top > 0 Then
-ReDim pos(1 To 1) As Long, SLen(1 To 1) As Long, hit(1 To 1) As Long
+ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 pos(1) = StrPtr(a$)
-SLen(1) = 1
+slen(1) = 1
 End If
 Else
 Dim p5 As Long
 p5 = 512 '' L \ 32 + 1
-ReDim pos(1 To p5) As Long, SLen(1 To p5) As Long, hit(1 To p5) As Long
+ReDim pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
 Dim i As Long, k As Long
 Dim p2 As Long, p4 As Long, p6 As Long, bb As Integer
 p2 = StrPtr(a$)
@@ -2525,7 +2518,7 @@ there1:
                 md = (mtop - mda + 1) \ 2
                 p6 = mda + md
                 Do While md > 0
-                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, pos(p6), SLen(p6))
+                    Select Case CompareString(uLCID, NORM_IGNORECASE, p2, k, pos(p6), slen(p6))
                         Case 1
                             mtop = mtop - md
                             md = (mtop - mda + 1) \ 2
@@ -2541,19 +2534,19 @@ there1:
                 If md = 0 Then
                 If Top = p5 Then
                 p5 = p5 * 2
-                ReDim Preserve pos(1 To p5) As Long, SLen(1 To p5) As Long, hit(1 To p5) As Long
+                ReDim Preserve pos(1 To p5) As Long, slen(1 To p5) As Long, hit(1 To p5) As Long
                 End If
                     Top = Top + 1
                     
                     If mda = Top - 1 Then
                         pos(Top) = p2
-                        SLen(Top) = k
+                        slen(Top) = k
                     Else
                         CopyMemory ByVal VarPtr(pos(1)) + mda * 4 + 4, ByVal VarPtr(pos(1)) + mda * 4, (Top - mda - 1) * 4
-                        CopyMemory ByVal VarPtr(SLen(1)) + mda * 4 + 4, ByVal VarPtr(SLen(1)) + mda * 4, (Top - mda - 1) * 4
+                        CopyMemory ByVal VarPtr(slen(1)) + mda * 4 + 4, ByVal VarPtr(slen(1)) + mda * 4, (Top - mda - 1) * 4
                         CopyMemory ByVal VarPtr(hit(1)) + mda * 4 + 4, ByVal VarPtr(hit(1)) + mda * 4, (Top - mda - 1) * 4
                         pos(mda + 1) = p2
-                        SLen(mda + 1) = k
+                        slen(mda + 1) = k
                         hit(mda + 1) = 0
                     End If
                 End If
@@ -2566,7 +2559,7 @@ CountWords2 = Top
 End If
 End Function
 Private Function MakeString(copythat As Long, ByVal lSize As Long) As String
-MakeString = Space$(lSize)
+MakeString = space$(lSize)
 CopyMemory ByVal StrPtr(MakeString), ByVal copythat, lSize * 2
 End Function
 Function ExportWords(Optional usenumbers As Boolean = True) As String()
@@ -2578,7 +2571,7 @@ Else
 ReDim a(1 To unique)
 Dim i As Long
 For i = 1 To unique
-a(i) = MakeString(pos(i), SLen(i)) & " (" & CStr(hit(i) + 1) & ")"
+a(i) = MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 ExportWords = a()
 End If
@@ -2596,11 +2589,11 @@ Exit Sub
 Else
 If usenumbers Then
 For i = 1 To unique
-ThisObject.additem MakeString(pos(i), SLen(i)) & " (" & CStr(hit(i) + 1) & ")"
+ThisObject.additem MakeString(pos(i), slen(i)) & " (" & CStr(hit(i) + 1) & ")"
 Next i
 Else
 For i = 1 To unique
-ThisObject.additem MakeString(pos(i), SLen(i))
+ThisObject.additem MakeString(pos(i), slen(i))
 Next i
 
 End If
@@ -2610,7 +2603,7 @@ End Sub
 Public Sub ResetWords()
 words$ = vbNullString
 p3 = 0
-ReDim pos(1 To 1) As Long, SLen(1 To 1) As Long, hit(1 To 1) As Long
+ReDim pos(1 To 1) As Long, slen(1 To 1) As Long, hit(1 To 1) As Long
 unique = 0
 End Sub
 Public Sub QuickSortString(Arr() As String, ByVal LB As Long, ByVal UB As Long)
@@ -2779,7 +2772,7 @@ notryother:
 Loop
 If st > 0 Then
             WChars = MultiByteToWideChar(65001, 0, shortbuf(1), st, 0, 0)
-            getUniStringLineUtF8 = Space$(WChars)
+            getUniStringLineUtF8 = space$(WChars)
             MultiByteToWideChar 65001, 0, shortbuf(1), st, StrPtr(getUniStringLineUtF8), WChars
 
 End If
